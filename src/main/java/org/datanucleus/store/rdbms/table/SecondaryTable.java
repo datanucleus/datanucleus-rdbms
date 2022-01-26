@@ -99,6 +99,7 @@ public class SecondaryTable extends AbstractClassTable implements SecondaryDatas
      * Pre initilize. For things that must be initialized right after constructor 
      * @param clr the ClassLoaderResolver
      */
+    @Override
     public void preInitialize(final ClassLoaderResolver clr)
     {
         assertIsUninitialized();
@@ -116,6 +117,7 @@ public class SecondaryTable extends AbstractClassTable implements SecondaryDatas
      * are added via the addFieldMapping() method.
      * @param clr The ClassLoaderResolver
      */
+    @Override
     public void initialize(ClassLoaderResolver clr)
     {
         assertIsUninitialized();
@@ -136,6 +138,7 @@ public class SecondaryTable extends AbstractClassTable implements SecondaryDatas
      * Post initilize. For things that must be set after all classes have been initialized before 
      * @param clr the ClassLoaderResolver
      */
+    @Override
     public void postInitialize(final ClassLoaderResolver clr)
     {
         assertIsInitialized();
@@ -145,6 +148,7 @@ public class SecondaryTable extends AbstractClassTable implements SecondaryDatas
      * Method to initialise the primary key of this table.
      * @see org.datanucleus.store.rdbms.table.AbstractClassTable#initializePK(ClassLoaderResolver)
      */
+    @Override
     protected void initializePK(ClassLoaderResolver clr)
     {
         assertIsPKUninitialized();
@@ -417,6 +421,7 @@ public class SecondaryTable extends AbstractClassTable implements SecondaryDatas
      * Provide the mappings to the consumer for all primary-key fields mapped to this table (for application identity).
      * @param consumer Consumer for the mappings
      */
+    @Override
     public void providePrimaryKeyMappings(MappingConsumer consumer)
     {
         consumer.preConsumeMapping(highestMemberNumber + 1);
@@ -446,6 +451,7 @@ public class SecondaryTable extends AbstractClassTable implements SecondaryDatas
         }
     }
 
+    @Override
     public void provideExternalMappings(MappingConsumer consumer, MappingType mappingType)
     {
     }
@@ -454,6 +460,7 @@ public class SecondaryTable extends AbstractClassTable implements SecondaryDatas
      * Method to provide all unmapped columns to the consumer.
      * @param consumer Consumer of information
      */
+    @Override
     public void provideUnmappedColumns(MappingConsumer consumer)
     {
     }

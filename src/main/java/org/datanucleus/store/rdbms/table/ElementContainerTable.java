@@ -106,6 +106,7 @@ public abstract class ElementContainerTable extends JoinTable
      * Method to initialise the table definition. Adds the owner mapping.
      * @param clr The ClassLoaderResolver
      */
+    @Override
     public void initialize(ClassLoaderResolver clr)
     {
         assertIsUninitialized();
@@ -338,7 +339,8 @@ public abstract class ElementContainerTable extends JoinTable
      * @param clr The ClassLoaderResolver
      * @return The expected foreign keys.
      */
-    public List getExpectedForeignKeys(ClassLoaderResolver clr)
+    @Override
+    public List<ForeignKey> getExpectedForeignKeys(ClassLoaderResolver clr)
     {
         assertIsInitialized();
 
@@ -349,7 +351,7 @@ public abstract class ElementContainerTable extends JoinTable
             autoMode = true;
         }
 
-        ArrayList foreignKeys = new ArrayList();
+        List<ForeignKey> foreignKeys = new ArrayList();
         try
         {
             // FK from join table to owner table
@@ -452,7 +454,8 @@ public abstract class ElementContainerTable extends JoinTable
      * @param clr The ClassLoaderResolver
      * @return The indices
      */
-    protected Set getExpectedIndices(ClassLoaderResolver clr)
+    @Override
+    protected Set<Index> getExpectedIndices(ClassLoaderResolver clr)
     {
         assertIsInitialized();
 
@@ -550,10 +553,11 @@ public abstract class ElementContainerTable extends JoinTable
      * Accessor for the candidate keys for this table.
      * @return The indices
      */
-    protected List getExpectedCandidateKeys()
+    @Override
+    protected List<CandidateKey> getExpectedCandidateKeys()
     {
         // The indices required by foreign keys (BaseTable)
-        List candidateKeys = super.getExpectedCandidateKeys();
+        List<CandidateKey> candidateKeys = super.getExpectedCandidateKeys();
 
         if (elementMapping instanceof EmbeddedElementPCMapping)
         {

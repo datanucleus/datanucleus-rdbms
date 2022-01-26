@@ -56,7 +56,8 @@ public class ProbeTable extends TableImpl
     /**
      * Method to initialise the table.
      * @param clr The ClassLoaderResolver
-     **/
+     */
+    @Override
     public void initialize(ClassLoaderResolver clr)
     {
         assertIsUninitialized();

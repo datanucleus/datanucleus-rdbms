@@ -35,6 +35,7 @@ import org.datanucleus.store.rdbms.identifier.DatastoreIdentifier;
 import org.datanucleus.store.rdbms.identifier.IdentifierFactory;
 import org.datanucleus.store.rdbms.key.CandidateKey;
 import org.datanucleus.store.rdbms.key.ForeignKey;
+import org.datanucleus.store.rdbms.key.Index;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
@@ -121,7 +122,8 @@ public class PersistableJoinTable extends JoinTable
      * @param clr The ClassLoaderResolver
      * @return The expected foreign keys.
      */
-    public List getExpectedForeignKeys(ClassLoaderResolver clr)
+    @Override
+    public List<ForeignKey> getExpectedForeignKeys(ClassLoaderResolver clr)
     {
         assertIsInitialized();
 
@@ -132,7 +134,7 @@ public class PersistableJoinTable extends JoinTable
             autoMode = true;
         }
 
-        ArrayList foreignKeys = new ArrayList();
+        List<ForeignKey> foreignKeys = new ArrayList();
         try
         {
             // FK from join table to owner table
@@ -191,10 +193,11 @@ public class PersistableJoinTable extends JoinTable
      * @param clr The ClassLoaderResolver
      * @return The indices
      */
-    protected Set getExpectedIndices(ClassLoaderResolver clr)
+    @Override
+    protected Set<Index> getExpectedIndices(ClassLoaderResolver clr)
     {
         // The indices required by foreign keys (BaseTable)
-        Set indices = super.getExpectedIndices(clr);
+        Set<Index> indices = super.getExpectedIndices(clr);
         return indices;
     }
 
@@ -202,10 +205,11 @@ public class PersistableJoinTable extends JoinTable
      * Accessor for the candidate keys for this table.
      * @return The indices
      */
-    protected List getExpectedCandidateKeys()
+    @Override
+    protected List<CandidateKey> getExpectedCandidateKeys()
     {
         // The indices required by foreign keys (BaseTable)
-        List candidateKeys = super.getExpectedCandidateKeys();
+        List<CandidateKey> candidateKeys = super.getExpectedCandidateKeys();
 
         if (mmd.getJoinMetaData() != null && mmd.getJoinMetaData().getUniqueMetaData() != null)
         {
@@ -225,8 +229,7 @@ public class PersistableJoinTable extends JoinTable
                     }
                     else
                     {
-                        throw new NucleusUserException("Unique key on join-table " + this + " has column " +
-                            columnName + " that is not found");
+                        throw new NucleusUserException("Unique key on join-table " + this + " has column " + columnName + " that is not found");
                     }
                 }
                 candidateKeys.add(uniKey);

@@ -97,7 +97,7 @@ public abstract class TableImpl extends AbstractTable
     }
 
     /**
-     * Pre-initialise. For things that must be initialised right after constructor 
+     * Pre-initialise. For things that must be initialised right after constructor.
      * @param clr the ClassLoaderResolver
      */
     public void preInitialize(final ClassLoaderResolver clr)
@@ -106,18 +106,17 @@ public abstract class TableImpl extends AbstractTable
     }    
 
     /**
-     * Post initialise. For things that must be set after all classes have been initialised before 
+     * Post initialise. For things that must be set after all classes have been initialised.
      * @param clr the ClassLoaderResolver
      */
     public void postInitialize(final ClassLoaderResolver clr)
     {
         assertIsInitialized();
-    }    
+    }
 
     /**
      * Accessor for the primary key for this table. 
-     * Will always return a PrimaryKey but if we have defined no columns,
-     * the pk.size() will be 0.
+     * Will always return a PrimaryKey but if we have defined no columns, the pk.size() will be 0.
      * @return The primary key.
      */
     public PrimaryKey getPrimaryKey()

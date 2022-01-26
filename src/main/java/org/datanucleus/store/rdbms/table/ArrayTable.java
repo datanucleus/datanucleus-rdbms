@@ -63,6 +63,7 @@ public class ArrayTable extends ElementContainerTable
      * Method to initialise the table definition.
      * @param clr The ClassLoaderResolver
      */
+    @Override
     public void initialize(ClassLoaderResolver clr)
     {
         super.initialize(clr);

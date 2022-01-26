@@ -154,7 +154,7 @@ public abstract class AbstractClassTable extends TableImpl
     }
 
     /**
-     * Accessor for the JavaTypeMapping that is handling the member of the specified name.
+     * Accessor for the JavaTypeMapping that is handling the member of the specified (fully qualified) name.
      * Returns the first one that matches.
      * @param memberName Name of the field/property
      * @return The java type mapping
@@ -402,14 +402,14 @@ public abstract class AbstractClassTable extends TableImpl
     }
 
     /**
-     * Utility to add the mapping for a field/property to the managed list.
-     * @param fieldMapping The mapping for the field/property
+     * Utility to add the mapping for a member to the managed list.
+     * @param mapping The mapping for the member
      */
-    protected void addMemberMapping(JavaTypeMapping fieldMapping)
+    protected void addMemberMapping(JavaTypeMapping mapping)
     {
-        AbstractMemberMetaData mmd = fieldMapping.getMemberMetaData();
-        logMapping(mmd.getFullFieldName(), fieldMapping);
-        memberMappingsMap.put(mmd, fieldMapping);
+        AbstractMemberMetaData mmd = mapping.getMemberMetaData();
+        logMapping(mmd.getFullFieldName(), mapping);
+        memberMappingsMap.put(mmd, mapping);
 
         // Update highest field number if this is higher
         int absoluteFieldNumber = mmd.getAbsoluteFieldNumber();
@@ -529,15 +529,13 @@ public abstract class AbstractClassTable extends TableImpl
     }
 
     /**
-     * Provide the mappings to the consumer for all primary-key fields mapped to
-     * this table (for application identity).
+     * Provide the mappings to the consumer for all primary-key members mapped to this table (for application identity).
      * @param consumer Consumer for the mappings
      */
     public abstract void providePrimaryKeyMappings(MappingConsumer consumer);
 
     /**
-     * Provide the mappings to the consumer for all non primary-key fields
-     * mapped to this table.
+     * Provide the mappings to the consumer for all non primary-key members mapped to this table.
      * @param consumer Consumer for the mappings
      */
     final public void provideNonPrimaryKeyMappings(MappingConsumer consumer)

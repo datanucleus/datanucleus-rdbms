@@ -120,6 +120,7 @@ public class ClassView extends ViewImpl implements DatastoreClass
      * the class to map to this view.
      * @param clr The ClassLoaderResolver
      */
+    @Override
     public void initialize(final ClassLoaderResolver clr)
     {
         assertIsUninitialized();
@@ -151,6 +152,7 @@ public class ClassView extends ViewImpl implements DatastoreClass
      * Post initialise. For things that must be set after all classes have been initialised before.
      * @param clr the ClassLoaderResolver
      */
+    @Override
     public void postInitialize(final ClassLoaderResolver clr)
     {
         assertIsInitialized();
@@ -169,7 +171,7 @@ public class ClassView extends ViewImpl implements DatastoreClass
             }, clr
         );
     }
-    
+
     /**
      * Accessor for a mapping for the ID. A view row doesn't have an id as such.
      * @return The ID mapping.
@@ -302,30 +304,32 @@ public class ClassView extends ViewImpl implements DatastoreClass
         return false;
     }
 
+    @Override
     public void provideSurrogateMapping(SurrogateColumnType colType, MappingConsumer consumer)
     {
     }
 
+    @Override
     public void provideMappingsForMembers(MappingConsumer consumer, AbstractMemberMetaData[] fieldNumbers, boolean includeSecondaryTables)
     {
     }
 
+    @Override
     public void providePrimaryKeyMappings(MappingConsumer consumer)
     {
     }
 
+    @Override
     public void provideNonPrimaryKeyMappings(MappingConsumer consumer)
     {
     }
 
+    @Override
     public void provideExternalMappings(MappingConsumer consumer, MappingType mappingType)
     {
     }
 
-    /**
-     * Method to provide all unmapped columns to the consumer.
-     * @param consumer Consumer of information
-     */
+    @Override
     public void provideUnmappedColumns(MappingConsumer consumer)
     {
     }
@@ -390,6 +394,7 @@ public class ClassView extends ViewImpl implements DatastoreClass
      * @param props Properties for controlling the creation of views
      * @return The SQL create statements.
      */
+    @Override
     protected List<String> getSQLCreateStatements(Properties props)
     {
         assertIsInitialized();

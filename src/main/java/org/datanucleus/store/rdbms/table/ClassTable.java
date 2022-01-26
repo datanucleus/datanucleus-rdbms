@@ -222,6 +222,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
      * We require any supertable, and the PK to be ready before we start initialisation.
      * @param clr the ClassLoaderResolver
      */
+    @Override
     public void preInitialize(final ClassLoaderResolver clr)
     {
         assertIsPKUninitialized();
@@ -250,6 +251,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
      * This adds the columns based on the MetaData representation for the class being represented by this table.
      * @param clr The ClassLoaderResolver
      */
+    @Override
     public void initialize(ClassLoaderResolver clr)
     {
         // if already initialized, we have nothing further to do here
@@ -408,6 +410,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
             storeMgr.getMappingManager().createColumnMapping(createUserMapping, auditColumn, typeName);
             logMapping("CREATEUSER", createUserMapping);
         }
+
         if (cmd.hasExtension(MetaData.EXTENSION_CLASS_CREATETIMESTAMP))
         {
             // Surrogate "create timestamp" column
@@ -451,6 +454,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
             storeMgr.getMappingManager().createColumnMapping(updateUserMapping, auditColumn, typeName);
             logMapping("UPDATEUSER", updateUserMapping);
         }
+
         if (cmd.hasExtension(MetaData.EXTENSION_CLASS_UPDATETIMESTAMP))
         {
             // Surrogate "update timestamp" column
@@ -498,6 +502,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
      * Post initilize. For things that must be set after all classes have been initialized before 
      * @param clr the ClassLoaderResolver
      */
+    @Override
     public void postInitialize(final ClassLoaderResolver clr)
     {
         assertIsInitialized();
@@ -529,9 +534,8 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
 
     /**
      * Method that adds the specified class to be managed by this table.
-     * Will provide mapping of all persistent fields to their underlying columns, map all necessary
-     * identity fields, and manage all "unmapped" columns that have no associated field.
-     * where the columns are defined for each mapping.
+     * Will provide mapping of all persistent fields to their underlying columns, map all necessary identity fields, 
+     * and manage all "unmapped" columns that have no associated field.
      * @param theCmd ClassMetaData for the class to be managed
      * @param clr The ClassLoaderResolver
      */
@@ -690,9 +694,8 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                                     }
                                 }
 
-                                DatastoreIdentifier secTableIdentifier = 
-                                    storeMgr.getIdentifierFactory().newTableIdentifier(mmd.getTable());
-                                // Use specified catalog, else take catalog of the owning table
+                                // Create identifier - use specified catalog, else take catalog of the owning table
+                                DatastoreIdentifier secTableIdentifier = storeMgr.getIdentifierFactory().newTableIdentifier(mmd.getTable());
                                 String catalogName = mmd.getCatalog();
                                 if (catalogName == null)
                                 {
@@ -1042,7 +1045,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
     }
 
     /**
-     * Accessor for whether this table manages the specified class
+     * Accessor for whether this table manages the specified class.
      * @param className Name of the class
      * @return Whether it is managed by this table
      */
@@ -1070,6 +1073,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
      * Method to initialise the table primary key field(s).
      * @param clr The ClassLoaderResolver
      */
+    @Override
     protected void initializePK(ClassLoaderResolver clr)
     {
         assertIsPKUninitialized();
@@ -1783,6 +1787,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
      * Whether this table or super table has id (primary key) attributed by the datastore
      * @return true if the id attributed by the datastore
      */
+    @Override
     public boolean isObjectIdDatastoreAttributed()
     {
         boolean attributed = storeMgr.isValueGenerationStrategyDatastoreAttributed(cmd, -1);
@@ -1912,8 +1917,8 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
     }
 
     /**
-     * Utility to find the table above this one. Will recurse to cater for inheritance
-     * strategies where fields are handed up to the super class, or down to this class.
+     * Utility to find the table above this one. 
+     * Will recurse to cater for inheritance strategies where fields are handed up to the super class, or down to this class.
      * @param theCmd ClassMetaData of the class to find the supertable for.
      * @return The table above this one in any inheritance hierarchy
      */
@@ -1948,8 +1953,8 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
     }
 
     /**
-     * Convenience accessor for the base table for this table which has the specified field.
-     * @param mmd Field MetaData for this field
+     * Convenience accessor for the base table for this table which has the specified member.
+     * @param mmd Member MetaData for this field
      * @return The base table which has the field specified
      */
     public DatastoreClass getBaseDatastoreClassWithMember(AbstractMemberMetaData mmd)
@@ -2012,6 +2017,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
      * @param clr The ClassLoaderResolver
      * @return The indices
      */
+    @Override
     protected Set<Index> getExpectedIndices(ClassLoaderResolver clr)
     {
         // Auto mode allows us to decide which indices are needed as well as using what is in the users MetaData
@@ -2405,6 +2411,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
      * @param clr The ClassLoaderResolver
      * @return The expected foreign keys.
      */
+    @Override
     public List<ForeignKey> getExpectedForeignKeys(ClassLoaderResolver clr)
     {
         assertIsInitialized();
@@ -2704,6 +2711,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
      * Accessor for the expected candidate keys for this table.
      * @return The expected candidate keys.
      */
+    @Override
     protected List<CandidateKey> getExpectedCandidateKeys()
     {
         assertIsInitialized();
@@ -2885,6 +2893,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
      * @param props Properties for creating the table
      * @return the SQL statements to be executed for creation
      */
+    @Override
     protected List<String> getSQLCreateStatements(Properties props)
     {
         List<String> stmts;
@@ -2920,11 +2929,10 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
         // Since the secondary tables are managed by us, we need to create their table
         if (secondaryTables != null)
         {
-            Set secondaryTableNames = secondaryTables.keySet();
-            Iterator iter = secondaryTableNames.iterator();
-            while (iter.hasNext())
+            Set<String> secondaryTableNames = secondaryTables.keySet();
+            for (String secTableName : secondaryTableNames)
             {
-                SecondaryTable secTable = secondaryTables.get(iter.next());
+                SecondaryTable secTable = secondaryTables.get(secTableName);
                 stmts.addAll(secTable.getSQLCreateStatements(tableProps)); // Use same tableProps as the primary table
             }
         }
@@ -2946,11 +2954,10 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
         // Drop any secondary tables
         if (secondaryTables != null)
         {
-            Set secondaryTableNames = secondaryTables.keySet();
-            Iterator iter = secondaryTableNames.iterator();
-            while (iter.hasNext())
+            Set<String> secondaryTableNames = secondaryTables.keySet();
+            for (String secTableName : secondaryTableNames)
             {
-                SecondaryTable secTable = secondaryTables.get(iter.next());
+                SecondaryTable secTable = secondaryTables.get(secTableName);
                 stmts.addAll(secTable.getSQLDropStatements());
             }
         }
@@ -3154,7 +3161,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
 
     /**
      * Initialize the ID Mapping.
-     * For datastore identity this will be a PCMapping that contains the OIDMapping.
+     * For datastore identity this will be a PCMapping that contains the DatastoreIdMapping.
      * For application identity this will be a PCMapping that contains the PK mapping(s).
      */
     private void initializeIDMapping()
@@ -3199,7 +3206,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
     /**
      * Accessor for all of the order mappings (used by FK Lists, Collections, Arrays)
      * @return The mappings for the order columns.
-     **/
+     */
     private Map<AbstractMemberMetaData, JavaTypeMapping> getExternalOrderMappings()
     {
         if (externalOrderMappings == null)
@@ -3217,7 +3224,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
     /**
      * Accessor for all of the external FK mappings.
      * @return The mappings for external FKs
-     **/
+     */
     private Map<AbstractMemberMetaData, JavaTypeMapping> getExternalFkMappings()
     {
         if (externalFkMappings == null)
@@ -3306,7 +3313,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
     /**
      * Accessor for all of the external FK discriminator mappings.
      * @return The mappings for external FKs
-     **/
+     */
     private Map<AbstractMemberMetaData, JavaTypeMapping> getExternalFkDiscriminatorMappings()
     {
         if (externalFkDiscriminatorMappings == null)
@@ -3375,8 +3382,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
         }
 
         // Check supertable
-        int ifc = cmd.getNoOfInheritedManagedMembers();
-        if (mmd.getAbsoluteFieldNumber() < ifc)
+        if (mmd.getAbsoluteFieldNumber() < cmd.getNoOfInheritedManagedMembers())
         {
             if (supertable != null)
             {
@@ -3391,11 +3397,9 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
         // Check secondary tables
         if (secondaryTables != null)
         {
-            Collection secTables = secondaryTables.values();
-            Iterator iter = secTables.iterator();
-            while (iter.hasNext())
+            Collection<SecondaryTable> secTables = secondaryTables.values();
+            for (SecondaryTable secTable : secTables)
             {
-                SecondaryTable secTable = (SecondaryTable)iter.next();
                 m = secTable.getMemberMapping(mmd);
                 if (m != null)
                 {
@@ -3459,13 +3463,12 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
     }
 
     /**
-     * Accessor for the field mapping for the named field.
-     * The field may exist in a parent table or a secondary table.
-     * Throws a NoSuchPersistentFieldException if the field name is not found.
-     * TODO Use of this is discouraged since the fieldName is not fully qualified
-     * and if a superclass-table inheritance is used we could have 2 fields of that name here.
-     * @param memberName Name of field/property
-     * @return The mapping.
+     * Accessor for the java mapping for the named member.
+     * The member may exist in a parent table or a secondary table.
+     * Throws a NoSuchPersistentFieldException if the member name is not found.
+     * TODO Use of this is discouraged since the memberName is not fully qualified and if a superclass-table inheritance is used we could have 2 members of that name here.
+     * @param memberName Name of member
+     * @return The mapping
      * @throws NoSuchPersistentFieldException Thrown when the field/property is not found
      */
     public JavaTypeMapping getMemberMapping(String memberName)
@@ -3481,14 +3484,12 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
     }
 
     /**
-     * Acessor for the FieldMetaData for the field with the specified name.
+     * Acessor for the MetaData for the member with the specified name.
      * Searches the MetaData of all classes managed by this table.
-     * Doesn't allow for cases where the table manages subclasses with the same field name.
-     * In that case you should use the equivalent method passing FieldMetaData.
-     * TODO Support subclasses with fields of the same name
-     * TODO Use of this is discouraged since the fieldName is not fully qualified
-     * and if a superclass-table inheritance is used we could have 2 fields of that name here.
-     * @param memberName the field/property name
+     * Doesn't allow for cases where the table manages subclasses with the same member name, in that case you should use the equivalent method passing metaData.
+     * TODO Support subclasses with members of the same name
+     * TODO Use of this is discouraged since the memberName is not fully qualified and if a superclass-table inheritance is used we could have 2 members of that name here.
+     * @param memberName the member name
      * @return metadata for the member
      */
     AbstractMemberMetaData getMetaDataForMember(String memberName)
@@ -3497,10 +3498,8 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
         AbstractMemberMetaData mmd = cmd.getMetaDataForMember(memberName);
         if (mmd == null)
         {
-            Iterator<AbstractClassMetaData> iter = managedClassMetaData.iterator();
-            while (iter.hasNext())
+            for (AbstractClassMetaData theCmd : managedClassMetaData)
             {
-                AbstractClassMetaData theCmd = iter.next();
                 final AbstractMemberMetaData foundMmd = theCmd.getMetaDataForMember(memberName);
                 if (foundMmd != null)
                 {
@@ -3581,10 +3580,10 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
     }
 
     /**
-     * Provide the mappings to the consumer for all primary-key fields mapped to
-     * this table.
+     * Provide the mappings to the consumer for all primary-key fields mapped to this table.
      * @param consumer Consumer for the mappings
      */
+    @Override
     public void providePrimaryKeyMappings(MappingConsumer consumer)
     {
         consumer.preConsumeMapping(highestMemberNumber + 1);
@@ -3614,11 +3613,11 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
     }
 
     /**
-     * Provide the mappings to the consumer for all external fields mapped to this table
-     * of the specified type
+     * Provide the mappings to the consumer for all external fields mapped to this table of the specified type
      * @param consumer Consumer for the mappings
      * @param mappingType Type of external mapping
      */
+    @Override
     final public void provideExternalMappings(MappingConsumer consumer, MappingType mappingType)
     {
         if (mappingType == MappingType.EXTERNAL_FK && externalFkMappings != null)
@@ -3669,12 +3668,12 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
     }
 
     /**
-     * Provide the mappings to the consumer for all absolute field Numbers in this table
-     * that are container in the fieldNumbers parameter.
+     * Provide the mappings to the consumer for all absolute field Numbers in this table that are container in the fieldNumbers parameter.
      * @param consumer Consumer for the mappings
      * @param fieldMetaData MetaData for the fields to provide mappings for
      * @param includeSecondaryTables Whether to provide fields in secondary tables
      */
+    @Override
     public void provideMappingsForMembers(MappingConsumer consumer, AbstractMemberMetaData[] fieldMetaData, boolean includeSecondaryTables)
     {
         super.provideMappingsForMembers(consumer, fieldMetaData, true);
@@ -3694,6 +3693,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
      * Method to provide all unmapped columns to the consumer.
      * @param consumer Consumer of information
      */
+    @Override
     public void provideUnmappedColumns(MappingConsumer consumer)
     {
         if (unmappedColumns != null)
@@ -3715,6 +3715,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
      * @return Whether the DB was modified
      * @throws SQLException Thrown when an error occurs in validation
      */
+    @Override
     public boolean validateConstraints(Connection conn, boolean autoCreate, Collection autoCreateErrors, ClassLoaderResolver clr)
     throws SQLException
     {

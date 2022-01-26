@@ -109,6 +109,7 @@ public class MapTable extends JoinTable
      * Method to initialise the table definition.
      * @param clr The ClassLoaderResolver
      */
+    @Override
     public void initialize(ClassLoaderResolver clr)
     {
         assertIsUninitialized();
@@ -637,6 +638,7 @@ public class MapTable extends JoinTable
      * @param clr The ClassLoaderResolver
      * @return The expected foreign keys.
      */
+    @Override
     public List getExpectedForeignKeys(ClassLoaderResolver clr)
     {
         assertIsInitialized();
@@ -785,6 +787,7 @@ public class MapTable extends JoinTable
      * @param clr The ClassLoaderResolver
      * @return The indices
      */
+    @Override
     protected Set getExpectedIndices(ClassLoaderResolver clr)
     {
         Set indices = new HashSet();
@@ -913,6 +916,7 @@ public class MapTable extends JoinTable
      * Accessor for the candidate keys for this table.
      * @return The indices
      */
+    @Override
     protected List getExpectedCandidateKeys()
     {
         // The indices required by foreign keys (BaseTable)
@@ -988,6 +992,7 @@ public class MapTable extends JoinTable
      * @param mmd MetaData for the field whose mapping we want
      * @return The mapping
      */
+    @Override
     public JavaTypeMapping getMemberMapping(AbstractMemberMetaData mmd)
     {
         return null;
