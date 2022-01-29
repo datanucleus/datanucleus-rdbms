@@ -2032,6 +2032,24 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
     protected Properties getPropertiesForValueGenerator(AbstractClassMetaData cmd, int absoluteFieldNumber, ClassLoaderResolver clr, SequenceMetaData seqmd, TableGeneratorMetaData tablegenmd)
     {
         Properties properties = new Properties();
+        properties.setProperty(ValueGenerator.PROPERTY_CLASS_NAME, cmd.getFullClassName());
+        properties.setProperty(ValueGenerator.PROPERTY_ROOT_CLASS_NAME, cmd.getBaseAbstractClassMetaData().getFullClassName());
+        if (cmd.getCatalog() != null)
+        {
+            properties.setProperty(ValueGenerator.PROPERTY_CATALOG_NAME, cmd.getCatalog());
+        }
+        else if (!StringUtils.isWhitespace(catalogName))
+        {
+            properties.setProperty(ValueGenerator.PROPERTY_CATALOG_NAME, catalogName);
+        }
+        if (cmd.getSchema() != null)
+        {
+            properties.setProperty(ValueGenerator.PROPERTY_SCHEMA_NAME, cmd.getSchema());
+        }
+        else if (!StringUtils.isWhitespace(schemaName))
+        {
+            properties.setProperty(ValueGenerator.PROPERTY_SCHEMA_NAME, schemaName);
+        }
 
         AbstractMemberMetaData mmd = null;
         ValueGenerationStrategy strategy = null;
@@ -2041,6 +2059,8 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
         {
             // real field
             mmd = cmd.getMetaDataForManagedMemberAtAbsolutePosition(absoluteFieldNumber);
+            properties.setProperty(ValueGenerator.PROPERTY_FIELD_NAME, mmd.getFullFieldName());
+
             strategy = mmd.getValueStrategy();
             if (strategy.equals(ValueGenerationStrategy.NATIVE))
             {
@@ -2048,7 +2068,16 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
             }
 
             sequence = mmd.getSequence();
+            if (sequence != null)
+            {
+                properties.setProperty(ValueGenerator.PROPERTY_SEQUENCE_NAME, sequence);
+            }
+
             extensions = mmd.getExtensions();
+            if (extensions != null && extensions.size() > 0)
+            {
+                properties.putAll(extensions);
+            }
         }
         else
         {
@@ -2062,143 +2091,122 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
             }
 
             sequence = idmd.getSequence();
+            if (sequence != null)
+            {
+                properties.setProperty(ValueGenerator.PROPERTY_SEQUENCE_NAME, sequence);
+            }
+
             extensions = idmd.getExtensions();
+            if (extensions != null && extensions.size() > 0)
+            {
+                properties.putAll(extensions);
+            }
         }
 
-        // Get base table with the required field
-        DatastoreClass tbl = getDatastoreClass(cmd.getBaseAbstractClassMetaData().getFullClassName(), clr);
-        if (tbl == null)
+        if (strategy != ValueGenerationStrategy.INCREMENT || tablegenmd == null)
         {
-            tbl = getTableForStrategy(cmd,absoluteFieldNumber, clr);
-        }
-        JavaTypeMapping m = null;
-        if (mmd != null)
-        {
-            m = tbl.getMemberMapping(mmd);
-            if (m == null)
+            // Get base table with the required field
+            DatastoreClass tbl = getDatastoreClass(cmd.getBaseAbstractClassMetaData().getFullClassName(), clr);
+            if (tbl == null)
             {
-                // Field not mapped in root table so use passed-in table
                 tbl = getTableForStrategy(cmd,absoluteFieldNumber, clr);
+            }
+            JavaTypeMapping m = null;
+            if (mmd != null)
+            {
                 m = tbl.getMemberMapping(mmd);
-            }
-        }
-        else
-        {
-            m = tbl.getIdMapping();
-        }
-        StringBuilder columnsName = new StringBuilder();
-        for (int i = 0; i < m.getNumberOfColumnMappings(); i++)
-        {
-            if (i > 0)
-            {
-                columnsName.append(",");
-            }
-            columnsName.append(m.getColumnMapping(i).getColumn().getIdentifier().toString());
-        }
-        properties.setProperty(ValueGenerator.PROPERTY_TABLE_NAME, tbl.getIdentifier().toString());
-        properties.setProperty(ValueGenerator.PROPERTY_COLUMN_NAME, columnsName.toString());
-
-        properties.setProperty(ValueGenerator.PROPERTY_CLASS_NAME, cmd.getFullClassName());
-        properties.setProperty(ValueGenerator.PROPERTY_ROOT_CLASS_NAME, cmd.getBaseAbstractClassMetaData().getFullClassName());
-        if (mmd != null)
-        {
-            properties.setProperty(ValueGenerator.PROPERTY_FIELD_NAME, mmd.getFullFieldName());
-        }
-
-        if (cmd.getCatalog() != null)
-        {
-            properties.setProperty(ValueGenerator.PROPERTY_CATALOG_NAME, cmd.getCatalog());
-        }
-        else if (!StringUtils.isWhitespace(catalogName))
-        {
-            properties.setProperty(ValueGenerator.PROPERTY_CATALOG_NAME, catalogName);
-        }
-
-        if (cmd.getSchema() != null)
-        {
-            properties.setProperty(ValueGenerator.PROPERTY_SCHEMA_NAME, cmd.getSchema());
-        }
-        else if (!StringUtils.isWhitespace(schemaName))
-        {
-            properties.setProperty(ValueGenerator.PROPERTY_SCHEMA_NAME, schemaName);
-        }
-
-        if (sequence != null)
-        {
-            properties.setProperty(ValueGenerator.PROPERTY_SEQUENCE_NAME, sequence);
-        }
-
-        // Add any extension properties
-        if (extensions != null && extensions.size() > 0)
-        {
-            properties.putAll(extensions);
-        }
-
-        if (strategy == ValueGenerationStrategy.INCREMENT && tablegenmd != null)
-        {
-            // User has specified a TableGenerator (JPA)
-            properties.setProperty(ValueGenerator.PROPERTY_KEY_INITIAL_VALUE, "" + tablegenmd.getInitialValue());
-            properties.setProperty(ValueGenerator.PROPERTY_KEY_CACHE_SIZE, "" + tablegenmd.getAllocationSize());
-            if (tablegenmd.getTableName() != null)
-            {
-                properties.setProperty(ValueGenerator.PROPERTY_SEQUENCETABLE_TABLE, tablegenmd.getTableName());
-            }
-            if (tablegenmd.getCatalogName() != null)
-            {
-                properties.setProperty(ValueGenerator.PROPERTY_SEQUENCETABLE_CATALOG, tablegenmd.getCatalogName());
-            }
-            if (tablegenmd.getSchemaName() != null)
-            {
-                properties.setProperty(ValueGenerator.PROPERTY_SEQUENCETABLE_SCHEMA, tablegenmd.getSchemaName());
-            }
-            if (tablegenmd.getPKColumnName() != null)
-            {
-                properties.setProperty(ValueGenerator.PROPERTY_SEQUENCETABLE_NAME_COLUMN, tablegenmd.getPKColumnName());
-            }
-            if (tablegenmd.getValueColumnName() != null)
-            {
-                properties.setProperty(ValueGenerator.PROPERTY_SEQUENCETABLE_NEXTVAL_COLUMN, tablegenmd.getValueColumnName());
-            }
-            if (tablegenmd.getPKColumnValue() != null)
-            {
-                properties.setProperty(ValueGenerator.PROPERTY_SEQUENCE_NAME, tablegenmd.getPKColumnValue());
-            }
-
-            // Using JPA generator so don't enable initial value detection
-            properties.remove(ValueGenerator.PROPERTY_TABLE_NAME);
-            properties.remove(ValueGenerator.PROPERTY_COLUMN_NAME);
-        }
-        else if (strategy == ValueGenerationStrategy.INCREMENT && tablegenmd == null)
-        {
-            if (!properties.containsKey(ValueGenerator.PROPERTY_KEY_CACHE_SIZE))
-            {
-                // Use default allocation size
-                int allocSize = getIntProperty(PropertyNames.PROPERTY_VALUEGEN_INCREMENT_ALLOCSIZE);
-                properties.setProperty(ValueGenerator.PROPERTY_KEY_CACHE_SIZE, "" + allocSize);
-            }
-        }
-        else if (strategy == ValueGenerationStrategy.SEQUENCE && seqmd != null)
-        {
-            // User has specified a SequenceGenerator (JDO/JPA)
-            if (seqmd.getSchemaName() != null)
-            {
-                properties.setProperty(ValueGenerator.PROPERTY_SEQUENCETABLE_SCHEMA, seqmd.getSchemaName());
-            }
-            if (seqmd.getCatalogName() != null)
-            {
-                properties.setProperty(ValueGenerator.PROPERTY_SEQUENCETABLE_CATALOG, seqmd.getCatalogName());
-            }
-
-            if (StringUtils.isWhitespace(sequence))
-            {
-                // Apply default to sequence name, as name of sequence metadata
-                if (seqmd.getName() != null)
+                if (m == null)
                 {
-                    properties.setProperty(ValueGenerator.PROPERTY_SEQUENCE_NAME, seqmd.getName());
+                    // Field not mapped in root table so use passed-in table
+                    tbl = getTableForStrategy(cmd,absoluteFieldNumber, clr);
+                    m = tbl.getMemberMapping(mmd);
                 }
             }
-            if (seqmd.getDatastoreSequence() != null)
+            else
             {
+                m = tbl.getIdMapping();
+            }
+            StringBuilder columnsName = new StringBuilder();
+            for (int i = 0; i < m.getNumberOfColumnMappings(); i++)
+            {
+                if (i > 0)
+                {
+                    columnsName.append(",");
+                }
+                columnsName.append(m.getColumnMapping(i).getColumn().getIdentifier().toString());
+            }
+            properties.setProperty(ValueGenerator.PROPERTY_TABLE_NAME, tbl.getIdentifier().toString());
+            properties.setProperty(ValueGenerator.PROPERTY_COLUMN_NAME, columnsName.toString());
+        }
+
+        if (strategy == ValueGenerationStrategy.INCREMENT)
+        {
+            if (tablegenmd != null)
+            {
+                // User has specified a TableGenerator (JPA)
+                properties.setProperty(ValueGenerator.PROPERTY_KEY_INITIAL_VALUE, "" + tablegenmd.getInitialValue());
+                properties.setProperty(ValueGenerator.PROPERTY_KEY_CACHE_SIZE, "" + tablegenmd.getAllocationSize());
+                if (tablegenmd.getTableName() != null)
+                {
+                    properties.setProperty(ValueGenerator.PROPERTY_SEQUENCETABLE_TABLE, tablegenmd.getTableName());
+                }
+                if (tablegenmd.getCatalogName() != null)
+                {
+                    properties.setProperty(ValueGenerator.PROPERTY_SEQUENCETABLE_CATALOG, tablegenmd.getCatalogName());
+                }
+                if (tablegenmd.getSchemaName() != null)
+                {
+                    properties.setProperty(ValueGenerator.PROPERTY_SEQUENCETABLE_SCHEMA, tablegenmd.getSchemaName());
+                }
+                if (tablegenmd.getPKColumnName() != null)
+                {
+                    properties.setProperty(ValueGenerator.PROPERTY_SEQUENCETABLE_NAME_COLUMN, tablegenmd.getPKColumnName());
+                }
+                if (tablegenmd.getValueColumnName() != null)
+                {
+                    properties.setProperty(ValueGenerator.PROPERTY_SEQUENCETABLE_NEXTVAL_COLUMN, tablegenmd.getValueColumnName());
+                }
+                if (tablegenmd.getPKColumnValue() != null)
+                {
+                    properties.setProperty(ValueGenerator.PROPERTY_SEQUENCE_NAME, tablegenmd.getPKColumnValue());
+                }
+            }
+            else
+            {
+                if (!properties.containsKey(ValueGenerator.PROPERTY_KEY_CACHE_SIZE))
+                {
+                    // Use default allocation size
+                    int allocSize = getIntProperty(PropertyNames.PROPERTY_VALUEGEN_INCREMENT_ALLOCSIZE);
+                    properties.setProperty(ValueGenerator.PROPERTY_KEY_CACHE_SIZE, "" + allocSize);
+                }
+            }
+        }
+        else if (strategy == ValueGenerationStrategy.SEQUENCE)
+        {
+            if (seqmd != null)
+            {
+                // User has specified a SequenceGenerator (JDO/JPA)
+                if (seqmd.getSchemaName() != null)
+                {
+                    properties.setProperty(ValueGenerator.PROPERTY_SEQUENCETABLE_SCHEMA, seqmd.getSchemaName());
+                }
+                if (seqmd.getCatalogName() != null)
+                {
+                    properties.setProperty(ValueGenerator.PROPERTY_SEQUENCETABLE_CATALOG, seqmd.getCatalogName());
+                }
+
+                if (StringUtils.isWhitespace(sequence))
+                {
+                    // Apply default to sequence name, as name of sequence metadata
+                    if (seqmd.getName() != null)
+                    {
+                        properties.setProperty(ValueGenerator.PROPERTY_SEQUENCE_NAME, seqmd.getName());
+                    }
+                }
+                if (seqmd.getDatastoreSequence() != null)
+                {
+                    properties.setProperty(ValueGenerator.PROPERTY_SEQUENCE_NAME, "" + seqmd.getDatastoreSequence());
+                }
                 if (seqmd.getInitialValue() >= 0)
                 {
                     properties.setProperty(ValueGenerator.PROPERTY_KEY_INITIAL_VALUE, "" + seqmd.getInitialValue());
@@ -2213,7 +2221,6 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                     int allocSize = getIntProperty(PropertyNames.PROPERTY_VALUEGEN_SEQUENCE_ALLOCSIZE);
                     properties.setProperty(ValueGenerator.PROPERTY_KEY_CACHE_SIZE, "" + allocSize);
                 }
-                properties.setProperty(ValueGenerator.PROPERTY_SEQUENCE_NAME, "" + seqmd.getDatastoreSequence());
 
                 // Add on any extensions specified on the sequence
                 Map<String, String> seqExtensions = seqmd.getExtensions();
@@ -2224,8 +2231,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
             }
             else
             {
-                // JDO Factory-based sequence generation
-                // TODO Support this
+                // Set some defaults
             }
         }
         return properties;
