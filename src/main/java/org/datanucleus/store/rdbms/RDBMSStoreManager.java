@@ -1957,6 +1957,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
      * @param ec execution context
      * @return The next value.
      */
+    @Override
     protected Object getNextValueForValueGenerator(ValueGenerator generator, final ExecutionContext ec)
     {
         Object oid = null;
@@ -2030,6 +2031,8 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
      */
     protected Properties getPropertiesForValueGenerator(AbstractClassMetaData cmd, int absoluteFieldNumber, ClassLoaderResolver clr, SequenceMetaData seqmd, TableGeneratorMetaData tablegenmd)
     {
+        Properties properties = new Properties();
+
         AbstractMemberMetaData mmd = null;
         ValueGenerationStrategy strategy = null;
         String sequence = null;
@@ -2039,6 +2042,11 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
             // real field
             mmd = cmd.getMetaDataForManagedMemberAtAbsolutePosition(absoluteFieldNumber);
             strategy = mmd.getValueStrategy();
+            if (strategy.equals(ValueGenerationStrategy.NATIVE))
+            {
+                strategy = ValueGenerationStrategy.getIdentityStrategy(getValueGenerationStrategyForNative(mmd));
+            }
+
             sequence = mmd.getSequence();
             extensions = mmd.getExtensions();
         }
@@ -2048,6 +2056,11 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
             // always use the root IdentityMetaData since the root class defines the identity
             DatastoreIdentityMetaData idmd = cmd.getBaseDatastoreIdentityMetaData();
             strategy = idmd.getValueStrategy();
+            if (strategy.equals(ValueGenerationStrategy.NATIVE))
+            {
+                strategy = ValueGenerationStrategy.getIdentityStrategy(getValueGenerationStrategyForNative(cmd));
+            }
+
             sequence = idmd.getSequence();
             extensions = idmd.getExtensions();
         }
@@ -2082,10 +2095,11 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
             }
             columnsName.append(m.getColumnMapping(i).getColumn().getIdentifier().toString());
         }
+        properties.setProperty(ValueGenerator.PROPERTY_TABLE_NAME, tbl.getIdentifier().toString());
+        properties.setProperty(ValueGenerator.PROPERTY_COLUMN_NAME, columnsName.toString());
 
-        Properties properties = new Properties();
         properties.setProperty(ValueGenerator.PROPERTY_CLASS_NAME, cmd.getFullClassName());
-        properties.put(ValueGenerator.PROPERTY_ROOT_CLASS_NAME, cmd.getBaseAbstractClassMetaData().getFullClassName());
+        properties.setProperty(ValueGenerator.PROPERTY_ROOT_CLASS_NAME, cmd.getBaseAbstractClassMetaData().getFullClassName());
         if (mmd != null)
         {
             properties.setProperty(ValueGenerator.PROPERTY_FIELD_NAME, mmd.getFullFieldName());
@@ -2109,9 +2123,6 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
             properties.setProperty(ValueGenerator.PROPERTY_SCHEMA_NAME, schemaName);
         }
 
-        properties.setProperty(ValueGenerator.PROPERTY_TABLE_NAME, tbl.getIdentifier().toString());
-        properties.setProperty(ValueGenerator.PROPERTY_COLUMN_NAME, columnsName.toString());
-
         if (sequence != null)
         {
             properties.setProperty(ValueGenerator.PROPERTY_SEQUENCE_NAME, sequence);
@@ -2123,40 +2134,34 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
             properties.putAll(extensions);
         }
 
-        if (strategy.equals(ValueGenerationStrategy.NATIVE))
-        {
-            String realStrategyName = getValueGenerationStrategyForNative(cmd, absoluteFieldNumber);
-            strategy = ValueGenerationStrategy.getIdentityStrategy(realStrategyName);
-        }
-
         if (strategy == ValueGenerationStrategy.INCREMENT && tablegenmd != null)
         {
             // User has specified a TableGenerator (JPA)
-            properties.put(ValueGenerator.PROPERTY_KEY_INITIAL_VALUE, "" + tablegenmd.getInitialValue());
-            properties.put(ValueGenerator.PROPERTY_KEY_CACHE_SIZE, "" + tablegenmd.getAllocationSize());
+            properties.setProperty(ValueGenerator.PROPERTY_KEY_INITIAL_VALUE, "" + tablegenmd.getInitialValue());
+            properties.setProperty(ValueGenerator.PROPERTY_KEY_CACHE_SIZE, "" + tablegenmd.getAllocationSize());
             if (tablegenmd.getTableName() != null)
             {
-                properties.put(ValueGenerator.PROPERTY_SEQUENCETABLE_TABLE, tablegenmd.getTableName());
+                properties.setProperty(ValueGenerator.PROPERTY_SEQUENCETABLE_TABLE, tablegenmd.getTableName());
             }
             if (tablegenmd.getCatalogName() != null)
             {
-                properties.put(ValueGenerator.PROPERTY_SEQUENCETABLE_CATALOG, tablegenmd.getCatalogName());
+                properties.setProperty(ValueGenerator.PROPERTY_SEQUENCETABLE_CATALOG, tablegenmd.getCatalogName());
             }
             if (tablegenmd.getSchemaName() != null)
             {
-                properties.put(ValueGenerator.PROPERTY_SEQUENCETABLE_SCHEMA, tablegenmd.getSchemaName());
+                properties.setProperty(ValueGenerator.PROPERTY_SEQUENCETABLE_SCHEMA, tablegenmd.getSchemaName());
             }
             if (tablegenmd.getPKColumnName() != null)
             {
-                properties.put(ValueGenerator.PROPERTY_SEQUENCETABLE_NAME_COLUMN, tablegenmd.getPKColumnName());
+                properties.setProperty(ValueGenerator.PROPERTY_SEQUENCETABLE_NAME_COLUMN, tablegenmd.getPKColumnName());
             }
-            if (tablegenmd.getPKColumnName() != null)
+            if (tablegenmd.getValueColumnName() != null)
             {
-                properties.put(ValueGenerator.PROPERTY_SEQUENCETABLE_NEXTVAL_COLUMN, tablegenmd.getValueColumnName());
+                properties.setProperty(ValueGenerator.PROPERTY_SEQUENCETABLE_NEXTVAL_COLUMN, tablegenmd.getValueColumnName());
             }
             if (tablegenmd.getPKColumnValue() != null)
             {
-                properties.put(ValueGenerator.PROPERTY_SEQUENCE_NAME, tablegenmd.getPKColumnValue());
+                properties.setProperty(ValueGenerator.PROPERTY_SEQUENCE_NAME, tablegenmd.getPKColumnValue());
             }
 
             // Using JPA generator so don't enable initial value detection
@@ -2169,7 +2174,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
             {
                 // Use default allocation size
                 int allocSize = getIntProperty(PropertyNames.PROPERTY_VALUEGEN_INCREMENT_ALLOCSIZE);
-                properties.put(ValueGenerator.PROPERTY_KEY_CACHE_SIZE, "" + allocSize);
+                properties.setProperty(ValueGenerator.PROPERTY_KEY_CACHE_SIZE, "" + allocSize);
             }
         }
         else if (strategy == ValueGenerationStrategy.SEQUENCE && seqmd != null)
@@ -2177,11 +2182,11 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
             // User has specified a SequenceGenerator (JDO/JPA)
             if (seqmd.getSchemaName() != null)
             {
-                properties.put(ValueGenerator.PROPERTY_SEQUENCETABLE_SCHEMA, seqmd.getSchemaName());
+                properties.setProperty(ValueGenerator.PROPERTY_SEQUENCETABLE_SCHEMA, seqmd.getSchemaName());
             }
             if (seqmd.getCatalogName() != null)
             {
-                properties.put(ValueGenerator.PROPERTY_SEQUENCETABLE_CATALOG, seqmd.getCatalogName());
+                properties.setProperty(ValueGenerator.PROPERTY_SEQUENCETABLE_CATALOG, seqmd.getCatalogName());
             }
 
             if (StringUtils.isWhitespace(sequence))
@@ -2189,26 +2194,26 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                 // Apply default to sequence name, as name of sequence metadata
                 if (seqmd.getName() != null)
                 {
-                    properties.put(ValueGenerator.PROPERTY_SEQUENCE_NAME, seqmd.getName());
+                    properties.setProperty(ValueGenerator.PROPERTY_SEQUENCE_NAME, seqmd.getName());
                 }
             }
             if (seqmd.getDatastoreSequence() != null)
             {
                 if (seqmd.getInitialValue() >= 0)
                 {
-                    properties.put(ValueGenerator.PROPERTY_KEY_INITIAL_VALUE, "" + seqmd.getInitialValue());
+                    properties.setProperty(ValueGenerator.PROPERTY_KEY_INITIAL_VALUE, "" + seqmd.getInitialValue());
                 }
                 if (seqmd.getAllocationSize() > 0)
                 {
-                    properties.put(ValueGenerator.PROPERTY_KEY_CACHE_SIZE, "" + seqmd.getAllocationSize());
+                    properties.setProperty(ValueGenerator.PROPERTY_KEY_CACHE_SIZE, "" + seqmd.getAllocationSize());
                 }
                 else
                 {
                     // Use default allocation size
                     int allocSize = getIntProperty(PropertyNames.PROPERTY_VALUEGEN_SEQUENCE_ALLOCSIZE);
-                    properties.put(ValueGenerator.PROPERTY_KEY_CACHE_SIZE, "" + allocSize);
+                    properties.setProperty(ValueGenerator.PROPERTY_KEY_CACHE_SIZE, "" + allocSize);
                 }
-                properties.put(ValueGenerator.PROPERTY_SEQUENCE_NAME, "" + seqmd.getDatastoreSequence());
+                properties.setProperty(ValueGenerator.PROPERTY_SEQUENCE_NAME, "" + seqmd.getDatastoreSequence());
 
                 // Add on any extensions specified on the sequence
                 Map<String, String> seqExtensions = seqmd.getExtensions();
@@ -2270,6 +2275,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
      * @param strategy The strategy
      * @return Whether it is supported.
      */
+    @Override
     public boolean supportsValueGenerationStrategy(String strategy)
     {
         // "identity" doesn't have an explicit entry in plugin since uses datastore capabilities
@@ -2292,27 +2298,14 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
         return false;
     }
 
-    /**
-     * Method defining which value-strategy to use when the user specifies "native".
-     * @return Should be overridden by all store managers that have other behaviour.
-     */
-    public String getValueGenerationStrategyForNative(AbstractClassMetaData cmd, int absFieldNumber)
+    @Override
+    public String getValueGenerationStrategyForNative(AbstractClassMetaData cmd)
     {
         // TODO If the user has generated the schema and the column for this field is an autoincrement column then select IDENTITY
         if (getBooleanProperty(RDBMSPropertyNames.PROPERTY_RDBMS_LEGACY_NATIVE_VALUE_STRATEGY))
         {
             // Use legacy process for deciding which strategy to use
-            String sequence = null;
-            if (absFieldNumber >= 0)
-            {
-                // real field
-                sequence = cmd.getMetaDataForManagedMemberAtAbsolutePosition(absFieldNumber).getSequence();
-            }
-            else
-            {
-                // datastore-identity surrogate field
-                sequence = cmd.getDatastoreIdentityMetaData().getSequence();
-            }
+            String sequence = cmd.getDatastoreIdentityMetaData().getSequence();
 
             if (dba.supportsOption(DatastoreAdapter.SEQUENCES) && sequence != null)
             {
@@ -2320,7 +2313,25 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
             }
             return ValueGenerationStrategy.INCREMENT.toString();
         }
-        return super.getValueGenerationStrategyForNative(cmd, absFieldNumber);
+        return super.getValueGenerationStrategyForNative(cmd);
+    }
+
+    @Override
+    public String getValueGenerationStrategyForNative(AbstractMemberMetaData mmd)
+    {
+        // TODO If the user has generated the schema and the column for this field is an autoincrement column then select IDENTITY
+        if (getBooleanProperty(RDBMSPropertyNames.PROPERTY_RDBMS_LEGACY_NATIVE_VALUE_STRATEGY))
+        {
+            // Use legacy process for deciding which strategy to use
+            String sequence = mmd.getSequence();
+
+            if (dba.supportsOption(DatastoreAdapter.SEQUENCES) && sequence != null)
+            {
+                return ValueGenerationStrategy.SEQUENCE.toString();
+            }
+            return ValueGenerationStrategy.INCREMENT.toString();
+        }
+        return super.getValueGenerationStrategyForNative(mmd);
     }
 
     /**

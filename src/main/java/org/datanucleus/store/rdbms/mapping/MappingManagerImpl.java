@@ -1504,7 +1504,7 @@ public class MappingManagerImpl implements MappingManager
             }
             else
             {
-                // Normal field
+                // Normal member
                 if (mmd.getColumnMetaData().length > 0)
                 {
                     // Utilise the jdbc and sql types if specified
@@ -1519,7 +1519,7 @@ public class MappingManagerImpl implements MappingManager
                     String strategyName = strategy.toString();
                     if (strategy == ValueGenerationStrategy.NATIVE)
                     {
-                        strategyName = storeMgr.getValueGenerationStrategyForNative(mmd.getAbstractClassMetaData(), mmd.getAbsoluteFieldNumber());
+                        strategyName = storeMgr.getValueGenerationStrategyForNative(mmd);
                     }
                     if (strategyName != null && ValueGenerationStrategy.IDENTITY.toString().equals(strategyName))
                     {
