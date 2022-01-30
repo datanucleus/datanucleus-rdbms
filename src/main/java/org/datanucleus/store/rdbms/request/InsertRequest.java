@@ -295,12 +295,11 @@ public class InsertRequest extends Request
                 try
                 {
                     StatementClassMapping mappingDefinition = new StatementClassMapping();
-                    StatementMappingIndex[] idxs = stmtMappings;
-                    for (int i=0;i<idxs.length;i++)
+                    for (int i=0;i<stmtMappings.length;i++)
                     {
-                        if (idxs[i] != null)
+                        if (stmtMappings[i] != null)
                         {
-                            mappingDefinition.addMappingForMember(i, idxs[i]);
+                            mappingDefinition.addMappingForMember(i, stmtMappings[i]);
                         }
                     }
 
@@ -355,6 +354,7 @@ public class InsertRequest extends Request
                                 numberOfFieldsToProvide++;
                             }
                         }
+
                         int j = 0;
                         int[] fieldNums = new int[numberOfFieldsToProvide];
                         for (int i = 0; i < insertFieldNumbers.length; i++)
@@ -561,13 +561,13 @@ public class InsertRequest extends Request
                                 fieldNums[j++] = reachableFieldNumbers[i];
                             }
                         }
+
                         mappingDefinition = new StatementClassMapping();
-                        idxs = retrievedStmtMappings;
-                        for (int i=0;i<idxs.length;i++)
+                        for (int i=0;i<retrievedStmtMappings.length;i++)
                         {
-                            if (idxs[i] != null)
+                            if (retrievedStmtMappings[i] != null)
                             {
-                                mappingDefinition.addMappingForMember(i, idxs[i]);
+                                mappingDefinition.addMappingForMember(i, retrievedStmtMappings[i]);
                             }
                         }
                         NucleusLogger.PERSISTENCE.debug("Performing reachability on fields " + StringUtils.intArrayToString(fieldNums));

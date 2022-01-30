@@ -314,11 +314,9 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
             if (sm == null)
             {
                 // Transient or detached maybe, so use reflection to get PK field values
-                if (mmd instanceof FieldMetaData)
-                {
-                    return ClassUtils.getValueOfFieldByReflection(value, mmd.getName());
-                }
-                return ClassUtils.getValueOfMethodByReflection(value, ClassUtils.getJavaBeanGetterName(mmd.getName(), false));
+                return (mmd instanceof FieldMetaData) ?
+                    ClassUtils.getValueOfFieldByReflection(value, mmd.getName()) : 
+                    ClassUtils.getValueOfMethodByReflection(value, ClassUtils.getJavaBeanGetterName(mmd.getName(), false));
             }
 
             if (!mmd.isPrimaryKey())
@@ -420,9 +418,10 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
                 AbstractClassMetaData cmd = mmgr.getMetaDataForClass(this.mmd.getType(), clr);
                 if (cmd.getIdentityType() == IdentityType.APPLICATION)
                 {
-                    for (int i=0; i<cmd.getPKMemberPositions().length; i++)
+                    int[] pkMemberPositions = cmd.getPKMemberPositions();
+                    for (int i=0; i<pkMemberPositions.length; i++)
                     {
-                        int pkMemberPosition = cmd.getPKMemberPositions()[i];
+                        int pkMemberPosition = pkMemberPositions[i];
                         ValueGenerationStrategy strategy = cmd.getMetaDataForManagedMemberAtAbsolutePosition(pkMemberPosition).getValueStrategy();
                         if (strategy != null)
                         {

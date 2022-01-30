@@ -247,8 +247,7 @@ public class DeleteRequest extends Request
         {
             for (int i=0;i<oneToOneNonOwnerFields.length;i++)
             {
-                AbstractMemberMetaData relatedFmd = oneToOneNonOwnerFields[i];
-                updateOneToOneBidirectionalOwnerObjectForField(sm, relatedFmd);
+                updateOneToOneBidirectionalOwnerObjectForField(sm, oneToOneNonOwnerFields[i]);
             }
         }
 

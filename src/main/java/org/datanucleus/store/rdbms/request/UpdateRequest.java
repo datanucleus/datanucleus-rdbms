@@ -197,6 +197,7 @@ public class UpdateRequest extends Request
         updateUserStmtMapping = consumer.getUpdateUserStatementMapping();
         updateTimestampStmtMapping = consumer.getUpdateTimestampStatementMapping();
 
+        // TODO Avoid this search for timestamp/user members
         AbstractMemberMetaData[] mmds = cmd.getManagedMembers();
         for (int i=0;i<mmds.length;i++)
         {
@@ -271,6 +272,7 @@ public class UpdateRequest extends Request
 
         if (stmt != null)
         {
+            // TODO Avoid this search for timestamp/user members
             AbstractMemberMetaData[] mmds = cmd.getManagedMembers();
             for (int i=0;i<mmds.length;i++)
             {
