@@ -1790,12 +1790,13 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
     @Override
     public boolean isObjectIdDatastoreAttributed()
     {
-        boolean attributed = storeMgr.isValueGenerationStrategyDatastoreAttributed(cmd, -1);
-        if (attributed)
+        if (storeMgr.isValueGenerationStrategyDatastoreAttributed(cmd, -1))
         {
             return true;
         }
-        for (int i=0; i<columns.size(); i++)
+
+        int numCols = columns.size();
+        for (int i=0; i<numCols; i++)
         {
             Column col = (Column)columns.get(i);
             if (col.isPrimaryKey() && col.isIdentity())

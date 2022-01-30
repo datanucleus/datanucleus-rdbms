@@ -401,12 +401,12 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
 
     /**
      * Check if one of the primary key fields of the PC has value attributed by the datastore
-     * @param mdm the {@link MetaDataManager}
+     * @param mmgr the {@link MetaDataManager}
      * @param srm the {@link StoreManager}
      * @param clr the {@link ClassLoaderResolver}
      * @return true if one of the primary key fields of the PC has value attributed by the datastore
      */
-    private boolean hasDatastoreAttributedPrimaryKeyValues(MetaDataManager mdm, StoreManager srm, ClassLoaderResolver clr)
+    private boolean hasDatastoreAttributedPrimaryKeyValues(MetaDataManager mmgr, StoreManager srm, ClassLoaderResolver clr)
     {
         boolean hasDatastoreAttributedPrimaryKeyValues = false;
         if (this.mmd != null)
@@ -417,17 +417,17 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
                 roleForMember != FieldRole.ROLE_MAP_VALUE)
             {
                 // Object is associated to a field (i.e not a join table)
-                AbstractClassMetaData acmd = mdm.getMetaDataForClass(this.mmd.getType(), clr);
-                if (acmd.getIdentityType() == IdentityType.APPLICATION)
+                AbstractClassMetaData cmd = mmgr.getMetaDataForClass(this.mmd.getType(), clr);
+                if (cmd.getIdentityType() == IdentityType.APPLICATION)
                 {
-                    for (int i=0; i<acmd.getPKMemberPositions().length; i++)
+                    for (int i=0; i<cmd.getPKMemberPositions().length; i++)
                     {
-                        ValueGenerationStrategy strategy = 
-                            acmd.getMetaDataForManagedMemberAtAbsolutePosition(acmd.getPKMemberPositions()[i]).getValueStrategy();
+                        int pkMemberPosition = cmd.getPKMemberPositions()[i];
+                        ValueGenerationStrategy strategy = cmd.getMetaDataForManagedMemberAtAbsolutePosition(pkMemberPosition).getValueStrategy();
                         if (strategy != null)
                         {
                             //if strategy is null, then it's user attributed value
-                            hasDatastoreAttributedPrimaryKeyValues |= srm.isValueGenerationStrategyDatastoreAttributed(acmd, acmd.getPKMemberPositions()[i]);
+                            hasDatastoreAttributedPrimaryKeyValues |= srm.isValueGenerationStrategyDatastoreAttributed(cmd, pkMemberPosition);
                         }
                     }
                 }
