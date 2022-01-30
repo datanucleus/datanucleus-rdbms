@@ -1960,7 +1960,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
     @Override
     protected Object getNextValueForValueGenerator(ValueGenerator generator, final ExecutionContext ec)
     {
-        Object oid = null;
+        Object value = null;
         synchronized (generator)
         {
             // Get the next value for this generator for this ExecutionContext
@@ -2015,9 +2015,9 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                 };
                 ((AbstractConnectedGenerator)generator).setConnectionProvider(connProvider);
             }
-            oid = generator.next();
+            value = generator.next();
         }
-        return oid;
+        return value;
     }
 
     /**
