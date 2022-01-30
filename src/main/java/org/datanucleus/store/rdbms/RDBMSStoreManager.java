@@ -2141,98 +2141,11 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
 
         if (strategy == ValueGenerationStrategy.INCREMENT)
         {
-            if (tablegenmd != null)
-            {
-                // User has specified a TableGenerator (JPA)
-                properties.setProperty(ValueGenerator.PROPERTY_KEY_INITIAL_VALUE, "" + tablegenmd.getInitialValue());
-                properties.setProperty(ValueGenerator.PROPERTY_KEY_CACHE_SIZE, "" + tablegenmd.getAllocationSize());
-                if (tablegenmd.getTableName() != null)
-                {
-                    properties.setProperty(ValueGenerator.PROPERTY_SEQUENCETABLE_TABLE, tablegenmd.getTableName());
-                }
-                if (tablegenmd.getCatalogName() != null)
-                {
-                    properties.setProperty(ValueGenerator.PROPERTY_SEQUENCETABLE_CATALOG, tablegenmd.getCatalogName());
-                }
-                if (tablegenmd.getSchemaName() != null)
-                {
-                    properties.setProperty(ValueGenerator.PROPERTY_SEQUENCETABLE_SCHEMA, tablegenmd.getSchemaName());
-                }
-                if (tablegenmd.getPKColumnName() != null)
-                {
-                    properties.setProperty(ValueGenerator.PROPERTY_SEQUENCETABLE_NAME_COLUMN, tablegenmd.getPKColumnName());
-                }
-                if (tablegenmd.getValueColumnName() != null)
-                {
-                    properties.setProperty(ValueGenerator.PROPERTY_SEQUENCETABLE_NEXTVAL_COLUMN, tablegenmd.getValueColumnName());
-                }
-                if (tablegenmd.getPKColumnValue() != null)
-                {
-                    properties.setProperty(ValueGenerator.PROPERTY_SEQUENCE_NAME, tablegenmd.getPKColumnValue());
-                }
-            }
-            else
-            {
-                if (!properties.containsKey(ValueGenerator.PROPERTY_KEY_CACHE_SIZE))
-                {
-                    // Use default allocation size
-                    int allocSize = getIntProperty(PropertyNames.PROPERTY_VALUEGEN_INCREMENT_ALLOCSIZE);
-                    properties.setProperty(ValueGenerator.PROPERTY_KEY_CACHE_SIZE, "" + allocSize);
-                }
-            }
+            addValueGenerationPropertiesForIncrement(properties, tablegenmd);
         }
         else if (strategy == ValueGenerationStrategy.SEQUENCE)
         {
-            if (seqmd != null)
-            {
-                // User has specified a SequenceGenerator (JDO/JPA)
-                if (seqmd.getSchemaName() != null)
-                {
-                    properties.setProperty(ValueGenerator.PROPERTY_SEQUENCETABLE_SCHEMA, seqmd.getSchemaName());
-                }
-                if (seqmd.getCatalogName() != null)
-                {
-                    properties.setProperty(ValueGenerator.PROPERTY_SEQUENCETABLE_CATALOG, seqmd.getCatalogName());
-                }
-
-                if (StringUtils.isWhitespace(sequence))
-                {
-                    // Apply default to sequence name, as name of sequence metadata
-                    if (seqmd.getName() != null)
-                    {
-                        properties.setProperty(ValueGenerator.PROPERTY_SEQUENCE_NAME, seqmd.getName());
-                    }
-                }
-                if (seqmd.getDatastoreSequence() != null)
-                {
-                    properties.setProperty(ValueGenerator.PROPERTY_SEQUENCE_NAME, "" + seqmd.getDatastoreSequence());
-                }
-                if (seqmd.getInitialValue() >= 0)
-                {
-                    properties.setProperty(ValueGenerator.PROPERTY_KEY_INITIAL_VALUE, "" + seqmd.getInitialValue());
-                }
-                if (seqmd.getAllocationSize() > 0)
-                {
-                    properties.setProperty(ValueGenerator.PROPERTY_KEY_CACHE_SIZE, "" + seqmd.getAllocationSize());
-                }
-                else
-                {
-                    // Use default allocation size
-                    int allocSize = getIntProperty(PropertyNames.PROPERTY_VALUEGEN_SEQUENCE_ALLOCSIZE);
-                    properties.setProperty(ValueGenerator.PROPERTY_KEY_CACHE_SIZE, "" + allocSize);
-                }
-
-                // Add on any extensions specified on the sequence
-                Map<String, String> seqExtensions = seqmd.getExtensions();
-                if (seqExtensions != null && seqExtensions.size() > 0)
-                {
-                    properties.putAll(seqExtensions);
-                }
-            }
-            else
-            {
-                // Set some defaults
-            }
+            addValueGenerationPropertiesForSequence(properties, seqmd);
         }
         return properties;
     }
