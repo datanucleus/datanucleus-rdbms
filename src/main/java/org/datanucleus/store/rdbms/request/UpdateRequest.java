@@ -197,20 +197,17 @@ public class UpdateRequest extends Request
         updateUserStmtMapping = consumer.getUpdateUserStatementMapping();
         updateTimestampStmtMapping = consumer.getUpdateTimestampStatementMapping();
 
-        // TODO Avoid this search for timestamp/user members
-        AbstractMemberMetaData[] mmds = cmd.getManagedMembers();
-        for (int i=0;i<mmds.length;i++)
+        int updateTimestampMemberPos = cmd.getUpdateTimestampMemberPosition();
+        if (updateTimestampMemberPos >= 0)
         {
-            if (mmds[i].isUpdateTimestamp())
-            {
-                AbstractMemberMetaData[] updateTsMmd = {mmds[i]};
-                table.provideMappingsForMembers(consumer, updateTsMmd, false);
-            }
-            else if (mmds[i].isUpdateUser())
-            {
-                AbstractMemberMetaData[] updateUserMmd = {mmds[i]};
-                table.provideMappingsForMembers(consumer, updateUserMmd, false);
-            }
+            AbstractMemberMetaData[] updateTsMmd = {cmd.getMetaDataForManagedMemberAtAbsolutePosition(updateTimestampMemberPos)};
+            table.provideMappingsForMembers(consumer, updateTsMmd, false);
+        }
+        int updateUserMemberPos = cmd.getUpdateUserMemberPosition();
+        if (updateUserMemberPos >= 0)
+        {
+            AbstractMemberMetaData[] updateUserMmd = {cmd.getMetaDataForManagedMemberAtAbsolutePosition(updateUserMemberPos)};
+            table.provideMappingsForMembers(consumer, updateUserMmd, false);
         }
 
         // WHERE clause - add identity
@@ -225,6 +222,8 @@ public class UpdateRequest extends Request
         }
         else
         {
+            // Nondurable identity
+            AbstractMemberMetaData[] mmds = cmd.getManagedMembers();
             table.provideMappingsForMembers(consumer, mmds, false);
         }
 
@@ -272,28 +271,28 @@ public class UpdateRequest extends Request
 
         if (stmt != null)
         {
-            // TODO Avoid this search for timestamp/user members
-            AbstractMemberMetaData[] mmds = cmd.getManagedMembers();
-            for (int i=0;i<mmds.length;i++)
+            // UpdateTimestamp
+            int updateTimestampMemberPos = cmd.getUpdateTimestampMemberPosition();
+            if (updateTimestampMemberPos >= 0)
             {
-                if (mmds[i].isUpdateTimestamp())
+                AbstractMemberMetaData updateTimestampMmd = cmd.getMetaDataForManagedMemberAtAbsolutePosition(updateTimestampMemberPos);
+                if (updateTimestampMmd.getType().isAssignableFrom(java.time.Instant.class))
                 {
-                    if (mmds[i].getType().isAssignableFrom(java.time.Instant.class))
-                    {
-                        sm.replaceField(mmds[i].getAbsoluteFieldNumber(), ec.getTransaction().getIsActive() ? 
-                            java.time.Instant.ofEpochMilli(ec.getTransaction().getBeginTime()) : java.time.Instant.now());
-                    }
-                    else
-                    {
-                        sm.replaceField(mmds[i].getAbsoluteFieldNumber(), ec.getTransaction().getIsActive() ? 
-                            new Timestamp(ec.getTransaction().getBeginTime()) : new Timestamp(System.currentTimeMillis()));
-                    }
-                    // TODO Throw exception if invalid member type
+                    sm.replaceField(updateTimestampMemberPos, ec.getTransaction().getIsActive() ? 
+                        java.time.Instant.ofEpochMilli(ec.getTransaction().getBeginTime()) : java.time.Instant.now());
                 }
-                else if (mmds[i].isUpdateUser())
+                else
                 {
-                    sm.replaceField(mmds[i].getAbsoluteFieldNumber(), ec.getCurrentUser());
+                    sm.replaceField(updateTimestampMemberPos, ec.getTransaction().getIsActive() ? 
+                        new Timestamp(ec.getTransaction().getBeginTime()) : new Timestamp(System.currentTimeMillis()));
                 }
+                // TODO Throw exception if invalid member type
+            }
+            // UpdateUser
+            int updateUserMemberPos = cmd.getUpdateUserMemberPosition();
+            if (updateUserMemberPos >= 0)
+            {
+                sm.replaceField(updateUserMemberPos, ec.getCurrentUser());
             }
 
             if (NucleusLogger.PERSISTENCE.isDebugEnabled())

@@ -146,6 +146,7 @@ public class DeleteRequest extends Request
         }
         else
         {
+            // Nondurable identity
             AbstractMemberMetaData[] mmds = cmd.getManagedMembers();
             table.provideMappingsForMembers(consumer, mmds, false);
         }
