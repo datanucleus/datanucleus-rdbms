@@ -320,37 +320,39 @@ public class InsertRequest extends Request
                         }
                     }
 
-                    // Provide all non-key fields needed for the insert.
-                    // This provides "persistence-by-reachability" for these fields
+                    // Provide all non-key fields needed for the insert - provides "persistence-by-reachability" for these fields
                     if (insertFieldNumbers.length > 0)
                     {
+                        AbstractClassMetaData cmd = sm.getClassMetaData();
+
+                        if (createTimestampStmtMapping != null)
+                        {
+                            // Set create timestamp to time for the start of this transaction
+                            int createTimestampMemberPos = cmd.getCreateTimestampMemberPosition();
+                            AbstractMemberMetaData mmd = cmd.getMetaDataForManagedMemberAtAbsolutePosition(createTimestampMemberPos);
+                            if (mmd.getType().isAssignableFrom(java.time.Instant.class))
+                            {
+                                sm.replaceField(createTimestampMemberPos, ec.getTransaction().getIsActive() ? 
+                                        java.time.Instant.ofEpochMilli(ec.getTransaction().getBeginTime()) : java.time.Instant.now());
+                            }
+                            else
+                            {
+                                sm.replaceField(createTimestampMemberPos, ec.getTransaction().getIsActive() ? 
+                                        new Timestamp(ec.getTransaction().getBeginTime()) : new Timestamp(System.currentTimeMillis()));
+                            }
+                        }
+                        if (createUserStmtMapping != null)
+                        {
+                            // Set create user to current user
+                            sm.replaceField(cmd.getCreateUserMemberPosition(), ec.getCurrentUser());
+                        }
+
                         int numberOfFieldsToProvide = 0;
+                        int numMembers = cmd.getMemberCount();
                         for (int i = 0; i < insertFieldNumbers.length; i++)
                         {
-                            if (insertFieldNumbers[i] < sm.getClassMetaData().getMemberCount())
+                            if (insertFieldNumbers[i] < numMembers)
                             {
-                                AbstractMemberMetaData mmd = sm.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(insertFieldNumbers[i]);
-                                if (mmd.isCreateTimestamp())
-                                {
-                                    // Set create timestamp to time for the start of this transaction
-                                    if (mmd.getType().isAssignableFrom(java.time.Instant.class))
-                                    {
-                                        sm.replaceField(insertFieldNumbers[i], ec.getTransaction().getIsActive() ? 
-                                                java.time.Instant.ofEpochMilli(ec.getTransaction().getBeginTime()) : java.time.Instant.now());
-                                    }
-                                    else
-                                    {
-                                        sm.replaceField(insertFieldNumbers[i], ec.getTransaction().getIsActive() ? 
-                                                new Timestamp(ec.getTransaction().getBeginTime()) : new Timestamp(System.currentTimeMillis()));
-                                    }
-                                    // TODO Throw exception if invalid member type
-                                }
-                                else if (mmd.isCreateUser())
-                                {
-                                    // Set create user to current user
-                                    sm.replaceField(insertFieldNumbers[i], ec.getCurrentUser());
-                                }
-
                                 numberOfFieldsToProvide++;
                             }
                         }
@@ -359,7 +361,7 @@ public class InsertRequest extends Request
                         int[] fieldNums = new int[numberOfFieldsToProvide];
                         for (int i = 0; i < insertFieldNumbers.length; i++)
                         {
-                            if (insertFieldNumbers[i] < sm.getClassMetaData().getMemberCount())
+                            if (insertFieldNumbers[i] < numMembers)
                             {
                                 fieldNums[j++] = insertFieldNumbers[i];
                             }
