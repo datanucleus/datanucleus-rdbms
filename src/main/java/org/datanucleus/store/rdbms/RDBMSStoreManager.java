@@ -3959,23 +3959,27 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                     }
                 }
 
-                for (AbstractMemberMetaData mmd : cmd.getManagedMembers())
+                int[] valueGenMemberPositions = cmd.getValueGenerationMemberPositions();
+                if (valueGenMemberPositions != null)
                 {
-                    ValueGenerationStrategy str = mmd.getValueStrategy();
-                    if (str == ValueGenerationStrategy.INCREMENT)
+                    for (int i=0;i<valueGenMemberPositions.length;i++)
                     {
-                        addSequenceTableForMetaData(mmd, clr, seqTablesGenerated);
-                    }
-                    else if (str == ValueGenerationStrategy.SEQUENCE)
-                    {
-                        String seqName = mmd.getSequence();
-                        if (StringUtils.isWhitespace(seqName))
+                        AbstractMemberMetaData valueGenMmd = cmd.getMetaDataForManagedMemberAtAbsolutePosition(valueGenMemberPositions[i]);
+                        if (valueGenMmd.getValueStrategy() == ValueGenerationStrategy.INCREMENT)
                         {
-                            seqName = mmd.getValueGeneratorName();
+                            addSequenceTableForMetaData(valueGenMmd, clr, seqTablesGenerated);
                         }
-                        if (!StringUtils.isWhitespace(seqName))
+                        else if (valueGenMmd.getValueStrategy() == ValueGenerationStrategy.SEQUENCE)
                         {
-                            addSequenceForMetaData(mmd, seqName, clr, sequencesGenerated, ddlWriter);
+                            String seqName = valueGenMmd.getSequence();
+                            if (StringUtils.isWhitespace(seqName))
+                            {
+                                seqName = valueGenMmd.getValueGeneratorName();
+                            }
+                            if (!StringUtils.isWhitespace(seqName))
+                            {
+                                addSequenceForMetaData(valueGenMmd, seqName, clr, sequencesGenerated, ddlWriter);
+                            }
                         }
                     }
                 }
