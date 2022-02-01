@@ -79,7 +79,7 @@ public class DeleteTablesSchemaTransaction extends AbstractSchemaTransaction
             boolean success = true;
             try
             {
-                NucleusLogger.DATASTORE_SCHEMA.debug(Localiser.msg("050045", rdbmsMgr.getCatalogName(), rdbmsMgr.getSchemaName()));
+                NucleusLogger.DATASTORE_SCHEMA.debug(Localiser.msg("050045", rdbmsMgr.getDefaultCatalogName(), rdbmsMgr.getDefaultSchemaName()));
 
                 // Create definition of tables/views to drop
                 Set<Table> tables = new HashSet<>();
@@ -230,6 +230,6 @@ public class DeleteTablesSchemaTransaction extends AbstractSchemaTransaction
      */
     public String toString()
     {
-        return Localiser.msg("050045", rdbmsMgr.getCatalogName(), rdbmsMgr.getSchemaName());
+        return Localiser.msg("050045", rdbmsMgr.getDefaultCatalogName(), rdbmsMgr.getDefaultSchemaName());
     }
 }

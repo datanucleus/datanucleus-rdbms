@@ -210,10 +210,10 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
     /** Factory for identifiers for this datastore. */
     protected IdentifierFactory identifierFactory;
 
-    /** Catalog name for the database (if supported). */
+    /** Default catalog name for the datastore. */
     protected String catalogName = null;
 
-    /** Schema name for the database (if supported). */
+    /** Default schema name for the datastore. */
     protected String schemaName = null;
 
     /** Manager for the mapping between Java and datastore types. */
@@ -1488,20 +1488,14 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
         ((RDBMSPersistenceHandler)persistenceHandler).removeAllRequests();
     }
 
-    /**
-     * Accessor for the (default) RDBMS catalog name.
-     * @return The catalog name.
-     */
-    public String getCatalogName()
+    @Override
+    public String getDefaultCatalogName()
     {
         return catalogName;
     }
 
-    /**
-     * Accessor for the (default) RDBMS schema name.
-     * @return The schema name.
-     */
-    public String getSchemaName()
+    @Override
+    public String getDefaultSchemaName()
     {
         return schemaName;
     }

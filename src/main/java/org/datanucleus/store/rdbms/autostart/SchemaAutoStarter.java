@@ -99,7 +99,7 @@ public class SchemaAutoStarter extends AbstractAutoStartMechanism
         catch (Exception e)
         {
             // Validation error - table is different to what we expect
-            NucleusLogger.DATASTORE_SCHEMA.error(Localiser.msg("049001",storeMgr.getSchemaName(),e));
+            NucleusLogger.DATASTORE_SCHEMA.error(Localiser.msg("049001",storeMgr.getDefaultSchemaName(),e));
 
             try
             {
@@ -124,7 +124,7 @@ public class SchemaAutoStarter extends AbstractAutoStartMechanism
             }
             catch (Exception e2)
             {
-                NucleusLogger.DATASTORE_SCHEMA.error(Localiser.msg("049001",storeMgr.getSchemaName(),e2));
+                NucleusLogger.DATASTORE_SCHEMA.error(Localiser.msg("049001",storeMgr.getDefaultSchemaName(),e2));
             }
         }
         finally

@@ -409,12 +409,12 @@ public class RDBMSSchemaHandler extends AbstractStoreSchemaHandler
         String catalogName = (c[0] != null) ? c[0] : table.getCatalogName();
         if (catalogName == null)
         {
-            catalogName = rdbmsStoreMgr.getCatalogName();
+            catalogName = rdbmsStoreMgr.getDefaultCatalogName();
         }
         String schemaName  = (c[1] != null) ? c[1] : table.getSchemaName();
         if (schemaName == null)
         {
-            schemaName = rdbmsStoreMgr.getSchemaName();
+            schemaName = rdbmsStoreMgr.getDefaultSchemaName();
         }
         String tableName   = (c[2] != null) ? c[2] : table.getIdentifier().getName();
 
@@ -558,7 +558,7 @@ public class RDBMSSchemaHandler extends AbstractStoreSchemaHandler
                         {
                             schemaCorrect = true;
                         }
-                        else if (foundSchema != null && StringUtils.isWhitespace(inputSchema) && foundSchema.equals(((RDBMSStoreManager)storeMgr).getSchemaName()))
+                        else if (foundSchema != null && StringUtils.isWhitespace(inputSchema) && foundSchema.equals(((RDBMSStoreManager)storeMgr).getDefaultSchemaName()))
                         {
                             schemaCorrect = true;
                         }
@@ -578,7 +578,7 @@ public class RDBMSSchemaHandler extends AbstractStoreSchemaHandler
                         {
                             catalogCorrect = true;
                         }
-                        else if (foundCatalog != null && StringUtils.isWhitespace(inputCatalog) && foundCatalog.equals(((RDBMSStoreManager)storeMgr).getCatalogName()))
+                        else if (foundCatalog != null && StringUtils.isWhitespace(inputCatalog) && foundCatalog.equals(((RDBMSStoreManager)storeMgr).getDefaultCatalogName()))
                         {
                             catalogCorrect = true;
                         }
@@ -642,12 +642,12 @@ public class RDBMSSchemaHandler extends AbstractStoreSchemaHandler
         String catalogName = (c[0] != null) ? c[0] : table.getCatalogName();
         if (catalogName == null)
         {
-            catalogName = rdbmsStoreMgr.getCatalogName();
+            catalogName = rdbmsStoreMgr.getDefaultCatalogName();
         }
         String schemaName  = (c[1] != null) ? c[1] : table.getSchemaName();
         if (schemaName == null)
         {
-            schemaName = rdbmsStoreMgr.getSchemaName();
+            schemaName = rdbmsStoreMgr.getDefaultSchemaName();
         }
         String tableName   = (c[2] != null) ? c[2] : table.getIdentifier().getName();
 
@@ -713,12 +713,12 @@ public class RDBMSSchemaHandler extends AbstractStoreSchemaHandler
         String catalogName = (c[0] != null) ? c[0] : table.getCatalogName();
         if (catalogName == null)
         {
-            catalogName = rdbmsStoreMgr.getCatalogName();
+            catalogName = rdbmsStoreMgr.getDefaultCatalogName();
         }
         String schemaName  = (c[1] != null) ? c[1] : table.getSchemaName();
         if (schemaName == null)
         {
-            schemaName = rdbmsStoreMgr.getSchemaName();
+            schemaName = rdbmsStoreMgr.getDefaultSchemaName();
         }
         String tableName   = (c[2] != null) ? c[2] : table.getIdentifier().getName();
 
@@ -784,12 +784,12 @@ public class RDBMSSchemaHandler extends AbstractStoreSchemaHandler
         String catalogName = (c[0] != null) ? c[0] : table.getCatalogName();
         if (catalogName == null)
         {
-            catalogName = rdbmsStoreMgr.getCatalogName();
+            catalogName = rdbmsStoreMgr.getDefaultCatalogName();
         }
         String schemaName  = (c[1] != null) ? c[1] : table.getSchemaName();
         if (schemaName == null)
         {
-            schemaName = rdbmsStoreMgr.getSchemaName();
+            schemaName = rdbmsStoreMgr.getDefaultSchemaName();
         }
         String tableName   = (c[2] != null) ? c[2] : table.getIdentifier().getName();
 
@@ -818,10 +818,10 @@ public class RDBMSSchemaHandler extends AbstractStoreSchemaHandler
         {
             // Note : the table name has no quotes here.
             String schemaNameTmp = schemaName;
-            if (schemaName == null && rdbmsStoreMgr.getSchemaName() != null)
+            if (schemaName == null && rdbmsStoreMgr.getDefaultSchemaName() != null)
             {
                 // This is a hack for the DatabaseAdapter method that requires a schema for Oracle
-                schemaNameTmp = rdbmsStoreMgr.getSchemaName();
+                schemaNameTmp = rdbmsStoreMgr.getDefaultSchemaName();
                 schemaNameTmp = getIdentifierForUseWithDatabaseMetaData(schemaNameTmp);
             }
             ResultSet rs = dba.getExistingIndexes(conn, catalogName, schemaNameTmp, tableName);
@@ -963,12 +963,12 @@ public class RDBMSSchemaHandler extends AbstractStoreSchemaHandler
         String catalogName = (c[0] != null) ? c[0] : table.getCatalogName();
         if (catalogName == null)
         {
-            catalogName = rdbmsStoreMgr.getCatalogName();
+            catalogName = rdbmsStoreMgr.getDefaultCatalogName();
         }
         String schemaName  = (c[1] != null) ? c[1] : table.getSchemaName();
         if (schemaName == null)
         {
-            schemaName = rdbmsStoreMgr.getSchemaName();
+            schemaName = rdbmsStoreMgr.getDefaultSchemaName();
         }
         String tableName   = (c[2] != null) ? c[2] : table.getIdentifier().getName();
 
@@ -993,7 +993,7 @@ public class RDBMSSchemaHandler extends AbstractStoreSchemaHandler
         if (info == null)
         {
             // No schema info defined yet
-            info = new RDBMSSchemaInfo(rdbmsStoreMgr.getCatalogName(), rdbmsStoreMgr.getSchemaName());
+            info = new RDBMSSchemaInfo(rdbmsStoreMgr.getDefaultCatalogName(), rdbmsStoreMgr.getDefaultSchemaName());
             schemaDataByName.put(TYPE_TABLES, info);
         }
 
@@ -1096,7 +1096,7 @@ public class RDBMSSchemaHandler extends AbstractStoreSchemaHandler
         RDBMSSchemaInfo info = (RDBMSSchemaInfo)getSchemaData(connection, TYPE_TABLES, null);
         if (info == null)
         {
-            info = new RDBMSSchemaInfo(rdbmsStoreMgr.getCatalogName(), rdbmsStoreMgr.getSchemaName());
+            info = new RDBMSSchemaInfo(rdbmsStoreMgr.getDefaultCatalogName(), rdbmsStoreMgr.getDefaultSchemaName());
             schemaDataByName.put(TYPE_TABLES, info);
         }
 

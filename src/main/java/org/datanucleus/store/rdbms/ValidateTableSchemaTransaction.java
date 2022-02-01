@@ -76,6 +76,6 @@ public class ValidateTableSchemaTransaction extends AbstractSchemaTransaction
      */
     public String toString()
     {
-        return Localiser.msg("050048", table, rdbmsMgr.getCatalogName(), rdbmsMgr.getSchemaName());
+        return Localiser.msg("050048", table, rdbmsMgr.getDefaultCatalogName(), rdbmsMgr.getDefaultSchemaName());
     }
 }
