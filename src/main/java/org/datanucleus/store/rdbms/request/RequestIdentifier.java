@@ -41,8 +41,7 @@ public class RequestIdentifier
      * @param type The type being represented
      * @param className The name of the class
      */
-    public RequestIdentifier(DatastoreClass table, AbstractMemberMetaData[] mmds, RequestType type, 
-            String className)
+    public RequestIdentifier(DatastoreClass table, AbstractMemberMetaData[] mmds, RequestType type, String className)
     {
         this.table = table;
         this.type = type;
@@ -116,7 +115,6 @@ public class RequestIdentifier
             return false;
         }
 
-        return table.equals(ri.table) && type.equals(ri.type) &&
-            Arrays.equals(memberNumbers, ri.memberNumbers) && className.equals(ri.className);
+        return table.equals(ri.table) && type.equals(ri.type) && Arrays.equals(memberNumbers, ri.memberNumbers) && className.equals(ri.className);
     }
 }

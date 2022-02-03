@@ -28,6 +28,7 @@ import java.util.Set;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ExecutionContext;
+import org.datanucleus.FetchPlanForClass;
 import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.exceptions.NucleusObjectNotFoundException;
@@ -103,12 +104,12 @@ public class RDBMSPersistenceHandler extends AbstractPersistenceHandler
     /**
      * Inserts a persistent object into the database.
      * The insert can take place in several steps, one insert per table that it is stored in.
-     * e.g When persisting an object that uses "new-table" inheritance for each level of the inheritance tree
-     * then will get an INSERT into each table. When persisting an object that uses "complete-table"
-     * inheritance then will get a single INSERT into its table.
+     * e.g When persisting an object that uses "new-table" inheritance for each level of the inheritance tree then will get an INSERT into each table. 
+     * When persisting an object that uses "complete-table" inheritance then will get a single INSERT into its table.
      * @param sm StateManager for the object to be inserted.
      * @throws NucleusDataStoreException when an error occurs in the datastore communication
      */
+    @Override
     public void insertObject(DNStateManager sm)
     {
         // Check if read-only so update not permitted
@@ -197,14 +198,15 @@ public class RDBMSPersistenceHandler extends AbstractPersistenceHandler
 
     /**
      * Fetches (fields of) a persistent object from the database.
-     * This does a single SELECT on the candidate of the class in question. Will join to inherited
-     * tables as appropriate to get values persisted into other tables. Can also join to the tables of
-     * related objects (1-1, N-1) as neccessary to retrieve those objects.
+     * This does a single SELECT on the candidate of the class in question. 
+     * Will join to inherited tables as appropriate to get values persisted into other tables. 
+     * Can also join to the tables of related objects (1-1, N-1) as necessary to retrieve those objects.
      * @param sm StateManager of the object to be fetched.
      * @param memberNumbers The numbers of the members to be fetched.
      * @throws NucleusObjectNotFoundException if the object doesn't exist
      * @throws NucleusDataStoreException when an error occurs in the datastore communication
      */
+    @Override
     public void fetchObject(DNStateManager sm, int memberNumbers[])
     {
         ExecutionContext ec = sm.getExecutionContext();
@@ -312,7 +314,7 @@ public class RDBMSPersistenceHandler extends AbstractPersistenceHandler
             }
 
             DatastoreClass table = getDatastoreClass(sm.getClassMetaData().getFullClassName(), clr);
-            Request req = getFetchRequest(table, mmds, sm.getClassMetaData(), clr);
+            Request req = getFetchRequest(table, sm.getFetchPlanForClass(), mmds, sm.getClassMetaData(), clr);
             req.execute(sm);
         }
     }
@@ -321,18 +323,20 @@ public class RDBMSPersistenceHandler extends AbstractPersistenceHandler
      * Returns a request object that will fetch a row from the given table. 
      * The store manager will cache the request object for re-use by subsequent requests to the same table.
      * @param table The table from which to fetch.
+     * @param fpClass FetchPlan for the class being fetched
      * @param mmds MetaData for the members corresponding to the columns to be fetched.
      * @param cmd ClassMetaData of the object of the request
      * @param clr ClassLoader resolver
      * @return A fetch request object.
      */
-    private Request getFetchRequest(DatastoreClass table, AbstractMemberMetaData[] mmds, AbstractClassMetaData cmd, ClassLoaderResolver clr)
+    private Request getFetchRequest(DatastoreClass table, FetchPlanForClass fpClass, AbstractMemberMetaData[] mmds, AbstractClassMetaData cmd, ClassLoaderResolver clr)
     {
+        // TODO Add fpClass to RequestIdentifier
         RequestIdentifier reqID = new RequestIdentifier(table, mmds, RequestType.FETCH, cmd.getFullClassName());
         Request req = requestsByID.get(reqID);
         if (req == null)
         {
-            req = new FetchRequest(table, mmds, cmd, clr);
+            req = new FetchRequest(table, fpClass, mmds, cmd, clr);
             requestsByID.put(reqID, req);
         }
         return req;
@@ -342,15 +346,14 @@ public class RDBMSPersistenceHandler extends AbstractPersistenceHandler
 
     /**
      * Updates a persistent object in the database.
-     * The update can take place in several steps, one update per table that it is stored in (depending on 
-     * which fields are updated).
-     * e.g When updating an object that uses "new-table" inheritance for each level of the inheritance tree
-     * then will get an UPDATE into each table. When updating an object that uses "complete-table"
-     * inheritance then will get a single UPDATE into its table.
+     * The update can take place in several steps, one update per table that it is stored in (depending on which fields are updated).
+     * e.g When updating an object that uses "new-table" inheritance for each level of the inheritance tree then will get an UPDATE into each table.
+     * When updating an object that uses "complete-table" inheritance then will get a single UPDATE into its table.
      * @param sm StateManager for the object to be updated.
      * @param fieldNumbers The numbers of the fields to be updated.
      * @throws NucleusDataStoreException when an error occurs in the datastore communication
      */
+    @Override
     public void updateObject(DNStateManager sm, int fieldNumbers[])
     {
         // Check if read-only so update not permitted
@@ -443,12 +446,12 @@ public class RDBMSPersistenceHandler extends AbstractPersistenceHandler
     /**
      * Deletes a persistent object from the database.
      * The delete can take place in several steps, one delete per table that it is stored in.
-     * e.g When deleting an object that uses "new-table" inheritance for each level of the inheritance tree
-     * then will get an DELETE for each table. When deleting an object that uses "complete-table"
-     * inheritance then will get a single DELETE for its table.
+     * e.g When deleting an object that uses "new-table" inheritance for each level of the inheritance tree then will get an DELETE for each table.
+     * When deleting an object that uses "complete-table" inheritance then will get a single DELETE for its table.
      * @param sm StateManager for the object to be deleted.
      * @throws NucleusDataStoreException when an error occurs in the datastore communication
      */
+    @Override
     public void deleteObject(DNStateManager sm)
     {
         // Check if read-only so update not permitted
@@ -522,6 +525,7 @@ public class RDBMSPersistenceHandler extends AbstractPersistenceHandler
 
     // ------------------------------ Locate ----------------------------------
 
+    @Override
     public void locateObjects(DNStateManager[] sms)
     {
         if (sms == null || sms.length == 0)
@@ -565,6 +569,7 @@ public class RDBMSPersistenceHandler extends AbstractPersistenceHandler
      * @throws NucleusObjectNotFoundException if the object doesnt exist
      * @throws NucleusDataStoreException when an error occurs in the datastore communication
      */
+    @Override
     public void locateObject(DNStateManager sm)
     {
         ClassLoaderResolver clr = sm.getExecutionContext().getClassLoaderResolver();
@@ -612,6 +617,7 @@ public class RDBMSPersistenceHandler extends AbstractPersistenceHandler
      * @return a persistable object with a valid object state (for example: hollow) or null, 
      *     indicating that the implementation leaves the instantiation work to us.
      */
+    @Override
     public Object findObject(ExecutionContext ec, Object id)
     {
         return null;

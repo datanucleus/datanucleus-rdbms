@@ -27,6 +27,7 @@ import java.util.List;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ExecutionContext;
+import org.datanucleus.FetchPlanForClass;
 import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.exceptions.NucleusObjectNotFoundException;
 import org.datanucleus.identity.IdentityUtils;
@@ -103,15 +104,14 @@ public class FetchRequest extends Request
     /**
      * Constructor, taking the table. Uses the structure of the datastore table to build a basic query.
      * @param classTable The Class Table representing the datastore table to retrieve
+     * @param fpClass FetchPlan for class being loaded
      * @param mmds MetaData of the fields/properties to retrieve
      * @param cmd ClassMetaData of objects being fetched
      * @param clr ClassLoader resolver
      */
-    public FetchRequest(DatastoreClass classTable, AbstractMemberMetaData[] mmds, AbstractClassMetaData cmd, ClassLoaderResolver clr)
+    public FetchRequest(DatastoreClass classTable, FetchPlanForClass fpClass, AbstractMemberMetaData[] mmds, AbstractClassMetaData cmd, ClassLoaderResolver clr)
     {
         super(classTable);
-
-        RDBMSStoreManager storeMgr = classTable.getStoreManager();
 
         // Work out the real candidate table.
         // Instead of just taking the most derived table as the candidate we find the table closest to the root table necessary to retrieve the requested fields
@@ -169,10 +169,12 @@ public class FetchRequest extends Request
         // TODO Can we skip the statement generation if we know there are no selectable fields?
 
         // Generate the statement for the requested members
+        RDBMSStoreManager storeMgr = classTable.getStoreManager();
         SelectStatement sqlStatement = new SelectStatement(storeMgr, table, null, null);
+
         mappingDefinition = new StatementClassMapping();
         mappingCallbacks = new ArrayList<>();
-        numberOfFieldsToFetch = processMembersOfClass(sqlStatement, mmds, table, sqlStatement.getPrimaryTable(), mappingDefinition, mappingCallbacks, clr);
+        numberOfFieldsToFetch = processMembersOfClass(sqlStatement, fpClass, mmds, table, sqlStatement.getPrimaryTable(), mappingDefinition, mappingCallbacks, clr);
         memberNumbersToFetch = mappingDefinition.getMemberNumbers();
 
         // Add WHERE clause restricting to an object of this type
@@ -508,6 +510,7 @@ public class FetchRequest extends Request
      * Can recurse if some of the requested fields are persistent objects in their own right, so we
      * take the opportunity to retrieve some of their fields.
      * @param sqlStatement Statement being built
+     * @param fpClass FetchPlan for the primary class
      * @param mmds Meta-data for the required fields/properties
      * @param table The table to look for member mappings
      * @param sqlTbl The table in the SQL statement to use for selects
@@ -516,7 +519,7 @@ public class FetchRequest extends Request
      * @param clr ClassLoader resolver
      * @return Number of fields being fetched
      */
-    protected int processMembersOfClass(SelectStatement sqlStatement, AbstractMemberMetaData[] mmds, 
+    protected int processMembersOfClass(SelectStatement sqlStatement, FetchPlanForClass fpClass, AbstractMemberMetaData[] mmds, 
             DatastoreClass table, SQLTable sqlTbl, StatementClassMapping mappingDef, Collection fetchCallbacks, ClassLoaderResolver clr)
     {
         int number = 0;
@@ -546,20 +549,28 @@ public class FetchRequest extends Request
 
                         if (mappingToUse instanceof PersistableMapping)
                         {
-                            // Special case of 1-1/N-1 where we know the other side type so know what to join to, hence can load the related object
-                            depth = 1;
-                            if (Modifier.isAbstract(mmdToUse.getType().getModifiers()))
+                            if (fpClass.getRecursionDepthForMember(mmd.getAbsoluteFieldNumber()) == 0)
                             {
-                                String typeName = mmdToUse.getTypeName();
-								DatastoreClass relTable = table.getStoreManager().getDatastoreClass(typeName, clr);
-                                if (relTable != null && relTable.getSurrogateMapping(SurrogateColumnType.DISCRIMINATOR, false) == null)
+                                // Special case of 1-1/N-1 and recursion-depth set as 0 (just retrieve the FK and don't instantiate the related object in the field)
+                                depth = 0;
+                            }
+                            else
+                            {
+                                // Special case of 1-1/N-1 where we know the other side type so know what to join to and can load the related object
+                                depth = 1;
+                                if (Modifier.isAbstract(mmdToUse.getType().getModifiers()))
                                 {
-                                    // 1-1 relation to base class with no discriminator and has subclasses
-                                    // hence no way of determining the exact type, hence no point in fetching it
-                                    String[] subclasses = table.getStoreManager().getMetaDataManager().getSubclassesForClass(typeName, false);
-                                    if (subclasses != null && subclasses.length > 0)
+                                    String typeName = mmdToUse.getTypeName();
+                                    DatastoreClass relTable = table.getStoreManager().getDatastoreClass(typeName, clr);
+                                    if (relTable != null && relTable.getSurrogateMapping(SurrogateColumnType.DISCRIMINATOR, false) == null)
                                     {
-                                        depth = 0;
+                                        // 1-1 relation to base class with no discriminator and has subclasses
+                                        // hence no way of determining the exact type, hence no point in fetching it
+                                        String[] subclasses = table.getStoreManager().getMetaDataManager().getSubclassesForClass(typeName, false);
+                                        if (subclasses != null && subclasses.length > 0)
+                                        {
+                                            depth = 0;
+                                        }
                                     }
                                 }
                             }
