@@ -39,8 +39,8 @@ import org.datanucleus.state.LockMode;
 import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.connection.ManagedConnection;
 import org.datanucleus.store.rdbms.mapping.MappingCallbacks;
+import org.datanucleus.store.rdbms.mapping.MappingHelper;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
-import org.datanucleus.store.rdbms.mapping.java.PersistableIdMapping;
 import org.datanucleus.store.rdbms.mapping.java.PersistableMapping;
 import org.datanucleus.store.rdbms.mapping.java.ReferenceMapping;
 import org.datanucleus.store.rdbms.mapping.java.SingleCollectionMapping;
@@ -498,10 +498,22 @@ public class FetchRequest extends Request
                                     if (m instanceof PersistableMapping)
                                     {
                                         // Create the identity of the related object
-                                        // TODO Note this will check the cache for an object and create a dummy object if none present. Prevent that.
-                                        PersistableIdMapping idMapping = new PersistableIdMapping((PersistableMapping) m);
-                                        Object value = idMapping.getObject(ec, rs, mapIdx.getColumnPositions());
-                                        sm.setAssociatedValue(DNStateManager.MEMBER_VALUE_STORED_PREFIX + memberNumbersToStoreFK[i], value);
+                                        AbstractClassMetaData memberCmd = ((PersistableMapping)m).getClassMetaData();
+
+                                        Object memberId = null;
+                                        if (memberCmd.getIdentityType() == IdentityType.DATASTORE)
+                                        {
+                                            memberId = MappingHelper.getDatastoreIdentityForResultSetRow(ec, m, rs, mapIdx.getColumnPositions(), memberCmd);
+                                        }
+                                        else if (memberCmd.getIdentityType() == IdentityType.APPLICATION)
+                                        {
+                                            memberId = MappingHelper.getApplicationIdentityForResultSetRow(ec, m, rs, mapIdx.getColumnPositions(), memberCmd);
+                                        }
+                                        else
+                                        {
+                                            break;
+                                        }
+                                        sm.setAssociatedValue(DNStateManager.MEMBER_VALUE_STORED_PREFIX + memberNumbersToStoreFK[i], memberId);
                                     }
                                 }
                             }

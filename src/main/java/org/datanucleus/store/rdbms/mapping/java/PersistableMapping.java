@@ -108,6 +108,15 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
     }
 
     /**
+     * Metadata for the class that this represents an object of.
+     * @return ClassMetaData
+     */
+    public AbstractClassMetaData getClassMetaData()
+    {
+        return cmd;
+    }
+
+    /**
      * Initialize this JavaTypeMapping with the given DatastoreAdapter for the given metadata.
      * @param mmd MetaData for the field/property to be mapped (if any)
      * @param table The datastore container storing this mapping (if any)
