@@ -40,6 +40,7 @@ import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.connection.ManagedConnection;
 import org.datanucleus.store.rdbms.mapping.MappingCallbacks;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
+import org.datanucleus.store.rdbms.mapping.java.PersistableIdMapping;
 import org.datanucleus.store.rdbms.mapping.java.PersistableMapping;
 import org.datanucleus.store.rdbms.mapping.java.ReferenceMapping;
 import org.datanucleus.store.rdbms.mapping.java.SingleCollectionMapping;
@@ -83,6 +84,9 @@ public class FetchRequest extends Request
 
     /** Absolute numbers of the fields/properties of the class to fetch. */
     private int[] memberNumbersToFetch = null;
+
+    /** Absolute numbers of the members of the class to store the FK value for. */
+    private int[] memberNumbersToStoreFK = null;
 
     /** The mapping of the results of the SQL statement. */
     private StatementClassMapping mappingDefinition;
@@ -174,8 +178,28 @@ public class FetchRequest extends Request
 
         mappingDefinition = new StatementClassMapping();
         mappingCallbacks = new ArrayList<>();
-        numberOfFieldsToFetch = processMembersOfClass(sqlStatement, fpClass, mmds, table, sqlStatement.getPrimaryTable(), mappingDefinition, mappingCallbacks, clr);
+        List<Integer> memberNumbersToStoreFKTmp = new ArrayList();
+        numberOfFieldsToFetch = processMembersOfClass(sqlStatement, fpClass, mmds, table, sqlStatement.getPrimaryTable(), mappingDefinition, mappingCallbacks, clr, memberNumbersToStoreFKTmp);
         memberNumbersToFetch = mappingDefinition.getMemberNumbers();
+        if (memberNumbersToStoreFKTmp.size() > 0)
+        {
+            int[] memberNumberTmp = new int[memberNumbersToFetch.length - memberNumbersToStoreFKTmp.size()];
+            int j = 0;
+            for (int i=0;i<memberNumbersToFetch.length;i++)
+            {
+                if (!memberNumbersToStoreFKTmp.contains(memberNumbersToFetch[i]))
+                {
+                    memberNumberTmp[j++] = memberNumbersToFetch[i];
+                }
+            }
+            memberNumbersToFetch = memberNumberTmp;
+            memberNumbersToStoreFK = new int[memberNumbersToStoreFKTmp.size()];
+            j = 0;
+            for (Integer absNum : memberNumbersToStoreFKTmp)
+            {
+                memberNumbersToStoreFK[j++] = absNum;
+            }
+        }
 
         // Add WHERE clause restricting to an object of this type
         int inputParamNum = 1;
@@ -465,6 +489,22 @@ public class FetchRequest extends Request
                             // Update all fields
                             // TODO If we ever support just loading a FK value but not instantiating this needs to store the value in StateManager.
                             sm.replaceFields(memberNumbersToFetch, rsGetter);
+                            if (memberNumbersToStoreFK != null)
+                            {
+                                for (int i=0;i<memberNumbersToStoreFK.length;i++)
+                                {
+                                    StatementMappingIndex mapIdx = mappingDefinition.getMappingForMemberPosition(memberNumbersToStoreFK[i]);
+                                    JavaTypeMapping m = mapIdx.getMapping();
+                                    if (m instanceof PersistableMapping)
+                                    {
+                                        // Create the identity of the related object
+                                        // TODO Note this will check the cache for an object and create a dummy object if none present. Prevent that.
+                                        PersistableIdMapping idMapping = new PersistableIdMapping((PersistableMapping) m);
+                                        Object value = idMapping.getObject(ec, rs, mapIdx.getColumnPositions());
+                                        sm.setAssociatedValue(DNStateManager.MEMBER_VALUE_STORED_PREFIX + memberNumbersToStoreFK[i], value);
+                                    }
+                                }
+                            }
                         }
                         finally
                         {
@@ -520,7 +560,7 @@ public class FetchRequest extends Request
      * @return Number of fields being fetched
      */
     protected int processMembersOfClass(SelectStatement sqlStatement, FetchPlanForClass fpClass, AbstractMemberMetaData[] mmds, 
-            DatastoreClass table, SQLTable sqlTbl, StatementClassMapping mappingDef, Collection fetchCallbacks, ClassLoaderResolver clr)
+            DatastoreClass table, SQLTable sqlTbl, StatementClassMapping mappingDef, Collection fetchCallbacks, ClassLoaderResolver clr, List<Integer> membersToFetchFK)
     {
         int number = 0;
         if (mmds != null)
@@ -534,10 +574,9 @@ public class FetchRequest extends Request
                 {
                     if (!mmd.isPrimaryKey() && mapping.includeInFetchStatement())
                     {
-                        // The depth is the number of levels down to load in this statement.
-                        // 0 is to load just this objects fields (as with JPOX, and DataNucleus up to 1.1.3)
+                        // The depth is the number of levels down to load in this statement : 0 is to load just this objects fields
                         int depth = 0;
-                        
+
                         AbstractMemberMetaData mmdToUse = mmd;
                         JavaTypeMapping mappingToUse = mapping;
                         if (mapping instanceof SingleCollectionMapping)
@@ -547,12 +586,14 @@ public class FetchRequest extends Request
                             mmdToUse = ((SingleCollectionMapping) mapping).getWrappedMapping().getMemberMetaData();
                         }
 
+                        boolean fetchAndSaveFK = false;
                         if (mappingToUse instanceof PersistableMapping)
                         {
                             if (fpClass.getRecursionDepthForMember(mmd.getAbsoluteFieldNumber()) == 0)
                             {
                                 // Special case of 1-1/N-1 and recursion-depth set as 0 (just retrieve the FK and don't instantiate the related object in the field)
                                 depth = 0;
+                                fetchAndSaveFK = true;
                             }
                             else
                             {
@@ -593,6 +634,10 @@ public class FetchRequest extends Request
                         // But this will mean we cannot cache the statement, since it is for a specific ExecutionContext
                         // TODO If this field is a 1-1 and the other side has a discriminator or version then we really ought to fetch it
                         SQLStatementHelper.selectMemberOfSourceInStatement(sqlStatement, mappingDef, null, sqlTbl, mmd, clr, depth, null);
+                        if (fetchAndSaveFK)
+                        {
+                            membersToFetchFK.add(mmd.getAbsoluteFieldNumber());
+                        }
                         number++;
                     }
 
