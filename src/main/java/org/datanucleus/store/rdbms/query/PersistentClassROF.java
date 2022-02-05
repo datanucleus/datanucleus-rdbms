@@ -465,6 +465,7 @@ public final class PersistentClassROF<T> extends AbstractROF<T>
             }
             else
             {
+                // TODO Not passing in memberNumbersToStore. Why are we using fieldNumbers anyway?
                 obj = findObjectWithIdAndLoadFields(id, fieldNumbers, null, pcClassForObject, cmd, surrogateVersion);
             }
         }
