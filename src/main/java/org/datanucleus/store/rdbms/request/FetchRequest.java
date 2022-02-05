@@ -513,7 +513,17 @@ public class FetchRequest extends Request
                                         {
                                             break;
                                         }
-                                        sm.setAssociatedValue(DNStateManager.MEMBER_VALUE_STORED_PREFIX + memberNumbersToStoreFK[i], memberId);
+
+                                        if (memberId == null)
+                                        {
+                                            // Just set the member and don't bother saving the value
+                                            sm.replaceField(memberNumbersToStoreFK[i], null);
+                                        }
+                                        else
+                                        {
+                                            // Store the "id" value in case the member is ever accessed
+                                            sm.setAssociatedValue(DNStateManager.MEMBER_VALUE_STORED_PREFIX + memberNumbersToStoreFK[i], memberId);
+                                        }
                                     }
                                 }
                             }
