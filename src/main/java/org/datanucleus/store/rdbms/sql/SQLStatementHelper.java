@@ -706,6 +706,15 @@ public class SQLStatementHelper
         {
             selectSubobjects = true;
         }
+        if (fetchPlan != null)
+        {
+            FetchPlanForClass fpClass = fetchPlan.getFetchPlanForClass(mmd.getAbstractClassMetaData());
+            if (fpClass.getRecursionDepthForMember(mmd.getAbsoluteFieldNumber()) == 0)
+            {
+                // User has marked this member as recursion-depth=0 meaning pull in just the FK and dont join to the sub-object
+                selectSubobjects = false;
+            }
+        }
 
         // Set table-group name for any related object we join to (naming based on member name)
         String tableGroupName = sourceSqlTbl.getGroupName() + "." + mmd.getName();

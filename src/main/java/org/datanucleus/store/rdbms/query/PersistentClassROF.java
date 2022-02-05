@@ -29,11 +29,14 @@ package org.datanucleus.store.rdbms.query;
 import java.lang.reflect.Modifier;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.FetchPlan;
+import org.datanucleus.FetchPlanForClass;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.identity.IdentityUtils;
@@ -45,7 +48,9 @@ import org.datanucleus.metadata.InterfaceMetaData;
 import org.datanucleus.metadata.VersionMetaData;
 import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.FieldValues;
+import org.datanucleus.store.rdbms.mapping.MappingHelper;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
+import org.datanucleus.store.rdbms.mapping.java.PersistableMapping;
 import org.datanucleus.store.schema.table.SurrogateColumnType;
 import org.datanucleus.store.rdbms.fieldmanager.ResultSetGetter;
 import org.datanucleus.util.ConcurrentReferenceHashMap;
@@ -325,6 +330,38 @@ public final class PersistentClassROF<T> extends AbstractROF<T>
             }
         }
 
+        // Split mappedFieldNumbers into memberToSet and membersToStore
+        FetchPlanForClass fpClass = fp.getFetchPlanForClass(cmd);
+        List<Integer> memberNumbersToStoreTmp = new ArrayList<>();
+        for (int i=0;i<mappedFieldNumbers.length;i++)
+        {
+            if (fpClass.getRecursionDepthForMember(mappedFieldNumbers[i]) == 0)
+            {
+                memberNumbersToStoreTmp.add(mappedFieldNumbers[i]);
+            }
+        }
+        int[] memberNumbersToStore = null;
+        int[] memberNumbersToLoad = mappedFieldNumbers;
+        if (memberNumbersToStoreTmp.size() > 0)
+        {
+            int[] memberNumberTmp = new int[mappedFieldNumbers.length - memberNumbersToStoreTmp.size()];
+            int j = 0;
+            for (int i=0;i<fieldNumbers.length;i++)
+            {
+                if (!memberNumbersToStoreTmp.contains(mappedFieldNumbers[i]))
+                {
+                    memberNumberTmp[j++] = mappedFieldNumbers[i];
+                }
+            }
+            memberNumbersToLoad = memberNumberTmp;
+            memberNumbersToStore = new int[memberNumbersToStoreTmp.size()];
+            j = 0;
+            for (Integer absNum : memberNumbersToStoreTmp)
+            {
+                memberNumbersToStore[j++] = absNum;
+            }
+        }
+
         // Extract the object from the ResultSet
         T obj = null;
         boolean needToSetVersion = false;
@@ -379,7 +416,7 @@ public final class PersistentClassROF<T> extends AbstractROF<T>
                     pcClassForObject = clr.classForName(idClassName);
                 }
 
-                obj = findObjectWithIdAndLoadFields(id, mappedFieldNumbers, pcClassForObject, cmd, surrogateVersion);
+                obj = findObjectWithIdAndLoadFields(id, memberNumbersToLoad, memberNumbersToStore, pcClassForObject, cmd, surrogateVersion);
             }
         }
         else if (cmd.getIdentityType() == IdentityType.DATASTORE)
@@ -408,7 +445,7 @@ public final class PersistentClassROF<T> extends AbstractROF<T>
                 }
                 else
                 {
-                    obj = findObjectWithIdAndLoadFields(id, mappedFieldNumbers, requiresInheritanceCheck ? null : pcClassForObject, cmd, surrogateVersion);
+                    obj = findObjectWithIdAndLoadFields(id, memberNumbersToLoad, memberNumbersToStore, requiresInheritanceCheck ? null : pcClassForObject, cmd, surrogateVersion);
                 }
             }
         }
@@ -428,7 +465,7 @@ public final class PersistentClassROF<T> extends AbstractROF<T>
             }
             else
             {
-                obj = findObjectWithIdAndLoadFields(id, fieldNumbers, pcClassForObject, cmd, surrogateVersion);
+                obj = findObjectWithIdAndLoadFields(id, fieldNumbers, null, pcClassForObject, cmd, surrogateVersion);
             }
         }
 
@@ -465,13 +502,15 @@ public final class PersistentClassROF<T> extends AbstractROF<T>
     /**
      * Method to lookup an object for an id, and specify its FieldValues using the ResultSet. Works for all identity types.
      * @param id The identity (DatastoreId, Application id, or SCOID when nondurable)
-     * @param fieldNumbers Field numbers that we have results for
+     * @param membersToLoad Absolute numbers of members to load
+     * @param membersToStore Absolute numbers of members to store in StateManager (for later)
      * @param pcClass The class of the required object if known
      * @param cmd Metadata for the type
      * @param surrogateVersion The version when the object has a surrogate version field
      * @return The persistable object for this id
      */
-    private T findObjectWithIdAndLoadFields(final Object id, final int[] fieldNumbers, Class pcClass, final AbstractClassMetaData cmd, final Object surrogateVersion)
+    private T findObjectWithIdAndLoadFields(final Object id, final int[] membersToLoad, final int[] membersToStore, Class pcClass, final AbstractClassMetaData cmd, 
+            final Object surrogateVersion)
     {
         return (T) ec.findObject(id, new FieldValues()
         {
@@ -479,7 +518,8 @@ public final class PersistentClassROF<T> extends AbstractROF<T>
             public void fetchFields(DNStateManager sm)
             {
                 resultSetGetter.setStateManager(sm);
-                sm.replaceFields(fieldNumbers, resultSetGetter, false);
+
+                sm.replaceFields(membersToLoad, resultSetGetter, false);
 
                 // Set version
                 if (surrogateVersion != null)
@@ -501,11 +541,52 @@ public final class PersistentClassROF<T> extends AbstractROF<T>
                         }
                     }
                 }
+
+                if (membersToStore != null)
+                {
+                    for (int i=0;i<membersToStore.length;i++)
+                    {
+                        StatementMappingIndex mapIdx = mappingDefinition.getMappingForMemberPosition(membersToStore[i]);
+                        JavaTypeMapping m = mapIdx.getMapping();
+                        if (m instanceof PersistableMapping)
+                        {
+                            // Create the identity of the related object
+                            AbstractClassMetaData memberCmd = ((PersistableMapping)m).getClassMetaData();
+
+                            Object memberId = null;
+                            if (memberCmd.getIdentityType() == IdentityType.DATASTORE)
+                            {
+                                memberId = MappingHelper.getDatastoreIdentityForResultSetRow(ec, m, rs, mapIdx.getColumnPositions(), memberCmd);
+                            }
+                            else if (memberCmd.getIdentityType() == IdentityType.APPLICATION)
+                            {
+                                memberId = MappingHelper.getApplicationIdentityForResultSetRow(ec, m, rs, mapIdx.getColumnPositions(), memberCmd);
+                            }
+                            else
+                            {
+                                break;
+                            }
+
+                            if (memberId == null)
+                            {
+                                // Just set the member to null and don't bother saving the value
+                                sm.replaceField(membersToStore[i], null);
+                            }
+                            else
+                            {
+                                // Store the "id" value in case the member is ever accessed
+                                sm.setAssociatedValue(DNStateManager.MEMBER_VALUE_STORED_PREFIX + membersToStore[i], memberId);
+                            }
+                        }
+                    }
+                }
             }
             public void fetchNonLoadedFields(DNStateManager sm)
             {
                 resultSetGetter.setStateManager(sm);
-                sm.replaceNonLoadedFields(fieldNumbers, resultSetGetter);
+
+                // TODO Use membersToStore here?
+                sm.replaceNonLoadedFields(membersToLoad, resultSetGetter);
             }
 
             public FetchPlan getFetchPlanForLoading()
