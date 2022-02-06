@@ -339,6 +339,14 @@ public final class PersistentClassROF<T> extends AbstractROF<T>
             {
                 memberNumbersToStoreTmp.add(mappedFieldNumbers[i]);
             }
+            else
+            {
+                AbstractMemberMetaData mmd = cmd.getMetaDataForManagedMemberAtAbsolutePosition(mappedFieldNumbers[i]);
+                if (mmd.fetchFKOnly())
+                {
+                    memberNumbersToStoreTmp.add(mappedFieldNumbers[i]);
+                }
+            }
         }
         int[] memberNumbersToStore = null;
         int[] memberNumbersToLoad = mappedFieldNumbers;

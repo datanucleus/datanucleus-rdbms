@@ -617,6 +617,12 @@ public class FetchRequest extends Request
                                 depth = 0;
                                 fetchAndSaveFK = true;
                             }
+                            else if (mmd.fetchFKOnly())
+                            {
+                                // Special case of 1-1/N-1 and fetch-fk-only extension - same as above
+                                depth = 0;
+                                fetchAndSaveFK = true;
+                            }
                             else
                             {
                                 // Special case of 1-1/N-1 where we know the other side type so know what to join to and can load the related object

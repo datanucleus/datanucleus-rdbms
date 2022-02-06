@@ -706,6 +706,11 @@ public class SQLStatementHelper
         {
             selectSubobjects = true;
         }
+        if (mmd.fetchFKOnly())
+        {
+            // Equivalent to recursion-depth=0
+            selectSubobjects = false;
+        }
         if (fetchPlan != null)
         {
             FetchPlanForClass fpClass = fetchPlan.getFetchPlanForClass(mmd.getAbstractClassMetaData());
