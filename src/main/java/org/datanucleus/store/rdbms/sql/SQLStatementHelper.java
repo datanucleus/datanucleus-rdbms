@@ -714,7 +714,7 @@ public class SQLStatementHelper
         if (fetchPlan != null)
         {
             FetchPlanForClass fpClass = fetchPlan.getFetchPlanForClass(mmd.getAbstractClassMetaData());
-            if (fpClass.getRecursionDepthForMember(mmd.getAbsoluteFieldNumber()) == 0)
+            if (RelationType.isRelationSingleValued(mmd.getRelationType(clr)) && fpClass.getRecursionDepthForMember(mmd.getAbsoluteFieldNumber()) == 0)
             {
                 // User has marked this member as recursion-depth=0 meaning pull in just the FK and dont join to the sub-object
                 selectSubobjects = false;

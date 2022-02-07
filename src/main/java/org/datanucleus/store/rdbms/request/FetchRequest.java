@@ -34,6 +34,7 @@ import org.datanucleus.identity.IdentityUtils;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.IdentityType;
+import org.datanucleus.metadata.RelationType;
 import org.datanucleus.metadata.VersionMetaData;
 import org.datanucleus.state.LockMode;
 import org.datanucleus.state.DNStateManager;
@@ -611,7 +612,7 @@ public class FetchRequest extends Request
                         boolean fetchAndSaveFK = false;
                         if (mappingToUse instanceof PersistableMapping)
                         {
-                            if (fpClass.getRecursionDepthForMember(mmd.getAbsoluteFieldNumber()) == 0)
+                            if (RelationType.isRelationSingleValued(mmd.getRelationType(clr)) && fpClass.getRecursionDepthForMember(mmd.getAbsoluteFieldNumber()) == 0)
                             {
                                 // Special case of 1-1/N-1 and recursion-depth set as 0 (just retrieve the FK and don't instantiate the related object in the field)
                                 depth = 0;
