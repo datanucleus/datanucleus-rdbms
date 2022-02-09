@@ -166,7 +166,8 @@ public abstract class SQLExpression
 
         st.append(op.toString());
 
-        if (op == Expression.OP_LIKE && stmt.getRDBMSManager().getDatastoreAdapter().supportsOption(DatastoreAdapter.RAW_PREFIX_LIKE_STATEMENTS)){
+        if (op == Expression.OP_LIKE && stmt.getRDBMSManager().getDatastoreAdapter().supportsOption(DatastoreAdapter.RAW_PREFIX_LIKE_STATEMENTS))
+        {
             expr2.toSQLText().prepend("r");
         }
 
