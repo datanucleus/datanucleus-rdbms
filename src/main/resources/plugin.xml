@@ -75,6 +75,7 @@ Contributors:
 
         <persistence-property name="datanucleus.rdbms.datastoreAdapterClassName" datastore="true"/>
         <persistence-property name="datanucleus.rdbms.omitDatabaseMetaDataGetColumns" datastore="true" value="false" validator="org.datanucleus.properties.BooleanPropertyValidator"/>
+        <persistence-property name="datanucleus.rdbms.omitValueGenerationGetColumns" datastore="true" value="false" validator="org.datanucleus.properties.BooleanPropertyValidator"/>
         <persistence-property name="datanucleus.rdbms.refreshAllTablesOnRefreshColumns" datastore="true" value="false" validator="org.datanucleus.properties.BooleanPropertyValidator"/>
         <persistence-property name="datanucleus.rdbms.sqlTableNamingStrategy" datastore="true" value="alpha-scheme"/>
         <persistence-property name="datanucleus.rdbms.allowColumnReuse" datastore="true" value="false"/>
@@ -124,6 +125,7 @@ Contributors:
         <datastore-adapter vendor-id="db2" class-name="org.datanucleus.store.rdbms.adapter.DB2Adapter" priority="0"/>
         <datastore-adapter vendor-id="derby" class-name="org.datanucleus.store.rdbms.adapter.DerbyAdapter" priority="0"/>
         <datastore-adapter vendor-id="firebird" class-name="org.datanucleus.store.rdbms.adapter.FirebirdAdapter" priority="0"/>
+        <datastore-adapter vendor-id="Google Cloud Spanner" class-name="org.datanucleus.store.rdbms.adapter.CloudSpannerAdapter" priority="0"/>
         <datastore-adapter vendor-id="h2" class-name="org.datanucleus.store.rdbms.adapter.H2Adapter" priority="0"/>
         <datastore-adapter vendor-id="hsql" class-name="org.datanucleus.store.rdbms.adapter.HSQLAdapter" priority="0"/>
         <datastore-adapter vendor-id="informix" class-name="org.datanucleus.store.rdbms.adapter.InformixAdapter" priority="0"/>

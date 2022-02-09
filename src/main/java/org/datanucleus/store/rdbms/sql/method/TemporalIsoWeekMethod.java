@@ -17,27 +17,25 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.store.rdbms.sql.method;
 
-import java.util.ArrayList;
 import java.util.List;
-
 import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.expression.NumericExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
 
 /**
- * Method for evaluating HOUR({dateExpr}) for Firebird and CloudSpanner.
- * Returns a NumericExpression that equates to <pre>extract(HOUR FROM expr)</pre>
+ * Method for evaluating ISOWEEK({dateExpr}) for CloudSpanner.
+ * Returns a NumericExpression that equates to <pre>extract(ISOWEEK FROM expr)</pre>
  */
-public class TemporalHourMethod6 extends TemporalBaseMethod
+public class TemporalIsoWeekMethod extends TemporalBaseMethod
 {
     /* (non-Javadoc)
      * @see org.datanucleus.store.rdbms.sql.method.SQLMethod#getExpression(org.datanucleus.store.rdbms.sql.expression.SQLExpression, java.util.List)
      */
     public SQLExpression getExpression(SQLStatement stmt, SQLExpression expr, List<SQLExpression> args)
     {
-        SQLExpression invokedExpr = getInvokedExpression(expr, args, "HOUR");
+        SQLExpression invokedExpr = getInvokedExpression(expr, args, "ISOWEEK");
 
-        invokedExpr.toSQLText().prepend("HOUR FROM ");
-        return new NumericExpression(stmt, stmt.getSQLExpressionFactory().getMappingForType(int.class), "EXTRACT", List.of(invokedExpr));
+        invokedExpr.toSQLText().prepend("ISOWEEK FROM ");
+        return new NumericExpression(stmt, stmt.getSQLExpressionFactory().getMappingForType(int.class, true), "EXTRACT", List.of(invokedExpr));
     }
 }

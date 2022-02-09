@@ -57,6 +57,19 @@ public class BooleanExpression extends SQLExpression
     }
 
     /**
+     * Generates statement as "FUNCTION_NAME(arg [,argN])" such as STARTS_WITH(arg1, arg2).
+     * @param stmt The statement
+     * @param mapping Mapping to use
+     * @param functionName Name of function
+     * @param args SQLExpression list
+     */
+    public BooleanExpression(SQLStatement stmt, JavaTypeMapping mapping, String functionName, List args)
+    {
+        super(stmt, mapping, functionName, args, null);
+        hasClosure = true;
+    }
+
+    /**
      * Constructor for a boolean expression for the specified mapping of the table.
      * The boolean expression DOESN'T have closure using this constructor.
      * @param stmt The statement

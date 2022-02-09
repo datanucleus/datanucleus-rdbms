@@ -25,7 +25,7 @@ import org.datanucleus.store.rdbms.sql.expression.NumericExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
 
 /**
- * Method for evaluating SECOND({dateExpr}) for Firebird.
+ * Method for evaluating SECOND({dateExpr}) for Firebird and CloudSpanner.
  * Returns a NumericExpression that equates to <pre>extract(SECOND FROM expr)</pre>
  */
 public class TemporalSecondMethod7 extends TemporalBaseMethod
@@ -38,8 +38,6 @@ public class TemporalSecondMethod7 extends TemporalBaseMethod
         SQLExpression invokedExpr = getInvokedExpression(expr, args, "SECOND");
 
         invokedExpr.toSQLText().prepend("SECOND FROM ");
-        ArrayList funcArgs = new ArrayList();
-        funcArgs.add(invokedExpr);
-        return new NumericExpression(stmt, stmt.getSQLExpressionFactory().getMappingForType(int.class, true), "EXTRACT", funcArgs);
+        return new NumericExpression(stmt, stmt.getSQLExpressionFactory().getMappingForType(int.class, true), "EXTRACT", List.of(invokedExpr));
     }
 }
