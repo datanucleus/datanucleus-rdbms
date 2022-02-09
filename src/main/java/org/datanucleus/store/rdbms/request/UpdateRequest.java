@@ -127,7 +127,7 @@ public class UpdateRequest extends Request
 
         this.cmd = cmd;
         versionMetaData = table.getVersionMetaData();
-        if (versionMetaData != null && versionMetaData.getVersionStrategy() != VersionStrategy.NONE)
+        if (versionMetaData != null && versionMetaData.getStrategy() != VersionStrategy.NONE)
         {
             // Only apply a version check if we have a strategy defined
             versionChecks = true;
@@ -143,14 +143,14 @@ public class UpdateRequest extends Request
             // We update the record whether or not there are any (other) columns to update in this table 
             // i.e when we just have an SCO collection/map field in a related table, so the version is upped in that situation also
             // TODO Allow the option of not updating the version in that situation
-            if (versionMetaData.getFieldName() != null)
+            if (versionMetaData.getMemberName() != null)
             {
                 // Version field
                 int numUpdateFields = reqFieldMetaData.length;
                 boolean includesVersion = false;
                 for (int i=0;i<reqFieldMetaData.length;i++)
                 {
-                    if (reqFieldMetaData[i].getName().equals(versionMetaData.getFieldName()))
+                    if (reqFieldMetaData[i].getName().equals(versionMetaData.getMemberName()))
                     {
                         includesVersion = true;
                         break;
@@ -169,7 +169,7 @@ public class UpdateRequest extends Request
                 if (!includesVersion)
                 {
                     // Version not updated, so add it since we will be updating it
-                    updateFmds[updateFmds.length-1] = cmd.getMetaDataForMember(versionMetaData.getFieldName());
+                    updateFmds[updateFmds.length-1] = cmd.getMetaDataForMember(versionMetaData.getMemberName());
                 }
                 table.provideMappingsForMembers(consumer, updateFmds, false);
             }
@@ -235,11 +235,11 @@ public class UpdateRequest extends Request
             // We update the record whether or not there are any (other) columns to update in this table 
             // i.e when we just have an SCO collection/map field in a related table, so the version is upped in that situation also
             // TODO Allow the option of not updating the version in that situation
-            if (versionMetaData.getFieldName() != null)
+            if (versionMetaData.getMemberName() != null)
             {
                 // Version field
                 AbstractMemberMetaData[] updateFmds = new AbstractMemberMetaData[1];
-                updateFmds[0] = cmd.getMetaDataForMember(versionMetaData.getFieldName());
+                updateFmds[0] = cmd.getMetaDataForMember(versionMetaData.getMemberName());
                 table.provideMappingsForMembers(consumer, updateFmds, false);
             }
             else
@@ -311,7 +311,7 @@ public class UpdateRequest extends Request
                     }
                 }
 
-                if (versionMetaData != null && versionMetaData.getFieldName() == null)
+                if (versionMetaData != null && versionMetaData.getMemberName() == null)
                 {
                     if (fieldStr.length() > 0)
                     {
@@ -344,10 +344,10 @@ public class UpdateRequest extends Request
                         if (versionMetaData != null) // TODO What if strategy is NONE?
                         {
                             // Set the next version in the object
-                            if (versionMetaData.getFieldName() != null)
+                            if (versionMetaData.getMemberName() != null)
                             {
                                 // Version field
-                                AbstractMemberMetaData verfmd = cmd.getMetaDataForMember(table.getVersionMetaData().getFieldName());
+                                AbstractMemberMetaData verfmd = cmd.getMetaDataForMember(table.getVersionMetaData().getMemberName());
                                 if (currentVersion instanceof Number)
                                 {
                                     currentVersion = Long.valueOf(((Number)currentVersion).longValue());
@@ -401,7 +401,7 @@ public class UpdateRequest extends Request
                             sm.provideFields(updateFieldNumbers, new ParameterSetter(sm, ps, mappingDefinition));
                         }
 
-                        if (versionMetaData != null && versionMetaData.getFieldName() == null)
+                        if (versionMetaData != null && versionMetaData.getMemberName() == null)
                         {
                             // SELECT clause - set the surrogate version column to the new version
                             StatementMappingIndex mapIdx = stmtMappingDefinition.getUpdateVersion();
@@ -648,7 +648,7 @@ public class UpdateRequest extends Request
                         // The candidate being updated isn't in this table, so go to base for metadata for this mapping
                         vermd = cmd.getBaseAbstractClassMetaData().getVersionMetaDataForClass();
                     }
-                    if (vermd != null && vermd.getFieldName() != null && mmd.getName().equals(vermd.getFieldName()))
+                    if (vermd != null && vermd.getMemberName() != null && mmd.getName().equals(vermd.getMemberName()))
                     {
                         // Version field to be put in WHERE clause (only non-PK field that will come here)
                         stmtMappingDefinition.setWhereVersion(sei);

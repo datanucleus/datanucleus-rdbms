@@ -303,13 +303,13 @@ public final class PersistentClassROF<T> extends AbstractROF<T>
         if (vermd != null)
         {
             StatementMappingIndex versionMappingIdx = null;
-            if (vermd.getFieldName() == null)
+            if (vermd.getMemberName() == null)
             {
                 versionMappingIdx = resultMapping.getMappingForMemberPosition(SurrogateColumnType.VERSION.getFieldNumber());
             }
             else
             {
-                versionMappingIdx = resultMapping.getMappingForMemberPosition(cmd.getMetaDataForMember(vermd.getFieldName()).getAbsoluteFieldNumber());
+                versionMappingIdx = resultMapping.getMappingForMemberPosition(cmd.getMetaDataForMember(vermd.getMemberName()).getAbsoluteFieldNumber());
             }
 
             if (versionMappingIdx != null)
@@ -488,10 +488,10 @@ public final class PersistentClassROF<T> extends AbstractROF<T>
             }
             else
             {
-                if (vermd != null && vermd.getFieldName() != null)
+                if (vermd != null && vermd.getMemberName() != null)
                 {
                     // Version stored in a normal field
-                    int versionFieldNumber = rootCmd.getMetaDataForMember(vermd.getFieldName()).getAbsoluteFieldNumber();
+                    int versionFieldNumber = rootCmd.getMetaDataForMember(vermd.getMemberName()).getAbsoluteFieldNumber();
                     if (resultMapping.getMappingForMemberPosition(versionFieldNumber) != null)
                     {
                         DNStateManager objOP = ec.findStateManager(obj);
@@ -536,11 +536,11 @@ public final class PersistentClassROF<T> extends AbstractROF<T>
                     // Surrogate version field
                     sm.setVersion(surrogateVersion);
                 }
-                else if (cmd.getVersionMetaData() != null && cmd.getVersionMetaData().getFieldName() != null)
+                else if (cmd.getVersionMetaData() != null && cmd.getVersionMetaData().getMemberName() != null)
                 {
                     // Version stored in a normal field
                     VersionMetaData vermd = cmd.getVersionMetaData();
-                    int versionFieldNumber = rootCmd.getMetaDataForMember(vermd.getFieldName()).getAbsoluteFieldNumber();
+                    int versionFieldNumber = rootCmd.getMetaDataForMember(vermd.getMemberName()).getAbsoluteFieldNumber();
                     if (resultMapping.getMappingForMemberPosition(versionFieldNumber) != null)
                     {
                         Object verFieldValue = sm.provideField(versionFieldNumber);

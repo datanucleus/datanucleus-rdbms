@@ -86,7 +86,7 @@ public class JDOHelperGetVersionMethod implements SQLMethod
                         throw new NucleusUserException("Cannot use JDOHelper.getVersion on object that has no version information");
                     }
 
-                    if (table.getVersionMetaData().getVersionStrategy() == VersionStrategy.VERSION_NUMBER)
+                    if (table.getVersionMetaData().getStrategy() == VersionStrategy.VERSION_NUMBER)
                     {
                         return new NumericExpression(stmt, expr.getSQLTable(), mapping);
                     }

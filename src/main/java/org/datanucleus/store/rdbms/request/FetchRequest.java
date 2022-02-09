@@ -156,7 +156,7 @@ public class FetchRequest extends Request
             VersionMetaData currentVermd = currentTable.getVersionMetaData();
             if (currentVermd != null)
             {
-                if (currentVermd.getFieldName() == null)
+                if (currentVermd.getMemberName() == null)
                 {
                     // Surrogate version stored in this table
                     fetchingSurrogateVersion = true;
@@ -164,7 +164,7 @@ public class FetchRequest extends Request
                 else
                 {
                     // Version field
-                    versionFieldName = currentVermd.getFieldName();
+                    versionFieldName = currentVermd.getMemberName();
                 }
             }
 

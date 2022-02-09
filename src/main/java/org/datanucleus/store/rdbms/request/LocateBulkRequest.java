@@ -135,7 +135,7 @@ public class LocateBulkRequest extends BulkRequest
         if (verMapping != null)
         {
             VersionMetaData currentVermd = table.getVersionMetaData();
-            if (currentVermd != null && currentVermd.getFieldName() == null)
+            if (currentVermd != null && currentVermd.getMemberName() == null)
             {
                 // Surrogate version column
                 SQLExpression expr = exprFactory.newExpression(sqlStatement, sqlStatement.getPrimaryTable(), verMapping);
@@ -524,7 +524,7 @@ public class LocateBulkRequest extends BulkRequest
                     Object datastoreVersion = null;
                     if (currentVermd != null)
                     {
-                        if (currentVermd.getFieldName() == null)
+                        if (currentVermd.getMemberName() == null)
                         {
                             // Surrogate version
                             versionMapping = table.getSurrogateMapping(SurrogateColumnType.VERSION, true); // Why use true now?
@@ -533,7 +533,7 @@ public class LocateBulkRequest extends BulkRequest
                         }
                         else
                         {
-                            datastoreVersion = sm.provideField(cmd.getAbsolutePositionOfMember(currentVermd.getFieldName()));
+                            datastoreVersion = sm.provideField(cmd.getAbsolutePositionOfMember(currentVermd.getMemberName()));
                         }
                         sm.setVersion(datastoreVersion);
                     }

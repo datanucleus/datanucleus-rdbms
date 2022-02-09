@@ -274,19 +274,19 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
         // Add Version where specified in MetaData
         // TODO If there is a superclass table that has a version we should omit from here even if in MetaData. See "getTableWithDiscriminator()" for the logic
         versionMetaData = cmd.getVersionMetaDataForTable();
-        if (versionMetaData != null && versionMetaData.getFieldName() == null)
+        if (versionMetaData != null && versionMetaData.getMemberName() == null)
         {
-            if (versionMetaData.getVersionStrategy() == VersionStrategy.NONE)
+            if (versionMetaData.getStrategy() == VersionStrategy.NONE)
             {
                 // Equate NONE to an integral column (TODO Allow for using timestamp when not checking the version?)
                 // See also LockManagerImpl
                 versionMapping = new VersionMapping.VersionLongMapping(this, storeMgr.getMappingManager().getMapping(Long.class));
             }
-            else if (versionMetaData.getVersionStrategy() == VersionStrategy.VERSION_NUMBER)
+            else if (versionMetaData.getStrategy() == VersionStrategy.VERSION_NUMBER)
             {
                 versionMapping = new VersionMapping.VersionLongMapping(this, storeMgr.getMappingManager().getMapping(Long.class));
             }
-            else if (versionMetaData.getVersionStrategy() == VersionStrategy.DATE_TIME)
+            else if (versionMetaData.getStrategy() == VersionStrategy.DATE_TIME)
             {
                 if (!dba.supportsOption(DatastoreAdapter.DATETIME_STORES_MILLISECS))
                 {
@@ -297,7 +297,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                 }
                 versionMapping = new VersionMapping.VersionTimestampMapping(this, storeMgr.getMappingManager().getMapping(Timestamp.class));
             }
-            else if (versionMetaData.getVersionStrategy() == VersionStrategy.STATE_IMAGE)
+            else if (versionMetaData.getStrategy() == VersionStrategy.STATE_IMAGE)
             {
                 // TODO Support state-image strategy
                 throw new NucleusUserException("DataNucleus doesnt currently support version strategy \"state-image\"");

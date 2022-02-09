@@ -124,7 +124,7 @@ public class DeleteRequest extends Request
 
         this.cmd = cmd;
         versionMetaData = table.getVersionMetaData();
-        if (versionMetaData != null && versionMetaData.getVersionStrategy() != VersionStrategy.NONE)
+        if (versionMetaData != null && versionMetaData.getStrategy() != VersionStrategy.NONE)
         {
             // Only apply a version check if we have a strategy defined
             versionChecks = true;
@@ -158,11 +158,11 @@ public class DeleteRequest extends Request
         // Add on the optimistic discriminator (if appropriate) to get the delete statement for optimistic txns
         if (versionMetaData != null)
         {
-            if (versionMetaData.getFieldName() != null)
+            if (versionMetaData.getMemberName() != null)
             {
                 // Version field
                 AbstractMemberMetaData[] versionFmds = new AbstractMemberMetaData[1];
-                versionFmds[0] = cmd.getMetaDataForMember(versionMetaData.getFieldName());
+                versionFmds[0] = cmd.getMetaDataForMember(versionMetaData.getMemberName());
                 table.provideMappingsForMembers(consumer, versionFmds, false);
             }
             else
@@ -590,7 +590,7 @@ public class DeleteRequest extends Request
                         // The candidate being updated isn't in this table, so go to base for metadata for this mapping
                         vermd = cmd.getBaseAbstractClassMetaData().getVersionMetaDataForClass();
                     }
-                    if (vermd != null && vermd.getFieldName() != null && mmd.getName().equals(vermd.getFieldName()))
+                    if (vermd != null && vermd.getMemberName() != null && mmd.getName().equals(vermd.getMemberName()))
                     {
                         // Version field
                         StatementMappingIndex sei = new StatementMappingIndex(m);

@@ -1154,7 +1154,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                 if (verTable == stmt.getPrimaryTable().getTable())
                 {
                     VersionMetaData vermd = candidateCmd.getVersionMetaDataForClass();
-                    if (vermd.getVersionStrategy() == VersionStrategy.VERSION_NUMBER)
+                    if (vermd.getStrategy() == VersionStrategy.VERSION_NUMBER)
                     {
                         // Increment the version
                         SQLTable verSqlTbl = stmt.getTable(verTable, stmt.getPrimaryTable().getGroupName());
@@ -1168,7 +1168,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                         updateSqlExprs[oldArray.length] = updateSqlExpr;
                         performingUpdate = true;
                     }
-                    else if (vermd.getVersionStrategy() == VersionStrategy.DATE_TIME)
+                    else if (vermd.getStrategy() == VersionStrategy.DATE_TIME)
                     {
                         // Set version to the time of update
                         SQLTable verSqlTbl = stmt.getTable(verTable, stmt.getPrimaryTable().getGroupName());

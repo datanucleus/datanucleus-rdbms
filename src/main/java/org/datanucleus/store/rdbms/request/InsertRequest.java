@@ -245,10 +245,10 @@ public class InsertRequest extends Request
         {
             VersionMetaData vermd = table.getVersionMetaData();
             RDBMSStoreManager storeMgr = table.getStoreManager();
-            if (vermd != null && vermd.getFieldName() != null)
+            if (vermd != null && vermd.getMemberName() != null)
             {
                 // Version field - Update the version in the object
-                AbstractMemberMetaData verfmd = ((AbstractClassMetaData)vermd.getParent()).getMetaDataForMember(vermd.getFieldName());
+                AbstractMemberMetaData verfmd = ((AbstractClassMetaData)vermd.getParent()).getMetaDataForMember(vermd.getMemberName());
                 Object currentVersion = sm.getVersion();
                 if (currentVersion instanceof Number)
                 {
@@ -381,7 +381,7 @@ public class InsertRequest extends Request
                         }
                         sm.setTransactionalVersion(nextOptimisticVersion);
                     }
-                    else if (vermd != null && vermd.getFieldName() != null)
+                    else if (vermd != null && vermd.getMemberName() != null)
                     {
                         // Version field - set the new version for the object
                         Object currentVersion = sm.getVersion();
