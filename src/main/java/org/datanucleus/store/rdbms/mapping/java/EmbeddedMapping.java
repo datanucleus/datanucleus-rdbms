@@ -21,6 +21,7 @@ package org.datanucleus.store.rdbms.mapping.java;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
@@ -148,11 +149,11 @@ public abstract class EmbeddedMapping extends SingleFieldMapping
 
         embCmd = rootEmbCmd;
 
-        AbstractMemberMetaData[] embFmds = null;
+        List<AbstractMemberMetaData> embFmds = null;
         if (emd == null && rootEmbCmd.isEmbeddedOnly())
         {
             // No <embedded> block yet the class is defined as embedded-only so just use its own definition of fields
-            embFmds = rootEmbCmd.getManagedMembers();
+            embFmds = Arrays.asList(rootEmbCmd.getManagedMembers());
         }
         else if (emd != null)
         {
@@ -250,7 +251,7 @@ public abstract class EmbeddedMapping extends SingleFieldMapping
      * @param embMmd Member to be added
      * @param embMmds The metadata defining mapping information for the members (if any)
      */
-    private void addMappingForMember(AbstractClassMetaData embCmd, AbstractMemberMetaData embMmd, AbstractMemberMetaData[] embMmds)
+    private void addMappingForMember(AbstractClassMetaData embCmd, AbstractMemberMetaData embMmd, List<AbstractMemberMetaData> embMmdsMapping)
     {
         if (emd != null && emd.getOwnerMember() != null && emd.getOwnerMember().equals(embMmd.getName()))
         {
@@ -259,20 +260,20 @@ public abstract class EmbeddedMapping extends SingleFieldMapping
         else
         {
             AbstractMemberMetaData embeddedMmd = null;
-            for (int j=0;j<embMmds.length;j++)
+            for (AbstractMemberMetaData embMmdMapping : embMmdsMapping)
             {
                 // Why are these even possible ? Why are they here ? Why don't they use localised messages ?
-                if (embMmds[j] == null)
+                if (embMmdMapping == null)
                 {
                     throw new RuntimeException("embMmds[j] is null for class=" + embCmd.toString() + " type="+ typeName);
                 }
-                AbstractMemberMetaData embMmdForMmds = embCmd.getMetaDataForMember(embMmds[j].getName());
+                AbstractMemberMetaData embMmdForMmds = embCmd.getMetaDataForMember(embMmdMapping.getName());
                 if (embMmdForMmds != null)
                 {
                     if (embMmdForMmds.getAbsoluteFieldNumber() == embMmd.getAbsoluteFieldNumber())
                     {
                         // Same as the member we are processing, so use it
-                        embeddedMmd = embMmds[j];
+                        embeddedMmd = embMmdMapping;
                     }
                 }
             }
