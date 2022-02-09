@@ -570,8 +570,7 @@ public class FetchRequest extends Request
 
     /**
      * Method to process the supplied members of the class, adding to the SQLStatement as required.
-     * Can recurse if some of the requested fields are persistent objects in their own right, so we
-     * take the opportunity to retrieve some of their fields.
+     * Can recurse if some of the requested fields are persistent objects in their own right, so we take the opportunity to retrieve some of their fields.
      * @param sqlStatement Statement being built
      * @param fpClass FetchPlan for the primary class
      * @param mmds Meta-data for the required fields/properties
@@ -580,10 +579,11 @@ public class FetchRequest extends Request
      * @param mappingDef Mapping definition for the result
      * @param fetchCallbacks Any additional required callbacks are added here
      * @param clr ClassLoader resolver
-     * @return Number of fields being fetched
+     * @param membersToStoreFK List of members where we can select the FK column(s) and store the returned FK rather than instantiate the related object
+     * @return Number of members being fetched
      */
     protected int processMembersOfClass(SelectStatement sqlStatement, FetchPlanForClass fpClass, AbstractMemberMetaData[] mmds, 
-            DatastoreClass table, SQLTable sqlTbl, StatementClassMapping mappingDef, Collection fetchCallbacks, ClassLoaderResolver clr, List<Integer> membersToFetchFK)
+            DatastoreClass table, SQLTable sqlTbl, StatementClassMapping mappingDef, Collection fetchCallbacks, ClassLoaderResolver clr, List<Integer> membersToStoreFK)
     {
         int number = 0;
         if (mmds != null)
@@ -665,7 +665,7 @@ public class FetchRequest extends Request
                         SQLStatementHelper.selectMemberOfSourceInStatement(sqlStatement, mappingDef, null, sqlTbl, mmd, clr, depth, null);
                         if (fetchAndSaveFK)
                         {
-                            membersToFetchFK.add(mmd.getAbsoluteFieldNumber());
+                            membersToStoreFK.add(mmd.getAbsoluteFieldNumber());
                         }
                         number++;
                     }
