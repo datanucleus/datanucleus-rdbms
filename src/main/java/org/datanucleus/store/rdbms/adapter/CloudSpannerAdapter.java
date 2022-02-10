@@ -75,7 +75,6 @@ public class CloudSpannerAdapter extends BaseDatastoreAdapter
         supportedOptions.remove(SEQUENCES);
         supportedOptions.remove(VALUE_GENERATION_UUID_STRING);
         supportedOptions.remove(SOME_ANY_ALL_SUBQUERY_EXPRESSIONS);
-        supportedOptions.remove(ANALYSIS_METHODS);
 
         supportedOptions.remove(ALTER_TABLE_DROP_FOREIGN_KEY_CONSTRAINT);
         supportedOptions.remove(CHAR_COLUMNS_PADDED_WITH_SPACES);
