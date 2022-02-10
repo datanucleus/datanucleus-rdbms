@@ -34,7 +34,7 @@ import org.datanucleus.store.rdbms.table.Table;
 import org.datanucleus.util.Localiser;
 
 /**
- * Method for evaluating {listExpr}.indexOf(elemExpr).
+ * Method for evaluating {listExpr}.indexOf(elemExpr) and JPQL "INDEX(elem)"
  * Returns a NumericExpression representing the index
  */
 public class ListIndexOfMethod implements SQLMethod

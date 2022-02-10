@@ -445,8 +445,6 @@ public class NumericColumnMapping extends AbstractColumnMapping
             }
             else if (getJavaTypeMapping().getJavaType().getName().equals(Number.class.getName()))
             {
-                // "Number" means we accept any numeric type from the datastore
-                // TODO Try to split out into Long, Float, Integer, etc somehow
                 return value;
             }
             else if (getJavaTypeMapping().getJavaType().getName().equals(ClassNameConstants.JAVA_MATH_BIGINTEGER))

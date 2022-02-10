@@ -566,7 +566,7 @@ public abstract class SQLExpression
         String sql = st.toString();
         if (sql.startsWith("DISTINCT (") && sql.endsWith(")"))
         {
-            // TODO Remove the DISTINCT
+            // Remove the DISTINCT
             st.removeLastPrependAppend();
         }
         return this;

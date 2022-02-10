@@ -1839,7 +1839,7 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
             else if ("DEGREES".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.DegreesFunction.class;
             else if ("COALESCE".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.CoalesceFunction.class;
             else if ("NULLIF".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.NullIfFunction.class;
-            else if ("INDEX".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.IndexFunction.class;
+            else if ("INDEX".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.ListIndexOfMethod.class;
             else if ("CURRENT_DATE".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.CurrentDateFunction.class;
             else if ("CURRENT_TIME".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.CurrentTimeFunction.class;
             else if ("CURRENT_TIMESTAMP".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.CurrentTimestampFunction.class;
