@@ -155,7 +155,6 @@ public class OracleAdapter extends BaseDatastoreAdapter
         supportedOptions.add(LOCK_ROW_USING_SELECT_FOR_UPDATE_NOWAIT);
         supportedOptions.add(SEQUENCES);
         supportedOptions.add(NULL_EQUALS_EMPTY_STRING);
-        supportedOptions.add(ANALYSIS_METHODS);
         supportedOptions.add(STORED_PROCEDURES);
         supportedOptions.add(ORDERBY_NULLS_DIRECTIVES);
         supportedOptions.add(GROUP_BY_REQUIRES_ALL_SELECT_PRIMARIES);
@@ -793,10 +792,11 @@ public class OracleAdapter extends BaseDatastoreAdapter
             else if ("HOUR".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalHourMethod2.class;
             else if ("MINUTE".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalMinuteMethod2.class;
             else if ("SECOND".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalSecondMethod2.class;
-            else if ("SQL_cube".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.SQLCubeFunction.class;
-            else if ("SQL_rollup".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.SQLRollupFunction.class;
             else if ("WEEK".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalWeekMethod6.class;
             else if ("QUARTER".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalQuarterMethod2.class;
+
+            else if ("SQL_cube".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.SQLCubeFunction.class;
+            else if ("SQL_rollup".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.SQLRollupFunction.class;
         }
         else
         {

@@ -108,12 +108,6 @@ public interface DatastoreAdapter
     public static final String PROJECTION_IN_TABLE_REFERENCE_JOINS = "ProjectionInTableReferenceJoins";
 
     /**
-     * Accessor for whether the SQL extensions CUBE, ROLLUP are supported.
-     * TODO Move this to a plugin extension as cube and rollup options (separate)
-     */
-    public static final String ANALYSIS_METHODS = "AnalysisMethods";
-
-    /**
      * Whether this datastore supports the use of the catalog name in ORM table definitions (DDL).
      */
     public static final String CATALOGS_IN_TABLE_DEFINITIONS = "CatalogInTableDefinition";

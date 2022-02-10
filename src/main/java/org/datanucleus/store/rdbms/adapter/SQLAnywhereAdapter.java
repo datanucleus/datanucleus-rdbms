@@ -204,7 +204,6 @@ public class SQLAnywhereAdapter extends BaseDatastoreAdapter
             supportedOptions.add(SEQUENCES);
         }
         supportedOptions.add(PROJECTION_IN_TABLE_REFERENCE_JOINS);
-        supportedOptions.add(ANALYSIS_METHODS);
         supportedOptions.add(CATALOGS_IN_TABLE_DEFINITIONS);
         supportedOptions.add(SCHEMAS_IN_TABLE_DEFINITIONS);
         supportedOptions.add(IDENTIFIERS_LOWERCASE);

@@ -87,7 +87,6 @@ public class DB2Adapter extends BaseDatastoreAdapter
         supportedOptions.add(LOCK_ROW_USING_SELECT_FOR_UPDATE);
         supportedOptions.add(IDENTITY_COLUMNS);
         supportedOptions.add(SEQUENCES);
-        supportedOptions.add(ANALYSIS_METHODS);
         supportedOptions.add(STORED_PROCEDURES);
         supportedOptions.add(USE_UNION_ALL);
         supportedOptions.add(ORDERBY_NULLS_DIRECTIVES);

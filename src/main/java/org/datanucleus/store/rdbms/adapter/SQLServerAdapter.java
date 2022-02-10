@@ -115,7 +115,6 @@ public class SQLServerAdapter extends BaseDatastoreAdapter
         supportedOptions.add(IDENTITY_COLUMNS);
         supportedOptions.add(LOCK_ROW_USING_OPTION_AFTER_FROM);
         supportedOptions.add(LOCK_ROW_USING_OPTION_WITHIN_JOIN);
-        supportedOptions.add(ANALYSIS_METHODS);
         supportedOptions.add(STORED_PROCEDURES);
         supportedOptions.add(ORDERBY_NULLS_USING_CASE_NULL);
 
