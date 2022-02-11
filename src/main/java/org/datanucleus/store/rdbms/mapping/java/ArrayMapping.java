@@ -141,7 +141,7 @@ public class ArrayMapping extends AbstractContainerMapping implements MappingCal
 
             for (int i=0;i<arrayLength;i++)
             {
-                if (ownerSM.getExecutionContext().getApiAdapter().isDetached(array[i]))
+                if (ec.getApiAdapter().isDetached(array[i]))
                 {
                     needsAttaching = true;
                     break;
@@ -158,7 +158,7 @@ public class ArrayMapping extends AbstractContainerMapping implements MappingCal
                 collWrapper.attachCopy(value);
 
                 // The attach will have put entries in the operationQueue if using optimistic, so flush them
-                ownerSM.getExecutionContext().flushOperationsForBackingStore(((BackedSCO)collWrapper).getBackingStore(), ownerSM);
+                ec.flushOperationsForBackingStore(((BackedSCO)collWrapper).getBackingStore(), ownerSM);
             }
         }
         else
@@ -166,7 +166,7 @@ public class ArrayMapping extends AbstractContainerMapping implements MappingCal
             if (arrayLength > 0)
             {
                 // Add the elements direct to the datastore
-                ((ArrayStore) storeMgr.getBackingStoreForField(ownerSM.getExecutionContext().getClassLoaderResolver(), mmd, null)).set(ownerSM, value);
+                ((ArrayStore) storeMgr.getBackingStoreForField(ec.getClassLoaderResolver(), mmd, null)).set(ownerSM, value);
             }
         }
     }

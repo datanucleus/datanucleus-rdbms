@@ -228,7 +228,7 @@ public class MapMapping extends AbstractContainerMapping implements MappingCallb
         if (value instanceof BackedSCO)
         {
             // Already have a SCO value, so flush outstanding updates
-            ownerSM.getExecutionContext().flushOperationsForBackingStore(((BackedSCO)value).getBackingStore(), ownerSM);
+            ec.flushOperationsForBackingStore(((BackedSCO)value).getBackingStore(), ownerSM);
             return;
         }
 

@@ -75,10 +75,10 @@ public class CollectionMapping extends AbstractContainerMapping implements Mappi
                     {
                         if (elem != null)
                         {
-                            DNStateManager elemOP = ec.findStateManager(elem);
-                            if (elemOP == null || ec.getApiAdapter().getExecutionContext(elem) == null)
+                            DNStateManager elemSM = ec.findStateManager(elem);
+                            if (elemSM == null || ec.getApiAdapter().getExecutionContext(elem) == null)
                             {
-                                elemOP = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, elem, false, ownerSM, mmd.getAbsoluteFieldNumber());
+                                elemSM = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, elem, false, ownerSM, mmd.getAbsoluteFieldNumber());
                             }
                         }
                     }
@@ -127,7 +127,7 @@ public class CollectionMapping extends AbstractContainerMapping implements Mappi
         boolean needsAttaching = false;
         for (Object collElement : collElements)
         {
-            if (ownerSM.getExecutionContext().getApiAdapter().isDetached(collElement))
+            if (ec.getApiAdapter().isDetached(collElement))
             {
                 needsAttaching = true;
                 break;
@@ -143,7 +143,7 @@ public class CollectionMapping extends AbstractContainerMapping implements Mappi
                 collWrapper.attachCopy(value);
 
                 // The attach will have put entries in the operationQueue if using optimistic, so flush them
-                ownerSM.getExecutionContext().flushOperationsForBackingStore(((BackedSCO)collWrapper).getBackingStore(), ownerSM);
+                ec.flushOperationsForBackingStore(((BackedSCO)collWrapper).getBackingStore(), ownerSM);
             }
         }
         else
@@ -151,14 +151,14 @@ public class CollectionMapping extends AbstractContainerMapping implements Mappi
             if (value.size() > 0)
             {
                 // Add the elements direct to the datastore
-                ((CollectionStore) storeMgr.getBackingStoreForField(ownerSM.getExecutionContext().getClassLoaderResolver(),mmd, value.getClass())).addAll(ownerSM, value, 0);
+                ((CollectionStore) storeMgr.getBackingStoreForField(ec.getClassLoaderResolver(),mmd, value.getClass())).addAll(ownerSM, value, 0);
 
                 // Create a SCO wrapper with the elements loaded
                 replaceFieldWithWrapper(ownerSM, value);
             }
             else
             {
-                if (mmd.getRelationType(ownerSM.getExecutionContext().getClassLoaderResolver()) == RelationType.MANY_TO_MANY_BI)
+                if (mmd.getRelationType(ec.getClassLoaderResolver()) == RelationType.MANY_TO_MANY_BI)
                 {
                     // Create a SCO wrapper, pass in null so it loads any from the datastore (on other side?)
                     replaceFieldWithWrapper(ownerSM, null);
@@ -220,7 +220,7 @@ public class CollectionMapping extends AbstractContainerMapping implements Mappi
         if (value instanceof BackedSCO)
         {
             // Already have a SCO value, so flush outstanding updates
-            ownerSM.getExecutionContext().flushOperationsForBackingStore(((BackedSCO)value).getBackingStore(), ownerSM);
+            ec.flushOperationsForBackingStore(((BackedSCO)value).getBackingStore(), ownerSM);
             return;
         }
 
@@ -269,6 +269,7 @@ public class CollectionMapping extends AbstractContainerMapping implements Mappi
             return;
         }
 
+        ExecutionContext ec = ownerSM.getExecutionContext();
         boolean dependent = mmd.getCollection().isDependentElement();
         if (mmd.isCascadeRemoveOrphans())
         {
@@ -288,22 +289,22 @@ public class CollectionMapping extends AbstractContainerMapping implements Mappi
                 // FK collection, using <field> FK spec
                 hasFK = true;
             }
-            AbstractMemberMetaData[] relatedMmds = mmd.getRelatedMemberMetaData(ownerSM.getExecutionContext().getClassLoaderResolver());
+            AbstractMemberMetaData[] relatedMmds = mmd.getRelatedMemberMetaData(ec.getClassLoaderResolver());
             if (relatedMmds != null && relatedMmds[0].getForeignKeyMetaData() != null)
             {
                 // FK collection (bidir), using <field> FK spec at other end
                 hasFK = true;
             }
         }
-        if (ownerSM.getExecutionContext().getStringProperty(PropertyNames.PROPERTY_DELETION_POLICY).equals("JDO2"))
+        if (ec.getStringProperty(PropertyNames.PROPERTY_DELETION_POLICY).equals("JDO2"))
         {
             // JDO doesn't currently take note of foreign-key
             hasFK = false;
         }
 
-        if (ownerSM.getExecutionContext().getManageRelations())
+        if (ec.getManageRelations())
         {
-            ownerSM.getExecutionContext().getRelationshipManager(ownerSM).relationChange(getAbsoluteFieldNumber(), value, null);
+            ec.getRelationshipManager(ownerSM).relationChange(getAbsoluteFieldNumber(), value, null);
         }
 
         // TODO Why dont we just do clear here always ? The backing store should take care of if nulling or deleting etc
@@ -319,7 +320,7 @@ public class CollectionMapping extends AbstractContainerMapping implements Mappi
             value.clear();
 
             // Flush any outstanding updates
-            ownerSM.getExecutionContext().flushOperationsForBackingStore(((BackedSCO)value).getBackingStore(), ownerSM);
+            ec.flushOperationsForBackingStore(((BackedSCO)value).getBackingStore(), ownerSM);
         }
     }
 }

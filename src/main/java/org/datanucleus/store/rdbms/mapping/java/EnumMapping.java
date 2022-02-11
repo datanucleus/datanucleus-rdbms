@@ -40,7 +40,7 @@ import org.datanucleus.util.StringUtils;
 public class EnumMapping extends SingleFieldMapping
 {
     /** Metadata extension key for specifying that the enum column has a CHECK constraint in the datastore. Set it to "true" to enable. */
-    public static final String EXTENSION_CHECK_CONSTRAINT_ENUM_VALUES = "enum-check-constraint"; // TODO Rename the string to be "check-constraint-enum-values"
+    public static final String EXTENSION_CHECK_CONSTRAINT_ENUM_VALUES = "enum-check-constraint";
 
     protected String datastoreJavaType = ClassNameConstants.JAVA_LANG_STRING;
 
