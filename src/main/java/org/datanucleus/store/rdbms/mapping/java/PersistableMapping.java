@@ -51,6 +51,7 @@ import org.datanucleus.metadata.FieldRole;
 import org.datanucleus.metadata.ValueGenerationStrategy;
 import org.datanucleus.metadata.IdentityType;
 import org.datanucleus.metadata.InheritanceStrategy;
+import org.datanucleus.metadata.MemberComponent;
 import org.datanucleus.metadata.MetaDataManager;
 import org.datanucleus.metadata.RelationType;
 import org.datanucleus.metadata.VersionMetaData;
@@ -355,20 +356,21 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
      */
     public void setObject(ExecutionContext ec, PreparedStatement ps, int[] param, Object value)
     {
-        setObject(ec, ps, param, value, null, -1);
+        setObject(ec, ps, param, value, null, -1, null);
     }
 
     /**
      * Method to set an object reference (FK) in the datastore.
      * @param ec The ExecutionContext
      * @param ps The Prepared Statement
-     * @param param The parameter ids in the statement
      * @param value The value to put in the statement at these ids
      * @param ownerSM StateManager for the owner object
      * @param ownerFieldNumber Field number of this PC object in the owner
+     * @param param The parameter ids in the statement
      * @throws NotYetFlushedException if an object hasn't yet been flushed to the datastore
      */
-    public void setObject(ExecutionContext ec, PreparedStatement ps, int[] param, Object value, DNStateManager ownerSM, int ownerFieldNumber)
+    @Override
+    public void setObject(ExecutionContext ec, PreparedStatement ps, int[] param, Object value, DNStateManager ownerSM, int ownerFieldNumber, MemberComponent ownerMemberCmpt)
     {
         if (value == null)
         {

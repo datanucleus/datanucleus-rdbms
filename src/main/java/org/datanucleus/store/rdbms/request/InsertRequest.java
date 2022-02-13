@@ -453,7 +453,7 @@ public class InsertRequest extends Request
                                 for (int k=0;k<externalFKStmtMappings[i].getNumberOfParameterOccurrences();k++)
                                 {
                                     externalFKStmtMappings[i].getMapping().setObject(ec, ps,
-                                        externalFKStmtMappings[i].getParameterPositionsForOccurrence(k), fkValue, null, ownerFmd.getAbsoluteFieldNumber());
+                                        externalFKStmtMappings[i].getParameterPositionsForOccurrence(k), fkValue, null, ownerFmd.getAbsoluteFieldNumber(), null);
                                 }
                             }
                             else

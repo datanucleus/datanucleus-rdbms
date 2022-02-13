@@ -28,6 +28,7 @@ import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.ColumnMetaData;
 import org.datanucleus.metadata.FieldRole;
+import org.datanucleus.metadata.MemberComponent;
 import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.mapping.column.ColumnMapping;
@@ -691,15 +692,16 @@ public abstract class JavaTypeMapping
     }
 
     /**
-     * Sets a <code>value</code> into <code>datastoreStatement</code> at position specified by <code>exprIndex</code>.
+     * Sets a <code>value</code> into <code>ps</code> at position specified by <code>exprIndex</code> when embedded/serialised into the specified owner.
      * @param ec ExecutionContext
      * @param ps PreparedStatement
      * @param exprIndex the position of the value in the statement
      * @param value the value
-     * @param ownerSM the owner StateManager
-     * @param ownerFieldNumber the owner absolute field number
-     */    
-    public void setObject(ExecutionContext ec, PreparedStatement ps, int[] exprIndex, Object value, DNStateManager ownerSM, int ownerFieldNumber)
+     * @param ownerSM the owner StateManager where this is embedded
+     * @param ownerFieldNumber the owner absolute field number where this is embedded
+     * @param ownerMemberCmpt Component in the member where this is serialised/embedded (or null for default)
+     */
+    public void setObject(ExecutionContext ec, PreparedStatement ps, int[] exprIndex, Object value, DNStateManager ownerSM, int ownerFieldNumber, MemberComponent ownerMemberCmpt)
     {
         throw new NucleusException(failureMessage("setObject")).setFatal();
     }
@@ -717,15 +719,16 @@ public abstract class JavaTypeMapping
     }
 
     /**
-     * Obtains a value from <code>datastoreResults</code> at position specified by <code>exprIndex</code>. 
+     * Obtains a value from the result set at position specified by <code>exprIndex</code> based on being embedded/serialised into the provided owner.
      * @param ec ExecutionContext
-     * @param rs an object returned from the datastore with values 
-     * @param exprIndex the position of the value in the result
-     * @param ownerSM the owner StateManager
-     * @param ownerFieldNumber the owner absolute field number
+     * @param rs an object returned from the datastore with values
+     * @param exprIndex the position of the value in the result set
+     * @param ownerSM the owner StateManager where this is embedded
+     * @param ownerFieldNumber the owner field number where this is embedded
+     * @param ownerMemberCmpt Component in the member where this is serialised/embedded (or null for default)
      * @return the value
      */
-    public Object getObject(ExecutionContext ec, ResultSet rs, int[] exprIndex, DNStateManager ownerSM, int ownerFieldNumber)
+    public Object getObject(ExecutionContext ec, ResultSet rs, int[] exprIndex, DNStateManager ownerSM, int ownerFieldNumber, MemberComponent ownerMemberCmpt)
     {
         throw new NucleusException(failureMessage("getObject")).setFatal();
     }

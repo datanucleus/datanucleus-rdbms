@@ -337,7 +337,7 @@ public class JoinPersistableRelationStore implements PersistableRelationStore
         if (joinTable.getOwnerMemberMetaData() != null)
         {
             joinTable.getOwnerMapping().setObject(ec, ps, MappingHelper.getMappingIndices(jdbcPosition, joinTable.getOwnerMapping()),
-                sm.getObject(), sm, joinTable.getOwnerMemberMetaData().getAbsoluteFieldNumber());
+                sm.getObject(), sm, joinTable.getOwnerMemberMetaData().getAbsoluteFieldNumber(), null);
         }
         else
         {

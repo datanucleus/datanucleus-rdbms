@@ -190,7 +190,7 @@ public class OracleArrayMapping extends ArrayMapping
                         DNStateManager elemOP = ec.findStateManager(elem);
                         if (elemOP == null || ec.getApiAdapter().getExecutionContext(elem) == null)
                         {
-                            elemOP = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, elem, false, sm, mmd.getAbsoluteFieldNumber());
+                            elemOP = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, elem, false, sm, mmd.getAbsoluteFieldNumber(), null);
                         }
                     }
                 }
@@ -228,7 +228,7 @@ public class OracleArrayMapping extends ArrayMapping
                         DNStateManager elemOP = ec.findStateManager(elem);
                         if (elemOP == null || ec.getApiAdapter().getExecutionContext(elem) == null)
                         {
-                            elemOP = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, elem, false, sm, mmd.getAbsoluteFieldNumber());
+                            elemOP = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, elem, false, sm, mmd.getAbsoluteFieldNumber(), null);
                         }
                     }
                 }

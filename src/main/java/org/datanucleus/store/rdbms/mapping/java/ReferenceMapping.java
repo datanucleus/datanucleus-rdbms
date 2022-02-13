@@ -39,6 +39,7 @@ import org.datanucleus.metadata.FieldRole;
 import org.datanucleus.metadata.IdentityType;
 import org.datanucleus.metadata.InheritanceStrategy;
 import org.datanucleus.metadata.KeyMetaData;
+import org.datanucleus.metadata.MemberComponent;
 import org.datanucleus.metadata.MetaData;
 import org.datanucleus.metadata.MetaDataUtils;
 import org.datanucleus.metadata.ValueMetaData;
@@ -538,12 +539,13 @@ public abstract class ReferenceMapping extends MultiPersistableMapping implement
      * Sets the specified positions in the PreparedStatement associated with this field, and value.
      * @param ec the ExecutionContext 
      * @param ps a datastore object that executes statements in the database
-     * @param pos The position(s) of the PreparedStatement to populate
      * @param value the value stored in this field
      * @param ownerSM the owner StateManager
      * @param ownerFieldNumber the owner absolute field number
+     * @param pos The position(s) of the PreparedStatement to populate
      */
-    public void setObject(ExecutionContext ec, PreparedStatement ps, int[] pos, Object value, DNStateManager ownerSM, int ownerFieldNumber)
+    @Override
+    public void setObject(ExecutionContext ec, PreparedStatement ps, int[] pos, Object value, DNStateManager ownerSM, int ownerFieldNumber, MemberComponent ownerMemberCmpt)
     {
         // TODO Cater for case where this mapping has no datastore columns (N-1 join table)
       /*if (getNumberOfColumnMappings() == 0)
@@ -562,7 +564,7 @@ public abstract class ReferenceMapping extends MultiPersistableMapping implement
 
         if (mappingStrategy == PER_IMPLEMENTATION_MAPPING)
         {
-            super.setObject(ec, ps, pos, value, ownerSM, ownerFieldNumber);
+            super.setObject(ec, ps, pos, value, ownerSM, ownerFieldNumber, ownerMemberCmpt);
         }
         else if (mappingStrategy == ID_MAPPING || mappingStrategy == XCALIA_MAPPING)
         {

@@ -28,6 +28,7 @@ import org.datanucleus.exceptions.NucleusObjectNotFoundException;
 import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.identity.IdentityUtils;
 import org.datanucleus.metadata.AbstractMemberMetaData;
+import org.datanucleus.metadata.MemberComponent;
 import org.datanucleus.metadata.MetaDataManager;
 import org.datanucleus.metadata.RelationType;
 import org.datanucleus.state.DNStateManager;
@@ -110,7 +111,7 @@ public abstract class MultiPersistableMapping extends MultiMapping
      */
     public void setObject(ExecutionContext ec, PreparedStatement ps, int[] pos, Object value)
     {
-        setObject(ec, ps, pos, value, null, -1);
+        setObject(ec, ps, pos, value, null, -1, null);
     }
 
     /**
@@ -121,12 +122,13 @@ public abstract class MultiPersistableMapping extends MultiMapping
      * being null and only want to input parameter(s) for the real implementation of "value".
      * @param ec execution context
      * @param ps a datastore object that executes statements in the database
-     * @param pos The position(s) of the PreparedStatement to populate
      * @param value the value stored in this field
      * @param ownerSM the owner StateManager
      * @param ownerFieldNumber the owner absolute field number
+     * @param pos The position(s) of the PreparedStatement to populate
      */
-    public void setObject(ExecutionContext ec, PreparedStatement ps, int[] pos, Object value, DNStateManager ownerSM, int ownerFieldNumber)
+    @Override
+    public void setObject(ExecutionContext ec, PreparedStatement ps, int[] pos, Object value, DNStateManager ownerSM, int ownerFieldNumber, MemberComponent ownerMemberCmpt)
     {
         boolean setValueFKOnly = false;
         if (pos != null && pos.length < getNumberOfColumnMappings())

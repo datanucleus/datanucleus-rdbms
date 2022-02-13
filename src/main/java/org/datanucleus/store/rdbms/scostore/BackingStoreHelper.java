@@ -105,7 +105,7 @@ public class BackingStoreHelper
         if (bcs.getOwnerMemberMetaData() != null && !embedded)
         {
             bcs.getOwnerMapping().setObject(ec, ps, MappingHelper.getMappingIndices(jdbcPosition, bcs.getOwnerMapping()), ownerSM.getObject(),
-                ownerSM, bcs.getOwnerMemberMetaData().getAbsoluteFieldNumber());
+                ownerSM, bcs.getOwnerMemberMetaData().getAbsoluteFieldNumber(), null);
         }
         else
         {

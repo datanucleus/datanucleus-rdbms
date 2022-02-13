@@ -86,7 +86,7 @@ public class OracleMapMapping extends MapMapping
                             Object key = entry.getKey();
                             if (ec.findStateManager(key) == null || ec.getApiAdapter().getExecutionContext(key) == null)
                             {
-                                ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, key, false, sm, mmd.getAbsoluteFieldNumber());
+                                ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, key, false, sm, mmd.getAbsoluteFieldNumber(), null);
                             }
                         }
                         if (mmd.getMap().valueIsPersistent() && entry.getValue() != null)
@@ -94,7 +94,7 @@ public class OracleMapMapping extends MapMapping
                             Object val = entry.getValue();
                             if (ec.findStateManager(val) == null || ec.getApiAdapter().getExecutionContext(val) == null)
                             {
-                                ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, val, false, sm, mmd.getAbsoluteFieldNumber());
+                                ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, val, false, sm, mmd.getAbsoluteFieldNumber(), null);
                             }
                         }
                     }
@@ -129,7 +129,7 @@ public class OracleMapMapping extends MapMapping
                             Object key = entry.getKey();
                             if (ec.findStateManager(key) == null || ec.getApiAdapter().getExecutionContext(key) == null)
                             {
-                                ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, key, false, sm, mmd.getAbsoluteFieldNumber());
+                                ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, key, false, sm, mmd.getAbsoluteFieldNumber(), null);
                             }
                         }
                         if (mmd.getMap().valueIsPersistent() && entry.getValue() != null)
@@ -137,7 +137,7 @@ public class OracleMapMapping extends MapMapping
                             Object val = entry.getValue();
                             if (ec.findStateManager(val) == null || ec.getApiAdapter().getExecutionContext(val) == null)
                             {
-                                ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, val, false, sm, mmd.getAbsoluteFieldNumber());
+                                ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, val, false, sm, mmd.getAbsoluteFieldNumber(), null);
                             }
                         }
                     }

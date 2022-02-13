@@ -144,7 +144,7 @@ public abstract class BaseContainerStore implements Store
         DNStateManager objOP = ec.findStateManager(obj);
         if (objOP == null)
         {
-            objOP = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, obj, false, sm, ownerMmd.getAbsoluteFieldNumber());
+            objOP = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, obj, false, sm, ownerMmd.getAbsoluteFieldNumber(), null);
         }
         objOP.setPcObjectType(pcType);
         return objOP;

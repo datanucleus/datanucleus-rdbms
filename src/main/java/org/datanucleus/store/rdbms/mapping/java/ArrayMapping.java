@@ -99,7 +99,7 @@ public class ArrayMapping extends AbstractContainerMapping implements MappingCal
                         DNStateManager elemOP = ec.findStateManager(elem);
                         if (elemOP == null || ec.getApiAdapter().getExecutionContext(elem) == null)
                         {
-                            elemOP = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, elem, false, ownerSM, mmd.getAbsoluteFieldNumber());
+                            elemOP = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, elem, false, ownerSM, mmd.getAbsoluteFieldNumber(), null);
                         }
                     }
                 }
@@ -277,7 +277,7 @@ public class ArrayMapping extends AbstractContainerMapping implements MappingCal
                             DNStateManager elemOP = ec.findStateManager(elem);
                             if (elemOP == null || ec.getApiAdapter().getExecutionContext(elem) == null)
                             {
-                                elemOP = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, elem, false, ownerSM, mmd.getAbsoluteFieldNumber());
+                                elemOP = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, elem, false, ownerSM, mmd.getAbsoluteFieldNumber(), null);
                             }
                         }
                     }

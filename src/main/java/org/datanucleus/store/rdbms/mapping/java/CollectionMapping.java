@@ -78,7 +78,7 @@ public class CollectionMapping extends AbstractContainerMapping implements Mappi
                             DNStateManager elemSM = ec.findStateManager(elem);
                             if (elemSM == null || ec.getApiAdapter().getExecutionContext(elem) == null)
                             {
-                                elemSM = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, elem, false, ownerSM, mmd.getAbsoluteFieldNumber());
+                                elemSM = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, elem, false, ownerSM, mmd.getAbsoluteFieldNumber(), null);
                             }
                         }
                     }
@@ -200,7 +200,7 @@ public class CollectionMapping extends AbstractContainerMapping implements Mappi
                             DNStateManager elemOP = ec.findStateManager(collElement);
                             if (elemOP == null || ec.getApiAdapter().getExecutionContext(collElement) == null)
                             {
-                                elemOP = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, collElement, false, ownerSM, mmd.getAbsoluteFieldNumber());
+                                elemOP = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, collElement, false, ownerSM, mmd.getAbsoluteFieldNumber(), null);
                             }
                         }
                     }

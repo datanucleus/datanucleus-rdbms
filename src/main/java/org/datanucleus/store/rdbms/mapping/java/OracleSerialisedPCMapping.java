@@ -46,7 +46,7 @@ public class OracleSerialisedPCMapping extends SerialisedPCMapping
             if (sm == null || sm.getExecutionContext().getApiAdapter().getExecutionContext(value) == null)
             {
                 // Assign a StateManager to the serialised object since none present
-                sm = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, value, false, ownerSM, mmd.getAbsoluteFieldNumber());
+                sm = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, value, false, ownerSM, mmd.getAbsoluteFieldNumber(), null);
             }
         }
 

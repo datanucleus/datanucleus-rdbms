@@ -122,7 +122,7 @@ public abstract class AbstractRDBMSQueryResult<E> extends AbstractQueryResult<E>
                         {
                             Object owner = iterStmt.getOwnerMapIndex().getMapping().getObject(ec, rs, iterStmt.getOwnerMapIndex().getColumnPositions());
                             Object element = backingStore.getElementMapping().getObject(ec, rs, param, ec.findStateManager(owner), 
-                                backingStore.getOwnerMemberMetaData().getAbsoluteFieldNumber());
+                                backingStore.getOwnerMemberMetaData().getAbsoluteFieldNumber(), null);
                             addOwnerMemberCollectionElement(mmd, owner, element);
                         }
                     }

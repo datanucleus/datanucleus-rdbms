@@ -84,7 +84,7 @@ public class MapMapping extends AbstractContainerMapping implements MappingCallb
                             Object key = entry.getKey();
                             if (ec.findStateManager(key) == null || ec.getApiAdapter().getExecutionContext(key) == null)
                             {
-                                ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, key, false, ownerSM, mmd.getAbsoluteFieldNumber());
+                                ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, key, false, ownerSM, mmd.getAbsoluteFieldNumber(), null);
                             }
                         }
                         if (mmd.getMap().valueIsPersistent() && entry.getValue() != null)
@@ -92,7 +92,7 @@ public class MapMapping extends AbstractContainerMapping implements MappingCallb
                             Object val = entry.getValue();
                             if (ec.findStateManager(val) == null || ec.getApiAdapter().getExecutionContext(val) == null)
                             {
-                                ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, val, false, ownerSM, mmd.getAbsoluteFieldNumber());
+                                ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, val, false, ownerSM, mmd.getAbsoluteFieldNumber(), null);
                             }
                         }
                     }
@@ -200,7 +200,7 @@ public class MapMapping extends AbstractContainerMapping implements MappingCallb
                             Object key = entry.getKey();
                             if (ec.findStateManager(key) == null || ec.getApiAdapter().getExecutionContext(key) == null)
                             {
-                                ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, key, false, ownerSM, mmd.getAbsoluteFieldNumber());
+                                ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, key, false, ownerSM, mmd.getAbsoluteFieldNumber(), null);
                             }
                         }
                         if (mmd.getMap().valueIsPersistent() && entry.getValue() != null)
@@ -208,7 +208,7 @@ public class MapMapping extends AbstractContainerMapping implements MappingCallb
                             Object val = entry.getValue();
                             if (ec.findStateManager(val) == null || ec.getApiAdapter().getExecutionContext(val) == null)
                             {
-                                ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, val, false, ownerSM, mmd.getAbsoluteFieldNumber());
+                                ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, val, false, ownerSM, mmd.getAbsoluteFieldNumber(), null);
                             }
                         }
                     }

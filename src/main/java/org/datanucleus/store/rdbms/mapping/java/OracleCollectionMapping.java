@@ -81,7 +81,7 @@ public class OracleCollectionMapping extends CollectionMapping
                             DNStateManager elemSM = ec.findStateManager(elem);
                             if (elemSM == null || ec.getApiAdapter().getExecutionContext(elem) == null)
                             {
-                                elemSM = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, elem, false, ownerSM, mmd.getAbsoluteFieldNumber());
+                                elemSM = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, elem, false, ownerSM, mmd.getAbsoluteFieldNumber(), null);
                             }
                         }
                     }
@@ -114,7 +114,7 @@ public class OracleCollectionMapping extends CollectionMapping
                             DNStateManager elemSM = ec.findStateManager(elem);
                             if (elemSM == null || ec.getApiAdapter().getExecutionContext(elem) == null)
                             {
-                                elemSM = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, elem, false, ownerSM, mmd.getAbsoluteFieldNumber());
+                                elemSM = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, elem, false, ownerSM, mmd.getAbsoluteFieldNumber(), null);
                             }
                         }
                     }

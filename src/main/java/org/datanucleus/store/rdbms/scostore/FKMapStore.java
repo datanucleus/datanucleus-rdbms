@@ -33,6 +33,7 @@ import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.DiscriminatorStrategy;
 import org.datanucleus.metadata.MapMetaData;
+import org.datanucleus.metadata.MemberComponent;
 import org.datanucleus.metadata.MapMetaData.MapType;
 import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.FieldValues;
@@ -994,7 +995,8 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
                     {
                         if (ownerMemberMetaData != null)
                         {
-                            ownerMapping.setObject(ec, ps, MappingHelper.getMappingIndices(1,ownerMapping), null, sm, ownerMemberMetaData.getAbsoluteFieldNumber());
+                            ownerMapping.setObject(ec, ps, MappingHelper.getMappingIndices(1,ownerMapping), null, 
+                                sm, ownerMemberMetaData.getAbsoluteFieldNumber(), MemberComponent.MAP_VALUE);
                         }
                         else
                         {
@@ -1047,7 +1049,8 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
                     {
                         if (ownerMemberMetaData != null)
                         {
-                            ownerMapping.setObject(ec, ps, MappingHelper.getMappingIndices(1,ownerMapping), null, sm, ownerMemberMetaData.getAbsoluteFieldNumber());
+                            ownerMapping.setObject(ec, ps, MappingHelper.getMappingIndices(1,ownerMapping), null, 
+                                sm, ownerMemberMetaData.getAbsoluteFieldNumber(), MemberComponent.MAP_KEY);
                         }
                         else
                         {

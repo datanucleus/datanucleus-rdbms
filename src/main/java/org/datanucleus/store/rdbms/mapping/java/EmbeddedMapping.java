@@ -39,6 +39,7 @@ import org.datanucleus.metadata.EmbeddedMetaData;
 import org.datanucleus.metadata.FieldPersistenceModifier;
 import org.datanucleus.metadata.FieldRole;
 import org.datanucleus.metadata.InheritanceMetaData;
+import org.datanucleus.metadata.MemberComponent;
 import org.datanucleus.metadata.MetaDataManager;
 import org.datanucleus.metadata.RelationType;
 import org.datanucleus.state.DNStateManager;
@@ -408,19 +409,20 @@ public abstract class EmbeddedMapping extends SingleFieldMapping
      */
     public void setObject(ExecutionContext ec, PreparedStatement ps, int[] param, Object value)
     {
-        setObject(ec, ps, param, value, null, -1);
+        setObject(ec, ps, param, value, null, -1, null);
     }
 
     /**
      * Mutator for the embedded object in the datastore.
      * @param ec ExecutionContext
      * @param ps The Prepared Statement
-     * @param param Param numbers in the PreparedStatement for the fields of this object
      * @param value The embedded object to use
      * @param ownerSM StateManager of the owning object containing this embedded object
      * @param ownerFieldNumber Field number in the owning object where this is stored
+     * @param param Param numbers in the PreparedStatement for the fields of this object
      */
-    public void setObject(ExecutionContext ec, PreparedStatement ps, int[] param, Object value, DNStateManager ownerSM, int ownerFieldNumber)
+    @Override
+    public void setObject(ExecutionContext ec, PreparedStatement ps, int[] param, Object value, DNStateManager ownerSM, int ownerFieldNumber, MemberComponent ownerMemberCmpt)
     {
         if (value == null)
         {
@@ -503,7 +505,7 @@ public abstract class EmbeddedMapping extends SingleFieldMapping
             if (embSM == null || api.getExecutionContext(value) == null)
             {
                 // Assign a StateManager to manage our embedded object
-                embSM = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, value, false, ownerSM, ownerFieldNumber);
+                embSM = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, value, false, ownerSM, ownerFieldNumber, null);
                 embSM.setPcObjectType(objectType);
             }
 
@@ -534,7 +536,7 @@ public abstract class EmbeddedMapping extends SingleFieldMapping
                     Object fieldValue = embSM.provideField(embAbsFieldNum);
                     if (mapping instanceof EmbeddedPCMapping)
                     {
-                        mapping.setObject(ec, ps, posMapping, fieldValue, embSM, embAbsFieldNum);
+                        mapping.setObject(ec, ps, posMapping, fieldValue, embSM, embAbsFieldNum, null);
                     }
                     else
                     {
@@ -561,19 +563,20 @@ public abstract class EmbeddedMapping extends SingleFieldMapping
      */
     public Object getObject(ExecutionContext ec, ResultSet rs, int[] param)
     {
-        return getObject(ec, rs, param, null, -1);
+        return getObject(ec, rs, param, null, -1, null);
     }
 
     /**
      * Accessor for the embedded object from the result set
      * @param ec ExecutionContext
      * @param rs The ResultSet
-     * @param param Array of param numbers in the ResultSet for the fields of this object
      * @param ownerSM StateManager of the owning object containing this embedded object
      * @param ownerFieldNumber Field number in the owning object where this is stored
+     * @param param Array of param numbers in the ResultSet for the fields of this object
      * @return The embedded object
      */
-    public Object getObject(ExecutionContext ec, ResultSet rs, int[] param, DNStateManager ownerSM, int ownerFieldNumber)
+    @Override
+    public Object getObject(ExecutionContext ec, ResultSet rs, int[] param, DNStateManager ownerSM, int ownerFieldNumber, MemberComponent ownerMemberCmpt)
     {
         Object value = null;
 
@@ -629,7 +632,7 @@ public abstract class EmbeddedMapping extends SingleFieldMapping
                     n += numSubParams;
 
                     // Use the sub-object mapping to extract the value for that object
-                    Object subValue = mapping.getObject(ec, rs, subParam, embSM, embAbsFieldNum);
+                    Object subValue = mapping.getObject(ec, rs, subParam, embSM, embAbsFieldNum, null);
                     if (subValue != null)
                     {
                         embSM.replaceField(embAbsFieldNum, subValue);
@@ -697,11 +700,11 @@ public abstract class EmbeddedMapping extends SingleFieldMapping
                 }
             }
         }
-        
+
         // Register the owner-embedded StateManager relation now we have values set
         if (value != null && ownerSM != null)
         {
-            ec.registerEmbeddedRelation(ownerSM, ownerFieldNumber, embSM);
+            ec.registerEmbeddedRelation(ownerSM, ownerFieldNumber, null, embSM); // TODO Set third argument
         }
 
         return value;
