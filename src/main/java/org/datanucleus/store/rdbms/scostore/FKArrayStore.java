@@ -172,6 +172,7 @@ public class FKArrayStore<E> extends AbstractArrayStore<E>
                     JavaTypeMapping otherMapping = null;
                     while (remainingMappedBy.indexOf('.') > 0)
                     {
+                        // JPA mappedBy dot notation
                         int dotPosition = remainingMappedBy.indexOf('.');
                         String thisMappedBy = remainingMappedBy.substring(0, dotPosition);
                         otherMmd = otherCmd.getMetaDataForMember(thisMappedBy);

@@ -186,6 +186,7 @@ public class FKListStore<E> extends AbstractListStore<E>
                     JavaTypeMapping otherMapping = null;
                     while (remainingMappedBy.indexOf('.') > 0)
                     {
+                        // JPA mappedBy dot notation
                         int dotPosition = remainingMappedBy.indexOf('.');
                         String thisMappedBy = remainingMappedBy.substring(0, dotPosition);
                         otherMmd = otherCmd.getMetaDataForMember(thisMappedBy);
@@ -1010,6 +1011,7 @@ public class FKListStore<E> extends AbstractListStore<E>
                         String remainingMappedBy = ownerMemberMetaData.getMappedBy();
                         while (remainingMappedBy.indexOf('.') > 0)
                         {
+                            // JPA mappedBy dot notation
                             int dotPosition = remainingMappedBy.indexOf('.');
                             String thisMappedBy = remainingMappedBy.substring(0, dotPosition);
                             otherMmd = otherCmd.getMetaDataForMember(thisMappedBy);
