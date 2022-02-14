@@ -23,7 +23,7 @@ import java.io.ObjectOutputStream;
 import java.util.Collection;
 
 import org.datanucleus.ExecutionContext;
-import org.datanucleus.metadata.MemberComponent;
+import org.datanucleus.PersistableObjectType;
 import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.rdbms.mapping.column.ColumnMappingPostSet;
 
@@ -83,7 +83,7 @@ public class OracleCollectionMapping extends CollectionMapping
                             if (elemSM == null || ec.getApiAdapter().getExecutionContext(elem) == null)
                             {
                                 elemSM = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, elem, false,
-                                    ownerSM, mmd.getAbsoluteFieldNumber(), MemberComponent.COLLECTION_ELEMENT);
+                                    ownerSM, mmd.getAbsoluteFieldNumber(), PersistableObjectType.EMBEDDED_COLLECTION_ELEMENT_PC);
                             }
                         }
                     }
@@ -117,7 +117,7 @@ public class OracleCollectionMapping extends CollectionMapping
                             if (elemSM == null || ec.getApiAdapter().getExecutionContext(elem) == null)
                             {
                                 elemSM = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, elem, false,
-                                    ownerSM, mmd.getAbsoluteFieldNumber(), MemberComponent.COLLECTION_ELEMENT);
+                                    ownerSM, mmd.getAbsoluteFieldNumber(), PersistableObjectType.EMBEDDED_COLLECTION_ELEMENT_PC);
                             }
                         }
                     }

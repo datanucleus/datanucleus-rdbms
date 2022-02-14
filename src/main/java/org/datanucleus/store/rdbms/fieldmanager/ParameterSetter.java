@@ -188,7 +188,7 @@ public class ParameterSetter extends AbstractFieldManager
                     // Set this value for all occurrences of this parameter
                     if (provideOwner)
                     {
-                        mapping.setObject(ec, statement, mapIdx.getParameterPositionsForOccurrence(i), value, sm, fieldNumber, null);
+                        mapping.setObject(ec, statement, mapIdx.getParameterPositionsForOccurrence(i), value, sm, fieldNumber);
                     }
                     else
                     {
@@ -201,7 +201,7 @@ public class ParameterSetter extends AbstractFieldManager
                 // Important : call setObject even if the paramIndices is null (reachability)
                 if (provideOwner)
                 {
-                    mapping.setObject(ec, statement, null, value, sm, fieldNumber, null);
+                    mapping.setObject(ec, statement, null, value, sm, fieldNumber);
                 }
                 else
                 {

@@ -22,9 +22,9 @@ import java.lang.reflect.Array;
 import java.util.List;
 
 import org.datanucleus.ExecutionContext;
+import org.datanucleus.PersistableObjectType;
 import org.datanucleus.exceptions.ReachableObjectNotCascadedException;
 import org.datanucleus.identity.IdentityUtils;
-import org.datanucleus.metadata.MemberComponent;
 import org.datanucleus.metadata.MetaDataUtils;
 import org.datanucleus.metadata.RelationType;
 import org.datanucleus.state.DNStateManager;
@@ -101,7 +101,7 @@ public class ArrayMapping extends AbstractContainerMapping implements MappingCal
                         if (elemOP == null || ec.getApiAdapter().getExecutionContext(elem) == null)
                         {
                             elemOP = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, elem, false,
-                                ownerSM, mmd.getAbsoluteFieldNumber(), MemberComponent.ARRAY_ELEMENT);
+                                ownerSM, mmd.getAbsoluteFieldNumber(), PersistableObjectType.EMBEDDED_ARRAY_ELEMENT_PC);
                         }
                     }
                 }
@@ -280,7 +280,7 @@ public class ArrayMapping extends AbstractContainerMapping implements MappingCal
                             if (elemOP == null || ec.getApiAdapter().getExecutionContext(elem) == null)
                             {
                                 elemOP = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, elem, false,
-                                    ownerSM, mmd.getAbsoluteFieldNumber(), MemberComponent.ARRAY_ELEMENT);
+                                    ownerSM, mmd.getAbsoluteFieldNumber(), PersistableObjectType.EMBEDDED_ARRAY_ELEMENT_PC);
                             }
                         }
                     }

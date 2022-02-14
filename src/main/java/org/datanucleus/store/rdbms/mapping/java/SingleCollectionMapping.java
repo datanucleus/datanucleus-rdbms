@@ -27,7 +27,6 @@ import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.CollectionMetaData;
 import org.datanucleus.metadata.ElementMetaData;
 import org.datanucleus.metadata.FieldRole;
-import org.datanucleus.metadata.MemberComponent;
 import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.rdbms.mapping.MappingCallbacks;
 import org.datanucleus.store.rdbms.mapping.column.ColumnMapping;
@@ -110,7 +109,7 @@ public class SingleCollectionMapping extends JavaTypeMapping implements MappingC
     }
 
     @Override
-    public Object getObject(ExecutionContext ec, ResultSet rs, int[] exprIndex, DNStateManager ownerSM, int ownerFieldNumber, MemberComponent ownerMemberCmpt)
+    public Object getObject(ExecutionContext ec, ResultSet rs, int[] exprIndex, DNStateManager ownerSM, int ownerFieldNumber)
     {
         throw new RuntimeException("Not implemented yet!");
     }

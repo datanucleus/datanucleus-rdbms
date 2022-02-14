@@ -30,6 +30,7 @@ import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ClassNameConstants;
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.FetchPlan;
+import org.datanucleus.PersistableObjectType;
 import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.exceptions.NucleusUserException;
@@ -37,7 +38,6 @@ import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.CollectionMetaData;
 import org.datanucleus.metadata.DiscriminatorStrategy;
-import org.datanucleus.metadata.MemberComponent;
 import org.datanucleus.metadata.RelationType;
 import org.datanucleus.metadata.OrderMetaData.FieldOrder;
 import org.datanucleus.state.DNStateManager;
@@ -439,7 +439,7 @@ public class FKListStore<E> extends AbstractListStore<E>
                         if (ownerMemberMetaData != null)
                         {
                             ownerMapping.setObject(ec, ps, MappingHelper.getMappingIndices(jdbcPosition, ownerMapping), null, 
-                                ownerSM, ownerMemberMetaData.getAbsoluteFieldNumber(), MemberComponent.COLLECTION_ELEMENT);
+                                ownerSM, ownerMemberMetaData.getAbsoluteFieldNumber());
                         }
                         else
                         {
@@ -1020,7 +1020,7 @@ public class FKListStore<E> extends AbstractListStore<E>
 
                             Object holderValueAtField = ownerHolderSM.provideField(otherMmd.getAbsoluteFieldNumber());
                             ownerHolderSM = sm.getExecutionContext().findStateManagerForEmbedded(holderValueAtField, 
-                                ownerHolderSM, otherMmd, MemberComponent.COLLECTION_ELEMENT);
+                                ownerHolderSM, otherMmd, PersistableObjectType.EMBEDDED_COLLECTION_ELEMENT_PC);
 
                             remainingMappedBy = remainingMappedBy.substring(dotPosition+1);
                             otherCmd = storeMgr.getMetaDataManager().getMetaDataForClass(otherMmd.getTypeName(), clr);

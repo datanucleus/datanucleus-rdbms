@@ -19,6 +19,7 @@ Contributors:
 package org.datanucleus.store.rdbms.mapping.java;
 
 import org.datanucleus.ClassLoaderResolver;
+import org.datanucleus.PersistableObjectType;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.rdbms.table.Table;
@@ -30,7 +31,7 @@ import org.datanucleus.store.rdbms.table.Table;
 public class EmbeddedValuePCMapping extends EmbeddedMapping
 {
     /**
-     * Initialize this JavaTypeMapping with the given DatastoreAdapter for the given metadata.
+     * Initialise this JavaTypeMapping with the given DatastoreAdapter for the given metadata.
      * @param mmd MetaData for the field to be mapped (if any)
      * @param table The datastore container storing this mapping (if any)
      * @param clr the ClassLoaderResolver
@@ -38,6 +39,6 @@ public class EmbeddedValuePCMapping extends EmbeddedMapping
     public void initialize(AbstractMemberMetaData mmd, Table table, ClassLoaderResolver clr)
     {
     	initialize(mmd, table, clr, mmd.getValueMetaData().getEmbeddedMetaData(), mmd.getMap().getValueType(),
-            DNStateManager.EMBEDDED_MAP_VALUE_PC);
+            PersistableObjectType.EMBEDDED_MAP_VALUE_PC, DNStateManager.EMBEDDED_MAP_VALUE_PC);
     }
 }

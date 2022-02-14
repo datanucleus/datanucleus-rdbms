@@ -20,6 +20,7 @@ package org.datanucleus.store.rdbms.mapping.java;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ExecutionContext;
+import org.datanucleus.PersistableObjectType;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.rdbms.mapping.MappingCallbacks;
@@ -36,14 +37,14 @@ import org.datanucleus.store.types.TypeManager;
 public class EmbeddedPCMapping extends EmbeddedMapping implements MappingCallbacks
 {
     /**
-     * Initialize this JavaTypeMapping with the given DatastoreAdapter for the given metadata.
+     * Initialise this JavaTypeMapping with the given DatastoreAdapter for the given metadata.
      * @param mmd FieldMetaData for the field to be mapped (if any)
      * @param table The datastore container storing this mapping (if any)
      * @param clr the ClassLoaderResolver
      */
     public void initialize(AbstractMemberMetaData mmd, Table table, ClassLoaderResolver clr)
     {
-        initialize(mmd, table, clr, mmd.getEmbeddedMetaData(), mmd.getTypeName(), DNStateManager.EMBEDDED_PC);
+        initialize(mmd, table, clr, mmd.getEmbeddedMetaData(), mmd.getTypeName(), PersistableObjectType.EMBEDDED_PC, DNStateManager.EMBEDDED_PC);
     }
 
     /**
@@ -164,7 +165,7 @@ public class EmbeddedPCMapping extends EmbeddedMapping implements MappingCallbac
         {
             // Assign a StateManager to manage our embedded object
             thisOP = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, value, false, ownerSM, theMmd.getAbsoluteFieldNumber(), null);
-            thisOP.setPcObjectType(objectType);
+            thisOP.setPcObjectType(pcObjectType);
         }
 
         return thisOP;

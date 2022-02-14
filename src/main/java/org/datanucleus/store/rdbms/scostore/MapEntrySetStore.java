@@ -31,7 +31,6 @@ import org.datanucleus.ExecutionContext;
 import org.datanucleus.FetchPlan;
 import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.metadata.AbstractMemberMetaData;
-import org.datanucleus.metadata.MemberComponent;
 import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.connection.ManagedConnection;
 import org.datanucleus.store.rdbms.exceptions.MappedDatastoreException;
@@ -637,7 +636,7 @@ class MapEntrySetStore<K, V> extends BaseContainerStore implements SetStore<Map.
                 JavaTypeMapping keyMapping = setStore.getKeyMapping();
                 if (keyMapping instanceof EmbeddedKeyPCMapping || keyMapping instanceof SerialisedPCMapping || keyMapping instanceof SerialisedReferenceMapping)
                 {
-                    key = keyMapping.getObject(ec, rs, keyResultCols, sm, ownerFieldNum, MemberComponent.MAP_KEY);
+                    key = keyMapping.getObject(ec, rs, keyResultCols, sm, ownerFieldNum);
                 }
                 else
                 {
@@ -649,7 +648,7 @@ class MapEntrySetStore<K, V> extends BaseContainerStore implements SetStore<Map.
                 JavaTypeMapping valueMapping = setStore.getValueMapping();
                 if (valueMapping instanceof EmbeddedValuePCMapping || valueMapping instanceof SerialisedPCMapping || valueMapping instanceof SerialisedReferenceMapping)
                 {
-                    value = valueMapping.getObject(ec, rs, valueResultCols, sm, ownerFieldNum, MemberComponent.MAP_VALUE);
+                    value = valueMapping.getObject(ec, rs, valueResultCols, sm, ownerFieldNum);
                 }
                 else
                 {

@@ -143,7 +143,7 @@ public class ResultSetGetter extends AbstractFieldManager
         Object value;
         if (mapping instanceof EmbeddedPCMapping || mapping instanceof SerialisedPCMapping || mapping instanceof SerialisedReferenceMapping)
         {
-            value = mapping.getObject(ec, rs, mapIdx.getColumnPositions(), sm, fieldNumber, null);
+            value = mapping.getObject(ec, rs, mapIdx.getColumnPositions(), sm, fieldNumber);
         }
         else
         {

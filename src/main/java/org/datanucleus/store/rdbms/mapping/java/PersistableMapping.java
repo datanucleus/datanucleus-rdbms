@@ -34,6 +34,7 @@ import java.util.Collection;
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.NucleusContext;
+import org.datanucleus.PersistableObjectType;
 import org.datanucleus.PropertyNames;
 import org.datanucleus.api.ApiAdapter;
 import org.datanucleus.exceptions.NotYetFlushedException;
@@ -51,7 +52,6 @@ import org.datanucleus.metadata.FieldRole;
 import org.datanucleus.metadata.ValueGenerationStrategy;
 import org.datanucleus.metadata.IdentityType;
 import org.datanucleus.metadata.InheritanceStrategy;
-import org.datanucleus.metadata.MemberComponent;
 import org.datanucleus.metadata.MetaDataManager;
 import org.datanucleus.metadata.RelationType;
 import org.datanucleus.metadata.VersionMetaData;
@@ -356,7 +356,7 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
      */
     public void setObject(ExecutionContext ec, PreparedStatement ps, int[] param, Object value)
     {
-        setObject(ec, ps, param, value, null, -1, null);
+        setObject(ec, ps, param, value, null, -1);
     }
 
     /**
@@ -370,7 +370,7 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
      * @throws NotYetFlushedException if an object hasn't yet been flushed to the datastore
      */
     @Override
-    public void setObject(ExecutionContext ec, PreparedStatement ps, int[] param, Object value, DNStateManager ownerSM, int ownerFieldNumber, MemberComponent ownerMemberCmpt)
+    public void setObject(ExecutionContext ec, PreparedStatement ps, int[] param, Object value, DNStateManager ownerSM, int ownerFieldNumber)
     {
         if (value == null)
         {
@@ -522,7 +522,7 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
                 if (ec.getApiAdapter().isDetached(value))
                 {
                     // Field value is detached and not yet started attaching, so attach
-                    Object attachedValue = ec.persistObjectInternal(value, null, -1, DNStateManager.PC);
+                    Object attachedValue = ec.persistObjectInternal(value, null, -1, PersistableObjectType.PC);
                     if (attachedValue != value && ownerSM != null)
                     {
                         // Replace the field value if using copy-on-attach
@@ -629,7 +629,7 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
 
                     try
                     {
-                        Object pcNew = ec.persistObjectInternal(value, null, -1, DNStateManager.PC);
+                        Object pcNew = ec.persistObjectInternal(value, null, -1, PersistableObjectType.PC);
                         if (hasDatastoreAttributedPrimaryKeyValues)
                         {
                             ec.flushInternal(false);
@@ -897,7 +897,7 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
             if (otherOP == null)
             {
                 // Related object is not yet persisted so persist it
-                Object other = sm.getExecutionContext().persistObjectInternal(pc, null, -1, DNStateManager.PC);
+                Object other = sm.getExecutionContext().persistObjectInternal(pc, null, -1, PersistableObjectType.PC);
                 otherOP = sm.getExecutionContext().findStateManager(other);
             }
 
@@ -935,7 +935,7 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
             if (relationType == RelationType.ONE_TO_ONE_BI || relationType == RelationType.MANY_TO_ONE_BI || relationType == RelationType.MANY_TO_ONE_UNI)
             {
                 // Related object is not yet persisted (e.g 1-1 with FK at other side) so persist it
-                Object other = sm.getExecutionContext().persistObjectInternal(pc, null, -1, DNStateManager.PC);
+                Object other = sm.getExecutionContext().persistObjectInternal(pc, null, -1, PersistableObjectType.PC);
                 otherOP = sm.getExecutionContext().findStateManager(other);
             }
         }

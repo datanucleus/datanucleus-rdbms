@@ -22,13 +22,13 @@ import java.sql.ResultSet;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ExecutionContext;
+import org.datanucleus.PersistableObjectType;
 import org.datanucleus.api.ApiAdapter;
 import org.datanucleus.exceptions.NotYetFlushedException;
 import org.datanucleus.exceptions.NucleusObjectNotFoundException;
 import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.identity.IdentityUtils;
 import org.datanucleus.metadata.AbstractMemberMetaData;
-import org.datanucleus.metadata.MemberComponent;
 import org.datanucleus.metadata.MetaDataManager;
 import org.datanucleus.metadata.RelationType;
 import org.datanucleus.state.DNStateManager;
@@ -111,7 +111,7 @@ public abstract class MultiPersistableMapping extends MultiMapping
      */
     public void setObject(ExecutionContext ec, PreparedStatement ps, int[] pos, Object value)
     {
-        setObject(ec, ps, pos, value, null, -1, null);
+        setObject(ec, ps, pos, value, null, -1);
     }
 
     /**
@@ -128,7 +128,7 @@ public abstract class MultiPersistableMapping extends MultiMapping
      * @param pos The position(s) of the PreparedStatement to populate
      */
     @Override
-    public void setObject(ExecutionContext ec, PreparedStatement ps, int[] pos, Object value, DNStateManager ownerSM, int ownerFieldNumber, MemberComponent ownerMemberCmpt)
+    public void setObject(ExecutionContext ec, PreparedStatement ps, int[] pos, Object value, DNStateManager ownerSM, int ownerFieldNumber)
     {
         boolean setValueFKOnly = false;
         if (pos != null && pos.length < getNumberOfColumnMappings())
@@ -180,7 +180,7 @@ public abstract class MultiPersistableMapping extends MultiMapping
                 if (requiresPersisting)
                 {
                     // The object is either not yet persistent or is detached and so needs attaching
-                    Object pcNew = ec.persistObjectInternal(value, null, -1, DNStateManager.PC);
+                    Object pcNew = ec.persistObjectInternal(value, null, -1, PersistableObjectType.PC);
                     ec.flushInternal(false);
                     id = api.getIdForObject(pcNew);
                     if (ec.getApiAdapter().isDetached(value) && ownerSM != null)

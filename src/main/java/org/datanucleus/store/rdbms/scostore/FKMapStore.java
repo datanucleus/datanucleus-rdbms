@@ -26,6 +26,7 @@ import java.util.NoSuchElementException;
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.FetchPlan;
+import org.datanucleus.PersistableObjectType;
 import org.datanucleus.api.ApiAdapter;
 import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.exceptions.NucleusUserException;
@@ -33,7 +34,6 @@ import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.DiscriminatorStrategy;
 import org.datanucleus.metadata.MapMetaData;
-import org.datanucleus.metadata.MemberComponent;
 import org.datanucleus.metadata.MapMetaData.MapType;
 import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.FieldValues;
@@ -543,7 +543,7 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
                         {
                             return null;
                         }
-                        }, DNStateManager.PC);
+                        }, PersistableObjectType.PC);
                 }
             }
             else
@@ -630,7 +630,7 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
                         {
                             return null;
                         }
-                        }, DNStateManager.PC
+                        }, PersistableObjectType.PC
                     );
 
                     /*if (ownerFieldNumber < 0)
@@ -996,7 +996,7 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
                         if (ownerMemberMetaData != null)
                         {
                             ownerMapping.setObject(ec, ps, MappingHelper.getMappingIndices(1,ownerMapping), null, 
-                                sm, ownerMemberMetaData.getAbsoluteFieldNumber(), MemberComponent.MAP_VALUE);
+                                sm, ownerMemberMetaData.getAbsoluteFieldNumber());
                         }
                         else
                         {
@@ -1050,7 +1050,7 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
                         if (ownerMemberMetaData != null)
                         {
                             ownerMapping.setObject(ec, ps, MappingHelper.getMappingIndices(1,ownerMapping), null, 
-                                sm, ownerMemberMetaData.getAbsoluteFieldNumber(), MemberComponent.MAP_KEY);
+                                sm, ownerMemberMetaData.getAbsoluteFieldNumber());
                         }
                         else
                         {

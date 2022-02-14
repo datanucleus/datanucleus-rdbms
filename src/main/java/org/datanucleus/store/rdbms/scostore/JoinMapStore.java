@@ -32,7 +32,6 @@ import org.datanucleus.ExecutionContext;
 import org.datanucleus.api.ApiAdapter;
 import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.metadata.MapMetaData;
-import org.datanucleus.metadata.MemberComponent;
 import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.connection.ManagedConnection;
 import org.datanucleus.store.query.expression.Expression;
@@ -903,7 +902,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
                             {
                                 // Value = Serialised
                                 int ownerFieldNumber = mapTable.getOwnerMemberMetaData().getAbsoluteFieldNumber();
-                                value = valueMapping.getObject(ec, rs, param, ownerSM, ownerFieldNumber, MemberComponent.MAP_VALUE);
+                                value = valueMapping.getObject(ec, rs, param, ownerSM, ownerFieldNumber);
                             }
                             else
                             {

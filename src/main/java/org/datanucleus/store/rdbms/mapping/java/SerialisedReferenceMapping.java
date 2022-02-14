@@ -22,8 +22,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
 import org.datanucleus.ExecutionContext;
+import org.datanucleus.PersistableObjectType;
 import org.datanucleus.api.ApiAdapter;
-import org.datanucleus.metadata.MemberComponent;
 import org.datanucleus.state.DNStateManager;
 
 /**
@@ -45,7 +45,7 @@ public class SerialisedReferenceMapping extends SerialisedMapping
     {
         if (mmd != null)
         {
-            setObject(ec, ps, exprIndex, value, null, mmd.getAbsoluteFieldNumber(), null);
+            setObject(ec, ps, exprIndex, value, null, mmd.getAbsoluteFieldNumber());
         }
         else
         {
@@ -63,7 +63,7 @@ public class SerialisedReferenceMapping extends SerialisedMapping
      * @param fieldNumber field number of this object in the owning object
      */
     @Override
-    public void setObject(ExecutionContext ec, PreparedStatement ps, int[] exprIndex, Object value, DNStateManager ownerSM, int fieldNumber, MemberComponent ownerMemberCmpt)
+    public void setObject(ExecutionContext ec, PreparedStatement ps, int[] exprIndex, Object value, DNStateManager ownerSM, int fieldNumber)
     {
         ApiAdapter api = ec.getApiAdapter();
         if (api.isPersistable(value))
@@ -72,7 +72,7 @@ public class SerialisedReferenceMapping extends SerialisedMapping
             DNStateManager embSM = ec.findStateManager(value);
             if (embSM == null || api.getExecutionContext(value) == null)
             {
-                embSM = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, value, false, ownerSM, fieldNumber, ownerMemberCmpt);
+                embSM = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, value, false, ownerSM, fieldNumber, PersistableObjectType.EMBEDDED_PC);
             }
         }
 
@@ -105,7 +105,7 @@ public class SerialisedReferenceMapping extends SerialisedMapping
     {
         if (mmd != null)
         {
-            return getObject(ec, resultSet, exprIndex, null, mmd.getAbsoluteFieldNumber(), null);
+            return getObject(ec, resultSet, exprIndex, null, mmd.getAbsoluteFieldNumber());
         }
         return super.getObject(ec, resultSet, exprIndex);
     }
@@ -120,7 +120,7 @@ public class SerialisedReferenceMapping extends SerialisedMapping
      * @return The (deserialised) persistable object
      */
     @Override
-    public Object getObject(ExecutionContext ec, ResultSet resultSet, int[] exprIndex, DNStateManager ownerSM, int fieldNumber, MemberComponent ownerMemberCmpt)
+    public Object getObject(ExecutionContext ec, ResultSet resultSet, int[] exprIndex, DNStateManager ownerSM, int fieldNumber)
     {
         Object obj = getColumnMapping(0).getObject(resultSet, exprIndex[0]);
         ApiAdapter api = ec.getApiAdapter();
@@ -130,7 +130,7 @@ public class SerialisedReferenceMapping extends SerialisedMapping
             DNStateManager embSM = ec.findStateManager(obj);
             if (embSM == null || api.getExecutionContext(obj) == null)
             {
-                ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, obj, false, ownerSM, fieldNumber, ownerMemberCmpt);
+                ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, obj, false, ownerSM, fieldNumber, PersistableObjectType.EMBEDDED_PC);
             }
         }
         return obj;

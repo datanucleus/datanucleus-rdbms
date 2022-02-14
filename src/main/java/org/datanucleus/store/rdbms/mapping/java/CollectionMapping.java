@@ -25,11 +25,11 @@ package org.datanucleus.store.rdbms.mapping.java;
 import java.util.Collection;
 
 import org.datanucleus.ExecutionContext;
+import org.datanucleus.PersistableObjectType;
 import org.datanucleus.PropertyNames;
 import org.datanucleus.exceptions.ReachableObjectNotCascadedException;
 import org.datanucleus.identity.IdentityUtils;
 import org.datanucleus.metadata.AbstractMemberMetaData;
-import org.datanucleus.metadata.MemberComponent;
 import org.datanucleus.metadata.RelationType;
 import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.rdbms.mapping.MappingCallbacks;
@@ -80,7 +80,7 @@ public class CollectionMapping extends AbstractContainerMapping implements Mappi
                             if (elemSM == null || ec.getApiAdapter().getExecutionContext(elem) == null)
                             {
                                 elemSM = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, elem, false,
-                                    ownerSM, mmd.getAbsoluteFieldNumber(), MemberComponent.COLLECTION_ELEMENT);
+                                    ownerSM, mmd.getAbsoluteFieldNumber(), PersistableObjectType.EMBEDDED_COLLECTION_ELEMENT_PC);
                             }
                         }
                     }
@@ -203,7 +203,7 @@ public class CollectionMapping extends AbstractContainerMapping implements Mappi
                             if (elemOP == null || ec.getApiAdapter().getExecutionContext(collElement) == null)
                             {
                                 elemOP = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, collElement, false,
-                                    ownerSM, mmd.getAbsoluteFieldNumber(), MemberComponent.COLLECTION_ELEMENT);
+                                    ownerSM, mmd.getAbsoluteFieldNumber(), PersistableObjectType.EMBEDDED_COLLECTION_ELEMENT_PC);
                             }
                         }
                     }

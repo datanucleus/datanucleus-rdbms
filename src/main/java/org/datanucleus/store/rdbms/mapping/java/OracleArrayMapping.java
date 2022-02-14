@@ -25,8 +25,8 @@ import java.math.BigInteger;
 import java.sql.SQLException;
 
 import org.datanucleus.ExecutionContext;
+import org.datanucleus.PersistableObjectType;
 import org.datanucleus.exceptions.NucleusDataStoreException;
-import org.datanucleus.metadata.MemberComponent;
 import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.rdbms.mapping.column.BlobImpl;
 import org.datanucleus.store.rdbms.mapping.column.ColumnMappingPostSet;
@@ -192,7 +192,7 @@ public class OracleArrayMapping extends ArrayMapping
                         if (elemOP == null || ec.getApiAdapter().getExecutionContext(elem) == null)
                         {
                             elemOP = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, elem, false,
-                                ownerSM, mmd.getAbsoluteFieldNumber(), MemberComponent.ARRAY_ELEMENT);
+                                ownerSM, mmd.getAbsoluteFieldNumber(), PersistableObjectType.EMBEDDED_ARRAY_ELEMENT_PC);
                         }
                     }
                 }
@@ -231,7 +231,7 @@ public class OracleArrayMapping extends ArrayMapping
                         if (elemOP == null || ec.getApiAdapter().getExecutionContext(elem) == null)
                         {
                             elemOP = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, elem, false,
-                                ownerSM, mmd.getAbsoluteFieldNumber(), MemberComponent.ARRAY_ELEMENT);
+                                ownerSM, mmd.getAbsoluteFieldNumber(), PersistableObjectType.EMBEDDED_ARRAY_ELEMENT_PC);
                         }
                     }
                 }

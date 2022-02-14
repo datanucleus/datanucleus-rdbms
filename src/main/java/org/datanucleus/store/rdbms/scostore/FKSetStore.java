@@ -27,6 +27,7 @@ import java.util.Iterator;
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.FetchPlan;
+import org.datanucleus.PersistableObjectType;
 import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.exceptions.NucleusUserException;
@@ -34,7 +35,6 @@ import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.CollectionMetaData;
 import org.datanucleus.metadata.DiscriminatorStrategy;
-import org.datanucleus.metadata.MemberComponent;
 import org.datanucleus.metadata.RelationType;
 import org.datanucleus.state.DNStateManager;
 import org.datanucleus.state.RelationshipManager;
@@ -306,11 +306,11 @@ public class FKSetStore<E> extends AbstractSetStore<E>
                     if (owner == null)
                     {
                         ownerMapping.setObject(ec, ps, MappingHelper.getMappingIndices(jdbcPosition, ownerMapping), null, 
-                            ownerSM, ownerMemberMetaData.getAbsoluteFieldNumber(), null);
+                            ownerSM, ownerMemberMetaData.getAbsoluteFieldNumber());
                     }
                     else
                     {
-                        ownerMapping.setObject(ec, ps, MappingHelper.getMappingIndices(jdbcPosition, ownerMapping), ownerSM.getObject(), ownerSM, ownerMemberMetaData.getAbsoluteFieldNumber(), null);
+                        ownerMapping.setObject(ec, ps, MappingHelper.getMappingIndices(jdbcPosition, ownerMapping), ownerSM.getObject(), ownerSM, ownerMemberMetaData.getAbsoluteFieldNumber());
                     }
                     jdbcPosition += ownerMapping.getNumberOfColumnMappings();
                     if (relationDiscriminatorMapping != null)
@@ -648,7 +648,7 @@ public class FKSetStore<E> extends AbstractSetStore<E>
                         otherMmd = otherCmd.getMetaDataForMember(thisMappedBy);
 
                         Object holderValueAtField = ownerHolderSM.provideField(otherMmd.getAbsoluteFieldNumber());
-                        ownerHolderSM = ec.findStateManagerForEmbedded(holderValueAtField, ownerHolderSM, otherMmd, MemberComponent.COLLECTION_ELEMENT);
+                        ownerHolderSM = ec.findStateManagerForEmbedded(holderValueAtField, ownerHolderSM, otherMmd, PersistableObjectType.EMBEDDED_COLLECTION_ELEMENT_PC);
 
                         remainingMappedBy = remainingMappedBy.substring(dotPosition+1);
                         otherCmd = storeMgr.getMetaDataManager().getMetaDataForClass(otherMmd.getTypeName(), clr);
@@ -821,7 +821,7 @@ public class FKSetStore<E> extends AbstractSetStore<E>
                             otherMmd = otherCmd.getMetaDataForMember(thisMappedBy);
 
                             Object holderValueAtField = ownerHolderSM.provideField(otherMmd.getAbsoluteFieldNumber());
-                            ownerHolderSM = ec.findStateManagerForEmbedded(holderValueAtField, ownerHolderSM, otherMmd, MemberComponent.COLLECTION_ELEMENT);
+                            ownerHolderSM = ec.findStateManagerForEmbedded(holderValueAtField, ownerHolderSM, otherMmd, PersistableObjectType.EMBEDDED_COLLECTION_ELEMENT_PC);
 
                             remainingMappedBy = remainingMappedBy.substring(dotPosition+1);
                             otherCmd = storeMgr.getMetaDataManager().getMetaDataForClass(otherMmd.getTypeName(), clr);

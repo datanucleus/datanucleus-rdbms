@@ -41,6 +41,7 @@ import java.util.stream.Stream;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ExecutionContext;
+import org.datanucleus.PersistableObjectType;
 import org.datanucleus.exceptions.NotYetFlushedException;
 import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.exceptions.NucleusException;
@@ -453,7 +454,7 @@ public class InsertRequest extends Request
                                 for (int k=0;k<externalFKStmtMappings[i].getNumberOfParameterOccurrences();k++)
                                 {
                                     externalFKStmtMappings[i].getMapping().setObject(ec, ps,
-                                        externalFKStmtMappings[i].getParameterPositionsForOccurrence(k), fkValue, null, ownerFmd.getAbsoluteFieldNumber(), null);
+                                        externalFKStmtMappings[i].getParameterPositionsForOccurrence(k), fkValue, null, ownerFmd.getAbsoluteFieldNumber());
                                 }
                             }
                             else
@@ -538,7 +539,7 @@ public class InsertRequest extends Request
                         Object value = sm.provideField(relationFieldNumbers[i]);
                         if (value != null && ec.getApiAdapter().isDetached(value))
                         {
-                            Object valueAttached = ec.persistObjectInternal(value, null, -1, DNStateManager.PC);
+                            Object valueAttached = ec.persistObjectInternal(value, null, -1, PersistableObjectType.PC);
                             sm.replaceField(relationFieldNumbers[i], valueAttached);
                         }
                     }

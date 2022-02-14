@@ -26,6 +26,7 @@ import java.util.Iterator;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ExecutionContext;
+import org.datanucleus.PersistableObjectType;
 import org.datanucleus.PropertyNames;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.exceptions.NucleusUserException;
@@ -39,7 +40,6 @@ import org.datanucleus.metadata.FieldRole;
 import org.datanucleus.metadata.IdentityType;
 import org.datanucleus.metadata.InheritanceStrategy;
 import org.datanucleus.metadata.KeyMetaData;
-import org.datanucleus.metadata.MemberComponent;
 import org.datanucleus.metadata.MetaData;
 import org.datanucleus.metadata.MetaDataUtils;
 import org.datanucleus.metadata.ValueMetaData;
@@ -545,7 +545,7 @@ public abstract class ReferenceMapping extends MultiPersistableMapping implement
      * @param pos The position(s) of the PreparedStatement to populate
      */
     @Override
-    public void setObject(ExecutionContext ec, PreparedStatement ps, int[] pos, Object value, DNStateManager ownerSM, int ownerFieldNumber, MemberComponent ownerMemberCmpt)
+    public void setObject(ExecutionContext ec, PreparedStatement ps, int[] pos, Object value, DNStateManager ownerSM, int ownerFieldNumber)
     {
         // TODO Cater for case where this mapping has no datastore columns (N-1 join table)
       /*if (getNumberOfColumnMappings() == 0)
@@ -564,7 +564,7 @@ public abstract class ReferenceMapping extends MultiPersistableMapping implement
 
         if (mappingStrategy == PER_IMPLEMENTATION_MAPPING)
         {
-            super.setObject(ec, ps, pos, value, ownerSM, ownerFieldNumber, ownerMemberCmpt);
+            super.setObject(ec, ps, pos, value, ownerSM, ownerFieldNumber);
         }
         else if (mappingStrategy == ID_MAPPING || mappingStrategy == XCALIA_MAPPING)
         {
@@ -641,7 +641,7 @@ public abstract class ReferenceMapping extends MultiPersistableMapping implement
             if (sm == null)
             {
                 // Referenced object is not yet persistent, so persist it
-                ec.persistObjectInternal(value, null, -1, DNStateManager.PC);
+                ec.persistObjectInternal(value, null, -1, PersistableObjectType.PC);
                 sm = ec.findStateManager(value);
                 sm.flush(); // Make sure the object is in the datastore so the id is set
             }

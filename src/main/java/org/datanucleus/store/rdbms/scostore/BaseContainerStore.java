@@ -24,10 +24,10 @@ import java.util.List;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ExecutionContext;
+import org.datanucleus.PersistableObjectType;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.InheritanceStrategy;
-import org.datanucleus.metadata.MemberComponent;
 import org.datanucleus.metadata.RelationType;
 import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.rdbms.adapter.DatastoreAdapter;
@@ -140,7 +140,7 @@ public abstract class BaseContainerStore implements Store
      * @param ownerMemberCmpt Component in the member of the owner where this is embedded/serialised
      * @return StateManager
      */
-    public DNStateManager getStateManagerForEmbeddedPCObject(DNStateManager sm, Object obj, AbstractMemberMetaData ownerMmd, short pcType, MemberComponent ownerMemberCmpt)
+    public DNStateManager getStateManagerForEmbeddedPCObject(DNStateManager sm, Object obj, AbstractMemberMetaData ownerMmd, short pcType, PersistableObjectType ownerMemberCmpt)
     {
         ExecutionContext ec = sm.getExecutionContext();
         DNStateManager objOP = ec.findStateManager(obj);

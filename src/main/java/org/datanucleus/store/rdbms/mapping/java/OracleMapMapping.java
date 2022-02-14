@@ -25,7 +25,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.datanucleus.ExecutionContext;
-import org.datanucleus.metadata.MemberComponent;
+import org.datanucleus.PersistableObjectType;
 import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.rdbms.mapping.column.ColumnMappingPostSet;
 
@@ -88,7 +88,7 @@ public class OracleMapMapping extends MapMapping
                             if (ec.findStateManager(key) == null || ec.getApiAdapter().getExecutionContext(key) == null)
                             {
                                 ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, key, false,
-                                    ownerSM, mmd.getAbsoluteFieldNumber(), MemberComponent.MAP_KEY);
+                                    ownerSM, mmd.getAbsoluteFieldNumber(), PersistableObjectType.EMBEDDED_MAP_KEY_PC);
                             }
                         }
                         if (mmd.getMap().valueIsPersistent() && entry.getValue() != null)
@@ -97,7 +97,7 @@ public class OracleMapMapping extends MapMapping
                             if (ec.findStateManager(val) == null || ec.getApiAdapter().getExecutionContext(val) == null)
                             {
                                 ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, val, false,
-                                    ownerSM, mmd.getAbsoluteFieldNumber(), MemberComponent.MAP_VALUE);
+                                    ownerSM, mmd.getAbsoluteFieldNumber(), PersistableObjectType.EMBEDDED_MAP_VALUE_PC);
                             }
                         }
                     }
@@ -133,7 +133,7 @@ public class OracleMapMapping extends MapMapping
                             if (ec.findStateManager(key) == null || ec.getApiAdapter().getExecutionContext(key) == null)
                             {
                                 ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, key, false,
-                                    ownerSM, mmd.getAbsoluteFieldNumber(), MemberComponent.MAP_KEY);
+                                    ownerSM, mmd.getAbsoluteFieldNumber(), PersistableObjectType.EMBEDDED_MAP_KEY_PC);
                             }
                         }
                         if (mmd.getMap().valueIsPersistent() && entry.getValue() != null)
@@ -142,7 +142,7 @@ public class OracleMapMapping extends MapMapping
                             if (ec.findStateManager(val) == null || ec.getApiAdapter().getExecutionContext(val) == null)
                             {
                                 ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, val, false,
-                                    ownerSM, mmd.getAbsoluteFieldNumber(), MemberComponent.MAP_VALUE);
+                                    ownerSM, mmd.getAbsoluteFieldNumber(), PersistableObjectType.EMBEDDED_MAP_VALUE_PC);
                             }
                         }
                     }

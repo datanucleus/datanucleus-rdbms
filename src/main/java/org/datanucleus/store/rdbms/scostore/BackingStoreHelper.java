@@ -24,10 +24,10 @@ import java.util.Iterator;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ExecutionContext;
+import org.datanucleus.PersistableObjectType;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.DiscriminatorStrategy;
-import org.datanucleus.metadata.MemberComponent;
 import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.fieldmanager.ParameterSetter;
@@ -106,7 +106,7 @@ public class BackingStoreHelper
         if (bcs.getOwnerMemberMetaData() != null && !embedded)
         {
             bcs.getOwnerMapping().setObject(ec, ps, MappingHelper.getMappingIndices(jdbcPosition, bcs.getOwnerMapping()), ownerSM.getObject(),
-                ownerSM, bcs.getOwnerMemberMetaData().getAbsoluteFieldNumber(), null);
+                ownerSM, bcs.getOwnerMemberMetaData().getAbsoluteFieldNumber());
         }
         else
         {
@@ -354,7 +354,7 @@ public class BackingStoreHelper
             mappingDefinition.addMappingForMember(absFieldNum, stmtMapping);
         }
 
-        DNStateManager elementSM = bcs.getStateManagerForEmbeddedPCObject(sm, element, ownerFieldMetaData, DNStateManager.EMBEDDED_COLLECTION_ELEMENT_PC, MemberComponent.COLLECTION_ELEMENT);
+        DNStateManager elementSM = bcs.getStateManagerForEmbeddedPCObject(sm, element, ownerFieldMetaData, DNStateManager.EMBEDDED_COLLECTION_ELEMENT_PC, PersistableObjectType.EMBEDDED_COLLECTION_ELEMENT_PC);
         elementSM.provideFields(elementFieldNumbers, new ParameterSetter(elementSM, ps, mappingDefinition));
 
         return jdbcPosition;
@@ -393,7 +393,7 @@ public class BackingStoreHelper
             mappingDefinition.addMappingForMember(absFieldNum, stmtMapping);
         }
 
-        DNStateManager elementSM = mapStore.getStateManagerForEmbeddedPCObject(sm, key, joinTable.getOwnerMemberMetaData(), DNStateManager.EMBEDDED_MAP_KEY_PC, MemberComponent.MAP_KEY);
+        DNStateManager elementSM = mapStore.getStateManagerForEmbeddedPCObject(sm, key, joinTable.getOwnerMemberMetaData(), DNStateManager.EMBEDDED_MAP_KEY_PC, PersistableObjectType.EMBEDDED_MAP_KEY_PC);
         elementSM.provideFields(elementFieldNumbers, new ParameterSetter(elementSM, ps, mappingDefinition));
 
         return jdbcPosition;
@@ -432,7 +432,7 @@ public class BackingStoreHelper
             mappingDefinition.addMappingForMember(absFieldNum, stmtMapping);
         }
 
-        DNStateManager elementSM = mapStore.getStateManagerForEmbeddedPCObject(sm, value, joinTable.getOwnerMemberMetaData(), DNStateManager.EMBEDDED_MAP_VALUE_PC, MemberComponent.MAP_VALUE);
+        DNStateManager elementSM = mapStore.getStateManagerForEmbeddedPCObject(sm, value, joinTable.getOwnerMemberMetaData(), DNStateManager.EMBEDDED_MAP_VALUE_PC, PersistableObjectType.EMBEDDED_MAP_VALUE_PC);
         elementSM.provideFields(elementFieldNumbers, new ParameterSetter(elementSM, ps, mappingDefinition));
 
         return jdbcPosition;

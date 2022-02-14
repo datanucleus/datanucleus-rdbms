@@ -24,7 +24,6 @@ import java.util.Iterator;
 
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.metadata.AbstractMemberMetaData;
-import org.datanucleus.metadata.MemberComponent;
 import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.rdbms.exceptions.MappedDatastoreException;
 import org.datanucleus.store.rdbms.mapping.java.EmbeddedElementPCMapping;
@@ -77,7 +76,7 @@ class CollectionStoreIterator<E> implements Iterator<E>
                         {
                             ownerFieldNumber = getOwnerMemberMetaData(collStore.containerTable).getAbsoluteFieldNumber();
                         }
-                        nextElement = collStore.elementMapping.getObject(ec, rs, param, sm, ownerFieldNumber, MemberComponent.COLLECTION_ELEMENT);
+                        nextElement = collStore.elementMapping.getObject(ec, rs, param, sm, ownerFieldNumber);
                     }
                     else
                     {

@@ -28,7 +28,6 @@ import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.ColumnMetaData;
 import org.datanucleus.metadata.FieldRole;
-import org.datanucleus.metadata.MemberComponent;
 import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.mapping.column.ColumnMapping;
@@ -699,9 +698,8 @@ public abstract class JavaTypeMapping
      * @param value the value
      * @param ownerSM the owner StateManager where this is embedded
      * @param ownerFieldNumber the owner absolute field number where this is embedded
-     * @param ownerMemberCmpt Component in the member where this is serialised/embedded (or null for default)
      */
-    public void setObject(ExecutionContext ec, PreparedStatement ps, int[] exprIndex, Object value, DNStateManager ownerSM, int ownerFieldNumber, MemberComponent ownerMemberCmpt)
+    public void setObject(ExecutionContext ec, PreparedStatement ps, int[] exprIndex, Object value, DNStateManager ownerSM, int ownerFieldNumber)
     {
         throw new NucleusException(failureMessage("setObject")).setFatal();
     }
@@ -725,10 +723,9 @@ public abstract class JavaTypeMapping
      * @param exprIndex the position of the value in the result set
      * @param ownerSM the owner StateManager where this is embedded
      * @param ownerFieldNumber the owner field number where this is embedded
-     * @param ownerMemberCmpt Component in the member where this is serialised/embedded (or null for default)
      * @return the value
      */
-    public Object getObject(ExecutionContext ec, ResultSet rs, int[] exprIndex, DNStateManager ownerSM, int ownerFieldNumber, MemberComponent ownerMemberCmpt)
+    public Object getObject(ExecutionContext ec, ResultSet rs, int[] exprIndex, DNStateManager ownerSM, int ownerFieldNumber)
     {
         throw new NucleusException(failureMessage("getObject")).setFatal();
     }

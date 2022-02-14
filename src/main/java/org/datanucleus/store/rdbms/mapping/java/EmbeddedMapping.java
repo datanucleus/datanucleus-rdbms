@@ -27,6 +27,7 @@ import java.util.List;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ExecutionContext;
+import org.datanucleus.PersistableObjectType;
 import org.datanucleus.api.ApiAdapter;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.exceptions.NucleusUserException;
@@ -39,7 +40,6 @@ import org.datanucleus.metadata.EmbeddedMetaData;
 import org.datanucleus.metadata.FieldPersistenceModifier;
 import org.datanucleus.metadata.FieldRole;
 import org.datanucleus.metadata.InheritanceMetaData;
-import org.datanucleus.metadata.MemberComponent;
 import org.datanucleus.metadata.MetaDataManager;
 import org.datanucleus.metadata.RelationType;
 import org.datanucleus.state.DNStateManager;
@@ -76,8 +76,10 @@ public abstract class EmbeddedMapping extends SingleFieldMapping
     /** Type name for the object being embedded. */
     protected String typeName;
 
-    /** Type of PC object. Corresponds to the values in StateManagerImpl. */
-    protected short objectType = -1;
+    protected PersistableObjectType objectType = null;
+    /** Type of PC object. Corresponds to the values in StateManagerImpl. 
+     * @deprecated */
+    protected short pcObjectType = -1;
 
     /** MetaData for the embedded class. */
     protected AbstractClassMetaData embCmd = null;
@@ -103,13 +105,14 @@ public abstract class EmbeddedMapping extends SingleFieldMapping
      * @param typeName type of the embedded PC object being stored
      * @param objectType Object type of the PC object being embedded (see StateManagerImpl object types)
      */
-    public void initialize(AbstractMemberMetaData mmd, Table table, ClassLoaderResolver clr, EmbeddedMetaData emd, String typeName, int objectType)
+    public void initialize(AbstractMemberMetaData mmd, Table table, ClassLoaderResolver clr, EmbeddedMetaData emd, String typeName, PersistableObjectType objectType, int pcObjectType)
     {
     	super.initialize(mmd, table, clr);
         this.clr = clr;
         this.emd = emd;
         this.typeName = typeName;
-        this.objectType = (short) objectType;
+        this.objectType = objectType;
+        this.pcObjectType = (short) pcObjectType;
 
         // Find the MetaData for the embedded PC class
         MetaDataManager mmgr = table.getStoreManager().getMetaDataManager();
@@ -409,7 +412,7 @@ public abstract class EmbeddedMapping extends SingleFieldMapping
      */
     public void setObject(ExecutionContext ec, PreparedStatement ps, int[] param, Object value)
     {
-        setObject(ec, ps, param, value, null, -1, null);
+        setObject(ec, ps, param, value, null, -1);
     }
 
     /**
@@ -422,7 +425,7 @@ public abstract class EmbeddedMapping extends SingleFieldMapping
      * @param param Param numbers in the PreparedStatement for the fields of this object
      */
     @Override
-    public void setObject(ExecutionContext ec, PreparedStatement ps, int[] param, Object value, DNStateManager ownerSM, int ownerFieldNumber, MemberComponent ownerMemberCmpt)
+    public void setObject(ExecutionContext ec, PreparedStatement ps, int[] param, Object value, DNStateManager ownerSM, int ownerFieldNumber)
     {
         if (value == null)
         {
@@ -505,8 +508,8 @@ public abstract class EmbeddedMapping extends SingleFieldMapping
             if (embSM == null || api.getExecutionContext(value) == null)
             {
                 // Assign a StateManager to manage our embedded object
-                embSM = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, value, false, ownerSM, ownerFieldNumber, ownerMemberCmpt);
-                embSM.setPcObjectType(objectType);
+                embSM = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, value, false, ownerSM, ownerFieldNumber, objectType);
+                embSM.setPcObjectType(pcObjectType);
             }
 
             int n = 0;
@@ -536,7 +539,7 @@ public abstract class EmbeddedMapping extends SingleFieldMapping
                     Object fieldValue = embSM.provideField(embAbsFieldNum);
                     if (mapping instanceof EmbeddedPCMapping)
                     {
-                        mapping.setObject(ec, ps, posMapping, fieldValue, embSM, embAbsFieldNum, null);
+                        mapping.setObject(ec, ps, posMapping, fieldValue, embSM, embAbsFieldNum);
                     }
                     else
                     {
@@ -563,7 +566,7 @@ public abstract class EmbeddedMapping extends SingleFieldMapping
      */
     public Object getObject(ExecutionContext ec, ResultSet rs, int[] param)
     {
-        return getObject(ec, rs, param, null, -1, null);
+        return getObject(ec, rs, param, null, -1);
     }
 
     /**
@@ -576,7 +579,7 @@ public abstract class EmbeddedMapping extends SingleFieldMapping
      * @return The embedded object
      */
     @Override
-    public Object getObject(ExecutionContext ec, ResultSet rs, int[] param, DNStateManager ownerSM, int ownerFieldNumber, MemberComponent ownerMemberCmpt)
+    public Object getObject(ExecutionContext ec, ResultSet rs, int[] param, DNStateManager ownerSM, int ownerFieldNumber)
     {
         Object value = null;
 
@@ -600,7 +603,7 @@ public abstract class EmbeddedMapping extends SingleFieldMapping
             embeddedType = ec.getClassLoaderResolver().classForName(mmd.getFieldTypes()[0]);
         }
         DNStateManager embSM = ec.getNucleusContext().getStateManagerFactory().newForHollow(ec, embeddedType, null);
-        embSM.setPcObjectType(objectType);
+        embSM.setPcObjectType(pcObjectType);
         value = embSM.getObject();
 
         String nullColumn = null;
@@ -632,7 +635,7 @@ public abstract class EmbeddedMapping extends SingleFieldMapping
                     n += numSubParams;
 
                     // Use the sub-object mapping to extract the value for that object
-                    Object subValue = mapping.getObject(ec, rs, subParam, embSM, embAbsFieldNum, null);
+                    Object subValue = mapping.getObject(ec, rs, subParam, embSM, embAbsFieldNum);
                     if (subValue != null)
                     {
                         embSM.replaceField(embAbsFieldNum, subValue);

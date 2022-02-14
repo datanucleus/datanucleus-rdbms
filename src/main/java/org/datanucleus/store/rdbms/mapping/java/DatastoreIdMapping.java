@@ -26,11 +26,11 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
 import org.datanucleus.ExecutionContext;
+import org.datanucleus.PersistableObjectType;
 import org.datanucleus.api.ApiAdapter;
 import org.datanucleus.exceptions.NotYetFlushedException;
 import org.datanucleus.identity.IdentityUtils;
 import org.datanucleus.identity.DatastoreId;
-import org.datanucleus.state.DNStateManager;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 
@@ -70,7 +70,7 @@ public class DatastoreIdMapping extends SingleFieldMapping
                     }
 
                     // Object is not persist, nor in the process of being made persistent
-                    ec.persistObjectInternal(value, null, -1, DNStateManager.PC);
+                    ec.persistObjectInternal(value, null, -1, PersistableObjectType.PC);
                     ec.flushInternal(false);
                 }
                 id = api.getIdForObject(value);
