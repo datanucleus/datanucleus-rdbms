@@ -62,7 +62,7 @@ public class SerialisedPCMapping extends SerialisedMapping
             DNStateManager embSM = ec.findStateManager(value);
             if (embSM == null || ec.getApiAdapter().getExecutionContext(value) == null)
             {
-                embSM = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, value, false, ownerSM, fieldNumber, null);
+                embSM = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, value, false, ownerSM, fieldNumber, ownerMemberCmpt);
             }
         }
 
@@ -115,7 +115,7 @@ public class SerialisedPCMapping extends SerialisedMapping
             DNStateManager embSM = ec.findStateManager(obj);
             if (embSM == null || ec.getApiAdapter().getExecutionContext(obj) == null)
             {
-                ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, obj, false, ownerSM, fieldNumber, null);
+                ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, obj, false, ownerSM, fieldNumber, ownerMemberCmpt);
             }
         }
         return obj;

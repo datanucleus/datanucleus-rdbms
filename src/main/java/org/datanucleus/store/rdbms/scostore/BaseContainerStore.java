@@ -27,6 +27,7 @@ import org.datanucleus.ExecutionContext;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.InheritanceStrategy;
+import org.datanucleus.metadata.MemberComponent;
 import org.datanucleus.metadata.RelationType;
 import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.rdbms.adapter.DatastoreAdapter;
@@ -135,16 +136,17 @@ public abstract class BaseContainerStore implements Store
      * @param sm StateManager of the owner
      * @param obj The embedded PC object
      * @param ownerMmd The meta data for the owner field
-     * @param pcType Object type for the embedded object (see DNStateManager EMBEDDED_PC etc)
+     * @param pcType Object type for the embedded object (see DNStateManager EMBEDDED_PC etc) TODO Drop this
+     * @param ownerMemberCmpt Component in the member of the owner where this is embedded/serialised
      * @return StateManager
      */
-    public DNStateManager getStateManagerForEmbeddedPCObject(DNStateManager sm, Object obj, AbstractMemberMetaData ownerMmd, short pcType)
+    public DNStateManager getStateManagerForEmbeddedPCObject(DNStateManager sm, Object obj, AbstractMemberMetaData ownerMmd, short pcType, MemberComponent ownerMemberCmpt)
     {
         ExecutionContext ec = sm.getExecutionContext();
         DNStateManager objOP = ec.findStateManager(obj);
         if (objOP == null)
         {
-            objOP = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, obj, false, sm, ownerMmd.getAbsoluteFieldNumber(), null);
+            objOP = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, obj, false, sm, ownerMmd.getAbsoluteFieldNumber(), ownerMemberCmpt);
         }
         objOP.setPcObjectType(pcType);
         return objOP;

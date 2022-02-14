@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.datanucleus.ExecutionContext;
+import org.datanucleus.metadata.MemberComponent;
 import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.rdbms.mapping.column.ColumnMappingPostSet;
 
@@ -63,12 +64,12 @@ public class OracleMapMapping extends MapMapping
         }
     }
 
-    public void postInsert(DNStateManager sm)
+    public void postInsert(DNStateManager ownerSM)
     {
         if (containerIsStoredInSingleColumn())
         {
-            ExecutionContext ec = sm.getExecutionContext();
-            java.util.Map value = (java.util.Map) sm.provideField(mmd.getAbsoluteFieldNumber());
+            ExecutionContext ec = ownerSM.getExecutionContext();
+            java.util.Map value = (java.util.Map) ownerSM.provideField(mmd.getAbsoluteFieldNumber());
 
             // Do nothing when serialised since we are handled in the main request
             if (value != null)
@@ -86,7 +87,8 @@ public class OracleMapMapping extends MapMapping
                             Object key = entry.getKey();
                             if (ec.findStateManager(key) == null || ec.getApiAdapter().getExecutionContext(key) == null)
                             {
-                                ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, key, false, sm, mmd.getAbsoluteFieldNumber(), null);
+                                ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, key, false,
+                                    ownerSM, mmd.getAbsoluteFieldNumber(), MemberComponent.MAP_KEY);
                             }
                         }
                         if (mmd.getMap().valueIsPersistent() && entry.getValue() != null)
@@ -94,7 +96,8 @@ public class OracleMapMapping extends MapMapping
                             Object val = entry.getValue();
                             if (ec.findStateManager(val) == null || ec.getApiAdapter().getExecutionContext(val) == null)
                             {
-                                ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, val, false, sm, mmd.getAbsoluteFieldNumber(), null);
+                                ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, val, false,
+                                    ownerSM, mmd.getAbsoluteFieldNumber(), MemberComponent.MAP_VALUE);
                             }
                         }
                     }
@@ -103,16 +106,16 @@ public class OracleMapMapping extends MapMapping
         }
         else
         {
-            super.postInsert(sm);
+            super.postInsert(ownerSM);
         }
     }
 
-    public void postUpdate(DNStateManager sm)
+    public void postUpdate(DNStateManager ownerSM)
     {
         if (containerIsStoredInSingleColumn())
         {
-            ExecutionContext ec = sm.getExecutionContext();
-            java.util.Map value = (java.util.Map) sm.provideField(mmd.getAbsoluteFieldNumber());
+            ExecutionContext ec = ownerSM.getExecutionContext();
+            java.util.Map value = (java.util.Map) ownerSM.provideField(mmd.getAbsoluteFieldNumber());
 
             if (value != null)
             {
@@ -129,7 +132,8 @@ public class OracleMapMapping extends MapMapping
                             Object key = entry.getKey();
                             if (ec.findStateManager(key) == null || ec.getApiAdapter().getExecutionContext(key) == null)
                             {
-                                ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, key, false, sm, mmd.getAbsoluteFieldNumber(), null);
+                                ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, key, false,
+                                    ownerSM, mmd.getAbsoluteFieldNumber(), MemberComponent.MAP_KEY);
                             }
                         }
                         if (mmd.getMap().valueIsPersistent() && entry.getValue() != null)
@@ -137,7 +141,8 @@ public class OracleMapMapping extends MapMapping
                             Object val = entry.getValue();
                             if (ec.findStateManager(val) == null || ec.getApiAdapter().getExecutionContext(val) == null)
                             {
-                                ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, val, false, sm, mmd.getAbsoluteFieldNumber(), null);
+                                ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, val, false,
+                                    ownerSM, mmd.getAbsoluteFieldNumber(), MemberComponent.MAP_VALUE);
                             }
                         }
                     }
@@ -146,7 +151,7 @@ public class OracleMapMapping extends MapMapping
         }
         else
         {
-            super.postUpdate(sm);
+            super.postUpdate(ownerSM);
         }
     }
 }

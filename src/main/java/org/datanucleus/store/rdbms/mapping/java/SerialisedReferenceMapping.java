@@ -72,7 +72,7 @@ public class SerialisedReferenceMapping extends SerialisedMapping
             DNStateManager embSM = ec.findStateManager(value);
             if (embSM == null || api.getExecutionContext(value) == null)
             {
-                embSM = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, value, false, ownerSM, fieldNumber, null);
+                embSM = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, value, false, ownerSM, fieldNumber, ownerMemberCmpt);
             }
         }
 
@@ -130,7 +130,7 @@ public class SerialisedReferenceMapping extends SerialisedMapping
             DNStateManager embSM = ec.findStateManager(obj);
             if (embSM == null || api.getExecutionContext(obj) == null)
             {
-                ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, obj, false, ownerSM, fieldNumber, null);
+                ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, obj, false, ownerSM, fieldNumber, ownerMemberCmpt);
             }
         }
         return obj;

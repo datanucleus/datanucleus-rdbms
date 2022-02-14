@@ -29,6 +29,7 @@ import org.datanucleus.PropertyNames;
 import org.datanucleus.exceptions.ReachableObjectNotCascadedException;
 import org.datanucleus.identity.IdentityUtils;
 import org.datanucleus.metadata.AbstractMemberMetaData;
+import org.datanucleus.metadata.MemberComponent;
 import org.datanucleus.metadata.RelationType;
 import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.rdbms.mapping.MappingCallbacks;
@@ -78,7 +79,8 @@ public class CollectionMapping extends AbstractContainerMapping implements Mappi
                             DNStateManager elemSM = ec.findStateManager(elem);
                             if (elemSM == null || ec.getApiAdapter().getExecutionContext(elem) == null)
                             {
-                                elemSM = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, elem, false, ownerSM, mmd.getAbsoluteFieldNumber(), null);
+                                elemSM = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, elem, false,
+                                    ownerSM, mmd.getAbsoluteFieldNumber(), MemberComponent.COLLECTION_ELEMENT);
                             }
                         }
                     }
@@ -200,7 +202,8 @@ public class CollectionMapping extends AbstractContainerMapping implements Mappi
                             DNStateManager elemOP = ec.findStateManager(collElement);
                             if (elemOP == null || ec.getApiAdapter().getExecutionContext(collElement) == null)
                             {
-                                elemOP = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, collElement, false, ownerSM, mmd.getAbsoluteFieldNumber(), null);
+                                elemOP = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, collElement, false,
+                                    ownerSM, mmd.getAbsoluteFieldNumber(), MemberComponent.COLLECTION_ELEMENT);
                             }
                         }
                     }

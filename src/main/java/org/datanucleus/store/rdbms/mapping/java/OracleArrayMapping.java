@@ -26,6 +26,7 @@ import java.sql.SQLException;
 
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.exceptions.NucleusDataStoreException;
+import org.datanucleus.metadata.MemberComponent;
 import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.rdbms.mapping.column.BlobImpl;
 import org.datanucleus.store.rdbms.mapping.column.ColumnMappingPostSet;
@@ -166,18 +167,18 @@ public class OracleArrayMapping extends ArrayMapping
 
     /**
      * Method to be called after the insert of the owner class element.
-     * @param sm StateManager of the owner
+     * @param ownerSM StateManager of the owner
      */
-    public void postInsert(DNStateManager sm)
+    public void postInsert(DNStateManager ownerSM)
     {
         if (containerIsStoredInSingleColumn())
         {
-            Object value = sm.provideField(mmd.getAbsoluteFieldNumber());
+            Object value = ownerSM.provideField(mmd.getAbsoluteFieldNumber());
             if (value == null)
             {
                 return;
             }
-            ExecutionContext ec = sm.getExecutionContext();
+            ExecutionContext ec = ownerSM.getExecutionContext();
 
             if (mmd.getArray().elementIsPersistent())
             {
@@ -190,7 +191,8 @@ public class OracleArrayMapping extends ArrayMapping
                         DNStateManager elemOP = ec.findStateManager(elem);
                         if (elemOP == null || ec.getApiAdapter().getExecutionContext(elem) == null)
                         {
-                            elemOP = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, elem, false, sm, mmd.getAbsoluteFieldNumber(), null);
+                            elemOP = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, elem, false,
+                                ownerSM, mmd.getAbsoluteFieldNumber(), MemberComponent.ARRAY_ELEMENT);
                         }
                     }
                 }
@@ -198,24 +200,24 @@ public class OracleArrayMapping extends ArrayMapping
         }
         else
         {
-            super.postInsert(sm);
+            super.postInsert(ownerSM);
         }
     }
 
     /**
      * Method to be called after any update of the owner class element.
-     * @param sm StateManager of the owner
+     * @param ownerSM StateManager of the owner
      */
-    public void postUpdate(DNStateManager sm)
+    public void postUpdate(DNStateManager ownerSM)
     {
         if (containerIsStoredInSingleColumn())
         {
-            Object value = sm.provideField(mmd.getAbsoluteFieldNumber());
+            Object value = ownerSM.provideField(mmd.getAbsoluteFieldNumber());
             if (value == null)
             {
                 return;
             }
-            ExecutionContext ec = sm.getExecutionContext();
+            ExecutionContext ec = ownerSM.getExecutionContext();
 
             if (mmd.getArray().elementIsPersistent())
             {
@@ -228,7 +230,8 @@ public class OracleArrayMapping extends ArrayMapping
                         DNStateManager elemOP = ec.findStateManager(elem);
                         if (elemOP == null || ec.getApiAdapter().getExecutionContext(elem) == null)
                         {
-                            elemOP = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, elem, false, sm, mmd.getAbsoluteFieldNumber(), null);
+                            elemOP = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, elem, false,
+                                ownerSM, mmd.getAbsoluteFieldNumber(), MemberComponent.ARRAY_ELEMENT);
                         }
                     }
                 }
@@ -236,7 +239,7 @@ public class OracleArrayMapping extends ArrayMapping
         }
         else
         {
-            super.postUpdate(sm);
+            super.postUpdate(ownerSM);
         }
     }
 }

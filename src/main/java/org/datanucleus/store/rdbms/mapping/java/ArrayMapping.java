@@ -24,6 +24,7 @@ import java.util.List;
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.exceptions.ReachableObjectNotCascadedException;
 import org.datanucleus.identity.IdentityUtils;
+import org.datanucleus.metadata.MemberComponent;
 import org.datanucleus.metadata.MetaDataUtils;
 import org.datanucleus.metadata.RelationType;
 import org.datanucleus.state.DNStateManager;
@@ -99,7 +100,8 @@ public class ArrayMapping extends AbstractContainerMapping implements MappingCal
                         DNStateManager elemOP = ec.findStateManager(elem);
                         if (elemOP == null || ec.getApiAdapter().getExecutionContext(elem) == null)
                         {
-                            elemOP = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, elem, false, ownerSM, mmd.getAbsoluteFieldNumber(), null);
+                            elemOP = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, elem, false,
+                                ownerSM, mmd.getAbsoluteFieldNumber(), MemberComponent.ARRAY_ELEMENT);
                         }
                     }
                 }
@@ -277,7 +279,8 @@ public class ArrayMapping extends AbstractContainerMapping implements MappingCal
                             DNStateManager elemOP = ec.findStateManager(elem);
                             if (elemOP == null || ec.getApiAdapter().getExecutionContext(elem) == null)
                             {
-                                elemOP = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, elem, false, ownerSM, mmd.getAbsoluteFieldNumber(), null);
+                                elemOP = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, elem, false,
+                                    ownerSM, mmd.getAbsoluteFieldNumber(), MemberComponent.ARRAY_ELEMENT);
                             }
                         }
                     }

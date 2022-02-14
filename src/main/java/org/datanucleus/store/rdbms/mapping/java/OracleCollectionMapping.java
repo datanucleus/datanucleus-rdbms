@@ -23,6 +23,7 @@ import java.io.ObjectOutputStream;
 import java.util.Collection;
 
 import org.datanucleus.ExecutionContext;
+import org.datanucleus.metadata.MemberComponent;
 import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.rdbms.mapping.column.ColumnMappingPostSet;
 
@@ -81,7 +82,8 @@ public class OracleCollectionMapping extends CollectionMapping
                             DNStateManager elemSM = ec.findStateManager(elem);
                             if (elemSM == null || ec.getApiAdapter().getExecutionContext(elem) == null)
                             {
-                                elemSM = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, elem, false, ownerSM, mmd.getAbsoluteFieldNumber(), null);
+                                elemSM = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, elem, false,
+                                    ownerSM, mmd.getAbsoluteFieldNumber(), MemberComponent.COLLECTION_ELEMENT);
                             }
                         }
                     }
@@ -114,7 +116,8 @@ public class OracleCollectionMapping extends CollectionMapping
                             DNStateManager elemSM = ec.findStateManager(elem);
                             if (elemSM == null || ec.getApiAdapter().getExecutionContext(elem) == null)
                             {
-                                elemSM = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, elem, false, ownerSM, mmd.getAbsoluteFieldNumber(), null);
+                                elemSM = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, elem, false,
+                                    ownerSM, mmd.getAbsoluteFieldNumber(), MemberComponent.COLLECTION_ELEMENT);
                             }
                         }
                     }
