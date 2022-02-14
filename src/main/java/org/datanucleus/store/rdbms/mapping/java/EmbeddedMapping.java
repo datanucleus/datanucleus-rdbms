@@ -591,18 +591,7 @@ public abstract class EmbeddedMapping extends SingleFieldMapping
         }
 
         // Create a persistable to put the values into
-        Class embeddedType = clr.classForName(embCmd.getFullClassName());
-        if (mmd.getFieldTypes() != null && mmd.getFieldTypes().length > 0)
-        {
-            // Embedded type has field-type defined so use that as our embedded type
-            embeddedType = ec.getClassLoaderResolver().classForName(mmd.getFieldTypes()[0]);
-        }
-
-        // TODO Replace with newForEmbedded
-        NucleusLogger.GENERAL.error(">> EmbeddedMapping.getObject creating SM using newForHollow mmd=" + mmd.getFullFieldName() + " embType=" + embeddedType + " class=" + embCmd.getFullClassName());
         DNStateManager embSM = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, embCmd, ownerSM, mmd.getAbsoluteFieldNumber(), objectType);
-//        DNStateManager embSM = ec.getNucleusContext().getStateManagerFactory().newForHollow(ec, embeddedType, null);
-//        embSM.setPcObjectType(pcObjectType);
         value = embSM.getObject();
 
         String nullColumn = null;
@@ -701,12 +690,6 @@ public abstract class EmbeddedMapping extends SingleFieldMapping
                     embSM.replaceField(ownerFieldNumberInElement, ownerSM != null ? ownerSM.getObject() : null);
                 }
             }
-        }
-
-        // Register the owner-embedded StateManager relation now we have values set
-        if (value != null && ownerSM != null)
-        {
-            ec.registerEmbeddedRelation(ownerSM, ownerFieldNumber, null, embSM); // TODO Set third argument
         }
 
         return value;
