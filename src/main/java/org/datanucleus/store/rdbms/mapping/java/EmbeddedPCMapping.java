@@ -164,8 +164,7 @@ public class EmbeddedPCMapping extends EmbeddedMapping implements MappingCallbac
         if (thisOP == null)
         {
             // Assign a StateManager to manage our embedded object
-            thisOP = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, value, false, ownerSM, theMmd.getAbsoluteFieldNumber(), null);
-            thisOP.setPcObjectType(pcObjectType);
+            thisOP = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, value, false, ownerSM, theMmd.getAbsoluteFieldNumber(), objectType);
         }
 
         return thisOP;

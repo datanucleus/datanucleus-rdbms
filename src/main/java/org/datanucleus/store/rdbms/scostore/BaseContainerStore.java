@@ -137,16 +137,16 @@ public abstract class BaseContainerStore implements Store
      * @param obj The embedded PC object
      * @param ownerMmd The meta data for the owner field
      * @param pcType Object type for the embedded object (see DNStateManager EMBEDDED_PC etc) TODO Drop this
-     * @param ownerMemberCmpt Component in the member of the owner where this is embedded/serialised
+     * @param objectType Type of object that is persisted embedded/serialised
      * @return StateManager
      */
-    public DNStateManager getStateManagerForEmbeddedPCObject(DNStateManager sm, Object obj, AbstractMemberMetaData ownerMmd, short pcType, PersistableObjectType ownerMemberCmpt)
+    public DNStateManager getStateManagerForEmbeddedPCObject(DNStateManager sm, Object obj, AbstractMemberMetaData ownerMmd, short pcType, PersistableObjectType objectType)
     {
         ExecutionContext ec = sm.getExecutionContext();
         DNStateManager objOP = ec.findStateManager(obj);
         if (objOP == null)
         {
-            objOP = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, obj, false, sm, ownerMmd.getAbsoluteFieldNumber(), ownerMemberCmpt);
+            objOP = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, obj, false, sm, ownerMmd.getAbsoluteFieldNumber(), objectType);
         }
         objOP.setPcObjectType(pcType);
         return objOP;

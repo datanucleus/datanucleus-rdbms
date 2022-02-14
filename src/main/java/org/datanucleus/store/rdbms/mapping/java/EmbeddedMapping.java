@@ -509,7 +509,6 @@ public abstract class EmbeddedMapping extends SingleFieldMapping
             {
                 // Assign a StateManager to manage our embedded object
                 embSM = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, value, false, ownerSM, ownerFieldNumber, objectType);
-                embSM.setPcObjectType(pcObjectType);
             }
 
             int n = 0;
@@ -602,8 +601,12 @@ public abstract class EmbeddedMapping extends SingleFieldMapping
             // Embedded type has field-type defined so use that as our embedded type
             embeddedType = ec.getClassLoaderResolver().classForName(mmd.getFieldTypes()[0]);
         }
-        DNStateManager embSM = ec.getNucleusContext().getStateManagerFactory().newForHollow(ec, embeddedType, null);
-        embSM.setPcObjectType(pcObjectType);
+
+        // TODO Replace with newForEmbedded
+        NucleusLogger.GENERAL.error(">> EmbeddedMapping.getObject creating SM using newForHollow mmd=" + mmd.getFullFieldName() + " embType=" + embeddedType + " class=" + embCmd.getFullClassName());
+        DNStateManager embSM = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, embCmd, ownerSM, mmd.getAbsoluteFieldNumber(), objectType);
+//        DNStateManager embSM = ec.getNucleusContext().getStateManagerFactory().newForHollow(ec, embeddedType, null);
+//        embSM.setPcObjectType(pcObjectType);
         value = embSM.getObject();
 
         String nullColumn = null;

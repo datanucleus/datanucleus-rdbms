@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 
 import org.datanucleus.ExecutionContext;
+import org.datanucleus.PersistableObjectType;
 import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.rdbms.mapping.column.ColumnMappingPostSet;
 
@@ -46,7 +47,7 @@ public class OracleSerialisedPCMapping extends SerialisedPCMapping
             if (sm == null || sm.getExecutionContext().getApiAdapter().getExecutionContext(value) == null)
             {
                 // Assign a StateManager to the serialised object since none present
-                sm = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, value, false, ownerSM, mmd.getAbsoluteFieldNumber(), null);
+                sm = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, value, false, ownerSM, mmd.getAbsoluteFieldNumber(), PersistableObjectType.EMBEDDED_PC);
             }
         }
 
