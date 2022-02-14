@@ -23,7 +23,6 @@ import java.util.Collection;
 import java.util.List;
 
 import org.datanucleus.ClassLoaderResolver;
-import org.datanucleus.ExecutionContext;
 import org.datanucleus.PersistableObjectType;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
@@ -133,23 +132,15 @@ public abstract class BaseContainerStore implements Store
     /**
      * Method to return StateManager for an embedded PC object (element, key, value).
      * It creates one if the element is not currently managed.
-     * @param sm StateManager of the owner
+     * @param ownerSM StateManager of the owner
      * @param obj The embedded PC object
      * @param ownerMmd The meta data for the owner field
-     * @param pcType Object type for the embedded object (see DNStateManager EMBEDDED_PC etc) TODO Drop this
      * @param objectType Type of object that is persisted embedded/serialised
-     * @return StateManager
+     * @return StateManager for the embedded object
      */
-    public DNStateManager getStateManagerForEmbeddedPCObject(DNStateManager sm, Object obj, AbstractMemberMetaData ownerMmd, short pcType, PersistableObjectType objectType)
+    public DNStateManager getStateManagerForEmbeddedPCObject(DNStateManager ownerSM, Object obj, AbstractMemberMetaData ownerMmd, PersistableObjectType objectType)
     {
-        ExecutionContext ec = sm.getExecutionContext();
-        DNStateManager objOP = ec.findStateManager(obj);
-        if (objOP == null)
-        {
-            objOP = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, obj, false, sm, ownerMmd.getAbsoluteFieldNumber(), objectType);
-        }
-        objOP.setPcObjectType(pcType);
-        return objOP;
+        return ownerSM.getExecutionContext().findStateManagerForEmbedded(obj, ownerSM, ownerMmd, objectType);
     }
 
     /**

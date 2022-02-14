@@ -44,7 +44,7 @@ public class EmbeddedPCMapping extends EmbeddedMapping implements MappingCallbac
      */
     public void initialize(AbstractMemberMetaData mmd, Table table, ClassLoaderResolver clr)
     {
-        initialize(mmd, table, clr, mmd.getEmbeddedMetaData(), mmd.getTypeName(), PersistableObjectType.EMBEDDED_PC, DNStateManager.EMBEDDED_PC);
+        initialize(mmd, table, clr, mmd.getEmbeddedMetaData(), mmd.getTypeName(), PersistableObjectType.EMBEDDED_PC);
     }
 
     /**

@@ -77,9 +77,6 @@ public abstract class EmbeddedMapping extends SingleFieldMapping
     protected String typeName;
 
     protected PersistableObjectType objectType = null;
-    /** Type of PC object. Corresponds to the values in StateManagerImpl. 
-     * @deprecated */
-    protected short pcObjectType = -1;
 
     /** MetaData for the embedded class. */
     protected AbstractClassMetaData embCmd = null;
@@ -103,16 +100,15 @@ public abstract class EmbeddedMapping extends SingleFieldMapping
      * @param clr The ClassLoaderResolver
      * @param emd Embedded MetaData for the object being embedded
      * @param typeName type of the embedded PC object being stored
-     * @param objectType Object type of the PC object being embedded (see StateManagerImpl object types)
+     * @param objectType Object type of the PC object being embedded
      */
-    public void initialize(AbstractMemberMetaData mmd, Table table, ClassLoaderResolver clr, EmbeddedMetaData emd, String typeName, PersistableObjectType objectType, int pcObjectType)
+    public void initialize(AbstractMemberMetaData mmd, Table table, ClassLoaderResolver clr, EmbeddedMetaData emd, String typeName, PersistableObjectType objectType)
     {
     	super.initialize(mmd, table, clr);
         this.clr = clr;
         this.emd = emd;
         this.typeName = typeName;
         this.objectType = objectType;
-        this.pcObjectType = (short) pcObjectType;
 
         // Find the MetaData for the embedded PC class
         MetaDataManager mmgr = table.getStoreManager().getMetaDataManager();

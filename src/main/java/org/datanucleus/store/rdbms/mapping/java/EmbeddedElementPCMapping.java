@@ -21,7 +21,6 @@ package org.datanucleus.store.rdbms.mapping.java;
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.PersistableObjectType;
 import org.datanucleus.metadata.AbstractMemberMetaData;
-import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.rdbms.table.Table;
 
 /**
@@ -39,7 +38,6 @@ public class EmbeddedElementPCMapping extends EmbeddedMapping
      */
     public void initialize(AbstractMemberMetaData fmd, Table table, ClassLoaderResolver clr)
     {
-    	initialize(fmd, table, clr, fmd.getElementMetaData().getEmbeddedMetaData(), fmd.getCollection().getElementType(),
-            PersistableObjectType.EMBEDDED_COLLECTION_ELEMENT_PC, DNStateManager.EMBEDDED_COLLECTION_ELEMENT_PC);
+    	initialize(fmd, table, clr, fmd.getElementMetaData().getEmbeddedMetaData(), fmd.getCollection().getElementType(), PersistableObjectType.EMBEDDED_COLLECTION_ELEMENT_PC);
     }
 }
