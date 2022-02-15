@@ -164,8 +164,8 @@ public class CloudSpannerAdapter extends BaseDatastoreAdapter
      * This function adds on any missing JDBC types when not available from driver metadata Spanner driver
      * only provides the common types. We should map the missing ones.
      * <p>
-     * JDBC type -> Spanner type ---------------------------- nvarchar -> string bigint -> int64 binary ->
-     * byte double -> float64 boolean -> bool date -> date timestamp -> timestamp numeric -> numeric
+     * JDBC type (Spanner type) as follows :-
+     * nvarchar (string), bigint (int64), binary (byte), double (float64), boolean (bool), date (date), timestamp (timestamp), numeric (numeric)
      * <p>
      * Copied the mappings from Hibernate,
      * https://github.com/GoogleCloudPlatform/google-cloud-spanner-hibernate/blob/master/google-cloud-spanner-hibernate-dialect/src/main/java/com/google/cloud/spanner/hibernate/SpannerDialect.java
@@ -507,7 +507,7 @@ public class CloudSpannerAdapter extends BaseDatastoreAdapter
     /**
      * Spanner does not support NUMERIC (and hence DECIMAL) as a valid primary key column type.
      * @param jdbcType the jdbc type to check
-     * @return
+     * @return Whether the provided type is suitable for part of the PK
      */
     @Override
     public boolean isValidPrimaryKeyType(JdbcType jdbcType)
@@ -516,7 +516,7 @@ public class CloudSpannerAdapter extends BaseDatastoreAdapter
     }
 
     /**
-     * Does Spanner support sequence statements? -> no.
+     * Spanner does not support sequence statements.
      * @return false since Spanner does not support sequence statements
      */
     public boolean sequenceExists(Connection conn, String catalogName, String schemaName, String seqName)
@@ -836,10 +836,10 @@ public class CloudSpannerAdapter extends BaseDatastoreAdapter
     }
 
     /**
-     * Load all datastore mappings defined in the associated plugins. We handle RDBMS datastore mappings so
-     * refer to rdbms-mapping-class, jdbc-type, sql-type in particular. SQL Type -> Spanner Type ---------
-     * ------------- nvarchar -> string bigint -> int64 binary -> byte double -> float64 boolean -> bool date
-     * -> date timestamp -> timestamp numeric -> numeric
+     * Load all datastore mappings defined in the associated plugins. 
+     * We handle RDBMS datastore mappings so refer to rdbms-mapping-class, jdbc-type, sql-type in particular. 
+     * SQL Type (Spanner Type) as follows :-
+     * nvarchar (string), bigint (int64), binary (byte), double (float64), boolean (bool), date (date), timestamp (timestamp), numeric (numeric)
      * @param mgr the PluginManager
      * @param clr the ClassLoaderResolver
      */
