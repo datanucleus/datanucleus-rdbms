@@ -56,26 +56,22 @@ public class BackingStoreHelper
      */
     public static DNStateManager getOwnerStateManagerForBackingStore(DNStateManager sm)
     {
-        DNStateManager ownerOP = sm;
-        while (ownerOP.isEmbedded())
+        // Navigate out to the first non-embedded owner
+        DNStateManager ownerSM = sm;
+        while (ownerSM.isEmbedded())
         {
             // Embedded object, so get the owner object it is embedded in
-            DNStateManager[] ownerSMs = sm.getExecutionContext().getOwnersForEmbeddedStateManager(ownerOP);
-            if (ownerSMs != null && ownerSMs.length == 1)
+            DNStateManager relOwnerSM = sm.getExecutionContext().getOwnerForEmbeddedStateManager(ownerSM);
+            if (relOwnerSM != null)
             {
-                ownerOP = ownerSMs[0];
-            }
-            else if (ownerSMs == null || ownerSMs.length == 0)
-            {
-                return null;
+                ownerSM = relOwnerSM;
             }
             else
             {
-                // Multiple owners so take first one
-                ownerOP = ownerSMs[0];
+                return null;
             }
         }
-        return ownerOP;
+        return ownerSM;
     }
 
     /**

@@ -369,12 +369,11 @@ public class OracleBlobColumnMapping extends AbstractColumnMapping implements Co
             if (sm.isEmbedded())
             {
                 // This mapping is embedded, so navigate back to the real owner since that is the "id" in the table
-                DNStateManager[] embeddedOwners = ec.getOwnersForEmbeddedStateManager(sm);
-                if (embeddedOwners != null)
+                DNStateManager embeddedOwner = ec.getOwnerForEmbeddedStateManager(sm);
+                if (embeddedOwner != null)
                 {
-                    // Just use the first owner
                     // TODO Should check if the owner is stored in this table
-                    sm = embeddedOwners[0];
+                    sm = embeddedOwner;
                 }
             }
 
