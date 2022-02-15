@@ -483,8 +483,8 @@ public final class PersistentClassROF<T> extends AbstractROF<T>
             // Set the version of the object where possible
             if (surrogateVersion != null)
             {
-                DNStateManager objOP = ec.findStateManager(obj);
-                objOP.setVersion(surrogateVersion);
+                DNStateManager objSM = ec.findStateManager(obj);
+                objSM.setVersion(surrogateVersion);
             }
             else
             {
@@ -494,11 +494,11 @@ public final class PersistentClassROF<T> extends AbstractROF<T>
                     int versionFieldNumber = rootCmd.getMetaDataForMember(vermd.getMemberName()).getAbsoluteFieldNumber();
                     if (resultMapping.getMappingForMemberPosition(versionFieldNumber) != null)
                     {
-                        DNStateManager objOP = ec.findStateManager(obj);
-                        Object verFieldValue = objOP.provideField(versionFieldNumber);
+                        DNStateManager objSM = ec.findStateManager(obj);
+                        Object verFieldValue = objSM.provideField(versionFieldNumber);
                         if (verFieldValue != null)
                         {
-                            objOP.setVersion(verFieldValue);
+                            objSM.setVersion(verFieldValue);
                         }
                     }
                 }

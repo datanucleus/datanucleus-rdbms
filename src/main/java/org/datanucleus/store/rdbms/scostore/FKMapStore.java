@@ -568,17 +568,17 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
                             ec.getApiAdapter().getIdForObject(newKey));
                     }
 
-                    DNStateManager valOP = ec.findStateManager(newKey);
+                    DNStateManager valSM = ec.findStateManager(newKey);
 
                     // Ensure the current owner field is loaded, and replace with new key
                     if (ownerFieldNumber >= 0)
                     {
-                        valOP.isLoaded(ownerFieldNumber);
-                        Object oldOwner = valOP.provideField(ownerFieldNumber);
-                        valOP.replaceFieldMakeDirty(ownerFieldNumber, newOwner);
+                        valSM.isLoaded(ownerFieldNumber);
+                        Object oldOwner = valSM.provideField(ownerFieldNumber);
+                        valSM.replaceFieldMakeDirty(ownerFieldNumber, newOwner);
                         if (ec.getManageRelations())
                         {
-                            ec.getRelationshipManager(valOP).relationChange(ownerFieldNumber, oldOwner, newOwner);
+                            ec.getRelationshipManager(valSM).relationChange(ownerFieldNumber, oldOwner, newOwner);
                         }
                     }
                     else
@@ -587,12 +587,12 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
                     }
 
                     // Ensure the current value field is loaded, and replace with new value
-                    valOP.isLoaded(valueFieldNumber);
-                    oldValue = (V) valOP.provideField(valueFieldNumber); // TODO Should we update the local variable ?
-                    valOP.replaceFieldMakeDirty(valueFieldNumber, newValue);
+                    valSM.isLoaded(valueFieldNumber);
+                    oldValue = (V) valSM.provideField(valueFieldNumber); // TODO Should we update the local variable ?
+                    valSM.replaceFieldMakeDirty(valueFieldNumber, newValue);
                     if (ec.getManageRelations())
                     {
-                        ec.getRelationshipManager(valOP).relationChange(valueFieldNumber, oldValue, newValue);
+                        ec.getRelationshipManager(valSM).relationChange(valueFieldNumber, oldValue, newValue);
                     }
                 }
                 else
@@ -689,13 +689,13 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
             if (oldValue != null)
             {
                 boolean deletingValue = false;
-                DNStateManager valueOP = ec.findStateManager(oldValue);
+                DNStateManager valueSM = ec.findStateManager(oldValue);
                 if (ownerMemberMetaData.getMap().isDependentValue())
                 {
                     // Delete the value if it is dependent
                     deletingValue = true;
                     ec.deleteObjectInternal(oldValue);
-                    valueOP.flush();
+                    valueSM.flush();
                 }
                 else if (ownerMapping.isNullable())
                 {
@@ -703,12 +703,12 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
                     if (ownerFieldNumber >= 0)
                     {
                         // Update the field in the value
-                        Object oldOwner = valueOP.provideField(ownerFieldNumber);
-                        valueOP.replaceFieldMakeDirty(ownerFieldNumber, null);
-                        valueOP.flush();
+                        Object oldOwner = valueSM.provideField(ownerFieldNumber);
+                        valueSM.replaceFieldMakeDirty(ownerFieldNumber, null);
+                        valueSM.flush();
                         if (ec.getManageRelations())
                         {
-                            ec.getRelationshipManager(valueOP).relationChange(ownerFieldNumber, oldOwner, null);
+                            ec.getRelationshipManager(valueSM).relationChange(ownerFieldNumber, oldOwner, null);
                         }
                     }
                     else
@@ -722,7 +722,7 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
                     // Not nullable, so must delete since no other way of removing from map
                     deletingValue = true;
                     ec.deleteObjectInternal(oldValue);
-                    valueOP.flush();
+                    valueSM.flush();
                 }
 
                 if (ownerMemberMetaData.getMap().isDependentKey())
@@ -733,17 +733,17 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
                         // Null FK in value to key
                         if (keyMapping.isNullable())
                         {
-                            valueOP.replaceFieldMakeDirty(keyFieldNumber, null);
-                            valueOP.flush();
+                            valueSM.replaceFieldMakeDirty(keyFieldNumber, null);
+                            valueSM.flush();
                             if (ec.getManageRelations())
                             {
-                                ec.getRelationshipManager(valueOP).relationChange(keyFieldNumber, key, null);
+                                ec.getRelationshipManager(valueSM).relationChange(keyFieldNumber, key, null);
                             }
                         }
                     }
                     ec.deleteObjectInternal(key);
-                    DNStateManager keyOP = ec.findStateManager(key);
-                    keyOP.flush();
+                    DNStateManager keySM = ec.findStateManager(key);
+                    keySM.flush();
                 }
             }
         }
@@ -753,13 +753,13 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
             if (key != null)
             {
                 boolean deletingKey = false;
-                DNStateManager keyOP = ec.findStateManager(key);
+                DNStateManager keySM = ec.findStateManager(key);
                 if (ownerMemberMetaData.getMap().isDependentKey())
                 {
                     // Delete the key if it is dependent
                     deletingKey = true;
                     ec.deleteObjectInternal(key);
-                    keyOP.flush();
+                    keySM.flush();
                 }
                 else if (ownerMapping.isNullable())
                 {
@@ -767,12 +767,12 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
                     if (ownerFieldNumber >= 0)
                     {
                         // Update the field in the key
-                        Object oldOwner = keyOP.provideField(ownerFieldNumber);
-                        keyOP.replaceFieldMakeDirty(ownerFieldNumber, null);
-                        keyOP.flush();
+                        Object oldOwner = keySM.provideField(ownerFieldNumber);
+                        keySM.replaceFieldMakeDirty(ownerFieldNumber, null);
+                        keySM.flush();
                         if (ec.getManageRelations())
                         {
-                            ec.getRelationshipManager(keyOP).relationChange(ownerFieldNumber, oldOwner, null);
+                            ec.getRelationshipManager(keySM).relationChange(ownerFieldNumber, oldOwner, null);
                         }
                     }
                     else
@@ -786,7 +786,7 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
                     // Not nullable, so must delete since no other way of removing from map
                     deletingKey = true;
                     ec.deleteObjectInternal(key);
-                    keyOP.flush();
+                    keySM.flush();
                 }
 
                 if (ownerMemberMetaData.getMap().isDependentValue())
@@ -797,17 +797,17 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
                         // Null FK in key to value
                         if (valueMapping.isNullable())
                         {
-                            keyOP.replaceFieldMakeDirty(valueFieldNumber, null);
-                            keyOP.flush();
+                            keySM.replaceFieldMakeDirty(valueFieldNumber, null);
+                            keySM.flush();
                             if (ec.getManageRelations())
                             {
-                                ec.getRelationshipManager(keyOP).relationChange(valueFieldNumber, oldValue, null);
+                                ec.getRelationshipManager(keySM).relationChange(valueFieldNumber, oldValue, null);
                             }
                         }
                     }
                     ec.deleteObjectInternal(oldValue);
-                    DNStateManager valOP = ec.findStateManager(oldValue);
-                    valOP.flush();
+                    DNStateManager valSM = ec.findStateManager(oldValue);
+                    valSM.flush();
                 }
             }
         }

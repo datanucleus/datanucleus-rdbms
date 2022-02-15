@@ -5196,13 +5196,13 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
             Object paramFieldValue = null;
             if (ec.getApiAdapter().isPersistable(obj))
             {
-                DNStateManager paramOP = ec.findStateManager(obj);
+                DNStateManager paramSM = ec.findStateManager(obj);
                 AbstractClassMetaData paramCmd = ec.getMetaDataManager().getMetaDataForClass(obj.getClass(), clr);
                 AbstractMemberMetaData paramFieldMmd = paramCmd.getMetaDataForMember(fieldName);
-                if (paramOP != null)
+                if (paramSM != null)
                 {
-                    paramOP.isLoaded(paramFieldMmd.getAbsoluteFieldNumber());
-                    paramFieldValue = paramOP.provideField(paramFieldMmd.getAbsoluteFieldNumber());
+                    paramSM.isLoaded(paramFieldMmd.getAbsoluteFieldNumber());
+                    paramFieldValue = paramSM.provideField(paramFieldMmd.getAbsoluteFieldNumber());
                 }
                 else
                 {

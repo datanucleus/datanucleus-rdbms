@@ -517,8 +517,8 @@ public class FKSetStore<E> extends AbstractSetStore<E>
 
         // Element was already persistent so make sure the FK is in place
         // TODO This is really "ManagedRelationships" so needs to go in RelationshipManager
-        DNStateManager elementOP = ec.findStateManager(element);
-        if (elementOP == null)
+        DNStateManager elementSM = ec.findStateManager(element);
+        if (elementSM == null)
         {
             // Element is likely being attached and this is the detached element; lookup the attached element via the id
             Object elementId = ec.getApiAdapter().getIdForObject(element);
@@ -527,16 +527,16 @@ public class FKSetStore<E> extends AbstractSetStore<E>
                 element = (E) ec.findObject(elementId, false, false, element.getClass().getName());
                 if (element != null)
                 {
-                    elementOP = ec.findStateManager(element);
+                    elementSM = ec.findStateManager(element);
                 }
             }
         }
-        int fieldNumInElement = getFieldNumberInElementForBidirectional(elementOP);
-        if (fieldNumInElement >= 0 && elementOP != null)
+        int fieldNumInElement = getFieldNumberInElementForBidirectional(elementSM);
+        if (fieldNumInElement >= 0 && elementSM != null)
         {
             // Managed Relations : 1-N bidir, so update the owner of the element
-            elementOP.isLoaded(fieldNumInElement); // Ensure is loaded
-            Object oldOwner = elementOP.provideField(fieldNumInElement);
+            elementSM.isLoaded(fieldNumInElement); // Ensure is loaded
+            Object oldOwner = elementSM.provideField(fieldNumInElement);
             if (oldOwner != newOwner)
             {
                 if (NucleusLogger.PERSISTENCE.isDebugEnabled())
@@ -544,11 +544,11 @@ public class FKSetStore<E> extends AbstractSetStore<E>
                     NucleusLogger.PERSISTENCE.debug(Localiser.msg("055009", ownerSM.getObjectAsPrintable(), ownerMemberMetaData.getFullFieldName(), StringUtils.toJVMIDString(element)));
                 }
 
-                elementOP.replaceFieldMakeDirty(fieldNumInElement, newOwner);
+                elementSM.replaceFieldMakeDirty(fieldNumInElement, newOwner);
                 if (ec.getManageRelations())
                 {
                     // Managed Relationships - add the change we've made here to be analysed at flush
-                    RelationshipManager relationshipManager = ec.getRelationshipManager(elementOP);
+                    RelationshipManager relationshipManager = ec.getRelationshipManager(elementSM);
                     relationshipManager.relationChange(fieldNumInElement, oldOwner, newOwner);
                     
                     if (ec.isFlushing())
@@ -560,7 +560,7 @@ public class FKSetStore<E> extends AbstractSetStore<E>
 
                 if (ec.isFlushing())
                 {
-                    elementOP.flush();
+                    elementSM.flush();
                 }
             }
             return oldOwner != newOwner;
@@ -626,19 +626,19 @@ public class FKSetStore<E> extends AbstractSetStore<E>
             elementToRemove = ec.findObject(ec.getApiAdapter().getIdForObject(element), true, false, element.getClass().getName());
         }
 
-        DNStateManager elementOP = ec.findStateManager(elementToRemove);
+        DNStateManager elementSM = ec.findStateManager(elementToRemove);
         Object oldOwner = null;
         if (ownerMemberMetaData.getMappedBy() != null)
         {
             if (!ec.getApiAdapter().isDeleted(elementToRemove))
             {
                 // Find the existing owner if the record hasn't already been deleted
-                DNStateManager ownerHolderSM = elementOP;
+                DNStateManager ownerHolderSM = elementSM;
                 int ownerFieldNumberInHolder = -1;
                 if (ownerMemberMetaData.getMappedBy().indexOf('.') > 0)
                 {
                     AbstractMemberMetaData otherMmd = null;
-                    AbstractClassMetaData otherCmd = elementOP.getClassMetaData();
+                    AbstractClassMetaData otherCmd = elementSM.getClassMetaData();
                     String remainingMappedBy = ownerMemberMetaData.getMappedBy();
                     while (remainingMappedBy.indexOf('.') > 0)
                     {
@@ -661,7 +661,7 @@ public class FKSetStore<E> extends AbstractSetStore<E>
                 }
                 else
                 {
-                    ownerFieldNumberInHolder = elementOP.getClassMetaData().getAbsolutePositionOfMember(ownerMemberMetaData.getMappedBy());
+                    ownerFieldNumberInHolder = elementSM.getClassMetaData().getAbsolutePositionOfMember(ownerMemberMetaData.getMappedBy());
                 }
 
                 ownerHolderSM.isLoaded(ownerFieldNumberInHolder);
@@ -685,7 +685,7 @@ public class FKSetStore<E> extends AbstractSetStore<E>
             if (ec.getApiAdapter().isPersistable(elementToRemove) && ec.getApiAdapter().isDeleted(elementToRemove))
             {
                 // Element is waiting to be deleted so flush it (it has the FK)
-                elementOP.flush();
+                elementSM.flush();
             }
             else
             {
@@ -797,8 +797,8 @@ public class FKSetStore<E> extends AbstractSetStore<E>
             // Managed Relations : 1-N bidirectional so null the owner on the elements
             if (!ec.getApiAdapter().isDeleted(element))
             {
-                DNStateManager elementOP = ec.findStateManager(element);
-                if (elementOP != null)
+                DNStateManager elementSM = ec.findStateManager(element);
+                if (elementSM != null)
                 {
                     // Null the owner of the element
                     if (NucleusLogger.PERSISTENCE.isDebugEnabled())
@@ -806,7 +806,7 @@ public class FKSetStore<E> extends AbstractSetStore<E>
                         NucleusLogger.PERSISTENCE.debug(Localiser.msg("055010", ownerSM.getObjectAsPrintable(), ownerMemberMetaData.getFullFieldName(), StringUtils.toJVMIDString(element)));
                     }
 
-                    DNStateManager ownerHolderSM = elementOP;
+                    DNStateManager ownerHolderSM = elementSM;
                     int ownerFieldNumberInHolder = -1;
                     if (ownerMemberMetaData.getMappedBy() != null && ownerMemberMetaData.getMappedBy().indexOf('.') > 0)
                     {
@@ -834,7 +834,7 @@ public class FKSetStore<E> extends AbstractSetStore<E>
                     }
                     else
                     {
-                        ownerFieldNumberInHolder = getFieldNumberInElementForBidirectional(elementOP);
+                        ownerFieldNumberInHolder = getFieldNumberInElementForBidirectional(elementSM);
                     }
 
                     Object currentValue = ownerHolderSM.provideField(ownerFieldNumberInHolder);
@@ -1150,11 +1150,11 @@ public class FKSetStore<E> extends AbstractSetStore<E>
                 PreparedStatement ps = sqlControl.getStatementForQuery(mconn, stmt);
 
                 // Set the owner
-                DNStateManager stmtOwnerOP = BackingStoreHelper.getOwnerStateManagerForBackingStore(ownerSM);
+                DNStateManager stmtOwnerSM = BackingStoreHelper.getOwnerStateManagerForBackingStore(ownerSM);
                 int numParams = ownerStmtMapIdx.getNumberOfParameterOccurrences();
                 for (int paramInstance=0;paramInstance<numParams;paramInstance++)
                 {
-                    ownerStmtMapIdx.getMapping().setObject(ec, ps, ownerStmtMapIdx.getParameterPositionsForOccurrence(paramInstance), stmtOwnerOP.getObject());
+                    ownerStmtMapIdx.getMapping().setObject(ec, ps, ownerStmtMapIdx.getParameterPositionsForOccurrence(paramInstance), stmtOwnerSM.getObject());
                 }
 
                 try

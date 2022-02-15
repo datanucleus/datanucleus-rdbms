@@ -53,9 +53,9 @@ public class EmbeddedPCMapping extends EmbeddedMapping implements MappingCallbac
      */
     public void postFetch(DNStateManager sm)
     {
-        // Find the OP for the embedded PC object
-        DNStateManager thisOP = getStateManagerForEmbeddedObject(sm);
-        if (thisOP == null)
+        // Find the StateManager for the embedded PC object
+        DNStateManager thisSM = getStateManagerForEmbeddedObject(sm);
+        if (thisSM == null)
         {
             return;
         }
@@ -65,7 +65,7 @@ public class EmbeddedPCMapping extends EmbeddedMapping implements MappingCallbac
             JavaTypeMapping m = getJavaTypeMapping(i);
             if (m instanceof MappingCallbacks)
             {
-                ((MappingCallbacks)m).postFetch(thisOP);
+                ((MappingCallbacks)m).postFetch(thisSM);
             }
         }
     }
@@ -76,9 +76,9 @@ public class EmbeddedPCMapping extends EmbeddedMapping implements MappingCallbac
      */
     public void postInsert(DNStateManager sm)
     {
-        // Find the OP for the embedded PC object
-        DNStateManager thisOP = getStateManagerForEmbeddedObject(sm);
-        if (thisOP == null)
+        // Find the StateManager for the embedded PC object
+        DNStateManager thisSM = getStateManagerForEmbeddedObject(sm);
+        if (thisSM == null)
         {
             return;
         }
@@ -89,7 +89,7 @@ public class EmbeddedPCMapping extends EmbeddedMapping implements MappingCallbac
             JavaTypeMapping m = getJavaTypeMapping(i);
             if (m instanceof MappingCallbacks)
             {
-                ((MappingCallbacks)m).postInsert(thisOP);
+                ((MappingCallbacks)m).postInsert(thisSM);
             }
         }
     }
@@ -100,9 +100,9 @@ public class EmbeddedPCMapping extends EmbeddedMapping implements MappingCallbac
      */
     public void postUpdate(DNStateManager sm)
     {
-        // Find the OP for the embedded PC object
-        DNStateManager thisOP = getStateManagerForEmbeddedObject(sm);
-        if (thisOP == null)
+        // Find the StateManager for the embedded PC object
+        DNStateManager thisSM = getStateManagerForEmbeddedObject(sm);
+        if (thisSM == null)
         {
             return;
         }
@@ -113,7 +113,7 @@ public class EmbeddedPCMapping extends EmbeddedMapping implements MappingCallbac
             JavaTypeMapping m = getJavaTypeMapping(i);
             if (m instanceof MappingCallbacks)
             {
-                ((MappingCallbacks)m).postUpdate(thisOP);
+                ((MappingCallbacks)m).postUpdate(thisSM);
             }
         }
     }
@@ -124,9 +124,9 @@ public class EmbeddedPCMapping extends EmbeddedMapping implements MappingCallbac
      */
     public void preDelete(DNStateManager sm)
     {
-        // Find the OP for the embedded PC object
-        DNStateManager thisOP = getStateManagerForEmbeddedObject(sm);
-        if (thisOP == null)
+        // Find the StateManager for the embedded PC object
+        DNStateManager thisSM = getStateManagerForEmbeddedObject(sm);
+        if (thisSM == null)
         {
             return;
         }
@@ -137,7 +137,7 @@ public class EmbeddedPCMapping extends EmbeddedMapping implements MappingCallbac
             JavaTypeMapping m = getJavaTypeMapping(i);
             if (m instanceof MappingCallbacks)
             {
-                ((MappingCallbacks)m).preDelete(thisOP);
+                ((MappingCallbacks)m).preDelete(thisSM);
             }
         }
     }
@@ -160,13 +160,13 @@ public class EmbeddedPCMapping extends EmbeddedMapping implements MappingCallbac
         }
 
         ExecutionContext ec = ownerSM.getExecutionContext();
-        DNStateManager thisOP = ec.findStateManager(value);
-        if (thisOP == null)
+        DNStateManager thisSM = ec.findStateManager(value);
+        if (thisSM == null)
         {
             // Assign a StateManager to manage our embedded object
-            thisOP = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, value, false, ownerSM, theMmd.getAbsoluteFieldNumber(), objectType);
+            thisSM = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, value, false, ownerSM, theMmd.getAbsoluteFieldNumber(), objectType);
         }
 
-        return thisOP;
+        return thisSM;
     }
 }

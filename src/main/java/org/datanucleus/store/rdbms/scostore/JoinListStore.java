@@ -201,25 +201,25 @@ public class JoinListStore<E> extends AbstractListStore<E>
             if (relationType == RelationType.ONE_TO_MANY_BI)
             {
                 // TODO This is ManagedRelations - move into RelationshipManager
-                DNStateManager elementOP = ec.findStateManager(element);
-                if (elementOP != null)
+                DNStateManager elementSM = ec.findStateManager(element);
+                if (elementSM != null)
                 {
                     AbstractMemberMetaData[] relatedMmds = ownerMemberMetaData.getRelatedMemberMetaData(clr);
                     // TODO Cater for more than 1 related field
-                    Object elementOwner = elementOP.provideField(relatedMmds[0].getAbsoluteFieldNumber());
+                    Object elementOwner = elementSM.provideField(relatedMmds[0].getAbsoluteFieldNumber());
                     if (elementOwner == null)
                     {
                         // No owner, so correct it
                         NucleusLogger.PERSISTENCE.info(Localiser.msg("056037", sm.getObjectAsPrintable(), ownerMemberMetaData.getFullFieldName(), 
-                            StringUtils.toJVMIDString(elementOP.getObject())));
-                        elementOP.replaceField(relatedMmds[0].getAbsoluteFieldNumber(), sm.getObject());
+                            StringUtils.toJVMIDString(elementSM.getObject())));
+                        elementSM.replaceField(relatedMmds[0].getAbsoluteFieldNumber(), sm.getObject());
                     }
                     else if (elementOwner != sm.getObject() && sm.getReferencedPC() == null)
                     {
                         // Owner of the element is neither this container nor being attached
                         // Inconsistent owner, so throw exception
                         throw new NucleusUserException(Localiser.msg("056038", sm.getObjectAsPrintable(), ownerMemberMetaData.getFullFieldName(), 
-                            StringUtils.toJVMIDString(elementOP.getObject()), StringUtils.toJVMIDString(elementOwner)));
+                            StringUtils.toJVMIDString(elementSM.getObject()), StringUtils.toJVMIDString(elementOwner)));
                     }
                 }
             }
@@ -771,11 +771,11 @@ public class JoinListStore<E> extends AbstractListStore<E>
                 PreparedStatement ps = sqlControl.getStatementForQuery(mconn, stmt);
 
                 // Set the owner
-                DNStateManager stmtOwnerOP = BackingStoreHelper.getOwnerStateManagerForBackingStore(ownerSM);
+                DNStateManager stmtOwnerSM = BackingStoreHelper.getOwnerStateManagerForBackingStore(ownerSM);
                 int numParams = ownerIdx.getNumberOfParameterOccurrences();
                 for (int paramInstance=0;paramInstance<numParams;paramInstance++)
                 {
-                    ownerIdx.getMapping().setObject(ec, ps, ownerIdx.getParameterPositionsForOccurrence(paramInstance), stmtOwnerOP.getObject());
+                    ownerIdx.getMapping().setObject(ec, ps, ownerIdx.getParameterPositionsForOccurrence(paramInstance), stmtOwnerSM.getObject());
                 }
 
                 try

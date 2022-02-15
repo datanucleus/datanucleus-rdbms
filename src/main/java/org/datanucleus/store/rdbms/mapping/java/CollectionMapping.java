@@ -199,10 +199,10 @@ public class CollectionMapping extends AbstractContainerMapping implements Mappi
                     {
                         if (collElement != null)
                         {
-                            DNStateManager elemOP = ec.findStateManager(collElement);
-                            if (elemOP == null || ec.getApiAdapter().getExecutionContext(collElement) == null)
+                            DNStateManager elemSM = ec.findStateManager(collElement);
+                            if (elemSM == null || ec.getApiAdapter().getExecutionContext(collElement) == null)
                             {
-                                elemOP = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, collElement, false,
+                                elemSM = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, collElement, false,
                                     ownerSM, mmd.getAbsoluteFieldNumber(), PersistableObjectType.EMBEDDED_COLLECTION_ELEMENT_PC);
                             }
                         }

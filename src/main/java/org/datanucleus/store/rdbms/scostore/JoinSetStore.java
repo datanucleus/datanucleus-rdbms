@@ -212,12 +212,12 @@ public class JoinSetStore<E> extends AbstractSetStore<E>
             return false;
         }
 
-        DNStateManager elementOP = ec.findStateManager(element);
-        if (elementOP != null)
+        DNStateManager elementSM = ec.findStateManager(element);
+        if (elementSM != null)
         {
             // Check the collection at the other side whether already added (to avoid the locate call)
             AbstractMemberMetaData[] relatedMmds = ownerMemberMetaData.getRelatedMemberMetaData(ec.getClassLoaderResolver());
-            Object elementColl = elementOP.provideField(relatedMmds[0].getAbsoluteFieldNumber());
+            Object elementColl = elementSM.provideField(relatedMmds[0].getAbsoluteFieldNumber());
             if (elementColl != null && elementColl instanceof Collection && elementColl instanceof SCO && ((Collection)elementColl).contains(ownerSM.getObject()))
             {
                 NucleusLogger.DATASTORE.info(Localiser.msg("056040", ownerMemberMetaData.getFullFieldName(), StringUtils.toJVMIDString(ownerSM.getObject()), element));
@@ -253,24 +253,24 @@ public class JoinSetStore<E> extends AbstractSetStore<E>
         {
             // TODO This is ManagedRelations - move into RelationshipManager
             // Managed Relations : make sure we have consistency of relation
-            DNStateManager elementOP = ec.findStateManager(element);
-            if (elementOP != null)
+            DNStateManager elementSM = ec.findStateManager(element);
+            if (elementSM != null)
             {
                 AbstractMemberMetaData[] relatedMmds = ownerMemberMetaData.getRelatedMemberMetaData(clr);
-                Object elementOwner = elementOP.provideField(relatedMmds[0].getAbsoluteFieldNumber());
+                Object elementOwner = elementSM.provideField(relatedMmds[0].getAbsoluteFieldNumber());
                 if (elementOwner == null)
                 {
                     // No owner, so correct it
                     NucleusLogger.PERSISTENCE.info(Localiser.msg("056037", sm.getObjectAsPrintable(), ownerMemberMetaData.getFullFieldName(), 
-                        StringUtils.toJVMIDString(elementOP.getObject())));
-                    elementOP.replaceField(relatedMmds[0].getAbsoluteFieldNumber(), sm.getObject());
+                        StringUtils.toJVMIDString(elementSM.getObject())));
+                    elementSM.replaceField(relatedMmds[0].getAbsoluteFieldNumber(), sm.getObject());
                 }
                 else if (elementOwner != sm.getObject() && sm.getReferencedPC() == null)
                 {
                     // Owner of the element is neither this container nor being attached
                     // Inconsistent owner, so throw exception
                     throw new NucleusUserException(Localiser.msg("056038", sm.getObjectAsPrintable(), ownerMemberMetaData.getFullFieldName(), 
-                        StringUtils.toJVMIDString(elementOP.getObject()), StringUtils.toJVMIDString(elementOwner)));
+                        StringUtils.toJVMIDString(elementSM.getObject()), StringUtils.toJVMIDString(elementOwner)));
                 }
             }
         }
@@ -342,24 +342,24 @@ public class JoinSetStore<E> extends AbstractSetStore<E>
             {
                 // TODO This is ManagedRelations - move into RelationshipManager
                 // Managed Relations : make sure we have consistency of relation
-                DNStateManager elementOP = sm.getExecutionContext().findStateManager(element);
-                if (elementOP != null)
+                DNStateManager elementSM = sm.getExecutionContext().findStateManager(element);
+                if (elementSM != null)
                 {
                     AbstractMemberMetaData[] relatedMmds = ownerMemberMetaData.getRelatedMemberMetaData(clr);
-                    Object elementOwner = elementOP.provideField(relatedMmds[0].getAbsoluteFieldNumber());
+                    Object elementOwner = elementSM.provideField(relatedMmds[0].getAbsoluteFieldNumber());
                     if (elementOwner == null)
                     {
                         // No owner, so correct it
                         NucleusLogger.PERSISTENCE.info(Localiser.msg("056037", sm.getObjectAsPrintable(), ownerMemberMetaData.getFullFieldName(), 
-                            StringUtils.toJVMIDString(elementOP.getObject())));
-                        elementOP.replaceField(relatedMmds[0].getAbsoluteFieldNumber(), sm.getObject());
+                            StringUtils.toJVMIDString(elementSM.getObject())));
+                        elementSM.replaceField(relatedMmds[0].getAbsoluteFieldNumber(), sm.getObject());
                     }
                     else if (elementOwner != sm.getObject() && sm.getReferencedPC() == null)
                     {
                         // Owner of the element is neither this container nor its referenced object
                         // Inconsistent owner, so throw exception
                         throw new NucleusUserException(Localiser.msg("056038", sm.getObjectAsPrintable(),
-                            ownerMemberMetaData.getFullFieldName(), StringUtils.toJVMIDString(elementOP.getObject()), StringUtils.toJVMIDString(elementOwner)));
+                            ownerMemberMetaData.getFullFieldName(), StringUtils.toJVMIDString(elementSM.getObject()), StringUtils.toJVMIDString(elementOwner)));
                     }
                 }
             }
@@ -894,11 +894,11 @@ public class JoinSetStore<E> extends AbstractSetStore<E>
                 PreparedStatement ps = sqlControl.getStatementForQuery(mconn, stmt);
 
                 // Set the owner
-                DNStateManager stmtOwnerOP = BackingStoreHelper.getOwnerStateManagerForBackingStore(ownerSM);
+                DNStateManager stmtOwnerSM = BackingStoreHelper.getOwnerStateManagerForBackingStore(ownerSM);
                 int numParams = ownerStmtMapIdx.getNumberOfParameterOccurrences();
                 for (int paramInstance=0;paramInstance<numParams;paramInstance++)
                 {
-                    ownerStmtMapIdx.getMapping().setObject(ec, ps, ownerStmtMapIdx.getParameterPositionsForOccurrence(paramInstance), stmtOwnerOP.getObject());
+                    ownerStmtMapIdx.getMapping().setObject(ec, ps, ownerStmtMapIdx.getParameterPositionsForOccurrence(paramInstance), stmtOwnerSM.getObject());
                 }
 
                 try

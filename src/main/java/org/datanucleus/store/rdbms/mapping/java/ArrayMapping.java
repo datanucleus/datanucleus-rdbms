@@ -97,10 +97,10 @@ public class ArrayMapping extends AbstractContainerMapping implements MappingCal
                 {
                     if (elem != null)
                     {
-                        DNStateManager elemOP = ec.findStateManager(elem);
-                        if (elemOP == null || ec.getApiAdapter().getExecutionContext(elem) == null)
+                        DNStateManager elemSM = ec.findStateManager(elem);
+                        if (elemSM == null || ec.getApiAdapter().getExecutionContext(elem) == null)
                         {
-                            elemOP = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, elem, false,
+                            elemSM = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, elem, false,
                                 ownerSM, mmd.getAbsoluteFieldNumber(), PersistableObjectType.EMBEDDED_ARRAY_ELEMENT_PC);
                         }
                     }
@@ -276,10 +276,10 @@ public class ArrayMapping extends AbstractContainerMapping implements MappingCal
                     {
                         if (elem != null)
                         {
-                            DNStateManager elemOP = ec.findStateManager(elem);
-                            if (elemOP == null || ec.getApiAdapter().getExecutionContext(elem) == null)
+                            DNStateManager elemSM = ec.findStateManager(elem);
+                            if (elemSM == null || ec.getApiAdapter().getExecutionContext(elem) == null)
                             {
-                                elemOP = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, elem, false,
+                                elemSM = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, elem, false,
                                     ownerSM, mmd.getAbsoluteFieldNumber(), PersistableObjectType.EMBEDDED_ARRAY_ELEMENT_PC);
                             }
                         }

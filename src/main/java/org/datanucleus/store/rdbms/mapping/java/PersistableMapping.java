@@ -572,10 +572,10 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
                                     if (obj != null)
                                     {
                                         // Make sure this object is not retained in cache etc
-                                        DNStateManager objOP = ec.findStateManager(obj);
-                                        if (objOP != null)
+                                        DNStateManager sm = ec.findStateManager(obj);
+                                        if (sm != null)
                                         {
-                                            ec.evictFromTransaction(objOP);
+                                            ec.evictFromTransaction(sm);
                                         }
                                         ec.removeObjectFromLevel1Cache(api.getIdForObject(value));
                                     }
@@ -655,8 +655,8 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
                             {
                                 AbstractMemberMetaData[] relatedMmds = mmd.getRelatedMemberMetaData(clr);
                                 // TODO Cater for more than 1 related field
-                                DNStateManager relatedOP = ec.findStateManager(pcNew);
-                                relatedOP.replaceFieldMakeDirty(relatedMmds[0].getAbsoluteFieldNumber(), ownerSM.getObject());
+                                DNStateManager relatedSM = ec.findStateManager(pcNew);
+                                relatedSM.replaceFieldMakeDirty(relatedMmds[0].getAbsoluteFieldNumber(), ownerSM.getObject());
                             }
                         }
                     }
@@ -699,13 +699,13 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
                             if (keyCmd != null && keyCmd.getIdentityType() == IdentityType.NONDURABLE)
                             {
                                 // Embedded ID - Make sure these are called starting at lowest first, in order
-                                // We cannot just call OP.provideFields with all fields since that does last first
-                                DNStateManager keyOP = ec.findStateManager(key);
+                                // We cannot just call SM.provideFields with all fields since that does last first
+                                DNStateManager keySM = ec.findStateManager(key);
                                 int[] fieldNums = keyCmd.getAllMemberPositions();
                                 FieldManager fm = new AppIDObjectIdFieldManager(param, ec, ps, javaTypeMappings);
                                 for (int i=0;i<fieldNums.length;i++)
                                 {
-                                    keyOP.provideFields(new int[] {fieldNums[i]}, fm);
+                                    keySM.provideFields(new int[] {fieldNums[i]}, fm);
                                 }
                                 fieldsSet = true;
                             }
@@ -781,15 +781,15 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
         }
 
         // Sanity check that we have loaded the version also
-        DNStateManager pcOP = ec.findStateManager(pc);
-        if (pcOP != null)
+        DNStateManager pcSM = ec.findStateManager(pc);
+        if (pcSM != null)
         {
             VersionMetaData vermd = cmd.getVersionMetaDataForTable();
-            if (vermd != null && vermd.getStrategy() != VersionStrategy.NONE && ec.getTransaction().getOptimistic() && !pcOP.isVersionLoaded())
+            if (vermd != null && vermd.getStrategy() != VersionStrategy.NONE && ec.getTransaction().getOptimistic() && !pcSM.isVersionLoaded())
             {
                 // For some reason the version was not loaded on this object, and wanting to delete it, so load the version (+DFG) now.
                 // This can happen when we have 1-1 between A and B and we loaded the B field of A via FetchRequest but didn't pull in the version since the inheritance wasn't knowable
-                pcOP.loadUnloadedFieldsInFetchPlan();
+                pcSM.loadUnloadedFieldsInFetchPlan();
             }
         }
         return pc;
@@ -828,8 +828,8 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
         RelationType relationType = mmd.getRelationType(clr);
         if (relationType == RelationType.ONE_TO_ONE_BI)
         {
-            DNStateManager otherOP = sm.getExecutionContext().findStateManager(pc);
-            if (otherOP == null)
+            DNStateManager otherSM = sm.getExecutionContext().findStateManager(pc);
+            if (otherSM == null)
             {
                 return;
             }
@@ -840,7 +840,7 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
                 // Fsck knows why
                 throw new NucleusUserException("You have a field " + mmd.getFullFieldName() + " that is 1-1 bidir yet cannot find the equivalent field at the other side. Why is that?");
             }
-            Object relatedValue = otherOP.provideField(relatedMmd.getAbsoluteFieldNumber());
+            Object relatedValue = otherSM.provideField(relatedMmd.getAbsoluteFieldNumber());
             
             relatedValue = relatedMmd.isSingleCollection() ? singleCollectionValue(typeManager, relatedValue) : relatedValue;
             
@@ -860,7 +860,7 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
 					replaceValue = containerHandler.newContainer(relatedMmd, sm.getObject());
                 }
                         
-                otherOP.replaceField(relatedMmd.getAbsoluteFieldNumber(), replaceValue);
+                otherSM.replaceField(relatedMmd.getAbsoluteFieldNumber(), replaceValue);
             }
             else if (relatedValue != sm.getObject())
             {
@@ -872,11 +872,11 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
         else if (relationType == RelationType.MANY_TO_ONE_BI && relatedMmds[0].hasCollection())
         {
             // TODO Make sure we have this PC in the collection at the other side
-            DNStateManager otherOP = sm.getExecutionContext().findStateManager(pc);
-            if (otherOP != null)
+            DNStateManager otherSM = sm.getExecutionContext().findStateManager(pc);
+            if (otherSM != null)
             {
                 // Managed Relations : add to the collection on the other side
-                Collection relatedColl = (Collection)otherOP.provideField(relatedMmds[0].getAbsoluteFieldNumber());
+                Collection relatedColl = (Collection)otherSM.provideField(relatedMmds[0].getAbsoluteFieldNumber());
                 if (relatedColl != null && !(relatedColl instanceof SCOCollection))
                 {
                     // TODO Make sure the collection is a wrapper
@@ -893,17 +893,17 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
         }
         else if (relationType == RelationType.MANY_TO_ONE_UNI)
         {
-            DNStateManager otherOP = sm.getExecutionContext().findStateManager(pc);
-            if (otherOP == null)
+            DNStateManager otherSM = sm.getExecutionContext().findStateManager(pc);
+            if (otherSM == null)
             {
                 // Related object is not yet persisted so persist it
                 Object other = sm.getExecutionContext().persistObjectInternal(pc, null, -1, PersistableObjectType.PC);
-                otherOP = sm.getExecutionContext().findStateManager(other);
+                otherSM = sm.getExecutionContext().findStateManager(other);
             }
 
             // Add join table entry
             PersistableRelationStore store = (PersistableRelationStore) storeMgr.getBackingStoreForField(clr, mmd, mmd.getType());
-            store.add(sm, otherOP);
+            store.add(sm, otherSM);
         }
     }
 
@@ -929,14 +929,14 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
             return;
         }
 
-        DNStateManager otherOP = sm.getExecutionContext().findStateManager(pc);
-        if (otherOP == null)
+        DNStateManager otherSM = sm.getExecutionContext().findStateManager(pc);
+        if (otherSM == null)
         {
             if (relationType == RelationType.ONE_TO_ONE_BI || relationType == RelationType.MANY_TO_ONE_BI || relationType == RelationType.MANY_TO_ONE_UNI)
             {
                 // Related object is not yet persisted (e.g 1-1 with FK at other side) so persist it
                 Object other = sm.getExecutionContext().persistObjectInternal(pc, null, -1, PersistableObjectType.PC);
-                otherOP = sm.getExecutionContext().findStateManager(other);
+                otherSM = sm.getExecutionContext().findStateManager(other);
             }
         }
 
@@ -944,7 +944,7 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
         {
             // Update join table entry
             PersistableRelationStore store = (PersistableRelationStore) storeMgr.getBackingStoreForField(clr, mmd, mmd.getType());
-            store.update(sm, otherOP);
+            store.update(sm, otherSM);
         }
     }
 
@@ -1063,22 +1063,22 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
                 AbstractMemberMetaData relatedMmd = mmd.getRelatedMemberMetaDataForObject(clr, sm.getObject(), pc);
                 if (relatedMmd != null)
                 {
-                    DNStateManager otherOP = ec.findStateManager(pc);
-                    if (otherOP != null)
+                    DNStateManager otherSM = ec.findStateManager(pc);
+                    if (otherSM != null)
                     {
                         // Managed Relations : 1-1 bidir, so null out the object at the other
-                        Object currentValue = otherOP.provideField(relatedMmd.getAbsoluteFieldNumber());
+                        Object currentValue = otherSM.provideField(relatedMmd.getAbsoluteFieldNumber());
                         if (currentValue != null)
                         {
                             if (NucleusLogger.PERSISTENCE.isDebugEnabled())
                             {
                                 NucleusLogger.PERSISTENCE.debug(Localiser.msg("041019", StringUtils.toJVMIDString(pc), relatedMmd.getFullFieldName(), sm.getObjectAsPrintable()));
                             }
-                            otherOP.replaceFieldMakeDirty(relatedMmd.getAbsoluteFieldNumber(), null);
+                            otherSM.replaceFieldMakeDirty(relatedMmd.getAbsoluteFieldNumber(), null);
 
                             if (ec.getManageRelations())
                             {
-                                otherOP.getExecutionContext().getRelationshipManager(otherOP).relationChange(relatedMmd.getAbsoluteFieldNumber(), sm.getObject(), null);
+                                otherSM.getExecutionContext().getRelationshipManager(otherSM).relationChange(relatedMmd.getAbsoluteFieldNumber(), sm.getObject(), null);
                             }
                         }
                     }
