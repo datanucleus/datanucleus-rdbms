@@ -54,7 +54,6 @@ import org.datanucleus.metadata.MetaData;
 import org.datanucleus.metadata.MetaDataUtils;
 import org.datanucleus.metadata.RelationType;
 import org.datanucleus.metadata.VersionMetaData;
-import org.datanucleus.state.ActivityState;
 import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.connection.ManagedConnection;
 import org.datanucleus.store.rdbms.identifier.DatastoreIdentifier;
@@ -267,7 +266,8 @@ public class InsertRequest extends Request
             }
 
             // Set the state to "inserting" (may already be at this state if multiple inheritance level INSERT)
-            sm.changeActivityState(ActivityState.INSERTING);
+            sm.setInserting();
+//            sm.changeActivityState(ActivityState.INSERTING);
 
             SQLController sqlControl = storeMgr.getSQLController();
             ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);

@@ -98,7 +98,6 @@ import org.datanucleus.metadata.MetaData;
 import org.datanucleus.metadata.QueryLanguage;
 import org.datanucleus.metadata.SequenceMetaData;
 import org.datanucleus.metadata.TableGeneratorMetaData;
-import org.datanucleus.state.ActivityState;
 import org.datanucleus.state.DNStateManager;
 import org.datanucleus.state.ReferentialStateManagerImpl;
 import org.datanucleus.store.AbstractStoreManager;
@@ -863,7 +862,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
         if (table.managesClass(sm.getClassMetaData().getFullClassName()))
         {
             // Full insertion has just completed so update activity state in StateManager
-            sm.changeActivityState(ActivityState.INSERTING_CALLBACKS);
+            sm.setInsertingCallbacks();
             insertedDatastoreClassByStateManager.remove(sm);
         }
     }
