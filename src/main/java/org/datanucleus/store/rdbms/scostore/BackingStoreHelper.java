@@ -521,8 +521,7 @@ public class BackingStoreHelper
      * @param containerAlias Any alias for the container of this mapping
      * @param firstWhereClause Whether this is the first WHERE clause (i.e omit the first "AND")
      */
-    public static void appendWhereClauseForMapping(StringBuilder stmt, JavaTypeMapping mapping, String containerAlias,
-            boolean firstWhereClause)
+    public static void appendWhereClauseForMapping(StringBuilder stmt, JavaTypeMapping mapping, String containerAlias, boolean firstWhereClause)
     {
         for (int i = 0; i < mapping.getNumberOfColumnMappings(); i++)
         {

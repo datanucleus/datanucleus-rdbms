@@ -575,9 +575,7 @@ public class FKListStore<E> extends AbstractListStore<E>
         if (shiftingElements)
         {
             // We need to shift existing elements before positioning the new ones
-            // TODO Consider doing all of this in smaller number of statements
-            // e.g if insert at start then do "UPDATE IDX=IDX+1 WHERE ID={...}" or similar, where the ID values are
-            // all ids after the position we insert at
+            // e.g if insert at start then do "UPDATE IDX=IDX+1 WHERE ID={...}" or similar, where the ID values are all ids after the position we insert at
             try
             {
                 // Calculate the amount we need to shift any existing elements by
@@ -589,11 +587,7 @@ public class FKListStore<E> extends AbstractListStore<E>
                 try
                 {
                     // shift up existing elements after start position by "shift"
-                    for (int i=currentListSize-1; i>=startAt; i--)
-                    {
-                        // Shift the index of this row by "shift"
-                        internalShift(ownerSM, mconn, true, i, shift, false);
-                    }
+                    internalShiftBulk(ownerSM, mconn, true, startAt-1, shift, true);
                 }
                 finally
                 {
@@ -696,6 +690,7 @@ public class FKListStore<E> extends AbstractListStore<E>
             // Indexed List
             // The element can be at one position only (no duplicates allowed in FK list)
             int index = indexOf(ownerSM, element);
+            NucleusLogger.GENERAL.info(">> FKListStore.internalRemove index=" + index);
             if (index == -1)
             {
                 return false;
@@ -809,6 +804,7 @@ public class FKListStore<E> extends AbstractListStore<E>
             // TODO Really ought to make this delete via ExecutionContext
             stmt = getRemoveAtStmt();
         }
+
         internalRemoveAt(ownerSM, index, stmt, size);
     }
 

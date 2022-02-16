@@ -259,13 +259,7 @@ public class JoinListStore<E> extends AbstractListStore<E>
                 // Shift any existing elements so that we can insert the new element(s) at their position
                 if (!atEnd && start != currentListSize)
                 {
-                    boolean batched = currentListSize - start > 0;
-
-                    for (int i = currentListSize - 1; i >= start; i--)
-                    {
-                        // Shift the index for this row by "shift"
-                        internalShift(sm, mconn, batched, i, shift, (i == start));
-                    }
+                    internalShiftBulk(sm, mconn, true, start-1, shift, true);
                 }
                 else
                 {
