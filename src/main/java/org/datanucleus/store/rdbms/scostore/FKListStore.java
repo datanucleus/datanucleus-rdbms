@@ -690,7 +690,6 @@ public class FKListStore<E> extends AbstractListStore<E>
             // Indexed List
             // The element can be at one position only (no duplicates allowed in FK list)
             int index = indexOf(ownerSM, element);
-            NucleusLogger.GENERAL.info(">> FKListStore.internalRemove index=" + index);
             if (index == -1)
             {
                 return false;
