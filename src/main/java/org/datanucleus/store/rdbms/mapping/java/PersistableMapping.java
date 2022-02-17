@@ -60,6 +60,7 @@ import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.StoreManager;
 import org.datanucleus.store.fieldmanager.FieldManager;
 import org.datanucleus.store.fieldmanager.SingleValueFieldManager;
+import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.mapping.AppIDObjectIdFieldManager;
 import org.datanucleus.store.rdbms.mapping.CorrespondentColumnsMapper;
 import org.datanucleus.store.rdbms.mapping.MappingCallbacks;
@@ -107,6 +108,15 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
     }
 
     /**
+     * Metadata for the class that this represents an object of.
+     * @return ClassMetaData
+     */
+    public AbstractClassMetaData getClassMetaData()
+    {
+        return cmd;
+    }
+
+    /**
      * Initialize this JavaTypeMapping with the given DatastoreAdapter for the given metadata.
      * @param mmd MetaData for the field/property to be mapped (if any)
      * @param table The datastore container storing this mapping (if any)
@@ -117,6 +127,16 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
         super.initialize(mmd, table, clr);
 
         prepareColumnMapping(clr);
+
+        cmd = storeMgr.getMetaDataManager().getMetaDataForClass(getType(), storeMgr.getNucleusContext().getClassLoaderResolver(null));
+    }
+
+    @Override
+    public void initialize(RDBMSStoreManager storeMgr, String type)
+    {
+        super.initialize(storeMgr, type);
+
+        cmd = storeMgr.getMetaDataManager().getMetaDataForClass(getType(), storeMgr.getNucleusContext().getClassLoaderResolver(null));
     }
 
     /**

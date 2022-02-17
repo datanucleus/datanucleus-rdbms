@@ -29,11 +29,14 @@ package org.datanucleus.store.rdbms.query;
 import java.lang.reflect.Modifier;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.FetchPlan;
+import org.datanucleus.FetchPlanForClass;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.identity.IdentityUtils;
@@ -71,6 +74,8 @@ public final class PersistentClassROF<T> extends AbstractROF<T>
     protected StatementClassMapping resultMapping = null;
 
     protected ResultSetGetter resultSetGetter = null;
+    protected StatementClassMapping mappingDefinition;
+    protected int[] mappedFieldNumbers;
 
     /** Resolved classes for metadata / discriminator keyed by class names. */
     private Map resolvedClasses = new ConcurrentReferenceHashMap<>(1, ReferenceType.STRONG, ReferenceType.SOFT);
@@ -116,7 +121,7 @@ public final class PersistentClassROF<T> extends AbstractROF<T>
 
         // Used for reporting details of a failed class lookup by discriminator
         boolean hasDiscrimValue = false;
-	    boolean foundClassByDiscrim = false;
+        boolean foundClassByDiscrim = false;
 
         StatementMappingIndex discrimMapIdx = resultMapping.getMappingForMemberPosition(SurrogateColumnType.DISCRIMINATOR.getFieldNumber());
         if (discrimMapIdx != null)
@@ -137,7 +142,7 @@ public final class PersistentClassROF<T> extends AbstractROF<T>
                 className = ec.getMetaDataManager().getClassNameFromDiscriminatorValue(discrimValue, dismd);
                 if (className != null)
                 {
-                	foundClassByDiscrim = true;
+                    foundClassByDiscrim = true;
                 }
                 requiresInheritanceCheck = false;
             }
@@ -263,30 +268,29 @@ public final class PersistentClassROF<T> extends AbstractROF<T>
 
         int[] fieldNumbers = resultMapping.getMemberNumbers();
 
-        StatementClassMapping mappingDefinition; // TODO We need this on the first object only to generate the ResultSetGetter; can we optimise this?
-        int[] mappedFieldNumbers;
-        if (rootCmd instanceof InterfaceMetaData)
-        {
-            // Persistent-interface : create new mapping definition for a result type of the implementation
-            mappingDefinition = new StatementClassMapping();
-            mappingDefinition.setNucleusTypeColumnName(resultMapping.getNucleusTypeColumnName());
-            mappedFieldNumbers = new int[fieldNumbers.length];
-            for (int i = 0; i < fieldNumbers.length; i++)
-            {
-                AbstractMemberMetaData mmd = rootCmd.getMetaDataForManagedMemberAtAbsolutePosition(fieldNumbers[i]);
-                mappedFieldNumbers[i] = cmd.getAbsolutePositionOfMember(mmd.getName());
-                mappingDefinition.addMappingForMember(mappedFieldNumbers[i], resultMapping.getMappingForMemberPosition(fieldNumbers[i]));
-            }
-        }
-        else
-        {
-            // Persistent class
-            mappingDefinition = resultMapping;
-            mappedFieldNumbers = fieldNumbers;
-        }
-
         if (resultSetGetter == null)
         {
+            // First time through, so generate mapping lookups and ResultSetGetter
+            if (rootCmd instanceof InterfaceMetaData)
+            {
+                // Persistent-interface : create new mapping definition for a result type of the implementation
+                mappingDefinition = new StatementClassMapping();
+                mappingDefinition.setNucleusTypeColumnName(resultMapping.getNucleusTypeColumnName());
+                mappedFieldNumbers = new int[fieldNumbers.length];
+                for (int i = 0; i < fieldNumbers.length; i++)
+                {
+                    AbstractMemberMetaData mmd = rootCmd.getMetaDataForManagedMemberAtAbsolutePosition(fieldNumbers[i]);
+                    mappedFieldNumbers[i] = cmd.getAbsolutePositionOfMember(mmd.getName());
+                    mappingDefinition.addMappingForMember(mappedFieldNumbers[i], resultMapping.getMappingForMemberPosition(fieldNumbers[i]));
+                }
+            }
+            else
+            {
+                // Persistent class
+                mappingDefinition = resultMapping;
+                mappedFieldNumbers = fieldNumbers;
+            }
+
             // Use this result mapping definition for our ResultSetGetter
             this.resultSetGetter = new ResultSetGetter(ec, rs, mappingDefinition, rootCmd);
         }
@@ -303,20 +307,17 @@ public final class PersistentClassROF<T> extends AbstractROF<T>
             }
             else
             {
-                AbstractMemberMetaData vermmd = cmd.getMetaDataForMember(vermd.getFieldName());
-                versionMapping = resultMapping.getMappingForMemberPosition(vermmd.getAbsoluteFieldNumber());
+                versionMapping = resultMapping.getMappingForMemberPosition(cmd.getMetaDataForMember(vermd.getFieldName()).getAbsoluteFieldNumber());
+            }
+
+            if (versionMapping != null)
+            {
+                // Surrogate version column returned by query
+                JavaTypeMapping mapping = versionMapping.getMapping();
+                surrogateVersion = mapping.getObject(ec, rs, versionMapping.getColumnPositions());
             }
         }
-        if (versionMapping != null)
-        {
-            // Surrogate version column returned by query
-            JavaTypeMapping mapping = versionMapping.getMapping();
-            surrogateVersion = mapping.getObject(ec, rs, versionMapping.getColumnPositions());
-        }
 
-        // Extract the object from the ResultSet
-        T obj = null;
-        boolean needToSetVersion = false;
         if (persistentClass.isInterface() && !cmd.isImplementationOfPersistentDefinition())
         {
             // Querying by interface, and not a generated implementation so use the metadata for the interface
@@ -328,6 +329,49 @@ public final class PersistentClassROF<T> extends AbstractROF<T>
             }
         }
 
+        // Split mappedFieldNumbers into memberToSet and membersToStore
+        FetchPlanForClass fpClass = fp.getFetchPlanForClass(cmd);
+        List<Integer> memberNumbersToStoreTmp = new ArrayList<>();
+        for (int i=0;i<mappedFieldNumbers.length;i++)
+        {
+            if (fpClass.getMaxRecursionDepthForMember(mappedFieldNumbers[i]) == 0)
+            {
+                memberNumbersToStoreTmp.add(mappedFieldNumbers[i]);
+            }
+            else
+            {
+                AbstractMemberMetaData mmd = cmd.getMetaDataForManagedMemberAtAbsolutePosition(mappedFieldNumbers[i]);
+                if (mmd.fetchFKOnly())
+                {
+                    memberNumbersToStoreTmp.add(mappedFieldNumbers[i]);
+                }
+            }
+        }
+        int[] memberNumbersToStore = null;
+        int[] memberNumbersToLoad = mappedFieldNumbers;
+        if (memberNumbersToStoreTmp.size() > 0)
+        {
+            int[] memberNumberTmp = new int[mappedFieldNumbers.length - memberNumbersToStoreTmp.size()];
+            int j = 0;
+            for (int i=0;i<fieldNumbers.length;i++)
+            {
+                if (!memberNumbersToStoreTmp.contains(mappedFieldNumbers[i]))
+                {
+                    memberNumberTmp[j++] = mappedFieldNumbers[i];
+                }
+            }
+            memberNumbersToLoad = memberNumberTmp;
+            memberNumbersToStore = new int[memberNumbersToStoreTmp.size()];
+            j = 0;
+            for (Integer absNum : memberNumbersToStoreTmp)
+            {
+                memberNumbersToStore[j++] = absNum;
+            }
+        }
+
+        // Extract the object from the ResultSet
+        T obj = null;
+        boolean needToSetVersion = false;
         if (cmd.getIdentityType() == IdentityType.APPLICATION)
         {
             // Check if the PK field(s) are all null (implies null object, when using OUTER JOIN)
@@ -380,7 +424,7 @@ public final class PersistentClassROF<T> extends AbstractROF<T>
                     pcClassForObject = clr.classForName(idClassName);
                 }
 
-                obj = findObjectWithIdAndLoadFields(id, mappedFieldNumbers, pcClassForObject, cmd, surrogateVersion);
+                obj = findObjectWithIdAndLoadFields(id, memberNumbersToLoad, memberNumbersToStore, pcClassForObject, cmd, surrogateVersion);
             }
         }
         else if (cmd.getIdentityType() == IdentityType.DATASTORE)
@@ -409,7 +453,7 @@ public final class PersistentClassROF<T> extends AbstractROF<T>
                 }
                 else
                 {
-                    obj = findObjectWithIdAndLoadFields(id, mappedFieldNumbers, requiresInheritanceCheck ? null : pcClassForObject, cmd, surrogateVersion);
+                    obj = findObjectWithIdAndLoadFields(id,  memberNumbersToLoad, memberNumbersToStore, requiresInheritanceCheck ? null : pcClassForObject, cmd, surrogateVersion);
                 }
             }
         }
@@ -429,7 +473,7 @@ public final class PersistentClassROF<T> extends AbstractROF<T>
             }
             else
             {
-                obj = findObjectWithIdAndLoadFields(id, fieldNumbers, pcClassForObject, cmd, surrogateVersion);
+                obj = findObjectWithIdAndLoadFields(id, fieldNumbers, null, pcClassForObject, cmd, surrogateVersion);
             }
         }
 
@@ -466,20 +510,22 @@ public final class PersistentClassROF<T> extends AbstractROF<T>
     /**
      * Method to lookup an object for an id, and specify its FieldValues using the ResultSet. Works for all identity types.
      * @param id The identity (DatastoreId, Application id, or SCOID when nondurable)
-     * @param fieldNumbers Field numbers that we have results for
+     * @param membersToLoad Absolute numbers of members to load
+     * @param membersToStore Absolute numbers of members to store in StateManager (for later)
      * @param pcClass The class of the required object if known
      * @param cmd Metadata for the type
      * @param surrogateVersion The version when the object has a surrogate version field
      * @return The persistable object for this id
      */
-    private T findObjectWithIdAndLoadFields(final Object id, final int[] fieldNumbers, Class pcClass, final AbstractClassMetaData cmd, final Object surrogateVersion)
+    private T findObjectWithIdAndLoadFields(final Object id, final int[] membersToLoad, final int[] membersToStore, Class pcClass, final AbstractClassMetaData cmd, 
+            final Object surrogateVersion)
     {
         return (T) ec.findObject(id, new FieldValues()
         {
             public void fetchFields(ObjectProvider op)
             {
                 resultSetGetter.setObjectProvider(op);
-                op.replaceFields(fieldNumbers, resultSetGetter, false);
+                op.replaceFields(membersToLoad, resultSetGetter, false);
 
                 // Set version
                 if (surrogateVersion != null)
@@ -501,11 +547,13 @@ public final class PersistentClassROF<T> extends AbstractROF<T>
                         }
                     }
                 }
+
             }
             public void fetchNonLoadedFields(ObjectProvider op)
             {
                 resultSetGetter.setObjectProvider(op);
-                op.replaceNonLoadedFields(fieldNumbers, resultSetGetter);
+
+                op.replaceNonLoadedFields(membersToLoad, resultSetGetter);
             }
 
             public FetchPlan getFetchPlanForLoading()

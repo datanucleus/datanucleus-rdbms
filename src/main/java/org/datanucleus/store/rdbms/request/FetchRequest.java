@@ -28,16 +28,19 @@ import java.util.List;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ExecutionContext;
+import org.datanucleus.FetchPlanForClass;
 import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.exceptions.NucleusObjectNotFoundException;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.IdentityType;
+import org.datanucleus.metadata.RelationType;
 import org.datanucleus.metadata.VersionMetaData;
 import org.datanucleus.state.LockMode;
 import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.connection.ManagedConnection;
 import org.datanucleus.store.rdbms.mapping.MappingCallbacks;
+import org.datanucleus.store.rdbms.mapping.MappingHelper;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.mapping.java.PersistableMapping;
 import org.datanucleus.store.rdbms.mapping.java.ReferenceMapping;
@@ -83,6 +86,9 @@ public class FetchRequest extends Request
     /** Absolute numbers of the fields/properties of the class to fetch. */
     private int[] memberNumbersToFetch = null;
 
+    /** Absolute numbers of the members of the class to store the FK value for. */
+    private int[] memberNumbersToStoreFK = null;
+
     /** The mapping of the results of the SQL statement. */
     private StatementClassMapping mappingDefinition;
 
@@ -103,11 +109,12 @@ public class FetchRequest extends Request
     /**
      * Constructor, taking the table. Uses the structure of the datastore table to build a basic query.
      * @param classTable The Class Table representing the datastore table to retrieve
+     * @param fpClass FetchPlan for class
      * @param mmds MetaData of the fields/properties to retrieve
      * @param cmd ClassMetaData of objects being fetched
      * @param clr ClassLoader resolver
      */
-    public FetchRequest(DatastoreClass classTable, AbstractMemberMetaData[] mmds, AbstractClassMetaData cmd, ClassLoaderResolver clr)
+    public FetchRequest(DatastoreClass classTable, FetchPlanForClass fpClass, AbstractMemberMetaData[] mmds, AbstractClassMetaData cmd, ClassLoaderResolver clr)
     {
         super(classTable);
 
@@ -172,9 +179,29 @@ public class FetchRequest extends Request
         SelectStatement sqlStatement = new SelectStatement(storeMgr, table, null, null);
         mappingDefinition = new StatementClassMapping();
         Collection<MappingCallbacks> fetchCallbacks = new HashSet<>();
-        numberOfFieldsToFetch = processMembersOfClass(sqlStatement, mmds, table, sqlStatement.getPrimaryTable(), mappingDefinition, fetchCallbacks, clr);
+        List<Integer> memberNumbersToStoreFKTmp = new ArrayList();
+        numberOfFieldsToFetch = processMembersOfClass(sqlStatement, fpClass, mmds, table, sqlStatement.getPrimaryTable(), mappingDefinition, fetchCallbacks, clr, memberNumbersToStoreFKTmp);
         callbacks = fetchCallbacks.toArray(new MappingCallbacks[fetchCallbacks.size()]);
         memberNumbersToFetch = mappingDefinition.getMemberNumbers();
+        if (memberNumbersToStoreFKTmp.size() > 0)
+        {
+            int[] memberNumberTmp = new int[memberNumbersToFetch.length - memberNumbersToStoreFKTmp.size()];
+            int j = 0;
+            for (int i=0;i<memberNumbersToFetch.length;i++)
+            {
+                if (!memberNumbersToStoreFKTmp.contains(memberNumbersToFetch[i]))
+                {
+                    memberNumberTmp[j++] = memberNumbersToFetch[i];
+                }
+            }
+            memberNumbersToFetch = memberNumberTmp;
+            memberNumbersToStoreFK = new int[memberNumbersToStoreFKTmp.size()];
+            j = 0;
+            for (Integer absNum : memberNumbersToStoreFKTmp)
+            {
+                memberNumbersToStoreFK[j++] = absNum;
+            }
+        }
 
         // Add WHERE clause restricting to an object of this type
         int inputParamNum = 1;
@@ -466,6 +493,44 @@ public class FetchRequest extends Request
 
                             // Update all fields
                             op.replaceFields(memberNumbersToFetch, rsGetter);
+                            if (memberNumbersToStoreFK != null)
+                            {
+                                for (int i=0;i<memberNumbersToStoreFK.length;i++)
+                                {
+                                    StatementMappingIndex mapIdx = mappingDefinition.getMappingForMemberPosition(memberNumbersToStoreFK[i]);
+                                    JavaTypeMapping m = mapIdx.getMapping();
+                                    if (m instanceof PersistableMapping)
+                                    {
+                                        // Create the identity of the related object
+                                        AbstractClassMetaData memberCmd = ((PersistableMapping)m).getClassMetaData();
+
+                                        Object memberId = null;
+                                        if (memberCmd.getIdentityType() == IdentityType.DATASTORE)
+                                        {
+                                            memberId = MappingHelper.getDatastoreIdentityForResultSetRow(ec, m, rs, mapIdx.getColumnPositions(), memberCmd);
+                                        }
+                                        else if (memberCmd.getIdentityType() == IdentityType.APPLICATION)
+                                        {
+                                            memberId = MappingHelper.getApplicationIdentityForResultSetRow(ec, m, rs, mapIdx.getColumnPositions(), memberCmd);
+                                        }
+                                        else
+                                        {
+                                            break;
+                                        }
+
+                                        if (memberId == null)
+                                        {
+                                            // Just set the member and don't bother saving the value
+                                            op.replaceField(memberNumbersToStoreFK[i], null);
+                                        }
+                                        else
+                                        {
+                                            // Store the "id" value in case the member is ever accessed
+                                            op.setAssociatedValue(ObjectProvider.MEMBER_VALUE_STORED_PREFIX + memberNumbersToStoreFK[i], memberId);
+                                        }
+                                    }
+                                }
+                            }
                         }
                         finally
                         {
@@ -508,16 +573,18 @@ public class FetchRequest extends Request
      * Can recurse if some of the requested fields are persistent objects in their own right, so we
      * take the opportunity to retrieve some of their fields.
      * @param sqlStatement Statement being built
+     * @param fpClass FetchPlan for class
      * @param mmds Meta-data for the required fields/properties
      * @param table The table to look for member mappings
      * @param sqlTbl The table in the SQL statement to use for selects
      * @param mappingDef Mapping definition for the result
      * @param fetchCallbacks Any additional required callbacks are added here
      * @param clr ClassLoader resolver
+     * @param members to store the FK of, populated by this call
      * @return Number of fields being fetched
      */
-    protected int processMembersOfClass(SelectStatement sqlStatement, AbstractMemberMetaData[] mmds, 
-            DatastoreClass table, SQLTable sqlTbl, StatementClassMapping mappingDef, Collection fetchCallbacks, ClassLoaderResolver clr)
+    protected int processMembersOfClass(SelectStatement sqlStatement, FetchPlanForClass fpClass, AbstractMemberMetaData[] mmds, 
+            DatastoreClass table, SQLTable sqlTbl, StatementClassMapping mappingDef, Collection fetchCallbacks, ClassLoaderResolver clr, List<Integer> membersToStoreFK)
     {
         int number = 0;
         if (mmds != null)
@@ -544,22 +611,38 @@ public class FetchRequest extends Request
                             mmdToUse = ((SingleCollectionMapping) mapping).getWrappedMapping().getMemberMetaData();
                         }
 
+                        boolean fetchAndSaveFK = false;
                         if (mappingToUse instanceof PersistableMapping)
                         {
-                            // Special case of 1-1/N-1 where we know the other side type so know what to join to, hence can load the related object
-                            depth = 1;
-                            if (Modifier.isAbstract(mmdToUse.getType().getModifiers()))
+                            if (RelationType.isRelationSingleValued(mmd.getRelationType(clr)) && fpClass.getMaxRecursionDepthForMember(mmd.getAbsoluteFieldNumber()) == 0)
                             {
-                                String typeName = mmdToUse.getTypeName();
-								DatastoreClass relTable = table.getStoreManager().getDatastoreClass(typeName, clr);
-                                if (relTable != null && relTable.getSurrogateMapping(SurrogateColumnType.DISCRIMINATOR, false) == null)
+                                // Special case of 1-1/N-1 and recursion-depth set as 0 (just retrieve the FK and don't instantiate the related object in the field)
+                                depth = 0;
+                                fetchAndSaveFK = true;
+                            }
+                            else if (mmd.fetchFKOnly())
+                            {
+                                // Special case of 1-1/N-1 and fetch-fk-only extension - same as above
+                                depth = 0;
+                                fetchAndSaveFK = true;
+                            }
+                            else
+                            {
+                                // Special case of 1-1/N-1 where we know the other side type so know what to join to, hence can load the related object
+                                depth = 1;
+                                if (Modifier.isAbstract(mmdToUse.getType().getModifiers()))
                                 {
-                                    // 1-1 relation to base class with no discriminator and has subclasses
-                                    // hence no way of determining the exact type, hence no point in fetching it
-                                    String[] subclasses = table.getStoreManager().getMetaDataManager().getSubclassesForClass(typeName, false);
-                                    if (subclasses != null && subclasses.length > 0)
+                                    String typeName = mmdToUse.getTypeName();
+                                    DatastoreClass relTable = table.getStoreManager().getDatastoreClass(typeName, clr);
+                                    if (relTable != null && relTable.getSurrogateMapping(SurrogateColumnType.DISCRIMINATOR, false) == null)
                                     {
-                                        depth = 0;
+                                        // 1-1 relation to base class with no discriminator and has subclasses
+                                        // hence no way of determining the exact type, hence no point in fetching it
+                                        String[] subclasses = table.getStoreManager().getMetaDataManager().getSubclassesForClass(typeName, false);
+                                        if (subclasses != null && subclasses.length > 0)
+                                        {
+                                            depth = 0;
+                                        }
                                     }
                                 }
                             }
@@ -582,6 +665,10 @@ public class FetchRequest extends Request
                         // But this will mean we cannot cache the statement, since it is for a specific ExecutionContext
                         // TODO If this field is a 1-1 and the other side has a discriminator or version then we really ought to fetch it
                         SQLStatementHelper.selectMemberOfSourceInStatement(sqlStatement, mappingDef, null, sqlTbl, mmd, clr, depth, null);
+                        if (fetchAndSaveFK)
+                        {
+                            membersToStoreFK.add(mmd.getAbsoluteFieldNumber());
+                        }
                         number++;
                     }
 

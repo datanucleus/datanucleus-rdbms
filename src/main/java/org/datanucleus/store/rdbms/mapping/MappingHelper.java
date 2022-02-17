@@ -119,6 +119,103 @@ public class MappingHelper
     }
 
     /**
+     * Get the datastore identity for the object in the passed result set row.
+     * @param ec ExecutionContext
+     * @param mapping The mapping in which this is returned
+     * @param rs the ResultSet
+     * @param resultIndexes indexes for the result set
+     * @param cmd the AbstractClassMetaData
+     * @return the id
+     */
+    public static Object getDatastoreIdentityForResultSetRow(ExecutionContext ec, JavaTypeMapping mapping, 
+            final ResultSet rs, int[] resultIndexes, AbstractClassMetaData cmd)
+    {
+        // Datastore Identity - retrieve the datastore id "value" for the class.
+        // Note that this is a temporary "id" that is simply formed from the type of base class in the relationship and the id value stored in the FK. 
+        // The real "id" for the object may be of a different class. For that reason we get the object by checking the inheritance (3rd param in findObject())
+        Object idValue = null;
+        if (mapping.getNumberOfColumnMappings() > 0)
+        {
+            idValue = mapping.getColumnMapping(0).getObject(rs, resultIndexes[0]);
+        }
+        else
+        {
+            // 1-1 bidirectional "mapped-by" relation, so use ID mappings of related class to retrieve the value
+            if (mapping.getReferenceMapping() != null) //TODO why is it null for PC concrete classes?
+            {
+                return mapping.getReferenceMapping().getObject(ec, rs, resultIndexes);
+            }
+
+            Class fieldType = mapping.getMemberMetaData().getType();
+            JavaTypeMapping referenceMapping = mapping.getStoreManager().getDatastoreClass(fieldType.getName(), ec.getClassLoaderResolver()).getIdMapping();
+            idValue = referenceMapping.getColumnMapping(0).getObject(rs, resultIndexes[0]);
+        }
+
+        if (idValue == null)
+        {
+            return null;
+        }
+
+        return ec.getNucleusContext().getIdentityManager().getDatastoreId(mapping.getType(), idValue);
+    }
+
+    /**
+     * Get the object instance for a class using application identity from the passed result set row.
+     * @param ec ExecutionContext
+     * @param mapping The mapping in which this is returned
+     * @param rs the ResultSet
+     * @param resultIndexes indexes in the result set to retrieve
+     * @param cmd the AbstractClassMetaData
+     * @return the id
+     */
+    public static Object getApplicationIdentityForResultSetRow(final ExecutionContext ec, JavaTypeMapping mapping, 
+            final ResultSet rs, int[] resultIndexes, AbstractClassMetaData cmd)
+    {
+        ClassLoaderResolver clr = ec.getClassLoaderResolver();
+
+        // Abstract class
+        if (cmd instanceof ClassMetaData && ((ClassMetaData)cmd).isAbstract() && cmd.getObjectidClass() != null)
+        {
+            // Abstract class
+            Class objectIdClass = clr.classForName(cmd.getObjectidClass());
+            if (cmd.usesSingleFieldIdentityClass())
+            {
+                return createSingleFieldIdentity(ec, mapping, rs, resultIndexes, cmd, objectIdClass, clr.classForName(cmd.getFullClassName())); 
+            }
+            return createObjectIdentityUsingReflection(ec, mapping, rs, resultIndexes, cmd, objectIdClass);
+        }
+
+        // Create a ResultSetGetter with the data for the primary key column(s) of this class solely
+        int totalMemberCount = cmd.getNoOfManagedMembers() + cmd.getNoOfInheritedManagedMembers();
+        final StatementMappingIndex[] statementExpressionIndex = new StatementMappingIndex[totalMemberCount];
+
+        DatastoreClass datastoreClass = mapping.getStoreManager().getDatastoreClass(cmd.getFullClassName(), clr);
+        final int[] pkMemberPositions = cmd.getPKMemberPositions();
+        int paramIndex = 0;
+        for (int i=0; i<pkMemberPositions.length; ++i)
+        {
+            AbstractMemberMetaData mmd = cmd.getMetaDataForManagedMemberAtAbsolutePosition(pkMemberPositions[i]);
+            JavaTypeMapping m = datastoreClass.getMemberMapping(mmd);
+            statementExpressionIndex[mmd.getAbsoluteFieldNumber()] = new StatementMappingIndex(m);
+            int expressionsIndex[] = new int[m.getNumberOfColumnMappings()];
+            for (int j = 0; j < expressionsIndex.length; j++)
+            {
+                expressionsIndex[j] = resultIndexes[paramIndex++];
+            }
+            statementExpressionIndex[mmd.getAbsoluteFieldNumber()].setColumnPositions(expressionsIndex);
+        }
+
+        final StatementClassMapping resultMappings = new StatementClassMapping();
+        for (int i=0;i<pkMemberPositions.length;i++)
+        {
+            resultMappings.addMappingForMember(pkMemberPositions[i], statementExpressionIndex[pkMemberPositions[i]]);
+        }
+
+        final FieldManager resultsFM = new ResultSetGetter(ec, rs, resultMappings, cmd);
+        return IdentityUtils.getApplicationIdentityForResultSetRow(ec, cmd, null, false, resultsFM);
+    }
+
+    /**
      * Get the object instance for a class using application identity
      * @param ec ExecutionContext
      * @param mapping The mapping in which this is returned
@@ -231,7 +328,7 @@ public class MappingHelper
      * @param objectIdClass the object id class
      * @return the id
      */
-    protected static Object createObjectIdInstanceReflection(ExecutionContext ec, JavaTypeMapping mapping, final ResultSet rs, 
+    protected static Object createObjectIdentityUsingReflection(ExecutionContext ec, JavaTypeMapping mapping, final ResultSet rs, 
             int[] param, AbstractClassMetaData cmd, Class objectIdClass)
     {
         // Users own AID
@@ -277,8 +374,7 @@ public class MappingHelper
         catch (Exception e)
         {
             AbstractMemberMetaData mmd = mapping.getMemberMetaData();
-            NucleusLogger.PERSISTENCE.error(Localiser.msg("041037",
-                cmd.getObjectidClass(), mmd == null ? null : mmd.getName(), fieldValue, e));
+            NucleusLogger.PERSISTENCE.error(Localiser.msg("041037", cmd.getObjectidClass(), mmd == null ? null : mmd.getName(), fieldValue, e));
             return null;
         }
     }
@@ -307,7 +403,7 @@ public class MappingHelper
         }
         else
         {
-            id = createObjectIdInstanceReflection(ec, mapping, rs, resultIndexes, cmd, objectIdClass); 
+            id = createObjectIdentityUsingReflection(ec, mapping, rs, resultIndexes, cmd, objectIdClass); 
         }
         return ec.findObject(id, false, true, null);
     }

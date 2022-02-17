@@ -28,6 +28,7 @@ import java.util.Set;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ExecutionContext;
+import org.datanucleus.FetchPlanForClass;
 import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.exceptions.NucleusObjectNotFoundException;
@@ -312,7 +313,7 @@ public class RDBMSPersistenceHandler extends AbstractPersistenceHandler
             }
 
             DatastoreClass table = getDatastoreClass(op.getClassMetaData().getFullClassName(), clr);
-            Request req = getFetchRequest(table, mmds, op.getClassMetaData(), clr);
+            Request req = getFetchRequest(table, op.getFetchPlanForClass(), mmds, op.getClassMetaData(), clr);
             req.execute(op);
         }
     }
@@ -321,18 +322,19 @@ public class RDBMSPersistenceHandler extends AbstractPersistenceHandler
      * Returns a request object that will fetch a row from the given table. 
      * The store manager will cache the request object for re-use by subsequent requests to the same table.
      * @param table The table from which to fetch.
+     * @param fpClass FetchPlan for class
      * @param mmds MetaData for the members corresponding to the columns to be fetched.
      * @param cmd ClassMetaData of the object of the request
      * @param clr ClassLoader resolver
      * @return A fetch request object.
      */
-    private Request getFetchRequest(DatastoreClass table, AbstractMemberMetaData[] mmds, AbstractClassMetaData cmd, ClassLoaderResolver clr)
+    private Request getFetchRequest(DatastoreClass table, FetchPlanForClass fpClass, AbstractMemberMetaData[] mmds, AbstractClassMetaData cmd, ClassLoaderResolver clr)
     {
         RequestIdentifier reqID = new RequestIdentifier(table, mmds, RequestType.FETCH, cmd.getFullClassName());
         Request req = requestsByID.get(reqID);
         if (req == null)
         {
-            req = new FetchRequest(table, mmds, cmd, clr);
+            req = new FetchRequest(table, fpClass, mmds, cmd, clr);
             requestsByID.put(reqID, req);
         }
         return req;
