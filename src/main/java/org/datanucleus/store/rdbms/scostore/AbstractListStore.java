@@ -59,6 +59,7 @@ public abstract class AbstractListStore<E> extends AbstractCollectionStore<E> im
     protected String lastIndexOfStmt;
     protected String removeAtStmt;
     protected String shiftStmt;
+    protected String shiftBulkStmt;
 
     /**
      * Constructor. Protected to prevent instantiation.
@@ -546,11 +547,13 @@ public abstract class AbstractListStore<E> extends AbstractCollectionStore<E> im
                 // shift down
                 if (index != currentListSize - 1)
                 {
-                    for (int i = index + 1; i < currentListSize; i++)
-                    {
-                        // Shift this index down 1
-                        internalShift(op, mconn, false, i, -1, true);
-                    }
+                    // shift all elements above this down by 1 in single statement
+                    internalShiftBulk(op, mconn, true, index, -1, true);
+//                    for (int i = index + 1; i < currentListSize; i++)
+//                    {
+//                        // Shift this index down 1
+//                        internalShift(op, mconn, false, i, -1, true);
+//                    }
                 }
             }
             finally
@@ -566,6 +569,51 @@ public abstract class AbstractListStore<E> extends AbstractCollectionStore<E> im
         {
             throw new NucleusDataStoreException(Localiser.msg("056012", stmt), e);
         }
+    }
+
+    /**
+     * Method to process a "shift" statement for all rows from the start point, updating the index in the list for the specified owner.
+     * @param op StateManager of the owner
+     * @param conn The connection
+     * @param batched Whether the statement is batched
+     * @param start The start index for the shift
+     * @param amount Amount to shift by (negative means shift down)
+     * @param executeNow Whether to execute the statement now (or wait for batching)
+     * @return Return code(s) from any executed statements
+     * @throws MappedDatastoreException Thrown if an error occurs
+     */
+    protected int[] internalShiftBulk(ObjectProvider op, ManagedConnection conn, boolean batched, int start, int amount, boolean executeNow)
+    throws MappedDatastoreException
+    {
+        ExecutionContext ec = op.getExecutionContext();
+        SQLController sqlControl = storeMgr.getSQLController();
+        String shiftBulkStmt = getShiftBulkStmt();
+        try
+        {
+            PreparedStatement ps = sqlControl.getStatementForUpdate(conn, shiftBulkStmt, batched);
+            try
+            {
+                int jdbcPosition = 1;
+                jdbcPosition = BackingStoreHelper.populateOrderInStatement(ec, ps, amount, jdbcPosition, orderMapping);
+                jdbcPosition = BackingStoreHelper.populateOwnerInStatement(op, ec, ps, jdbcPosition, this);
+                jdbcPosition = BackingStoreHelper.populateOrderInStatement(ec, ps, start, jdbcPosition, orderMapping);
+                if (relationDiscriminatorMapping != null)
+                {
+                    jdbcPosition = BackingStoreHelper.populateRelationDiscriminatorInStatement(ec, ps, jdbcPosition, this);
+                }
+
+                // Execute the statement
+                return sqlControl.executeStatementUpdate(ec, conn, shiftStmt, ps, executeNow);
+            }
+            finally
+            {
+                sqlControl.closeStatement(conn, ps);
+            }
+        }
+        catch (SQLException sqle)
+        {
+            throw new MappedDatastoreException(shiftStmt, sqle);
+        }        
     }
 
     /**
@@ -873,5 +921,55 @@ public abstract class AbstractListStore<E> extends AbstractCollectionStore<E> im
             }
         }
         return shiftStmt;
+    }
+
+    /**
+     * Generates the statement for shifting items in bulk
+     * 
+     * <PRE>
+     * UPDATE LISTTABLE SET INDEXCOL = INDEXCOL + ?
+     * WHERE OWNERCOL = ?
+     * AND INDEXCOL > ?
+     * [AND DISTINGUISHER=?]
+     * </PRE>
+     * @return The Statement for shifting elements in bulk
+     */
+    protected String getShiftBulkStmt()
+    {
+        if (shiftBulkStmt == null)
+        {
+            synchronized (this)
+            {
+                StringBuilder stmt = new StringBuilder("UPDATE ").append(containerTable.toString()).append(" SET ");
+
+                for (int i = 0; i < orderMapping.getNumberOfColumnMappings(); i++)
+                {
+                    if (i > 0)
+                    {
+                        stmt.append(",");
+                    }
+                    stmt.append(orderMapping.getColumnMapping(i).getColumn().getIdentifier().toString());
+                    stmt.append(" = ");
+                    stmt.append(orderMapping.getColumnMapping(i).getColumn().getIdentifier().toString());
+                    stmt.append(" + ");
+                    stmt.append(orderMapping.getColumnMapping(i).getUpdateInputParameter());
+                }
+
+                stmt.append(" WHERE ");
+                BackingStoreHelper.appendWhereClauseForMapping(stmt, ownerMapping, null, true);
+
+                stmt.append(" AND ");
+                stmt.append(orderMapping.getColumnMapping(0).getColumn().getIdentifier().toString());
+                stmt.append(">");
+                stmt.append(orderMapping.getColumnMapping(0).getInsertionInputParameter()); // Start position
+
+                if (relationDiscriminatorMapping != null)
+                {
+                    BackingStoreHelper.appendWhereClauseForMapping(stmt, relationDiscriminatorMapping, null, false);
+                }
+                shiftBulkStmt = stmt.toString();
+            }
+        }
+        return shiftBulkStmt;
     }
 }

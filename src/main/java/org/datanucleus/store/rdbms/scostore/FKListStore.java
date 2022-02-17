@@ -574,9 +574,7 @@ public class FKListStore<E> extends AbstractListStore<E>
         if (shiftingElements)
         {
             // We need to shift existing elements before positioning the new ones
-            // TODO Consider doing all of this in smaller number of statements
-            // e.g if insert at start then do "UPDATE IDX=IDX+1 WHERE ID={...}" or similar, where the ID values are
-            // all ids after the position we insert at
+            // e.g if insert at start then do "UPDATE IDX=IDX+1 WHERE ID={...}" or similar, where the ID values are all ids after the position we insert at
             try
             {
                 // Calculate the amount we need to shift any existing elements by
@@ -588,11 +586,12 @@ public class FKListStore<E> extends AbstractListStore<E>
                 try
                 {
                     // shift up existing elements after start position by "shift"
-                    for (int i=currentListSize-1; i>=startAt; i--)
-                    {
-                        // Shift the index of this row by "shift"
-                        internalShift(ownerOP, mconn, true, i, shift, false);
-                    }
+                    internalShiftBulk(ownerOP, mconn, true, startAt-1, shift, true);
+//                    for (int i=currentListSize-1; i>=startAt; i--)
+//                    {
+//                        // Shift the index of this row by "shift"
+//                        internalShift(ownerOP, mconn, true, i, shift, false);
+//                    }
                 }
                 finally
                 {
