@@ -164,12 +164,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
         clearStmt = getClearStmt();
     }
 
-    /**
-     * Method to put multiple objects where we are also provided with the map contents prior to this change to avoid lookups.
-     * @param sm StateManager for the owner
-     * @param m Map of objects to put
-     * @param currentMap Map prior to this put
-     */
+    @Override
     public void putAll(DNStateManager<?> sm, Map<? extends K, ? extends V> m, Map<K, V> currentMap)
     {
         if (m == null || m.isEmpty())
@@ -209,11 +204,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
         processPutsAndUpdates(sm, puts, updates);
     }
 
-    /**
-     * Method to put all elements from a Map into our Map.
-     * @param sm StateManager for the Map
-     * @param m The Map to add
-     */
+    @Override
     public void putAll(DNStateManager sm, Map<? extends K, ? extends V> m)
     {
         if (m == null || m.isEmpty())
@@ -320,14 +311,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
         }
     }
 
-    /**
-     * Method to put an item in the Map where we provide whether the key is present and its current value if so.
-     * @param sm StateManager for the map.
-     * @param key The key to store the value against
-     * @param value The value to store.
-     * @param previousValue The previous value
-     * @param present Whether the key is already present previous to this
-     */
+    @Override
     public void put(DNStateManager sm, K key, V value, V previousValue, boolean present)
     {
         validateKeyForWriting(sm, key);
@@ -375,13 +359,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
         }
     }
 
-    /**
-     * Method to put an item in the Map.
-     * @param sm StateManager for the map.
-     * @param key The key to store the value against
-     * @param value The value to store.
-     * @return The value stored.
-     */
+    @Override
     public V put(DNStateManager sm, K key, V value)
     {
         validateKeyForWriting(sm, key);
@@ -509,12 +487,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
 //        processPutsAndUpdates(sm, puts, updates);
 //    }
 
-    /**
-     * Method to remove an entry from the map.
-     * @param sm StateManager for the map.
-     * @param key Key of the entry to remove.
-     * @return The value that was removed.
-     */
+    @Override
     public V remove(DNStateManager sm, Object key)
     {
         if (!validateKeyForReading(sm, key))
@@ -561,12 +534,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
         return oldValue;
     }
 
-    /**
-     * Method to remove an item from the map where we know the value associated with the key.
-     * @param sm StateManager for the map.
-     * @param key Key of the item to remove.
-     * @param oldValue Value associated with the key before removal.
-     */
+    @Override
     public void remove(DNStateManager sm, Object key, Object oldValue)
     {
         if (!validateKeyForReading(sm, key))
@@ -595,10 +563,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
         }
     }
 
-    /**
-     * Method to clear the map of all values.
-     * @param ownerSM StateManager for the map.
-     */
+    @Override
     public void clear(DNStateManager ownerSM)
     {
         Collection dependentElements = null;
@@ -632,10 +597,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
         }
     }
 
-    /**
-     * Accessor for the keys in the Map.
-     * @return The keys
-     */
+    @Override
     public synchronized SetStore keySetStore()
     {
         if (keySetStore == null)
@@ -645,10 +607,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
         return keySetStore;
     }
 
-    /**
-     * Accessor for the values in the Map.
-     * @return The values.
-     */
+    @Override
     public synchronized CollectionStore valueCollectionStore()
     {
         if (valueSetStore == null)
@@ -658,10 +617,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
         return valueSetStore;
     }
 
-    /**
-     * Accessor for the map entries in the Map.
-     * @return The map entries.
-     */
+    @Override
     public synchronized SetStore entrySetStore()
     {
         if (entrySetStore == null)
@@ -1307,13 +1263,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
         return maxAdapterColumnIdStmt;
     }
 
-    /**
-     * Method to update a field of an embedded key.
-     * @param sm StateManager of the owner
-     * @param key The key to update
-     * @param fieldNumber The number of the field to update
-     * @param newValue The new value
-     */
+    @Override
     public boolean updateEmbeddedKey(DNStateManager sm, Object key, int fieldNumber, Object newValue)
     {
         boolean modified = false;
@@ -1375,13 +1325,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
         return modified;
     }
 
-    /**
-     * Method to update a field of an embedded key.
-     * @param sm StateManager of the owner
-     * @param value The value to update
-     * @param fieldNumber The number of the field to update
-     * @param newValue The new value
-     */
+    @Override
     public boolean updateEmbeddedValue(DNStateManager sm, Object value, int fieldNumber, Object newValue)
     {
         boolean modified = false;

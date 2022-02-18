@@ -26,10 +26,7 @@ package org.datanucleus.store.rdbms.scostore;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Iterator;
-import java.util.List;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ExecutionContext;
@@ -37,7 +34,6 @@ import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.metadata.CollectionMetaData;
 import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.connection.ManagedConnection;
-import org.datanucleus.store.rdbms.exceptions.MappedDatastoreException;
 import org.datanucleus.store.types.scostore.SetStore;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.SQLController;
@@ -61,22 +57,10 @@ public abstract class AbstractSetStore<E> extends AbstractCollectionStore<E> imp
         super(storeMgr, clr);
     }
 
-    /**
-     * Accessor for an iterator for the set.
-     * Implemented by the subclass using whatever mechanism the underlying datastore provides.
-     * @param sm StateManager for the set. 
-     * @return Iterator for the set.
-     */
+    @Override
     public abstract Iterator<E> iterator(DNStateManager sm);
 
-    /**
-     * Removes the association to one element
-     * @param sm StateManager for the container
-     * @param element Element to remove
-     * @param size Current size
-     * @param allowDependentField Whether to allow any cascade deletes caused by this removal
-     * @return Whether it was successful 
-     */
+    @Override
     public boolean remove(DNStateManager sm, Object element, int size, boolean allowDependentField)
     {
         if (!validateElementForReading(sm, element))
@@ -143,132 +127,6 @@ public abstract class AbstractSetStore<E> extends AbstractCollectionStore<E> imp
         {
             // Delete the element if it is dependent
             sm.getExecutionContext().deleteObjectInternal(elementToRemove);
-        }
-
-        return modified;
-    }
-
-    /**
-     * Remove all elements from a collection from the association owner vs elements.
-     * This implementation iterates around the remove() method doing each element 1 at a time. 
-     * Please refer to the JoinSetStore and FKSetStore for the variations used there. 
-     * This is used for Map key and value stores.
-     * @param sm StateManager for the container
-     * @param elements Collection of elements to remove 
-     * @return Whether the database was updated
-     */
-    public boolean removeAll(DNStateManager sm, Collection elements, int size)
-    {
-        if (elements == null || elements.size() == 0)
-        {
-            return false;
-        }
-
-        boolean modified = false;
-        List exceptions = new ArrayList();
-        boolean batched = (elements.size() > 1);
-
-        // Validate all elements exist
-        Iterator iter = elements.iterator();
-        while (iter.hasNext())
-        {
-            Object element = iter.next();
-            if (!validateElementForReading(sm, element))
-            {
-                NucleusLogger.DATASTORE.debug("AbstractSetStore::removeAll element=" + element + " doesn't exist in this Set.");
-                return false;
-            }
-        }
-
-        try
-        {
-            ExecutionContext ec = sm.getExecutionContext();
-            ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
-            try
-            {
-                // Process all waiting batched statements before we start our work
-                SQLController sqlControl = storeMgr.getSQLController();
-                try
-                {
-                    sqlControl.processStatementsForConnection(mconn);
-                }
-                catch (SQLException e)
-                {
-                    throw new MappedDatastoreException("SQLException", e);
-                }
-
-                iter = elements.iterator();
-                while (iter.hasNext())
-                {
-                    Object element = iter.next();
- 
-                    try
-                    {
-                        // Process the remove
-                        int[] rc = null;
-                        String removeStmt = getRemoveStmt(element);
-                        try
-                        {
-                            PreparedStatement ps = sqlControl.getStatementForUpdate(mconn, removeStmt, batched);
-                            try
-                            {
-                                int jdbcPosition = 1;
-                                jdbcPosition = BackingStoreHelper.populateOwnerInStatement(sm, ec, ps, jdbcPosition, this);
-                                jdbcPosition = BackingStoreHelper.populateElementForWhereClauseInStatement(ec, ps, element, jdbcPosition, elementMapping);
-                                if (relationDiscriminatorMapping != null)
-                                {
-                                    jdbcPosition = BackingStoreHelper.populateRelationDiscriminatorInStatement(ec, ps, jdbcPosition, this);
-                                }
-
-                                // Execute the statement
-                                rc = sqlControl.executeStatementUpdate(ec, mconn, removeStmt, ps, !batched || (batched && !iter.hasNext()));
-
-                                if (rc != null)
-                                {
-                                    for (int i=0;i<rc.length;i++)
-                                    {
-                                        if (rc[i] > 0)
-                                        {
-                                            // At least one record was inserted
-                                            modified = true;
-                                        }
-                                    }
-                                }
-                            }
-                            finally
-                            {
-                                sqlControl.closeStatement(mconn, ps);
-                            }
-                        }
-                        catch (SQLException e)
-                        {
-                            throw new MappedDatastoreException("SQLException", e);
-                        }
-                    }
-                    catch (MappedDatastoreException mde)
-                    {
-                        exceptions.add(mde);
-                        NucleusLogger.DATASTORE.error("Exception in remove", mde);
-                    }
-                }
-            }
-            finally
-            {
-                mconn.release();
-            }
-        }
-        catch (MappedDatastoreException e)
-        {
-            exceptions.add(e);
-            NucleusLogger.DATASTORE.error("Exception performing removeAll on set backing store", e);
-        }
-
-        if (!exceptions.isEmpty())
-        {
-            // Throw all exceptions received as the cause of a NucleusDataStoreException so the user can see which record(s) didn't remove
-            String msg = Localiser.msg("056012", ((Exception) exceptions.get(0)).getMessage());
-            NucleusLogger.DATASTORE.error(msg);
-            throw new NucleusDataStoreException(msg, (Throwable[])exceptions.toArray(new Throwable[exceptions.size()]), sm.getObject());
         }
 
         return modified;

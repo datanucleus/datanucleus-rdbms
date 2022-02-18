@@ -71,23 +71,13 @@ public abstract class AbstractListStore<E> extends AbstractCollectionStore<E> im
         super(storeMgr, clr);
     }
 
-    // -------------------------- List Method implementations ------------------
-
-    /**
-     * Accessor for an iterator through the list elements.
-     * @param sm StateManager for the container.
-     * @return The Iterator
-     */
+    @Override
     public Iterator<E> iterator(DNStateManager sm)
     {
         return listIterator(sm);
     }
 
-    /**
-     * Accessor for an iterator through the list elements.
-     * @param sm StateManager for the container.
-     * @return The List Iterator
-     */
+    @Override
     public ListIterator<E> listIterator(DNStateManager sm)
     {
         return listIterator(sm, -1, -1);
@@ -102,49 +92,25 @@ public abstract class AbstractListStore<E> extends AbstractCollectionStore<E> im
      */
     protected abstract ListIterator<E> listIterator(DNStateManager sm, int startIdx, int endIdx);
 
-    /**
-     * Method to add an element to the List.
-     * @param sm StateManager
-     * @param element The element to remove
-     * @param size Size of the current list (if known, -1 if not)
-     * @return Whether it was added successfully.
-     */
+    @Override
     public boolean add(DNStateManager sm, E element, int size)
     {
         return internalAdd(sm, 0, true, Collections.singleton(element), size);
     }
 
-    /**
-     * Method to add an element to the List.
-     * @param element The element to add.
-     * @param index The location to add at
-     * @param sm StateManager.
-     */
+    @Override
     public void add(DNStateManager sm, E element, int index, int size)
     {
         internalAdd(sm, index, false, Collections.singleton(element), size);
     }
 
-    /**
-     * Method to add a collection of elements to the List.
-     * @param sm StateManager
-     * @param elements The elements to remove
-     * @param size Current size of the list (if known). -1 if not known
-     * @return Whether they were added successfully.
-     */
+    @Override
     public boolean addAll(DNStateManager sm, Collection<E> elements, int size)
     {
         return internalAdd(sm, 0, true, elements, size);
     }
 
-    /**
-     * Method to add all elements from a Collection to the List.
-     * @param sm StateManager
-     * @param elements The collection
-     * @param index The location to add at
-     * @param size Current size of the list (if known). -1 if not known
-     * @return Whether it was successful
-     */
+    @Override
     public boolean addAll(DNStateManager sm, Collection<E> elements, int index, int size)
     {
         return internalAdd(sm, index, false, elements, size);
@@ -161,12 +127,7 @@ public abstract class AbstractListStore<E> extends AbstractCollectionStore<E> im
      */
     protected abstract boolean internalAdd(DNStateManager sm, int startAt, boolean atEnd, Collection<E> elements, int size);
 
-    /**
-     * Method to retrieve an element from the List.
-     * @param sm StateManager for the owner
-     * @param index The index of the element required.
-     * @return The object
-     */
+    @Override
     public E get(DNStateManager sm, int index)
     {
         ListIterator<E> iter = listIterator(sm, index, index);
@@ -193,38 +154,21 @@ public abstract class AbstractListStore<E> extends AbstractCollectionStore<E> im
         return iter.next();
     }
 
-    /**
-     * Accessor for the indexOf an object in the List.
-     * @param sm StateManager for the owner
-     * @param element The element.
-     * @return The index
-     */
+    @Override
     public int indexOf(DNStateManager sm, Object element)
     {
         validateElementForReading(sm, element);
         return internalIndexOf(sm, element, getIndexOfStmt(element));
     }
 
-    /**
-     * Method to retrieve the last index of an object in the list.
-     * @param sm StateManager for the owner
-     * @param element The object
-     * @return The last index
-     */
+    @Override
     public int lastIndexOf(DNStateManager sm, Object element)
     {
         validateElementForReading(sm, element);
         return internalIndexOf(sm, element, getLastIndexOfStmt(element));
     }
 
-    /**
-     * Method to remove the specified element from the List.
-     * @param sm StateManager for the owner
-     * @param element The element to remove.
-     * @param size Current size of list if known. -1 if not known
-     * @param allowDependentField Whether to allow any cascade deletes caused by this removal
-     * @return Whether it was removed successfully.
-     */
+    @Override
     public boolean remove(DNStateManager sm, Object element, int size, boolean allowDependentField)
     {
         if (!validateElementForReading(sm, element))
@@ -253,7 +197,7 @@ public abstract class AbstractListStore<E> extends AbstractCollectionStore<E> im
             if (dependent && !collmd.isEmbeddedElement())
             {
                 // Delete the element if it is dependent
-                sm.getExecutionContext().deleteObjectInternal(elementToRemove);
+                ec.deleteObjectInternal(elementToRemove);
             }
         }
 
@@ -268,6 +212,7 @@ public abstract class AbstractListStore<E> extends AbstractCollectionStore<E> im
      * @param size Current size of the list (if known). -1 if not known
      * @return The object that was removed
      */
+    @Override
     public E remove(DNStateManager sm, int index, int size)
     {
         E element = get(sm, index);
@@ -318,13 +263,7 @@ public abstract class AbstractListStore<E> extends AbstractCollectionStore<E> im
      */
     protected abstract void internalRemoveAt(DNStateManager sm, int index, int size);
 
-    /**
-     * Method to retrieve a list of elements in a range.
-     * @param sm StateManager
-     * @param startIdx From index (inclusive).
-     * @param endIdx To index (exclusive)
-     * @return Sub List of elements in this range.
-     */
+    @Override
     public java.util.List<E> subList(DNStateManager sm, int startIdx, int endIdx)
     {
         ListIterator iter = listIterator(sm, startIdx, endIdx);
@@ -358,10 +297,9 @@ public abstract class AbstractListStore<E> extends AbstractCollectionStore<E> im
             return null;
         }
 
-        Iterator iter = elements.iterator();
-        while (iter.hasNext())
+        for (Object elem : elements)
         {
-            validateElementForReading(sm, iter.next());
+            validateElementForReading(sm, elem);
         }
 
         String stmt = getIndicesOfStmt(elements);
@@ -504,16 +442,8 @@ public abstract class AbstractListStore<E> extends AbstractCollectionStore<E> im
      */
     protected void internalRemoveAt(DNStateManager sm, int index, String stmt, int size)
     {
-        int currentListSize = 0;
-        if (size < 0)
-        {
-            // Get the current size from the datastore
-            currentListSize = size(sm);
-        }
-        else
-        {
-            currentListSize = size;
-        }
+        // Get current size from datastore if not provided
+        int currentListSize = (size < 0) ? size(sm) : size;
 
         ExecutionContext ec = sm.getExecutionContext();
         try
@@ -736,6 +666,7 @@ public abstract class AbstractListStore<E> extends AbstractCollectionStore<E> im
     {
         if (elementMapping instanceof ReferenceMapping && elementMapping.getNumberOfColumnMappings() > 1)
         {
+            // Don't cache since depends on the element
             return getLastIndexOfStatementString(element);
         }
 
@@ -785,7 +716,6 @@ public abstract class AbstractListStore<E> extends AbstractCollectionStore<E> im
     /**
      * Generates the statement for getting the indices of a collection of element. Order into descending index order
      * (highest first) so they will NOT be in the same order as they appear in the input collection "elements".
-     * 
      * <PRE>
      * SELECT INDEXCOL FROM LISTTABLE
      * WHERE (OWNERCOL=? AND ELEMENT_COL=? [AND DISTINGUISHER=?]) OR
@@ -841,7 +771,6 @@ public abstract class AbstractListStore<E> extends AbstractCollectionStore<E> im
 
     /**
      * Generates the statement for removing an item.
-     * 
      * <PRE>
      * DELETE FROM LISTTABLE
      * WHERE OWNERCOL = ?
@@ -874,7 +803,6 @@ public abstract class AbstractListStore<E> extends AbstractCollectionStore<E> im
 
     /**
      * Generates the statement for shifting items.
-     * 
      * <PRE>
      * UPDATE LISTTABLE SET INDEXCOL = ? + INDEXCOL
      * WHERE OWNERCOL = ?
@@ -918,8 +846,7 @@ public abstract class AbstractListStore<E> extends AbstractCollectionStore<E> im
     }
 
     /**
-     * Generates the statement for shifting items in bulk
-     * 
+     * Generates the statement for shifting items in bulk.
      * <PRE>
      * UPDATE LISTTABLE SET INDEXCOL = INDEXCOL + ?
      * WHERE OWNERCOL = ?

@@ -74,7 +74,7 @@ import org.datanucleus.util.NucleusLogger;
 import org.datanucleus.util.StringUtils;
 
 /**
- * RDBMS-specific implementation of an {@link ListStore} using foreign keys.
+ * Implementation of a {@link ListStore} using foreign keys.
  */
 public class FKListStore<E> extends AbstractListStore<E>
 {
@@ -270,14 +270,7 @@ public class FKListStore<E> extends AbstractListStore<E>
         }
     }
 
-    /**
-     * Method to set an object in the List at a position.
-     * @param ownerSM StateManager for the owner
-     * @param index The item index
-     * @param element What to set it to.
-     * @param allowDependentField Whether to enable dependent-field deletes during the set
-     * @return The value before setting.
-     */
+    @Override
     public E set(DNStateManager ownerSM, int index, Object element, boolean allowDependentField)
     {
         validateElementForWriting(ownerSM, element, -1); // Last argument means don't set the position on any INSERT
@@ -482,11 +475,7 @@ public class FKListStore<E> extends AbstractListStore<E>
         return retval;
     }
 
-    /**
-     * Method to update the collection to be the supplied collection of elements.
-     * @param ownerSM StateManager for the owner
-     * @param coll The collection to use
-     */
+    @Override
     public void update(DNStateManager ownerSM, Collection coll)
     {
         if (coll == null || coll.isEmpty())
@@ -523,7 +512,7 @@ public class FKListStore<E> extends AbstractListStore<E>
     }
 
     /**
-     * Internal method for adding an item to the List.
+     * Internal method for adding item(s) to the List as a specific position.
      * @param ownerSM StateManager for the owner
      * @param startAt The start position
      * @param atEnd Whether to add at the end
@@ -563,7 +552,7 @@ public class FKListStore<E> extends AbstractListStore<E>
             boolean inserted = validateElementForWriting(ownerSM, elementIter.next(), position);
             if (!inserted || shiftingElements)
             {
-                // This element wasnt positioned in the validate so we need to set the positions later
+                // This element wasn't positioned in the validate so we need to set the positions later
                 elementsNeedPositioning = true;
             }
             if (!shiftingElements)
@@ -586,7 +575,7 @@ public class FKListStore<E> extends AbstractListStore<E>
                 ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
                 try
                 {
-                    // shift up existing elements after start position by "shift"
+                    // shift existing elements after start position by "shift" to make room for new elements
                     internalShiftBulk(ownerSM, mconn, true, startAt-1, shift, true);
                 }
                 finally
@@ -605,10 +594,8 @@ public class FKListStore<E> extends AbstractListStore<E>
         {
             // Some elements have been shifted so the new elements need positioning now, or we already had some
             // of the new elements persistent and so they need their positions setting now
-            elementIter = c.iterator();
-            while (elementIter.hasNext())
+            for (E element : c)
             {
-                Object element = elementIter.next();
                 updateElementFk(ownerSM, element, ownerSM.getObject(), startAt);
                 startAt++;
             }
@@ -625,6 +612,7 @@ public class FKListStore<E> extends AbstractListStore<E>
      * @param elements Collection of elements to remove 
      * @return Whether the database was updated 
      */
+    @Override
     public boolean removeAll(DNStateManager ownerSM, Collection elements, int size)
     {
         if (elements == null || elements.size() == 0)
@@ -651,12 +639,7 @@ public class FKListStore<E> extends AbstractListStore<E>
             }
 
             // Dependent-element
-            boolean dependent = ownerMemberMetaData.getCollection().isDependentElement();
-            if (ownerMemberMetaData.isCascadeRemoveOrphans())
-            {
-                dependent = true;
-            }
-            if (dependent)
+            if (ownerMemberMetaData.isCascadeRemoveOrphans() || ownerMemberMetaData.getCollection().isDependentElement())
             {
                 // "delete-dependent" : delete elements if the collection is marked as dependent
                 // TODO What if the collection contains elements that are not in the List ? should not delete them
@@ -666,11 +649,13 @@ public class FKListStore<E> extends AbstractListStore<E>
         else
         {
             // Ordered List
-            Iterator iter = elements.iterator();
-            while (iter.hasNext())
+            for (Object element : elements)
             {
-                Object element = iter.next();
-                remove(ownerSM, element, size, true);
+                boolean success = remove(ownerSM, element, size, true);
+                if (success)
+                {
+                    modified = true;
+                }
             }
         }
 
@@ -814,6 +799,7 @@ public class FKListStore<E> extends AbstractListStore<E>
      * and removing all existing prior to adding all new.
      * @param ownerSM StateManager for the owner
      */
+    @Override
     public void clear(DNStateManager ownerSM)
     {
         boolean deleteElements = false;
@@ -931,24 +917,12 @@ public class FKListStore<E> extends AbstractListStore<E>
 
         ComponentInfo info = getComponentInfoForElement(element);
 
-        final DatastoreClass elementTable;
-        if (storeMgr.getNucleusContext().getMetaDataManager().isPersistentInterface(elementType))
-        {
-            elementTable = storeMgr.getDatastoreClass(storeMgr.getNucleusContext().getMetaDataManager().getImplementationNameForPersistentInterface(elementType), clr);
-        }
-        else
-        {
-            elementTable = storeMgr.getDatastoreClass(element.getClass().getName(), clr);
-        }
-        final JavaTypeMapping orderMapping;
-        if (info != null)
-        {
-            orderMapping = info.getDatastoreClass().getExternalMapping(ownerMemberMetaData, MappingType.EXTERNAL_INDEX);
-        }
-        else
-        {
-            orderMapping = this.orderMapping;
-        }
+        final DatastoreClass elementTable = storeMgr.getNucleusContext().getMetaDataManager().isPersistentInterface(elementType) ?
+            storeMgr.getDatastoreClass(storeMgr.getNucleusContext().getMetaDataManager().getImplementationNameForPersistentInterface(elementType), clr) :
+            storeMgr.getDatastoreClass(element.getClass().getName(), clr);
+
+        final JavaTypeMapping orderMapping = (info != null) ?
+            info.getDatastoreClass().getExternalMapping(ownerMemberMetaData, MappingType.EXTERNAL_INDEX) : this.orderMapping;
 
         // Check if element is ok for use in the datastore, specifying any external mappings that may be required
         boolean inserted = super.validateElementForWriting(sm.getExecutionContext(), element, new FieldValues()
@@ -1551,6 +1525,7 @@ public class FKListStore<E> extends AbstractListStore<E>
      *   [ELEM_TBL.DISCRIM = {discrimValue}]
      * [ORDER BY {orderClause}]
      * </pre>
+     * This is public to provide access for BulkFetchXXXHandler class(es).
      * @param ec ExecutionContext
      * @param fp FetchPlan to use in determing which fields of element to select
      * @param addRestrictionOnOwner Whether to restrict to a particular owner (otherwise functions as bulk fetch for many owners).

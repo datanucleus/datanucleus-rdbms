@@ -70,7 +70,7 @@ import org.datanucleus.util.NucleusLogger;
 import org.datanucleus.util.StringUtils;
 
 /**
- * RDBMS-specific implementation of a {@link SetStore} using join table.
+ * Implementation of a {@link SetStore} using join table.
  */
 public class JoinSetStore<E> extends AbstractSetStore<E>
 {
@@ -138,11 +138,7 @@ public class JoinSetStore<E> extends AbstractSetStore<E>
         }
     }
 
-    /**
-     * Method to update the collection to be the supplied collection of elements.
-     * @param sm StateManager of the object
-     * @param coll The collection to use
-     */
+    @Override
     public void update(DNStateManager sm, Collection coll)
     {
         if (coll == null || coll.isEmpty())
@@ -237,12 +233,7 @@ public class JoinSetStore<E> extends AbstractSetStore<E>
         return false;
     }
 
-    /**
-     * Adds one element to the association owner vs elements.
-     * @param sm StateManager for the container.
-     * @param element Element to add
-     * @return Whether it was successful
-     */
+    @Override
     public boolean add(DNStateManager sm, E element, int size)
     {
         // Check that the object is valid for writing
@@ -314,12 +305,7 @@ public class JoinSetStore<E> extends AbstractSetStore<E>
         return modified;
     }
 
-    /**
-     * Adds all elements from a collection to the association container.
-     * @param sm StateManager for the container.
-     * @param elements Collection of elements to add
-     * @return Whether it was successful
-     */
+    @Override
     public boolean addAll(DNStateManager sm, Collection<E> elements, int size)
     {
         if (elements == null || elements.size() == 0)
@@ -446,12 +432,7 @@ public class JoinSetStore<E> extends AbstractSetStore<E>
         return modified;
     }
 
-    /**
-     * Remove all elements from a collection from the association owner vs elements.
-     * @param sm StateManager for the container
-     * @param elements Collection of elements to remove
-     * @return Whether the database was updated
-     */
+    @Override
     public boolean removeAll(DNStateManager sm, Collection elements, int size)
     {
         if (elements == null || elements.size() == 0)
@@ -573,11 +554,9 @@ public class JoinSetStore<E> extends AbstractSetStore<E>
 
         StringBuilder stmt = new StringBuilder("DELETE FROM ").append(containerTable.toString()).append(" WHERE ");
 
-        Iterator elementsIter = elements.iterator();
         boolean first = true;
-        while (elementsIter.hasNext())
+        for (Object element : elements)
         {
-            Object element = elementsIter.next();
             stmt.append(first ? "(" : " OR (");
             BackingStoreHelper.appendWhereClauseForMapping(stmt, ownerMapping, null, true);
             BackingStoreHelper.appendWhereClauseForElement(stmt, elementMapping, element, elementsAreSerialised, null, false);
@@ -774,15 +753,7 @@ public class JoinSetStore<E> extends AbstractSetStore<E>
                     ResultSet rs = sqlControl.executeStatementQuery(ec, mconn, stmt, ps);
                     try
                     {
-                        if (!rs.next())
-                        {
-                            nextID = 1;
-                        }
-                        else
-                        {
-                            nextID = rs.getInt(1) + 1;
-                        }
-
+                        nextID = rs.next() ? rs.getInt(1) + 1 : 1;
                         JDBCUtils.logWarnings(rs);
                     }
                     finally
@@ -838,11 +809,7 @@ public class JoinSetStore<E> extends AbstractSetStore<E>
         return maxOrderColumnIdStmt;
     }
 
-    /**
-     * Accessor for an iterator for the set.
-     * @param ownerSM StateManager for the set.
-     * @return Iterator for the set.
-     */
+    @Override
     public Iterator<E> iterator(DNStateManager ownerSM)
     {
         ExecutionContext ec = ownerSM.getExecutionContext();
@@ -955,6 +922,7 @@ public class JoinSetStore<E> extends AbstractSetStore<E>
      *   [JOIN_TBL.DISCRIM = {discrimValue}]
      * [ORDER BY {orderClause}]
      * </pre>
+     * This is public to provide access for BulkFetchXXXHandler class(es).
      * @param ec ExecutionContext
      * @param fp FetchPlan to use in determining which fields of element to select
      * @param addRestrictionOnOwner Whether to restrict to a particular owner (otherwise functions as bulk fetch for many owners).

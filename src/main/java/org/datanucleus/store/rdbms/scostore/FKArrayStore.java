@@ -62,7 +62,7 @@ import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 
 /**
- * RDBMS-specific implementation of an FK ArrayStore.
+ * Implementation of an FK ArrayStore.
  */
 public class FKArrayStore<E> extends AbstractArrayStore<E>
 {
@@ -397,6 +397,7 @@ public class FKArrayStore<E> extends AbstractArrayStore<E>
      * This is called when the container object is being deleted and the elements are to be removed (maybe for dependent field).
      * @param ownerSM StateManager
      */
+    @Override
     public void clear(DNStateManager ownerSM)
     {
         boolean deleteElements = false;
@@ -540,12 +541,7 @@ public class FKArrayStore<E> extends AbstractArrayStore<E>
         return clearNullifyStmt;
     }
 
-    /**
-     * Method to set the array for the specified owner to the passed value.
-     * @param ownerSM StateManager for the owner
-     * @param array the array
-     * @return Whether the array was updated successfully
-     */
+    @Override
     public boolean set(DNStateManager ownerSM, Object array)
     {
         if (array == null)
@@ -570,11 +566,7 @@ public class FKArrayStore<E> extends AbstractArrayStore<E>
         return true;
     }
 
-    /**
-     * Accessor for an iterator for the set.
-     * @param ownerSM StateManager for the set.
-     * @return Iterator for the set.
-     */
+    @Override
     public Iterator<E> iterator(DNStateManager ownerSM)
     {
         ExecutionContext ec = ownerSM.getExecutionContext();

@@ -71,7 +71,7 @@ import org.datanucleus.util.NucleusLogger;
 import org.datanucleus.util.StringUtils;
 
 /**
- * RDBMS-specific implementation of a {@link ListStore} using join table.
+ * Implementation of a {@link ListStore} using join table.
  */
 public class JoinListStore<E> extends AbstractListStore<E>
 {
@@ -226,17 +226,7 @@ public class JoinListStore<E> extends AbstractListStore<E>
 
         }
 
-        // Check what we have persistent already
-        int currentListSize = 0;
-        if (size < 0)
-        {
-            // Get the current size from the datastore
-            currentListSize = size(sm);
-        }
-        else
-        {
-            currentListSize = size;
-        }
+        int currentListSize = (size < 0) ? size(sm) : size;
 
         // Check for dynamic schema updates prior to addition
         if (storeMgr.getBooleanObjectProperty(RDBMSPropertyNames.PROPERTY_RDBMS_DYNAMIC_SCHEMA_UPDATES).booleanValue())
@@ -311,14 +301,7 @@ public class JoinListStore<E> extends AbstractListStore<E>
         return true;
     }
 
-    /**
-     * Method to set an object in the List.
-     * @param sm StateManager for the owner
-     * @param index The item index
-     * @param element What to set it to.
-     * @param allowDependentField Whether to allow dependent field deletes
-     * @return The value before setting.
-     */
+    @Override
     public E set(DNStateManager sm, int index, Object element, boolean allowDependentField)
     {
         ExecutionContext ec = sm.getExecutionContext();
@@ -413,11 +396,7 @@ public class JoinListStore<E> extends AbstractListStore<E>
         return oldElement;
     }
 
-    /**
-     * Method to update the collection to be the supplied collection of elements.
-     * @param sm StateManager of the object
-     * @param coll The collection to use
-     */
+    @Override
     public void update(DNStateManager sm, Collection coll)
     {
         if (coll == null || coll.isEmpty())
@@ -567,6 +546,7 @@ public class JoinListStore<E> extends AbstractListStore<E>
      * @param elements Collection of elements to remove 
      * @return Whether the database was updated 
      */
+    @Override
     public boolean removeAll(DNStateManager sm, Collection elements, int size)
     {
         if (elements == null || elements.size() == 0)
@@ -912,6 +892,7 @@ public class JoinListStore<E> extends AbstractListStore<E>
      *   [JOIN_TBL.DISCRIM = {discrimValue}]
      * [ORDER BY {orderClause}]
      * </pre>
+     * This is public to provide access for BulkFetchXXXHandler class(es).
      * @param ec ExecutionContext
      * @param fp FetchPlan to use in determing which fields of element to select
      * @param addRestrictionOnOwner Whether to restrict to a particular owner (otherwise functions as bulk fetch for many owners).

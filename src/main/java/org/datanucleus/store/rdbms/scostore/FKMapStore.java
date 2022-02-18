@@ -74,7 +74,7 @@ import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 
 /**
- * RDBMS-specific implementation of an {@link MapStore} where either the value has a FK to the owner (and the key stored in the value), 
+ * Implementation of an {@link MapStore} where either the value has a FK to the owner (and the key stored in the value), 
  * or whether the key has a FK to the owner (and the value stored in the key).
  */
 public class FKMapStore<K, V> extends AbstractMapStore<K, V>
@@ -431,13 +431,7 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
         super.validateValueType(clr, value);
     }
 
-    /**
-     * Method to put an item in the Map.
-     * @param sm StateManager for the map.
-     * @param newKey The key to store the value against
-     * @param newValue The value to store.
-     * @return The value stored.
-     */
+    @Override
     public V put(final DNStateManager sm, final K newKey, V newValue)
     {
         ExecutionContext ec = sm.getExecutionContext();
@@ -655,12 +649,7 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
         return oldValue;
     }
 
-    /**
-     * Method to remove an entry from the map.
-     * @param sm StateManager for the map.
-     * @param key Key of the entry to remove.
-     * @return The value that was removed.
-     */
+    @Override
     public V remove(DNStateManager sm, Object key)
     {
         if (!allowNulls && key == null)
@@ -674,12 +663,7 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
         return oldValue;
     }
 
-    /**
-     * Method to remove an entry from the map where we know the value associated with the key.
-     * @param sm StateManager for the map.
-     * @param key Key of the entry to remove.
-     * @param oldValue The value associated with the key
-     */
+    @Override
     public void remove(DNStateManager sm, Object key, Object oldValue)
     {
         ExecutionContext ec = sm.getExecutionContext();
@@ -857,10 +841,7 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
         }
     }
 
-    /**
-     * Method to clear the map of all values.
-     * @param sm StateManager for the map.
-     */
+    @Override
     public void clear(DNStateManager sm)
     {
         // TODO Fix this. Should not be retrieving objects only to remove them since they
@@ -914,28 +895,19 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
         }
     }
 
-    /**
-     * Accessor for the keys in the Map.
-     * @return The keys
-     */
+    @Override
     public synchronized SetStore keySetStore()
     {
         return new MapKeySetStore(mapTable, this, clr);
     }
 
-    /**
-     * Accessor for the values in the Map.
-     * @return The values.
-     */
+    @Override
     public synchronized CollectionStore valueCollectionStore()
     {
         return new MapValueCollectionStore(mapTable, this, clr);
     }
 
-    /**
-     * Accessor for the map entries in the Map.
-     * @return The map entries.
-     */
+    @Override
     public synchronized SetStore entrySetStore()
     {
         return new MapEntrySetStore(mapTable, this, clr);

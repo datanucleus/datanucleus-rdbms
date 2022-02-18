@@ -27,7 +27,6 @@ package org.datanucleus.store.rdbms.scostore;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
@@ -117,6 +116,7 @@ public abstract class AbstractMapStore<K, V> extends BaseContainerStore implemen
      * If they are PC instances then returns false;
      * @return Whether the keys are embedded
      */
+    @Override
     public boolean keysAreEmbedded()
     {
         return keysAreEmbedded;
@@ -127,6 +127,7 @@ public abstract class AbstractMapStore<K, V> extends BaseContainerStore implemen
      * If they are PC instances then returns false;
      * @return Whether the keys are serialised
      */
+    @Override
     public boolean keysAreSerialised()
     {
         return keysAreSerialised;
@@ -137,6 +138,7 @@ public abstract class AbstractMapStore<K, V> extends BaseContainerStore implemen
      * If they are PC instances then returns false;
      * @return Whether the values are embedded
      */
+    @Override
     public boolean valuesAreEmbedded()
     {
         return valuesAreEmbedded;
@@ -147,17 +149,13 @@ public abstract class AbstractMapStore<K, V> extends BaseContainerStore implemen
      * If they are PC instances then returns false;
      * @return Whether the values are serialised
      */
+    @Override
     public boolean valuesAreSerialised()
     {
         return valuesAreSerialised;
     }
 
-    /**
-     * Method to check if a key exists in the Map.
-     * @param sm StateManager for the map
-     * @param key The key to check for.
-     * @return Whether the key exists in the Map.
-     */
+    @Override
     public boolean containsKey(DNStateManager sm, Object key)
     {
         if (key == null)
@@ -176,12 +174,7 @@ public abstract class AbstractMapStore<K, V> extends BaseContainerStore implemen
         }
     }
 
-    /**
-     * Method to check if a value exists in the Map.
-     * @param sm StateManager for the map
-     * @param value The value to check for.
-     * @return Whether the value exists in the Map.
-     */
+    @Override
     public boolean containsValue(DNStateManager sm, Object value)
     {
         if (value == null)
@@ -243,12 +236,7 @@ public abstract class AbstractMapStore<K, V> extends BaseContainerStore implemen
         return exists;
     }
 
-    /**
-     * Method to return the value for a key.
-     * @param sm StateManager for the Map.
-     * @param key The key of the object to retrieve.
-     * @return The value for this key.
-     */
+    @Override
     public V get(DNStateManager sm, Object key)
     {
         try
@@ -261,19 +249,12 @@ public abstract class AbstractMapStore<K, V> extends BaseContainerStore implemen
         }
     }
 
-    /**
-     * Method to put all elements from a Map into our Map.
-     * Simply performs a sequence of puts. Override to provide bulk handling.
-     * @param sm StateManager for the Map
-     * @param m The Map to add
-     */
+    @Override
     public void putAll(DNStateManager sm, Map<? extends K, ? extends V> m)
     {
-        Iterator i = m.entrySet().iterator();
-        while (i.hasNext())
+        for (Map.Entry<? extends K, ? extends V> entry : m.entrySet())
         {
-            Map.Entry<K, V> e = (Map.Entry)i.next();
-            put(sm, e.getKey(), e.getValue());
+            put(sm, entry.getKey(), entry.getValue());
         }
     }
 

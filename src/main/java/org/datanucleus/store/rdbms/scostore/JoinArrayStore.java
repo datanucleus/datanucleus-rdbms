@@ -58,7 +58,7 @@ import org.datanucleus.util.ClassUtils;
 import org.datanucleus.util.Localiser;
 
 /**
- * RDBMS-specific implementation of a Join ArrayStore
+ * Implementation of a Join ArrayStore
  */
 public class JoinArrayStore<E> extends AbstractArrayStore<E>
 {
@@ -133,10 +133,7 @@ public class JoinArrayStore<E> extends AbstractArrayStore<E>
         }
     }
 
-    /**
-     * Method to return an iterator to the array.
-     * @param ownerSM StateManager for the owner of the array
-     */
+    @Override
     public Iterator<E> iterator(DNStateManager ownerSM)
     {
         ExecutionContext ec = ownerSM.getExecutionContext();

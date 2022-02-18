@@ -69,7 +69,7 @@ import org.datanucleus.util.NucleusLogger;
 import org.datanucleus.util.StringUtils;
 
 /**
- * RDBMS-specific implementation of an {@link SetStore} using foreign keys.
+ * Implementation of an {@link SetStore} using foreign keys.
  */
 public class FKSetStore<E> extends AbstractSetStore<E>
 {
@@ -340,11 +340,7 @@ public class FKSetStore<E> extends AbstractSetStore<E>
         return retval;
     }
 
-    /**
-     * Method to update the collection to be the supplied collection of elements.
-     * @param ownerSM StateManager for the owner.
-     * @param coll The collection to use
-     */
+    @Override
     public void update(DNStateManager ownerSM, Collection coll)
     {
         if (coll == null || coll.isEmpty())
@@ -385,12 +381,7 @@ public class FKSetStore<E> extends AbstractSetStore<E>
         }
     }
 
-    /**
-     * Method to add an object to the relationship at the collection end.
-     * @param ownerSM StateManager for the owner.
-     * @param element Element to be added
-     * @return Success indicator
-     */
+    @Override
     public boolean add(final DNStateManager ownerSM, E element, int size)
     {
         if (element == null)
@@ -571,12 +562,7 @@ public class FKSetStore<E> extends AbstractSetStore<E>
         return (contained ? false : updateElementFk(ownerSM, element, newOwner));
     }
  
-    /**
-     * Method to add a collection of object to the relationship at the collection end.
-     * @param ownerSM StateManager for the owner.
-     * @param elements Elements to be added
-     * @return Success indicator
-     */
+    @Override
     public boolean addAll(DNStateManager ownerSM, Collection<E> elements, int size)
     {
         if (elements == null || elements.size() == 0)
@@ -585,15 +571,13 @@ public class FKSetStore<E> extends AbstractSetStore<E>
         }
 
         boolean success = false;
-        Iterator<E> iter = elements.iterator();
-        while (iter.hasNext())
+        for (E elem : elements)
         {
-            if (add(ownerSM, iter.next(), -1))
+            if (add(ownerSM, elem, -1))
             {
                 success = true;
             }
         }
-
         return success;
     }
 
@@ -606,6 +590,7 @@ public class FKSetStore<E> extends AbstractSetStore<E>
      * @param allowDependentField Whether to allow any cascade deletes caused by this removal
      * @return A success indicator.
      */
+    @Override
     public boolean remove(DNStateManager ownerSM, Object element, int size, boolean allowDependentField)
     {
         if (element == null)
@@ -707,12 +692,12 @@ public class FKSetStore<E> extends AbstractSetStore<E>
 
     /**
      * Method to remove the links to a collection of elements specified.
-     * Depending on the column characteristics in the collection table, the id
-     * of the owner fields may be NULLed, or the records may be deleted completely.
+     * Depending on the column characteristics in the collection table, the id of the owner fields may be NULLed, or the records may be deleted completely.
      * @param ownerSM StateManager for the owner.
      * @param elements The elements of the collection to be deleted.
      * @return A success indicator.
      */
+    @Override
     public boolean removeAll(DNStateManager ownerSM, Collection elements, int size)
     {
         if (elements == null || elements.size() == 0)
@@ -720,14 +705,10 @@ public class FKSetStore<E> extends AbstractSetStore<E>
             return false;
         }
 
-        // Check the first element for whether we can null the column or
-        // whether we have to delete
         boolean success = true;
-
-        Iterator iter=elements.iterator();
-        while (iter.hasNext())
+        for (Object elem : elements)
         {
-            if (remove(ownerSM, iter.next(), -1, true))
+            if (remove(ownerSM, elem, -1, true))
             {
                 success = false;
             }
@@ -859,6 +840,7 @@ public class FKSetStore<E> extends AbstractSetStore<E>
      * and removing all existing prior to adding all new.
      * @param ownerSM StateManager for the owner.
      */
+    @Override
     public void clear(DNStateManager ownerSM)
     {
         ExecutionContext ec = ownerSM.getExecutionContext();
@@ -1089,19 +1071,15 @@ public class FKSetStore<E> extends AbstractSetStore<E>
         return stmt.toString();
     }
 
-    /**
-     * Accessor for an iterator for the set.
-     * @param ownerSM StateManager for the owner.
-     * @return Iterator for the set.
-     */
+    @Override
     public Iterator<E> iterator(DNStateManager ownerSM)
     {
-        ExecutionContext ec = ownerSM.getExecutionContext();
-
         if (elementInfo == null || elementInfo.length == 0)
         {
             return null;
         }
+
+        ExecutionContext ec = ownerSM.getExecutionContext();
 
         // Generate the statement, and statement mapping/parameter information
         ElementIteratorStatement iterStmt = getIteratorStatement(ec, ec.getFetchPlan(), true);
@@ -1117,7 +1095,7 @@ public class FKSetStore<E> extends AbstractSetStore<E>
             for (int j=0;j<sqlStmt.getNumberOfUnions()+1;j++)
             {
                 int[] paramPositions = new int[ownerMapping.getNumberOfColumnMappings()];
-                for (int k=0;k<ownerMapping.getNumberOfColumnMappings();k++)
+                for (int k=0;k<paramPositions.length;k++)
                 {
                     paramPositions[k] = inputParamNum++;
                 }
@@ -1127,7 +1105,7 @@ public class FKSetStore<E> extends AbstractSetStore<E>
         else
         {
             int[] paramPositions = new int[ownerMapping.getNumberOfColumnMappings()];
-            for (int k=0;k<ownerMapping.getNumberOfColumnMappings();k++)
+            for (int k=0;k<paramPositions.length;k++)
             {
                 paramPositions[k] = inputParamNum++;
             }
@@ -1203,6 +1181,7 @@ public class FKSetStore<E> extends AbstractSetStore<E>
      *   [ELEM_TBL.DISCRIM = {discrimValue}]
      * [ORDER BY {orderClause}]
      * </pre>
+     * This is public to provide access for BulkFetchXXXHandler class(es).
      * @param ec ExecutionContext
      * @param fp FetchPlan to use in determining which fields of element to select
      * @param addRestrictionOnOwner Whether to restrict to a particular owner (otherwise functions as bulk fetch for many owners).

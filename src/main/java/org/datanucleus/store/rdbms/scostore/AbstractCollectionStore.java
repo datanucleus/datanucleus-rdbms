@@ -62,11 +62,7 @@ public abstract class AbstractCollectionStore<E> extends ElementContainerStore i
         super(storeMgr, clr);
     }
 
-    /**
-     * Method to update the collection to be the supplied collection of elements.
-     * @param sm StateManager of the object
-     * @param coll The collection to use
-     */
+    @Override
     public void update(DNStateManager sm, Collection coll)
     {
         // Crude update - remove existing and add new!
@@ -74,12 +70,7 @@ public abstract class AbstractCollectionStore<E> extends ElementContainerStore i
         addAll(sm, coll, 0);
     }
 
-    /**
-     * Method to verify if the specified element is contained in this collection.
-     * @param sm StateManager
-     * @param element The element
-     * @return Whether it contains the element 
-     */
+    @Override
     public boolean contains(DNStateManager sm, Object element)
     {
         if (!validateElementForReading(sm, element))
@@ -146,8 +137,7 @@ public abstract class AbstractCollectionStore<E> extends ElementContainerStore i
 
     /**
      * Generate statement for retrieving the contents of the Collection.
-     * The discriminator part is only present when the element type has
-     * inheritance strategy of "superclass-table" and is Inverse.
+     * The discriminator part is only present when the element type has inheritance strategy of "superclass-table" and is Inverse.
      * <PRE>
      * SELECT OWNERCOL FROM COLLECTIONTABLE
      * WHERE OWNERCOL=?
@@ -155,7 +145,6 @@ public abstract class AbstractCollectionStore<E> extends ElementContainerStore i
      * [AND DISCRIMINATOR=?]
      * [AND RELATION_DISCRIM=?]
      * </PRE>
-     *
      * @return Statement for retrieving the contents of the Collection.
      */
     private String getContainsStmt(Object element)
@@ -372,6 +361,7 @@ public abstract class AbstractCollectionStore<E> extends ElementContainerStore i
      * @param value The value
      * @return true if the datastore was updated
      */
+    @Override
     public boolean updateEmbeddedElement(DNStateManager sm, E element, int fieldNumber, Object value)
     {
         // TODO Only for join table cases, so really ought to move there
