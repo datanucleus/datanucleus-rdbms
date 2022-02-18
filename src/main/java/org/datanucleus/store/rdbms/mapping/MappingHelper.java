@@ -58,7 +58,7 @@ public class MappingHelper
      */
     public static int[] getMappingIndices(int initialPosition, JavaTypeMapping mapping)
     {
-        if (mapping.getNumberOfColumnMappings() < 1)
+        if (mapping.getNumberOfColumnMappings() == 0)
         {
             return new int[]{initialPosition};
         }
@@ -72,44 +72,22 @@ public class MappingHelper
     }
 
     /**
-     * Get the object instance for a class using datastore identity
+     * Get the persistable object instance for a class using datastore identity defined by result set columns.
      * @param ec ExecutionContext
      * @param mapping The mapping in which this is returned
      * @param rs the ResultSet
      * @param resultIndexes indexes for the result set
      * @param cmd the AbstractClassMetaData
-     * @return the id
+     * @return the persistable object
      */
-    public static Object getObjectForDatastoreIdentity(ExecutionContext ec, JavaTypeMapping mapping, 
-            final ResultSet rs, int[] resultIndexes, AbstractClassMetaData cmd)
+    public static Object getObjectForDatastoreIdentity(ExecutionContext ec, JavaTypeMapping mapping, final ResultSet rs, int[] resultIndexes, AbstractClassMetaData cmd)
     {
-        // Datastore Identity - retrieve the datastore id "value" for the class.
-        // Note that this is a temporary "id" that is simply formed from the type of base class in the relationship and the id value stored in the FK. 
-        // The real "id" for the object may be of a different class. For that reason we get the object by checking the inheritance (3rd param in findObject())
-        Object idValue = null;
-        if (mapping.getNumberOfColumnMappings() > 0)
-        {
-            idValue = mapping.getColumnMapping(0).getObject(rs, resultIndexes[0]);
-        }
-        else
-        {
-            // 1-1 bidirectional "mapped-by" relation, so use ID mappings of related class to retrieve the value
-            if (mapping.getReferenceMapping() != null) //TODO why is it null for PC concrete classes?
-            {
-                return mapping.getReferenceMapping().getObject(ec, rs, resultIndexes);
-            }
-
-            Class fieldType = mapping.getMemberMetaData().getType();
-            JavaTypeMapping referenceMapping = mapping.getStoreManager().getDatastoreClass(fieldType.getName(), ec.getClassLoaderResolver()).getIdMapping();
-            idValue = referenceMapping.getColumnMapping(0).getObject(rs, resultIndexes[0]);
-        }
-
-        if (idValue == null)
+        Object id = getDatastoreIdentityForResultSetRow(ec, mapping, rs, resultIndexes, cmd);
+        if (id == null)
         {
             return null;
         }
 
-        Object id = ec.getNucleusContext().getIdentityManager().getDatastoreId(mapping.getType(), idValue);
         return ec.findObject(id, false, true, null);
     }
 
@@ -122,8 +100,7 @@ public class MappingHelper
      * @param cmd the AbstractClassMetaData
      * @return the id
      */
-    public static Object getDatastoreIdentityForResultSetRow(ExecutionContext ec, JavaTypeMapping mapping, 
-            final ResultSet rs, int[] resultIndexes, AbstractClassMetaData cmd)
+    public static Object getDatastoreIdentityForResultSetRow(ExecutionContext ec, JavaTypeMapping mapping, final ResultSet rs, int[] resultIndexes, AbstractClassMetaData cmd)
     {
         // Datastore Identity - retrieve the datastore id "value" for the class.
         // Note that this is a temporary "id" that is simply formed from the type of base class in the relationship and the id value stored in the FK. 
@@ -211,13 +188,13 @@ public class MappingHelper
     }
 
     /**
-     * Get the object instance for a class using application identity
+     * Get the persistent object instance for a class using application identity defined by the provided result set columns
      * @param ec ExecutionContext
      * @param mapping The mapping in which this is returned
      * @param rs the ResultSet
      * @param resultIndexes indexes in the result set to retrieve
      * @param cmd the AbstractClassMetaData
-     * @return the id
+     * @return the persistent object instance
      */
     public static Object getObjectForApplicationIdentity(final ExecutionContext ec, JavaTypeMapping mapping, 
             final ResultSet rs, int[] resultIndexes, AbstractClassMetaData cmd)
@@ -256,10 +233,9 @@ public class MappingHelper
             resultMappings.addMappingForMember(pkMemberPositions[i], statementExpressionIndex[pkMemberPositions[i]]);
         }
         // TODO Use any other (non-PK) param values
-
         final FieldManager resultsFM = new ResultSetGetter(ec, rs, resultMappings, cmd);
-        Object id = IdentityUtils.getApplicationIdentityForResultSetRow(ec, cmd, null, false, resultsFM);
 
+        Object id = IdentityUtils.getApplicationIdentityForResultSetRow(ec, cmd, null, false, resultsFM);
         Class type = ec.getClassLoaderResolver().classForName(cmd.getFullClassName());
         return ec.findObject(id, new FieldValues()
         {
@@ -293,15 +269,10 @@ public class MappingHelper
 
         // Abstract class, so we need to generate an id before proceeding
         Class objectIdClass = clr.classForName(cmd.getObjectidClass());
-        Object id;
-        if (cmd.usesSingleFieldIdentityClass())
-        {
-            id = createSingleFieldIdentity(ec, mapping, rs, resultIndexes, cmd, objectIdClass, clr.classForName(cmd.getFullClassName())); 
-        }
-        else
-        {
-            id = createObjectIdentityUsingReflection(ec, mapping, rs, resultIndexes, cmd, objectIdClass); 
-        }
+        Object id = (cmd.usesSingleFieldIdentityClass()) ?
+            createSingleFieldIdentity(ec, mapping, rs, resultIndexes, cmd, objectIdClass, clr.classForName(cmd.getFullClassName())) :
+            createObjectIdentityUsingReflection(ec, mapping, rs, resultIndexes, cmd, objectIdClass);
+
         return ec.findObject(id, false, true, null);
     }
 
@@ -329,8 +300,7 @@ public class MappingHelper
             }
 
             // Make sure the key type is correct for the type of SingleFieldIdentity
-            Class keyType = IdentityUtils.getKeyTypeForSingleFieldIdentityType(objectIdClass);
-            idValue = TypeConversionHelper.convertTo(idValue, keyType);
+            idValue = TypeConversionHelper.convertTo(idValue, IdentityUtils.getKeyTypeForSingleFieldIdentityType(objectIdClass));
             return ec.getNucleusContext().getIdentityManager().getSingleFieldId(objectIdClass, pcClass, idValue);
         }
         catch (Exception e)
@@ -375,9 +345,8 @@ public class MappingHelper
                     if ((obj instanceof BigDecimal))
                     {
                         BigDecimal bigDecimal = (BigDecimal) obj;
-                        // Oracle 10g returns BigDecimal for NUMBER columns, resulting in IllegalArgumentException 
-                        // when reflective setter is invoked for incompatible field type
-                        // (see http://www.jpox.org/servlet/jira/browse/CORE-2624)
+
+                        // Oracle 10g returns BigDecimal for NUMBER columns, resulting in IllegalArgumentException when reflective setter is invoked for incompatible field type
                         Class keyType = IdentityUtils.getKeyTypeForSingleFieldIdentityType(field.getType());
                         obj = TypeConversionHelper.convertTo(bigDecimal, keyType);
                         if (!bigDecimal.subtract(new BigDecimal("" + obj)).equals(new BigDecimal("0")))
@@ -385,7 +354,7 @@ public class MappingHelper
                             throw new NucleusException("Cannot convert retrieved BigInteger value to field of object id class!").setFatal();
                         }
                     }
-                    // field with multiple columns should have values returned from db merged here
+                    // TODO field with multiple columns should have values returned from db merged here
                     fieldValue = obj;
                 }
                 field.set(id, fieldValue);

@@ -25,8 +25,6 @@ import java.sql.Date;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -243,6 +241,7 @@ public class MappingManagerImpl implements MappingManager
      * @param javaTypeName The java type name
      * @return Whether the class is supported (to some degree)
      */
+    @Override
     public boolean isSupportedMappedType(String javaTypeName)
     {
         if (javaTypeName == null)
@@ -273,6 +272,7 @@ public class MappingManagerImpl implements MappingManager
      * @param javaTypeName The java type name
      * @return The Java mapping type
      */
+    @Override
     public Class<? extends JavaTypeMapping> getMappingType(String javaTypeName)
     {
         if (javaTypeName == null)
@@ -281,43 +281,43 @@ public class MappingManagerImpl implements MappingManager
         }
 
         MappedType type = mappedTypes.get(javaTypeName);
-        if (type == null)
+        if (type != null)
         {
-            // No explicit <java_mapping> so check for a default TypeConverter against the basic <java-type>
-            TypeManager typeMgr = storeMgr.getNucleusContext().getTypeManager();
-            TypeConverter defaultTypeConv = typeMgr.getDefaultTypeConverterForType(clr.classForName(javaTypeName));
-            if (defaultTypeConv != null)
-            {
-                // We have no explicit mapping and there is a defined default TypeConverter so return and that will be picked
-                return null;
-            }
+            return type.javaMappingType;
+        }
 
-            // Check if this is a SCO wrapper
-            Class cls = typeMgr.getTypeForSecondClassWrapper(javaTypeName);
-            if (cls != null)
-            {
-                // Supplied class is a SCO wrapper, so return the java type mapping for the underlying java type
-                type = mappedTypes.get(cls.getName());
-                if (type != null)
-                {
-                    return type.javaMappingType;
-                }
-            }
+        // No explicit <java_mapping> so check for a default TypeConverter against the basic <java-type>
+        TypeManager typeMgr = storeMgr.getNucleusContext().getTypeManager();
+        TypeConverter defaultTypeConv = typeMgr.getDefaultTypeConverterForType(clr.classForName(javaTypeName));
+        if (defaultTypeConv != null)
+        {
+            // We have no explicit mapping and there is a defined default TypeConverter so return and that will be picked
+            return null;
+        }
 
-            // Not SCO wrapper so find a type
-            try
+        // Check if this is a SCO wrapper
+        Class cls = typeMgr.getTypeForSecondClassWrapper(javaTypeName);
+        if (cls != null)
+        {
+            // Supplied class is a SCO wrapper, so return the java type mapping for the underlying java type
+            type = mappedTypes.get(cls.getName());
+            if (type != null)
             {
-                cls = clr.classForName(javaTypeName);
-                type = findMappedTypeForClass(cls);
                 return type.javaMappingType;
-            }
-            catch (Exception e)
-            {
-                return null;
             }
         }
 
-        return type.javaMappingType;
+        // Not SCO wrapper so find a type
+        try
+        {
+            cls = clr.classForName(javaTypeName);
+            type = findMappedTypeForClass(cls);
+            return type.javaMappingType;
+        }
+        catch (Exception e)
+        {
+            return null;
+        }
     }
 
     /**
@@ -365,34 +365,32 @@ public class MappingManagerImpl implements MappingManager
 
         // Not supported so try to find one that is supported that this class derives from
         Class componentCls = javaType.isArray() ? javaType.getComponentType() : null;
-        Collection<MappedType> supportedTypes = new HashSet<>(mappedTypes.values());
-        Iterator<MappedType> iter = supportedTypes.iterator();
-        while (iter.hasNext())
+
+        for (MappedType mappedType : mappedTypes.values())
         {
-            type = iter.next();
-            if (type.javaType == javaType)
+            if (mappedType.javaType == javaType)
             {
-                return type;
+                return mappedType;
             }
 
-            if (!type.javaType.getName().equals("java.lang.Object") && !type.javaType.getName().equals("java.io.Serializable"))
+            if (!mappedType.javaType.getName().equals("java.lang.Object") && !mappedType.javaType.getName().equals("java.io.Serializable"))
             {
                 if (componentCls != null)
                 {
                     // Array type
-                    if (type.javaType.isArray() && type.javaType.getComponentType().isAssignableFrom(componentCls))
+                    if (mappedType.javaType.isArray() && mappedType.javaType.getComponentType().isAssignableFrom(componentCls))
                     {
-                        mappedTypes.put(javaType.getName(), type);
-                        return type;
+                        mappedTypes.put(javaType.getName(), mappedType);
+                        return mappedType;
                     }
                 }
                 else
                 {
                     // Basic type
-                    if (type.javaType.isAssignableFrom(javaType))
+                    if (mappedType.javaType.isAssignableFrom(javaType))
                     {
-                        mappedTypes.put(javaType.getName(), type);
-                        return type;
+                        mappedTypes.put(javaType.getName(), mappedType);
+                        return mappedType;
                     }
                 }
             }
@@ -413,6 +411,7 @@ public class MappingManagerImpl implements MappingManager
      * @param clr ClassLoader resolver
      * @return The mapping for the class.
      */
+    @Override
     public JavaTypeMapping getMappingWithColumnMapping(Class javaType, boolean serialised, boolean embedded, ClassLoaderResolver clr)
     {
         try
@@ -460,6 +459,7 @@ public class MappingManagerImpl implements MappingManager
      * @param javaType Java type
      * @return The mapping for the class.
      */
+    @Override
     public JavaTypeMapping getMapping(Class javaType)
     {
         return getMapping(javaType, false, false, (String)null);
@@ -475,6 +475,7 @@ public class MappingManagerImpl implements MappingManager
      * @param fieldName Name of the field (for logging)
      * @return The mapping for the class.
      */
+    @Override
     public JavaTypeMapping getMapping(Class javaType, boolean serialised, boolean embedded, String fieldName)
     {
         MappingConverterDetails mcd = getMappingClass(javaType, serialised, embedded, null, fieldName); // TODO Pass in 4th arg?
@@ -503,6 +504,7 @@ public class MappingManagerImpl implements MappingManager
      * @param fieldRole Role that this mapping plays for the field
      * @return The mapping for the member.
      */
+    @Override
     public JavaTypeMapping getMapping(Table table, AbstractMemberMetaData mmd, ClassLoaderResolver clr, FieldRole fieldRole)
     {
         if (fieldRole == FieldRole.ROLE_COLLECTION_ELEMENT || fieldRole == FieldRole.ROLE_ARRAY_ELEMENT)
@@ -598,15 +600,9 @@ public class MappingManagerImpl implements MappingManager
         }
         else
         {
-            AbstractClassMetaData typeCmd = null;
-            if (mmd.getType().isInterface())
-            {
-                typeCmd = storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForInterface(mmd.getType(), clr);
-            }
-            else
-            {
-                typeCmd = storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForClass(mmd.getType(), clr);
-            }
+            AbstractClassMetaData typeCmd = (mmd.getType().isInterface()) ?
+                storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForInterface(mmd.getType(), clr) :
+                storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForClass(mmd.getType(), clr);
 
             if (mmd.hasExtension(SerialisedLocalFileMapping.EXTENSION_SERIALIZE_TO_FOLDER) && Serializable.class.isAssignableFrom(mmd.getType()))
             {
@@ -744,7 +740,7 @@ public class MappingManagerImpl implements MappingManager
      * @param colmds Metadata for column(s) (optional)
      * @param fieldName The full field name (for logging only)
      * @return The mapping class for the class
-     **/
+     */
     protected MappingConverterDetails getMappingClass(Class javaType, boolean serialised, boolean embedded, ColumnMetaData[] colmds, String fieldName)
     {
         ApiAdapter api = storeMgr.getApiAdapter();
@@ -949,26 +945,21 @@ public class MappingManagerImpl implements MappingManager
                     (mmd.getElementMetaData() != null && mmd.getElementMetaData().getEmbeddedMetaData() != null);
             boolean elementPC = ((mmd.hasCollection() && mmd.getCollection().elementIsPersistent()) ||
                     (mmd.hasArray() && mmd.getArray().elementIsPersistent()));
-            boolean embedded = true;
-            if (mmd.hasCollection())
-            {
-                embedded = mmd.getCollection().isEmbeddedElement();
-            }
-            else if (mmd.hasArray())
-            {
-                embedded = mmd.getArray().isEmbeddedElement();
-            }
 
+            boolean embedded = true;
             Class elementCls = null;
             if (mmd.hasCollection())
             {
+                embedded = mmd.getCollection().isEmbeddedElement();
                 elementCls = clr.classForName(mmd.getCollection().getElementType());
             }
             else if (mmd.hasArray())
             {
                 // Use declared element type rather than any restricted type specified in metadata
+                embedded = mmd.getArray().isEmbeddedElement();
                 elementCls = mmd.getType().getComponentType();
             }
+
             boolean elementReference = ClassUtils.isReferenceType(elementCls);
 
             if (serialised)
@@ -1559,6 +1550,7 @@ public class MappingManagerImpl implements MappingManager
      * @param javaType The java type
      * @return The column mapping
      */
+    @Override
     public ColumnMapping createColumnMapping(JavaTypeMapping mapping, Column column, String javaType)
     {
         Column col = column;
@@ -1589,6 +1581,7 @@ public class MappingManagerImpl implements MappingManager
      * @param columnIndex Index of the column to use
      * @return The column
      */
+    @Override
     public Column createColumn(JavaTypeMapping mapping, String javaType, int columnIndex)
     {
         AbstractMemberMetaData mmd = mapping.getMemberMetaData();
@@ -1746,6 +1739,7 @@ public class MappingManagerImpl implements MappingManager
      * @param colmd MetaData for the column
      * @return The column
      */
+    @Override
     public Column createColumn(JavaTypeMapping mapping, String javaType, ColumnMetaData colmd)
     {
         AbstractMemberMetaData mmd = mapping.getMemberMetaData();

@@ -21,7 +21,6 @@ package org.datanucleus.store.rdbms.valuegenerator;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.HashSet;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.exceptions.NucleusException;
@@ -53,9 +52,6 @@ public class SequenceTable extends TableImpl
 
     private String insertStmt = null;
     private String incrementByStmt = null;
-    private String deleteStmt = null;
-    private String deleteAllStmt = null;
-    private String fetchAllStmt = null;
     private String fetchStmt = null;
 
     /** the sequence column name */
@@ -82,7 +78,8 @@ public class SequenceTable extends TableImpl
     /**
      * Method to initialise the table.
      * @param clr The ClassLoaderResolver
-     **/
+     */
+    @Override
     public void initialize(ClassLoaderResolver clr)
     {
         assertIsUninitialized();
@@ -106,8 +103,6 @@ public class SequenceTable extends TableImpl
         insertStmt = "INSERT INTO " + identifier.getFullyQualifiedName(false) + " (" + colSequenceName.getIdentifier() + "," + colNextVal.getIdentifier() + ") VALUES (?,?)";
         incrementByStmt = "UPDATE " + identifier.getFullyQualifiedName(false) + " SET " + colNextVal.getIdentifier() + "=(" + 
             colNextVal.getIdentifier() + "+?) WHERE " + colSequenceName.getIdentifier() + "=?";
-        deleteStmt = "DELETE FROM " + identifier.getFullyQualifiedName(false) + " WHERE " + colSequenceName.getIdentifier() + "=?";
-        deleteAllStmt = "DELETE FROM " + identifier.getFullyQualifiedName(false);
 
         fetchStmt = "SELECT " + colNextVal.getIdentifier() + " FROM " + identifier.getFullyQualifiedName(false);
         if (dba.supportsOption(DatastoreAdapter.LOCK_ROW_USING_OPTION_AFTER_FROM))
@@ -120,9 +115,6 @@ public class SequenceTable extends TableImpl
             fetchStmt += " FOR UPDATE";
         }
 
-        fetchAllStmt = "SELECT " + colNextVal.getIdentifier() + "," + colSequenceName.getIdentifier() + 
-            " FROM " + identifier.getFullyQualifiedName(false) + " ORDER BY " + colSequenceName.getIdentifier();
-
         storeMgr.registerTableInitialized(this);
         state = TABLE_STATE_INITIALIZED;
     }
@@ -130,51 +122,11 @@ public class SequenceTable extends TableImpl
     /**
      * Accessor for a mapping for the ID (persistable) for this table.
      * @return The (persistable) ID mapping.
-     **/
+     */
+    @Override
     public JavaTypeMapping getIdMapping()
     {
         throw new NucleusException("Attempt to get ID mapping of Sequence table!").setFatal();
-    }
-
-    /**
-     * Accessor for the sequences
-     * @param conn Connection for this datastore.
-     * @return The HashSet of Sequence names
-     * @throws SQLException Thrown when an error occurs in the process.
-     **/
-    public HashSet getFetchAllSequences(ManagedConnection conn)
-    throws SQLException
-    {
-        HashSet sequenceNames = new HashSet();
-
-        PreparedStatement ps = null;
-        SQLController sqlControl = storeMgr.getSQLController();
-        try
-        {
-            ps = sqlControl.getStatementForQuery(conn, fetchAllStmt);
-
-            ResultSet rs = sqlControl.executeStatementQuery(null, conn, fetchAllStmt, ps);
-            try
-            {
-	            while (rs.next())
-	            {
-	                sequenceNames.add(rs.getString(2));
-	            }
-            }
-            finally
-            {
-                rs.close();
-            }
-        }
-        finally
-        {
-            if (ps != null)
-            {
-                sqlControl.closeStatement(conn, ps);
-            }
-        }
-
-        return sequenceNames;
     }
 
     /**
@@ -187,9 +139,8 @@ public class SequenceTable extends TableImpl
      * @param initialValue Initial value (if not using tableIdentifier/columnName to find the initial value)
      * @return The next value that should be used
      * @throws SQLException Thrown when an error occurs in the process.
-     **/
-    public Long getNextVal(String sequenceName, ManagedConnection conn, int incrementBy, 
-            DatastoreIdentifier tableIdentifier, String columnName, int initialValue)
+     */
+    public Long getNextVal(String sequenceName, ManagedConnection conn, int incrementBy, DatastoreIdentifier tableIdentifier, String columnName, int initialValue)
     throws SQLException
     {
         PreparedStatement ps = null;
@@ -288,7 +239,7 @@ public class SequenceTable extends TableImpl
      * Method to increment a sequence
      * @param conn Connection to the datastore
      * @throws SQLException Thrown when an error occurs incrementing the sequence. 
-     **/
+     */
     private void incrementSequence(String sequenceName, long incrementBy, ManagedConnection conn)
     throws SQLException
     {
@@ -318,7 +269,7 @@ public class SequenceTable extends TableImpl
      * Method to insert a row in the SequenceTable
      * @param conn Connection to the datastore
      * @throws SQLException Thrown when an error occurs inserting the sequence. 
-     **/
+     */
     private void addSequence(String sequenceName, Long nextVal, ManagedConnection conn)
     throws SQLException
     {
@@ -349,67 +300,11 @@ public class SequenceTable extends TableImpl
     }
 
     /**
-     * Method to delete a sequence.
-     * @param sequenceName Name of the sequence
-     * @param conn Connection to the datastore
-     * @throws SQLException Thrown when an error occurs deleting the schema. 
-     **/
-    public void deleteSequence(String sequenceName, ManagedConnection conn)
-    throws SQLException
-    {
-        PreparedStatement ps=null;
-        SQLController sqlControl = storeMgr.getSQLController();
-        try
-        {
-            ps = sqlControl.getStatementForUpdate(conn, deleteStmt, false);
-            ps.setString(1, sequenceName);
-
-            sqlControl.executeStatementUpdate(null, conn, deleteStmt, ps, true);
-
-            // TODO : handle any warning messages
-        }
-        finally
-        {
-            if (ps != null)
-            {
-                sqlControl.closeStatement(conn, ps);
-            }
-        }
-    }
-
-    /**
-     * Method to delete all sequences
-     *
-     * @param conn Connection to the datastore
-     * @throws SQLException Thrown when an error occurs deleting. 
-     **/
-    public void deleteAllSequences(ManagedConnection conn)
-    throws SQLException
-    {
-        PreparedStatement ps=null;
-        SQLController sqlControl = storeMgr.getSQLController();
-        try
-        {
-            ps = sqlControl.getStatementForUpdate(conn, deleteAllStmt, false);
-
-            sqlControl.executeStatementUpdate(null, conn, deleteAllStmt, ps, true);
-
-            // TODO : handle any warning messages
-        }
-        finally
-        {
-            if (ps != null)
-            {
-                sqlControl.closeStatement(conn, ps);
-            }
-        }
-    }
-
-    /**
-     * Accessor the for the mapping for a field store in this table
+     * Accessor the for the mapping for a field stored in this table
      * @param mmd MetaData for the field whose mapping we want
      * @return The mapping
      */
+    @Override
     public JavaTypeMapping getMemberMapping(AbstractMemberMetaData mmd)
     {
         return null;
