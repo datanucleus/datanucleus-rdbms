@@ -22,7 +22,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 
 import org.datanucleus.ClassLoaderResolver;
@@ -249,9 +248,9 @@ public abstract class EmbeddedMapping extends SingleFieldMapping
      * Method to add a mapping for the specified member to this mapping.
      * @param embCmd Class that the member belongs to
      * @param embMmd Member to be added
-     * @param embMmds The metadata defining mapping information for the members (if any)
+     * @param embmdMmds Metadata for embedded members in the "embedded" specification (if any)
      */
-    private void addMappingForMember(AbstractClassMetaData embCmd, AbstractMemberMetaData embMmd, List<AbstractMemberMetaData> embMmdsMapping)
+    private void addMappingForMember(AbstractClassMetaData embCmd, AbstractMemberMetaData embMmd, List<AbstractMemberMetaData> embmdMmds)
     {
         if (emd != null && emd.getOwnerMember() != null && emd.getOwnerMember().equals(embMmd.getName()))
         {
@@ -259,21 +258,18 @@ public abstract class EmbeddedMapping extends SingleFieldMapping
         }
         else
         {
+            // Find the (embedded) member metadata for this member
             AbstractMemberMetaData embeddedMmd = null;
-            for (AbstractMemberMetaData embMmdMapping : embMmdsMapping)
+            for (AbstractMemberMetaData embmdMmd : embmdMmds)
             {
-                // Why are these even possible ? Why are they here ? Why don't they use localised messages ?
-                if (embMmdMapping == null)
-                {
-                    throw new RuntimeException("embMmds[j] is null for class=" + embCmd.toString() + " type="+ typeName);
-                }
-                AbstractMemberMetaData embMmdForMmds = embCmd.getMetaDataForMember(embMmdMapping.getName());
+                AbstractMemberMetaData embMmdForMmds = embCmd.getMetaDataForMember(embmdMmd.getName());
                 if (embMmdForMmds != null)
                 {
                     if (embMmdForMmds.getAbsoluteFieldNumber() == embMmd.getAbsoluteFieldNumber())
                     {
                         // Same as the member we are processing, so use it
-                        embeddedMmd = embMmdMapping;
+                        embeddedMmd = embmdMmd;
+                        break;
                     }
                 }
             }
@@ -294,16 +290,19 @@ public abstract class EmbeddedMapping extends SingleFieldMapping
 
             if (embMmd.getRelationType(clr) != RelationType.NONE && embMmdMapping instanceof AbstractContainerMapping)
             {
-                // TODO Support 1-N (unidirectional) relationships and use owner object as the key in the join table
+                // TODO Support 1-N (unidirectional) relationships and use owner object as the key in the join table See #core-171
+                // Removing this block would be the first step, but then we need to update scostore classes to allow for this case, and update
+                // table of element to link back to the owner of this embedded PC
                 NucleusLogger.PERSISTENCE.warn("Embedded object at " + getMemberMetaData().getFullFieldName() + " has a member " + embMmd.getFullFieldName() + 
                     " that is a container. Not fully supported as part of an embedded object!");
             }
 
-            // Use field number from embMmd, since the embedded mapping info doesn't have reliable field number infos
+            // Use field number from embMmd, since the embedded mmd info doesn't have reliable field numbers
             embMmdMapping.setAbsFieldNumber(embMmd.getAbsoluteFieldNumber());
             this.addJavaTypeMapping(embMmdMapping);
 
-            for (int j=0; j<embMmdMapping.getNumberOfColumnMappings(); j++)
+            int numCols = embMmdMapping.getNumberOfColumnMappings();
+            for (int j=0; j<numCols; j++)
             {
                 // Register column with mapping
                 ColumnMapping colMapping = embMmdMapping.getColumnMapping(j);
@@ -364,11 +363,7 @@ public abstract class EmbeddedMapping extends SingleFieldMapping
      */
     public JavaTypeMapping getJavaTypeMapping(int i)
     {
-        if (javaTypeMappings == null)
-        {
-            return null;
-        }
-        return javaTypeMappings.get(i);
+        return (javaTypeMappings == null) ? null : javaTypeMappings.get(i);
     }
 
     /**
@@ -382,10 +377,8 @@ public abstract class EmbeddedMapping extends SingleFieldMapping
         {
             return null;
         }
-        Iterator iter = javaTypeMappings.iterator();
-        while (iter.hasNext())
+        for (JavaTypeMapping m : javaTypeMappings)
         {
-            JavaTypeMapping m = (JavaTypeMapping)iter.next();
             if (m.getMemberMetaData().getName().equals(fieldName))
             {
                 return m;
@@ -425,21 +418,18 @@ public abstract class EmbeddedMapping extends SingleFieldMapping
     {
         if (value == null)
         {
+            String nullColumn = (emd != null) ? emd.getNullIndicatorColumn() : null;
+            String nullValue = (emd != null) ? emd.getNullIndicatorValue() : null;
+
             int n = 0;
-            String nullColumn = null;
-            String nullValue = null;
-            if (emd != null)
-            {
-                nullColumn = emd.getNullIndicatorColumn();
-                nullValue = emd.getNullIndicatorValue();
-            }
             if (discrimMapping != null)
             {
                 discrimMapping.setObject(ec, ps, new int[]{param[n]}, null);
                 n++;
             }
 
-            for (int i=0; i<javaTypeMappings.size(); i++)
+            int numJavaMappings = javaTypeMappings.size();
+            for (int i=0; i<numJavaMappings; i++)
             {
                 JavaTypeMapping mapping = javaTypeMappings.get(i);
                 int[] posMapping = new int[mapping.getNumberOfColumnMappings()];
@@ -517,7 +507,8 @@ public abstract class EmbeddedMapping extends SingleFieldMapping
                 n++;
             }
 
-            for (int i=0; i<javaTypeMappings.size(); i++)
+            int numJavaMappings = javaTypeMappings.size();
+            for (int i=0; i<numJavaMappings; i++)
             {
                 JavaTypeMapping mapping = javaTypeMappings.get(i);
                 int[] posMapping = new int[mapping.getNumberOfColumnMappings()];
@@ -578,10 +569,9 @@ public abstract class EmbeddedMapping extends SingleFieldMapping
     {
         Object value = null;
 
-        int n = 0;
-
         // Determine the type of the embedded object
         AbstractClassMetaData embCmd = this.embCmd;
+        int n = 0;
         if (discrimMapping != null)
         {
             Object discrimValue = discrimMapping.getObject(ec, rs, new int[]{param[n]});
@@ -594,16 +584,12 @@ public abstract class EmbeddedMapping extends SingleFieldMapping
         DNStateManager embSM = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, embCmd, ownerSM, mmd.getAbsoluteFieldNumber(), objectType);
         value = embSM.getObject();
 
-        String nullColumn = null;
-        String nullValue = null;
-        if (emd != null)
-        {
-            nullColumn = emd.getNullIndicatorColumn();
-            nullValue = emd.getNullIndicatorValue();
-        }
+        String nullColumn = (emd != null) ? emd.getNullIndicatorColumn() : null;
+        String nullValue = (emd != null) ? emd.getNullIndicatorValue() : null;
 
         // Populate the field values
-        for (int i=0; i<javaTypeMappings.size(); i++)
+        int numJavaMappings = javaTypeMappings.size();
+        for (int i=0; i<numJavaMappings; i++)
         {
             JavaTypeMapping mapping = javaTypeMappings.get(i);
             int embAbsFieldNum = embCmd.getAbsolutePositionOfMember(mapping.getMemberMetaData().getName());
