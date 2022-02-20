@@ -624,17 +624,21 @@ public class FKListStore<E> extends AbstractListStore<E>
         if (indexedList)
         {
             // Get the indices of the elements to remove in reverse order (highest first)
-            int[] indices = getIndicesOf(ownerSM,elements);
+            int[] indices = getIndicesOf(ownerSM, elements);
             if (indices == null)
             {
                 return false;
             }
 
             // Remove each element in turn, doing the shifting of indexes each time
-            // TODO : Change this to remove all in one go and then shift once
-            for (int i=0;i<indices.length;i++)
+            // TODO : Change this to remove all in one go and then shift to remove gaps
+
+            // Get current size from datastore if not provided
+            int currentListSize = (size < 0) ? size(ownerSM) : size;
+            for (int i=0; i<indices.length; i++)
             {
-                internalRemoveAt(ownerSM, indices[i], -1);
+                internalRemoveAt(ownerSM, indices[i], currentListSize >= 0 ? currentListSize : -1);
+                currentListSize--;
                 modified = true;
             }
 

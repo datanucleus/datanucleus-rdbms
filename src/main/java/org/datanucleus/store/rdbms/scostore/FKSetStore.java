@@ -588,6 +588,7 @@ public class FKSetStore<E> extends AbstractSetStore<E>
      * @param ownerSM StateManager for the owner.
      * @param element The element of the collection to be deleted.
      * @param allowDependentField Whether to allow any cascade deletes caused by this removal
+     * @param size Not used
      * @return A success indicator.
      */
     @Override
@@ -695,6 +696,7 @@ public class FKSetStore<E> extends AbstractSetStore<E>
      * Depending on the column characteristics in the collection table, the id of the owner fields may be NULLed, or the records may be deleted completely.
      * @param ownerSM StateManager for the owner.
      * @param elements The elements of the collection to be deleted.
+     * @param size Not used
      * @return A success indicator.
      */
     @Override
@@ -708,7 +710,7 @@ public class FKSetStore<E> extends AbstractSetStore<E>
         boolean success = true;
         for (Object elem : elements)
         {
-            if (remove(ownerSM, elem, -1, true))
+            if (!remove(ownerSM, elem, size, true))
             {
                 success = false;
             }

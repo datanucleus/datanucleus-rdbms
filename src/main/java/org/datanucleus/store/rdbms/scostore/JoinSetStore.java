@@ -440,26 +440,8 @@ public class JoinSetStore<E> extends AbstractSetStore<E>
             return false;
         }
 
-        boolean modified = removeAllInternal(sm, elements, size);
-        boolean dependent = ownerMemberMetaData.getCollection().isDependentElement();
-        if (ownerMemberMetaData.isCascadeRemoveOrphans())
-        {
-            dependent = true;
-        }
-        if (dependent)
-        {
-            // "delete-dependent" : delete elements if the collection is marked as dependent
-            // TODO What if the collection contains elements that are not in the Set ? should not delete them
-            sm.getExecutionContext().deleteObjects(elements.toArray());
-        }
-
-        return modified;
-    }
-
-    protected boolean removeAllInternal(DNStateManager sm, Collection elements, int size)
-    {
+        // Remove specified elements from join table using single SQL
         boolean modified = false;
-
         String removeAllStmt = getRemoveAllStmt(sm, elements);
         try
         {
@@ -505,6 +487,15 @@ public class JoinSetStore<E> extends AbstractSetStore<E>
             NucleusLogger.DATASTORE.error("Exception on removeAll", e);
             throw new NucleusDataStoreException(Localiser.msg("056012", removeAllStmt), e);
         }
+
+        // Delete elements if cascade required
+        if (ownerMemberMetaData.getCollection().isDependentElement() || ownerMemberMetaData.isCascadeRemoveOrphans())
+        {
+            // "delete-dependent" : delete elements if the collection is marked as dependent
+            // TODO What if the collection contains elements that are not in the Set ? should not delete them
+            sm.getExecutionContext().deleteObjects(elements.toArray());
+        }
+
         return modified;
     }
 

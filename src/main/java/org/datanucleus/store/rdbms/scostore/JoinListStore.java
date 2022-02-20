@@ -537,13 +537,14 @@ public class JoinListStore<E> extends AbstractListStore<E>
     }
 
     /**
-     * Remove all elements from a collection from the association owner vs
-     * elements. Performs the removal in 3 steps. The first gets the indices
-     * that will be removed (and the highest index present). The second step
-     * removes these elements from the list. The third step updates the indices
-     * of the remaining indices to fill the holes created.
+     * Remove all elements from a collection from the association owner vs elements. 
+     * Performs the removal in 3 steps. 
+     * The first gets the indices that will be removed (and the highest index present). 
+     * The second step removes these elements from the list.
+     * The third step updates the indices of the remaining indices to fill the holes created.
      * @param sm StateManager
-     * @param elements Collection of elements to remove 
+     * @param elements Elements to remove 
+     * @param size Current size of the list (-1 if not known)
      * @return Whether the database was updated 
      */
     @Override
@@ -555,7 +556,7 @@ public class JoinListStore<E> extends AbstractListStore<E>
         }
 
         // Get the current size of the list (and hence maximum index size)
-        int currentListSize = size(sm);
+        int currentListSize = (size > 0) ? size : size(sm);
 
         // Get the indices of the elements we are going to remove (highest first)
         int[] indices = getIndicesOf(sm, elements);
@@ -564,17 +565,16 @@ public class JoinListStore<E> extends AbstractListStore<E>
             return false;
         }
 
+        // Remove specified elements from join table using single SQL
         boolean modified = false;
-        SQLController sqlControl = storeMgr.getSQLController();
         ExecutionContext ec = sm.getExecutionContext();
-
-        // Remove the specified elements from the join table
         String removeAllStmt = getRemoveAllStmt(elements);
         try
         {
             ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
             try
             {
+                SQLController sqlControl = storeMgr.getSQLController();
                 PreparedStatement ps = sqlControl.getStatementForUpdate(mconn, removeAllStmt, false);
                 try
                 {
@@ -614,6 +614,7 @@ public class JoinListStore<E> extends AbstractListStore<E>
         }
 
         // Shift the remaining indices to remove the holes in ordering
+        // TODO Make this process use fewer SQL
         try
         {
             boolean batched = storeMgr.allowsBatching();
