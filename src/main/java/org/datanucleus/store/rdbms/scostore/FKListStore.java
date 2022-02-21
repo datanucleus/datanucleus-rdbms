@@ -1235,15 +1235,15 @@ public class FKListStore<E> extends AbstractListStore<E>
             {
                 // TODO If ownerMapping is not for containerTable then use owner table for the UPDATE
                 StringBuilder stmt = new StringBuilder("UPDATE ");
-                if (elementInfo.length > 1)
-                {
-                    stmt.append("?");
-                }
-                else
-                {
+//                if (elementInfo.length > 1)
+//                {
+//                    stmt.append("?");
+//                }
+//                else
+//                {
                     // Could use elementInfo[0].getDatastoreClass but need to allow for relation in superclass table
                     stmt.append(containerTable.toString());
-                }
+//                }
                 stmt.append(" SET ");
                 for (int i = 0; i < ownerMapping.getNumberOfColumnMappings(); i++)
                 {
@@ -1453,15 +1453,15 @@ public class FKListStore<E> extends AbstractListStore<E>
             {
                 // TODO If ownerMapping is not for containerTable then use owner table for the UPDATE
                 StringBuilder stmt = new StringBuilder("UPDATE ");
-                if (elementInfo.length > 1)
-                {
-                    stmt.append("?");
-                }
-                else
-                {
+//                if (elementInfo.length > 1)
+//                {
+//                    stmt.append("?");
+//                }
+//                else
+//                {
                     // Could use elementInfo[0].getDatastoreClass but need to allow for relation in superclass table
                     stmt.append(containerTable.toString());
-                }
+//                }
                 stmt.append(" SET ");
                 for (int i = 0; i < ownerMapping.getNumberOfColumnMappings(); i++)
                 {
