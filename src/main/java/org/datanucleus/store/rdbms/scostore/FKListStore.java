@@ -631,16 +631,30 @@ public class FKListStore<E> extends AbstractListStore<E>
         return element;
     }
 
-    /**
-     * Remove all elements from a collection from the association owner vs elements.
-     * TODO : Change the query to do all in one go for efficiency. Currently removes an element and shuffles the indexes, then removes an element
-     * and shuffles the indexes, then removes an element and shuffles the indexes etc ... a bit inefficient !!!
-     * @param ownerSM StateManager for the owner
-     * @param elements Collection of elements to remove 
-     * @return Whether the database was updated 
-     */
     @Override
     public boolean removeAll(DNStateManager ownerSM, Collection elements, int size)
+    {
+        if (elements == null || elements.size() == 0)
+        {
+            return false;
+        }
+
+        if (indexedList)
+        {
+            // Get the indices of the elements to remove from the datastore
+            int[] indices = getIndicesOf(ownerSM, elements);
+            if (indices == null)
+            {
+                return false;
+            }
+            return removeAll(ownerSM, elements, size, indices);
+        }
+
+        return removeAll(ownerSM, elements, size, null);
+    }
+
+    @Override
+    public boolean removeAll(DNStateManager ownerSM, Collection elements, int size, int[] elementIndices)
     {
         if (elements == null || elements.size() == 0)
         {
@@ -650,8 +664,8 @@ public class FKListStore<E> extends AbstractListStore<E>
         boolean modified = false;
         if (indexedList)
         {
-            // Get the indices of the elements to remove in reverse order (highest first)
-            int[] indices = getIndicesOf(ownerSM, elements);
+            // Ensure we have all indices of the elements (highest first)
+            int[] indices = (elementIndices != null) ? elementIndices : getIndicesOf(ownerSM, elements);
             if (indices == null)
             {
                 return false;

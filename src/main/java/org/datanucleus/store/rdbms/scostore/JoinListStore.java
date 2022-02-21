@@ -564,19 +564,17 @@ public class JoinListStore<E> extends AbstractListStore<E>
         }
     }
 
-    /**
-     * Remove all elements from a collection from the association owner vs elements. 
-     * Performs the removal in 3 steps. 
-     * The first gets the indices that will be removed (and the highest index present). 
-     * The second step removes these elements from the list.
-     * The third step updates the indices of the remaining indices to fill the holes created.
-     * @param ownerSM StateManager for the list owner
-     * @param elements Elements to remove 
-     * @param size Current size of the list (-1 if not known)
-     * @return Whether the database was updated 
-     */
     @Override
     public boolean removeAll(DNStateManager ownerSM, Collection elements, int size)
+    {
+        // Get the indices of the elements we are going to remove (highest first)
+        int[] indices = getIndicesOf(ownerSM, elements);
+
+        return removeAll(ownerSM, elements, size, indices);
+    }
+
+    @Override
+    public boolean removeAll(DNStateManager ownerSM, Collection elements, int size, int[] elementIndices)
     {
         if (elements == null || elements.size() == 0)
         {
@@ -586,8 +584,8 @@ public class JoinListStore<E> extends AbstractListStore<E>
         // Get the current size of the list (and hence maximum index size)
         int currentListSize = (size > 0) ? size : size(ownerSM);
 
-        // Get the indices of the elements we are going to remove (highest first)
-        int[] indices = getIndicesOf(ownerSM, elements);
+        // Ensure we have all indices of the elements (highest first)
+        int[] indices = (elementIndices != null) ? elementIndices : getIndicesOf(ownerSM, elements);
         if (indices == null)
         {
             return false;
