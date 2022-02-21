@@ -604,6 +604,33 @@ public class FKListStore<E> extends AbstractListStore<E>
         return true;
     }
 
+    @Override
+    public E remove(DNStateManager ownerSM, int index, int size)
+    {
+        E element = get(ownerSM, index);
+        if (indexedList)
+        {
+            // Remove the element at this position
+            internalRemoveAt(ownerSM, index, size);
+        }
+        else
+        {
+            // Ordered list doesn't allow indexed removal so just remove the element
+            internalRemove(ownerSM, element, size);
+        }
+
+        // Dependent element
+        CollectionMetaData collmd = ownerMemberMetaData.getCollection();
+        boolean dependent = (collmd.isDependentElement() || ownerMemberMetaData.isCascadeRemoveOrphans());
+        if (dependent && !collmd.isEmbeddedElement())
+        {
+            // Delete the element if it is dependent and doesn't have a duplicate entry in the list
+            ownerSM.getExecutionContext().deleteObjectInternal(element);
+        }
+
+        return element;
+    }
+
     /**
      * Remove all elements from a collection from the association owner vs elements.
      * TODO : Change the query to do all in one go for efficiency. Currently removes an element and shuffles the indexes, then removes an element
@@ -720,44 +747,8 @@ public class FKListStore<E> extends AbstractListStore<E>
     }
 
     /**
-     * Convenience method to manage the removal of an element from the collection, performing
-     * any necessary "managed relationship" updates when the field is bidirectional.
-     * @param ownerSM StateManager for the collection owner
-     * @param element The element
-     */
-    protected void manageRemovalOfElement(DNStateManager ownerSM, Object element)
-    {
-        // TODO Complete this
-        /*ExecutionContext om = ownerSM.getExecutionContext();
-        if (relationType == Relation.ONE_TO_MANY_BI && om.getManageRelations())
-        {
-            // Managed Relations : 1-N bidirectional so null the owner on the elements
-            if (!om.getApiAdapter().isDeleted(element))
-            {
-                DNStateManager elementSM = om.findStateManager(element);
-                if (elementSM != null)
-                {
-                    // Null the owner of the element
-                    if (NucleusLogger.PERSISTENCE.isDebugEnabled())
-                    {
-                        NucleusLogger.PERSISTENCE.debug(
-                            Localiser.msg("055010", ownerSM.toPrintableID(), ownerMemberMetaData.getFullFieldName(), StringUtils.toJVMIDString(element)));
-                    }
-
-                    elementSM.replaceField(getFieldNumberInElementForBidirectional(elementSM), null, true);
-                    if (om.isFlushing())
-                    {
-                        // Make sure this change gets flushed
-                        elementSM.flush();
-                    }
-                }
-            }
-        }*/
-    }
-
-    /**
      * Internal method to remove an object at a location in the List.
-     * Differs from the JoinTable List in that it nulls out the owner FK.
+     * Differs from the JoinTable List in that it typically nulls out the owner FK (unless not nullable).
      * @param ownerSM StateManager for the owner
      * @param index The location
      * @param size Current size of list (if known). -1 if not known
@@ -769,27 +760,17 @@ public class FKListStore<E> extends AbstractListStore<E>
             throw new NucleusUserException("Cannot remove an element from a particular position with an ordered list since no indexes exist");
         }
 
-        boolean nullify = false;
-        if (ownerMapping.isNullable() && orderMapping != null && orderMapping.isNullable())
+        String stmt;
+        if (ownerMapping.isNullable())
         {
             NucleusLogger.DATASTORE.debug(Localiser.msg("056043"));
-            nullify = true;
-        }
-        else
-        {
-            NucleusLogger.DATASTORE.debug(Localiser.msg("056042"));
-        }
-
-        String stmt;
-        if (nullify)
-        {
-            // TODO When using this statement we need to plug in the element table name, and do it for
-            // all possible element tables
+            // TODO When using this statement we need to plug in the element table name, and do it for all possible element tables
             stmt = getRemoveAtNullifyStmt();
         }
         else
         {
-            // TODO Really ought to make this delete via ExecutionContext
+            NucleusLogger.DATASTORE.debug(Localiser.msg("056042"));
+            // TODO Really ought to make this delete via ExecutionContext (sm.getExecutionContext().deleteObjectInternal(element)) but we need the element object
             stmt = getRemoveAtStmt();
         }
 
@@ -807,12 +788,7 @@ public class FKListStore<E> extends AbstractListStore<E>
     public void clear(DNStateManager ownerSM)
     {
         boolean deleteElements = false;
-        ExecutionContext ec = ownerSM.getExecutionContext();
-        boolean dependent = ownerMemberMetaData.getCollection().isDependentElement();
-        if (ownerMemberMetaData.isCascadeRemoveOrphans())
-        {
-            dependent = true;
-        }
+        boolean dependent = (ownerMemberMetaData.getCollection().isDependentElement() || ownerMemberMetaData.isCascadeRemoveOrphans());
         if (dependent)
         {
             // Elements are dependent and can't exist on their own, so delete them all
@@ -841,6 +817,7 @@ public class FKListStore<E> extends AbstractListStore<E>
             }
         }
 
+        ExecutionContext ec = ownerSM.getExecutionContext();
         if (deleteElements)
         {
             // Find elements present in the datastore and delete them one-by-one
@@ -910,14 +887,14 @@ public class FKListStore<E> extends AbstractListStore<E>
     /**
      * Method to validate that an element is valid for writing to the datastore.
      * TODO Minimise differences to super.validateElementForWriting()
-     * @param sm StateManager for the List
+     * @param ownerSM StateManager for the List owner
      * @param element The element to validate
      * @param index The position that the element is being stored at in the list
      * @return Whether the element was inserted
      */
-    protected boolean validateElementForWriting(final DNStateManager sm, final Object element, final int index)
+    protected boolean validateElementForWriting(final DNStateManager ownerSM, final Object element, final int index)
     {
-        final Object newOwner = sm.getObject();
+        final Object newOwner = ownerSM.getObject();
 
         ComponentInfo info = getComponentInfoForElement(element);
 
@@ -929,7 +906,7 @@ public class FKListStore<E> extends AbstractListStore<E>
             info.getDatastoreClass().getExternalMapping(ownerMemberMetaData, MappingType.EXTERNAL_INDEX) : this.orderMapping;
 
         // Check if element is ok for use in the datastore, specifying any external mappings that may be required
-        boolean inserted = super.validateElementForWriting(sm.getExecutionContext(), element, new FieldValues()
+        boolean inserted = super.validateElementForWriting(ownerSM.getExecutionContext(), element, new FieldValues()
         {
             public void fetchFields(DNStateManager elemOP)
             {
@@ -940,7 +917,7 @@ public class FKListStore<E> extends AbstractListStore<E>
                     if (externalFKMapping != null)
                     {
                         // The element has an external FK mapping so set the value it needs to use in the INSERT
-                        elemOP.setAssociatedValue(externalFKMapping, sm.getObject());
+                        elemOP.setAssociatedValue(externalFKMapping, ownerSM.getObject());
                     }
                     if (relationDiscriminatorMapping != null)
                     {
@@ -992,7 +969,7 @@ public class FKListStore<E> extends AbstractListStore<E>
                             otherMmd = otherCmd.getMetaDataForMember(thisMappedBy);
 
                             Object holderValueAtField = ownerHolderSM.provideField(otherMmd.getAbsoluteFieldNumber());
-                            ownerHolderSM = sm.getExecutionContext().findStateManagerForEmbedded(holderValueAtField, 
+                            ownerHolderSM = ownerSM.getExecutionContext().findStateManagerForEmbedded(holderValueAtField, 
                                 ownerHolderSM, otherMmd, PersistableObjectType.EMBEDDED_COLLECTION_ELEMENT_PC);
 
                             remainingMappedBy = remainingMappedBy.substring(dotPosition+1);
@@ -1013,15 +990,15 @@ public class FKListStore<E> extends AbstractListStore<E>
                     if (currentOwner == null)
                     {
                         // No owner, so correct it
-                        NucleusLogger.PERSISTENCE.info(Localiser.msg("056037", sm.getObjectAsPrintable(), ownerMemberMetaData.getFullFieldName(), 
+                        NucleusLogger.PERSISTENCE.info(Localiser.msg("056037", ownerSM.getObjectAsPrintable(), ownerMemberMetaData.getFullFieldName(), 
                             StringUtils.toJVMIDString(ownerHolderSM.getObject())));
                         ownerHolderSM.replaceFieldMakeDirty(ownerFieldNumberInHolder, newOwner);
                     }
-                    else if (currentOwner != newOwner && sm.getReferencedPC() == null)
+                    else if (currentOwner != newOwner && ownerSM.getReferencedPC() == null)
                     {
                         // Owner of the element is neither this container nor is it being attached
                         // Inconsistent owner, so throw exception
-                        throw new NucleusUserException(Localiser.msg("056038", sm.getObjectAsPrintable(), ownerMemberMetaData.getFullFieldName(), 
+                        throw new NucleusUserException(Localiser.msg("056038", ownerSM.getObjectAsPrintable(), ownerMemberMetaData.getFullFieldName(), 
                             StringUtils.toJVMIDString(ownerHolderSM.getObject()), StringUtils.toJVMIDString(currentOwner)));
                     }
                 }
@@ -1045,6 +1022,7 @@ public class FKListStore<E> extends AbstractListStore<E>
      * @param endIdx The end index in the list (only for indexed lists)
      * @return The List Iterator
      */
+    @Override
     protected ListIterator<E> listIterator(DNStateManager ownerSM, int startIdx, int endIdx)
     {
         ExecutionContext ec = ownerSM.getExecutionContext();

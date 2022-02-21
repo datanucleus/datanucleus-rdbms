@@ -205,48 +205,6 @@ public abstract class AbstractListStore<E> extends AbstractCollectionStore<E> im
     }
 
     /**
-     * Method to remove an object at an index in the List.
-     * If the list is ordered, will remove the element completely since no index positions exist.
-     * @param sm StateManager
-     * @param index The location
-     * @param size Current size of the list (if known). -1 if not known
-     * @return The object that was removed
-     */
-    @Override
-    public E remove(DNStateManager sm, int index, int size)
-    {
-        E element = get(sm, index);
-        if (indexedList)
-        {
-            // Remove the element at this position
-            internalRemoveAt(sm, index, size);
-        }
-        else
-        {
-            // Ordered list doesn't allow indexed removal so just remove the element
-            internalRemove(sm, element, size);
-        }
-
-        // Dependent element
-        CollectionMetaData collmd = ownerMemberMetaData.getCollection();
-        boolean dependent = collmd.isDependentElement();
-        if (ownerMemberMetaData.isCascadeRemoveOrphans())
-        {
-            dependent = true;
-        }
-        if (dependent && !collmd.isEmbeddedElement())
-        {
-            if (!contains(sm, element))
-            {
-                // Delete the element if it is dependent and doesn't have a duplicate entry in the list
-                sm.getExecutionContext().deleteObjectInternal(element);
-            }
-        }
-
-        return element;
-    }
-
-    /**
      * Internal method to remove the specified element from the List.
      * @param sm StateManager of the owner
      * @param element The element
@@ -254,14 +212,6 @@ public abstract class AbstractListStore<E> extends AbstractCollectionStore<E> im
      * @return Whether the List was modified
      */
     protected abstract boolean internalRemove(DNStateManager sm, Object element, int size);
-
-    /**
-     * Internal method to remove an object at a location from the List.
-     * @param sm StateManager
-     * @param index The index of the element to remove
-     * @param size Current list size (if known). -1 if not known
-     */
-    protected abstract void internalRemoveAt(DNStateManager sm, int index, int size);
 
     @Override
     public java.util.List<E> subList(DNStateManager sm, int startIdx, int endIdx)
@@ -272,8 +222,10 @@ public abstract class AbstractListStore<E> extends AbstractCollectionStore<E> im
         {
             list.add(iter.next());
         }
+
         if (!indexedList)
         {
+            // Ordered list
             if (list.size() > (endIdx-startIdx))
             {
                 // Iterator hasn't restricted what is returned so do the index range restriction here
@@ -435,17 +387,17 @@ public abstract class AbstractListStore<E> extends AbstractCollectionStore<E> im
 
     /**
      * Internal method to remove an object at a location in the List.
-     * @param sm StateManager
+     * @param ownerSM StateManager for the list owner
      * @param index The location
      * @param stmt The statement to remove the element from the List
      * @param size Current list size (if known). -1 if not known
      */
-    protected void internalRemoveAt(DNStateManager sm, int index, String stmt, int size)
+    protected void internalRemoveAt(DNStateManager ownerSM, int index, String stmt, int size)
     {
         // Get current size from datastore if not provided
-        int currentListSize = (size < 0) ? size(sm) : size;
+        int currentListSize = (size < 0) ? size(ownerSM) : size;
 
-        ExecutionContext ec = sm.getExecutionContext();
+        ExecutionContext ec = ownerSM.getExecutionContext();
         try
         {
             ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
@@ -456,7 +408,7 @@ public abstract class AbstractListStore<E> extends AbstractCollectionStore<E> im
                 try
                 {
                     int jdbcPosition = 1;
-                    jdbcPosition = BackingStoreHelper.populateOwnerInStatement(sm, ec, ps, jdbcPosition, this);
+                    jdbcPosition = BackingStoreHelper.populateOwnerInStatement(ownerSM, ec, ps, jdbcPosition, this);
                     jdbcPosition = BackingStoreHelper.populateOrderInStatement(ec, ps, index, jdbcPosition, orderMapping);
                     if (relationDiscriminatorMapping != null)
                     {
@@ -477,7 +429,7 @@ public abstract class AbstractListStore<E> extends AbstractCollectionStore<E> im
                 if (index != currentListSize - 1)
                 {
                     // shift all elements above this down by 1 in single statement
-                    internalShiftBulk(sm, mconn, true, index, -1, true);
+                    internalShiftBulk(ownerSM, mconn, true, index, -1, true);
                 }
             }
             finally
@@ -497,7 +449,7 @@ public abstract class AbstractListStore<E> extends AbstractCollectionStore<E> im
 
     /**
      * Method to process a "shift" statement for all rows from the start point, updating the index in the list for the specified owner.
-     * @param sm StateManager of the owner
+     * @param ownerSM StateManager for the list owner
      * @param conn The connection
      * @param batched Whether the statement is batched
      * @param start The start index for the shift
@@ -506,10 +458,10 @@ public abstract class AbstractListStore<E> extends AbstractCollectionStore<E> im
      * @return Return code(s) from any executed statements
      * @throws MappedDatastoreException Thrown if an error occurs
      */
-    protected int[] internalShiftBulk(DNStateManager sm, ManagedConnection conn, boolean batched, int start, int amount, boolean executeNow)
+    protected int[] internalShiftBulk(DNStateManager ownerSM, ManagedConnection conn, boolean batched, int start, int amount, boolean executeNow)
     throws MappedDatastoreException
     {
-        ExecutionContext ec = sm.getExecutionContext();
+        ExecutionContext ec = ownerSM.getExecutionContext();
         SQLController sqlControl = storeMgr.getSQLController();
         String shiftBulkStmt = getShiftBulkStmt();
         try
@@ -519,7 +471,7 @@ public abstract class AbstractListStore<E> extends AbstractCollectionStore<E> im
             {
                 int jdbcPosition = 1;
                 jdbcPosition = BackingStoreHelper.populateOrderInStatement(ec, ps, amount, jdbcPosition, orderMapping);
-                jdbcPosition = BackingStoreHelper.populateOwnerInStatement(sm, ec, ps, jdbcPosition, this);
+                jdbcPosition = BackingStoreHelper.populateOwnerInStatement(ownerSM, ec, ps, jdbcPosition, this);
                 jdbcPosition = BackingStoreHelper.populateOrderInStatement(ec, ps, start, jdbcPosition, orderMapping);
                 if (relationDiscriminatorMapping != null)
                 {
@@ -542,7 +494,7 @@ public abstract class AbstractListStore<E> extends AbstractCollectionStore<E> im
 
     /**
      * Method to process a "shift" statement, updating the index in the list of the specified index.
-     * @param sm StateManager
+     * @param ownerSM StateManager for the list owner
      * @param conn The connection
      * @param batched Whether the statement is batched
      * @param oldIndex The old index
@@ -551,10 +503,10 @@ public abstract class AbstractListStore<E> extends AbstractCollectionStore<E> im
      * @return Return code(s) from any executed statements
      * @throws MappedDatastoreException Thrown if an error occurs
      */
-    protected int[] internalShift(DNStateManager sm, ManagedConnection conn, boolean batched, int oldIndex, int amount, boolean executeNow) 
+    protected int[] internalShift(DNStateManager ownerSM, ManagedConnection conn, boolean batched, int oldIndex, int amount, boolean executeNow) 
     throws MappedDatastoreException
     {
-        ExecutionContext ec = sm.getExecutionContext();
+        ExecutionContext ec = ownerSM.getExecutionContext();
         SQLController sqlControl = storeMgr.getSQLController();
         String shiftStmt = getShiftStmt();
         try
@@ -564,7 +516,7 @@ public abstract class AbstractListStore<E> extends AbstractCollectionStore<E> im
             {
                 int jdbcPosition = 1;
                 jdbcPosition = BackingStoreHelper.populateOrderInStatement(ec, ps, amount, jdbcPosition, orderMapping);
-                jdbcPosition = BackingStoreHelper.populateOwnerInStatement(sm, ec, ps, jdbcPosition, this);
+                jdbcPosition = BackingStoreHelper.populateOwnerInStatement(ownerSM, ec, ps, jdbcPosition, this);
                 jdbcPosition = BackingStoreHelper.populateOrderInStatement(ec, ps, oldIndex, jdbcPosition, orderMapping);
                 if (relationDiscriminatorMapping != null)
                 {

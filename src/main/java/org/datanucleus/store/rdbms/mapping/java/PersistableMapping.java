@@ -968,19 +968,26 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
             dependent = true;
         }
 
-        // Special case of FK this side and unidirectional (and not dependent)
-        if (!dependent && relationType == RelationType.ONE_TO_ONE_UNI)
+        if (!dependent)
         {
-            return;
+            if (relationType == RelationType.ONE_TO_ONE_UNI)
+            {
+                // Special case of FK this side and unidirectional, just return
+                return;
+            }
+            // TODO If we have the FK and not dependent then should avoid the load on the related object
         }
-        // TODO If we have the FK and not dependent then should avoid the load on the related object
 
         if (!sm.isFieldLoaded(fieldNumber))
         {
             // Load the field if we need its value
             try
             {
-                sm.loadField(fieldNumber);
+                // First try from stored FK value, otherwise load from database
+                if (!sm.loadStoredField(fieldNumber))
+                {
+                    sm.loadField(fieldNumber);
+                }
             }
             catch (NucleusObjectNotFoundException onfe)
             {
@@ -988,6 +995,7 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
                 return;
             }
         }
+
         Object pc = sm.provideField(fieldNumber);
         pc = mmd.isSingleCollection() ? SCOUtils.singleCollectionValue(getStoreManager().getNucleusContext().getTypeManager(), pc) : pc;
         if (pc == null)
@@ -1184,9 +1192,12 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
                                     {
                                         otherSM.getExecutionContext().getRelationshipManager(otherSM).relationRemove(relatedMmds[0].getAbsoluteFieldNumber(), sm.getObject());
                                     }
-                                    // TODO Localise this message
-                                    NucleusLogger.PERSISTENCE.debug("ManagedRelationships : delete of object causes removal from collection at " + relatedMmds[0].getFullFieldName());
-                                    otherColl.remove(sm.getObject());
+                                    if (otherColl.contains(sm.getObject()))
+                                    {
+                                        // TODO Localise this message
+                                        NucleusLogger.PERSISTENCE.debug("ManagedRelationships : delete of object causes removal from collection at " + relatedMmds[0].getFullFieldName());
+                                        otherColl.remove(sm.getObject());
+                                    }
                                 }
                             }
                         }
@@ -1219,7 +1230,7 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
                             // Make sure the other object has the collection loaded so does this change
                             otherSM.isLoaded(relatedMmds[0].getAbsoluteFieldNumber());
                             Collection otherColl = (Collection)otherSM.provideField(relatedMmds[0].getAbsoluteFieldNumber());
-                            if (otherColl != null)
+                            if (otherColl != null && otherColl.contains(sm.getObject()))
                             {
                                 // TODO Localise this
                                 NucleusLogger.PERSISTENCE.debug("ManagedRelationships : delete of object causes removal from collection at " + relatedMmds[0].getFullFieldName());
