@@ -184,6 +184,20 @@ public class ResultSetGetter extends AbstractFieldManager
 
         if (sm != null)
         {
+            if (relationType == RelationType.ONE_TO_ONE_BI && value != null)
+            {
+                // Store the value at the other side of the 1-1 BI for use later if required
+                DNStateManager otherSM = ec.findStateManager(value);
+                if (otherSM != null)
+                {
+                    AbstractMemberMetaData[] relMmds = mmd.getRelatedMemberMetaData(ec.getClassLoaderResolver());
+                    if (!otherSM.isFieldLoaded(relMmds[0].getAbsoluteFieldNumber()) &&
+                        relMmds[0].getType().isAssignableFrom(sm.getObject().getClass()))
+                    {
+                        otherSM.storeFieldValue(relMmds[0].getAbsoluteFieldNumber(), sm.getExternalObjectId());
+                    }
+                }
+            }
             if (cmd.getSCOMutableMemberFlags()[fieldNumber])
             {
                 // Wrap any SCO mutable fields
