@@ -584,7 +584,7 @@ public final class PersistentClassROF<T> extends AbstractROF<T>
                             else
                             {
                                 // Store the "id" value in case the member is ever accessed
-                                sm.setAssociatedValue(DNStateManager.MEMBER_VALUE_STORED_PREFIX + membersToStore[i], memberId);
+                                sm.storeFieldValue(membersToStore[i], memberId);
                             }
                         }
                     }

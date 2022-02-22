@@ -523,7 +523,7 @@ public class FetchRequest extends Request
                                         else
                                         {
                                             // Store the "id" value in case the member is ever accessed
-                                            sm.setAssociatedValue(DNStateManager.MEMBER_VALUE_STORED_PREFIX + memberNumbersToStoreFK[i], memberId);
+                                            sm.storeFieldValue(memberNumbersToStoreFK[i], memberId);
                                         }
                                     }
                                 }
