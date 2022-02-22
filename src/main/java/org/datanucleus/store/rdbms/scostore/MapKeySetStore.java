@@ -31,7 +31,6 @@ import org.datanucleus.metadata.DiscriminatorStrategy;
 import org.datanucleus.metadata.MapMetaData.MapType;
 import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.connection.ManagedConnection;
-import org.datanucleus.store.rdbms.exceptions.MappedDatastoreException;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.SQLController;
 import org.datanucleus.store.rdbms.query.PersistentClassROF;
@@ -231,10 +230,6 @@ class MapKeySetStore<K> extends AbstractSetStore<K>
             }
         }
         catch (SQLException e)
-        {
-            throw new NucleusDataStoreException(Localiser.msg("056006", stmt),e);
-        }
-        catch (MappedDatastoreException e)
         {
             throw new NucleusDataStoreException(Localiser.msg("056006", stmt),e);
         }

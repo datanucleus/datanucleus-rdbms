@@ -41,7 +41,6 @@ import org.datanucleus.metadata.MetaDataUtils;
 import org.datanucleus.metadata.RelationType;
 import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.connection.ManagedConnection;
-import org.datanucleus.store.rdbms.exceptions.MappedDatastoreException;
 import org.datanucleus.store.rdbms.mapping.java.ReferenceMapping;
 import org.datanucleus.store.rdbms.JDBCUtils;
 import org.datanucleus.store.rdbms.RDBMSPropertyNames;
@@ -276,29 +275,20 @@ public class JoinSetStore<E> extends AbstractSetStore<E>
 
         if (toBeInserted)
         {
+            ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
             try
             {
-                ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
-                try
+                // Add a row to the join table
+                int orderID = orderMapping != null ? getNextIDForOrderColumn(sm) : -1;
+                int[] returnCode = doInternalAdd(sm, element, mconn, false, orderID, true);
+                if (returnCode[0] > 0)
                 {
-                    // Add a row to the join table
-                    int orderID = orderMapping != null ? getNextIDForOrderColumn(sm) : -1;
-                    int[] returnCode = doInternalAdd(sm, element, mconn, false, orderID, true);
-                    if (returnCode[0] > 0)
-                    {
-                        modified = true;
-                    }
-                }
-                finally
-                {
-                    mconn.release();
+                    modified = true;
                 }
             }
-            catch (MappedDatastoreException e)
+            finally
             {
-                String msg = Localiser.msg("056009", e.getMessage());
-                NucleusLogger.DATASTORE.error(msg, e);
-                throw new NucleusDataStoreException(msg, e);
+                mconn.release();
             }
         }
 
@@ -352,73 +342,57 @@ public class JoinSetStore<E> extends AbstractSetStore<E>
         }
 
         boolean modified = false;
+        ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
         try
         {
-            ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
+            SQLController sqlControl = storeMgr.getSQLController();
             try
             {
-                SQLController sqlControl = storeMgr.getSQLController();
-                try
-                {
-                    // Process all waiting batched statements before we start our work
-                    sqlControl.processStatementsForConnection(mconn);
-                }
-                catch (SQLException e)
-                {
-                    throw new MappedDatastoreException("SQLException", e);
-                }
-
-                int nextOrderID = orderMapping != null ? getNextIDForOrderColumn(sm) : 0;
-
-                // Loop through all elements to be added
-                iter = elements.iterator();
-                E element = null;
-                while (iter.hasNext())
-                {
-                    element = iter.next();
-
-                    try
-                    {
-                        // Add the row to the join table
-                        boolean toBeInserted = true;
-                        if (relationType == RelationType.MANY_TO_MANY_BI)
-                        {
-                            toBeInserted = !elementAlreadyContainsOwnerInMtoN(sm, element);
-                        }
-
-                        if (toBeInserted)
-                        {
-                            int[] rc = doInternalAdd(sm, element, mconn, batched, nextOrderID, !batched || (batched && !iter.hasNext()));
-                            if (rc != null)
-                            {
-                                for (int i = 0; i < rc.length; i++)
-                                {
-                                    if (rc[i] > 0)
-                                    {
-                                        // At least one record was inserted
-                                        modified = true;
-                                    }
-                                }
-                            }
-                            nextOrderID++;
-                        }
-                    }
-                    catch (MappedDatastoreException mde)
-                    {
-                        exceptions.add(mde);
-                        NucleusLogger.DATASTORE.error("Exception thrown", mde);
-                    }
-                }
+                // Process all waiting batched statements before we start our work
+                sqlControl.processStatementsForConnection(mconn);
             }
-            finally
+            catch (SQLException e)
             {
-                mconn.release();
+                throw new NucleusDataStoreException("SQLException", e);
+            }
+
+            int nextOrderID = orderMapping != null ? getNextIDForOrderColumn(sm) : 0;
+
+            // Loop through all elements to be added
+            iter = elements.iterator();
+            E element = null;
+            while (iter.hasNext())
+            {
+                element = iter.next();
+
+                // Add the row to the join table
+                boolean toBeInserted = true;
+                if (relationType == RelationType.MANY_TO_MANY_BI)
+                {
+                    toBeInserted = !elementAlreadyContainsOwnerInMtoN(sm, element);
+                }
+
+                if (toBeInserted)
+                {
+                    int[] rc = doInternalAdd(sm, element, mconn, batched, nextOrderID, !batched || (batched && !iter.hasNext()));
+                    if (rc != null)
+                    {
+                        for (int i = 0; i < rc.length; i++)
+                        {
+                            if (rc[i] > 0)
+                            {
+                                // At least one record was inserted
+                                modified = true;
+                            }
+                        }
+                    }
+                    nextOrderID++;
+                }
             }
         }
-        catch (MappedDatastoreException e)
+        finally
         {
-            exceptions.add(e);
-            NucleusLogger.DATASTORE.error("Exception thrown", e);
+            mconn.release();
         }
 
         if (!exceptions.isEmpty())
@@ -617,7 +591,6 @@ public class JoinSetStore<E> extends AbstractSetStore<E>
     }
 
     protected int[] doInternalAdd(DNStateManager sm, E element, ManagedConnection conn, boolean batched, int orderId, boolean executeNow)
-    throws MappedDatastoreException
     {
         // Check for dynamic schema updates prior to addition
         if (storeMgr.getBooleanObjectProperty(RDBMSPropertyNames.PROPERTY_RDBMS_DYNAMIC_SCHEMA_UPDATES).booleanValue())
@@ -676,7 +649,7 @@ public class JoinSetStore<E> extends AbstractSetStore<E>
         }
         catch (SQLException e)
         {
-            throw new MappedDatastoreException(addStmt, e);
+            throw new NucleusDataStoreException(Localiser.msg("056009", addStmt), e);
         }
     }
 
@@ -895,7 +868,7 @@ public class JoinSetStore<E> extends AbstractSetStore<E>
                 mconn.release();
             }
         }
-        catch (SQLException | MappedDatastoreException e)
+        catch (SQLException e)
         {
             throw new NucleusDataStoreException(Localiser.msg("056006", stmt),e);
         }

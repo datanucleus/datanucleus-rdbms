@@ -35,7 +35,6 @@ import org.datanucleus.metadata.FieldRole;
 import org.datanucleus.metadata.MetaDataUtils;
 import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.connection.ManagedConnection;
-import org.datanucleus.store.rdbms.exceptions.MappedDatastoreException;
 import org.datanucleus.store.rdbms.mapping.java.ReferenceMapping;
 import org.datanucleus.store.rdbms.SQLController;
 import org.datanucleus.store.rdbms.query.PersistentClassROF;
@@ -231,7 +230,7 @@ public class JoinArrayStore<E> extends AbstractArrayStore<E>
                 mconn.release();
             }
         }
-        catch (SQLException | MappedDatastoreException e)
+        catch (SQLException e)
         {
             throw new NucleusDataStoreException(Localiser.msg("056006", stmt),e);
         }

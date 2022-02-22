@@ -33,7 +33,6 @@ import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.connection.ManagedConnection;
-import org.datanucleus.store.rdbms.exceptions.MappedDatastoreException;
 import org.datanucleus.store.rdbms.mapping.java.EmbeddedKeyPCMapping;
 import org.datanucleus.store.rdbms.mapping.java.EmbeddedValuePCMapping;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
@@ -55,6 +54,7 @@ import org.datanucleus.store.rdbms.table.MapTable;
 import org.datanucleus.store.rdbms.table.Table;
 import org.datanucleus.store.types.scostore.MapStore;
 import org.datanucleus.store.types.scostore.SetStore;
+import org.datanucleus.util.Localiser;
 
 /**
  * RDBMS-specific implementation of a SetStore for map entries.
@@ -418,7 +418,7 @@ class MapEntrySetStore<K, V> extends BaseContainerStore implements SetStore<Map.
                     {
                         return new SetIterator(ownerSM, this, ownerMemberMetaData, rs, iteratorKeyResultCols, iteratorValueResultCols)
                         {
-                            protected boolean next(Object rs) throws MappedDatastoreException
+                            protected boolean next(Object rs)
                             {
                                 try
                                 {
@@ -426,7 +426,7 @@ class MapEntrySetStore<K, V> extends BaseContainerStore implements SetStore<Map.
                                 }
                                 catch (SQLException e)
                                 {
-                                    throw new MappedDatastoreException("SQLException", e);
+                                    throw new NucleusDataStoreException("SQLException", e);
                                 }
                             }
                         };
@@ -446,9 +446,9 @@ class MapEntrySetStore<K, V> extends BaseContainerStore implements SetStore<Map.
                 mconn.release();
             }
         }
-        catch (SQLException | MappedDatastoreException e)
+        catch (SQLException e)
         {
-            throw new NucleusDataStoreException("Iteration request failed: " + stmtSql, e);
+            throw new NucleusDataStoreException(Localiser.msg("056012", stmtSql), e);
         }
     }
 
@@ -616,10 +616,8 @@ class MapEntrySetStore<K, V> extends BaseContainerStore implements SetStore<Map.
          * @param rs the ResultSet
          * @param keyResultCols Column(s) for the key id
          * @param valueResultCols Column(s) for the value id
-         * @throws MappedDatastoreException Thrown if an error occurs extracting the results
          */
-        protected SetIterator(DNStateManager sm, MapEntrySetStore setStore, AbstractMemberMetaData ownerMmd,
-                ResultSet rs, int[] keyResultCols, int[] valueResultCols) throws MappedDatastoreException
+        protected SetIterator(DNStateManager sm, MapEntrySetStore setStore, AbstractMemberMetaData ownerMmd, ResultSet rs, int[] keyResultCols, int[] valueResultCols)
         {
             this.sm = sm;
             this.setStore = setStore;
@@ -687,7 +685,7 @@ class MapEntrySetStore<K, V> extends BaseContainerStore implements SetStore<Map.
             lastElement = null;
         }
 
-        protected abstract boolean next(Object rs) throws MappedDatastoreException;
+        protected abstract boolean next(Object rs);
     }
 
     /**

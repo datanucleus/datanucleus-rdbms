@@ -35,7 +35,6 @@ import org.datanucleus.metadata.ArrayMetaData;
 import org.datanucleus.metadata.DiscriminatorStrategy;
 import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.connection.ManagedConnection;
-import org.datanucleus.store.rdbms.exceptions.MappedDatastoreException;
 import org.datanucleus.store.rdbms.mapping.MappingHelper;
 import org.datanucleus.store.rdbms.mapping.MappingType;
 import org.datanucleus.store.rdbms.mapping.java.EmbeddedPCMapping;
@@ -662,7 +661,7 @@ public class FKArrayStore<E> extends AbstractArrayStore<E>
                 mconn.release();
             }
         }
-        catch (SQLException | MappedDatastoreException e)
+        catch (SQLException e)
         {
             throw new NucleusDataStoreException(Localiser.msg("056006", stmt),e);
         }

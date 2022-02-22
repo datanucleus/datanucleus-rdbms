@@ -23,9 +23,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import org.datanucleus.ExecutionContext;
+import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.state.DNStateManager;
-import org.datanucleus.store.rdbms.exceptions.MappedDatastoreException;
 import org.datanucleus.store.rdbms.mapping.java.EmbeddedElementPCMapping;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.mapping.java.ReferenceMapping;
@@ -47,8 +47,7 @@ public class ArrayStoreIterator implements Iterator
 
     private Object lastElement = null;
 
-    ArrayStoreIterator(DNStateManager sm, ResultSet rs, ResultObjectFactory rof, ElementContainerStore backingStore) 
-    throws MappedDatastoreException
+    ArrayStoreIterator(DNStateManager sm, ResultSet rs, ResultObjectFactory rof, ElementContainerStore backingStore)
     {
         this.ec = sm.getExecutionContext();
 
@@ -126,7 +125,7 @@ public class ArrayStoreIterator implements Iterator
         // Do nothing
     }
 
-    protected boolean next(Object rs) throws MappedDatastoreException
+    protected boolean next(Object rs)
     {
         try
         {
@@ -134,7 +133,7 @@ public class ArrayStoreIterator implements Iterator
         }
         catch (SQLException e)
         {
-            throw new MappedDatastoreException("SQLException", e);
+            throw new NucleusDataStoreException("SQLException", e);
         }
     }
 

@@ -35,7 +35,6 @@ import org.datanucleus.metadata.MapMetaData;
 import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.connection.ManagedConnection;
 import org.datanucleus.store.query.expression.Expression;
-import org.datanucleus.store.rdbms.exceptions.MappedDatastoreException;
 import org.datanucleus.store.rdbms.mapping.MappingHelper;
 import org.datanucleus.store.rdbms.mapping.java.EmbeddedKeyPCMapping;
 import org.datanucleus.store.rdbms.mapping.java.EmbeddedValuePCMapping;
@@ -257,56 +256,42 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
         // Put any new entries
         if (!puts.isEmpty())
         {
+            ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(sm.getExecutionContext());
             try
             {
-                ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(sm.getExecutionContext());
-                try
+                // Loop through all entries
+                Iterator<Map.Entry> iter = puts.iterator();
+                while (iter.hasNext())
                 {
-                    // Loop through all entries
-                    Iterator<Map.Entry> iter = puts.iterator();
-                    while (iter.hasNext())
-                    {
-                        // Add the row to the join table
-                        Map.Entry entry = iter.next();
-                        internalPut(sm, mconn, batched, entry.getKey(), entry.getValue(), (!iter.hasNext()));
-                    }
-                }
-                finally
-                {
-                    mconn.release();
+                    // Add the row to the join table
+                    Map.Entry entry = iter.next();
+                    internalPut(sm, mconn, batched, entry.getKey(), entry.getValue(), (!iter.hasNext()));
                 }
             }
-            catch (MappedDatastoreException e)
+            finally
             {
-                throw new NucleusDataStoreException(Localiser.msg("056016", e.getMessage()), e);
+                mconn.release();
             }
         }
 
         // Update any changed entries
         if (!updates.isEmpty())
         {
+            ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(sm.getExecutionContext());
             try
             {
-                ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(sm.getExecutionContext());
-                try
+                // Loop through all entries
+                Iterator<Map.Entry> iter = updates.iterator();
+                while (iter.hasNext())
                 {
-                    // Loop through all entries
-                    Iterator<Map.Entry> iter = updates.iterator();
-                    while (iter.hasNext())
-                    {
-                        // Update the row in the join table
-                        Map.Entry entry = iter.next();
-                        internalUpdate(sm, mconn, batched, entry.getKey(), entry.getValue(), !iter.hasNext());
-                    }
-                }
-                finally
-                {
-                    mconn.release();
+                    // Update the row in the join table
+                    Map.Entry entry = iter.next();
+                    internalUpdate(sm, mconn, batched, entry.getKey(), entry.getValue(), !iter.hasNext());
                 }
             }
-            catch (MappedDatastoreException mde)
+            finally
             {
-                throw new NucleusDataStoreException(Localiser.msg("056016", mde.getMessage()), mde);
+                mconn.release();
             }
         }
     }
@@ -323,29 +308,22 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
             return;
         }
 
+        ExecutionContext ec = sm.getExecutionContext();
+        ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
         try
         {
-            ExecutionContext ec = sm.getExecutionContext();
-            ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
-            try
+            if (present)
             {
-                if (present)
-                {
-                    internalUpdate(sm, mconn, false, key, value, true);
-                }
-                else
-                {
-                    internalPut(sm, mconn, false, key, value, true);
-                }
+                internalUpdate(sm, mconn, false, key, value, true);
             }
-            finally
+            else
             {
-                mconn.release();
+                internalPut(sm, mconn, false, key, value, true);
             }
         }
-        catch (MappedDatastoreException e)
+        finally
         {
-            throw new NucleusDataStoreException(Localiser.msg("056016", e.getMessage()), e);
+            mconn.release();
         }
 
         MapMetaData mapmd = ownerMemberMetaData.getMap();
@@ -381,29 +359,22 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
         if (oldValue != value)
         {
             // Value changed so update the map
+            ExecutionContext ec = sm.getExecutionContext();
+            ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
             try
             {
-                ExecutionContext ec = sm.getExecutionContext();
-                ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
-                try
+                if (exists)
                 {
-                    if (exists)
-                    {
-                        internalUpdate(sm, mconn, false, key, value, true);
-                    }
-                    else
-                    {
-                        internalPut(sm, mconn, false, key, value, true);
-                    }
+                    internalUpdate(sm, mconn, false, key, value, true);
                 }
-                finally
+                else
                 {
-                    mconn.release();
+                    internalPut(sm, mconn, false, key, value, true);
                 }
             }
-            catch (MappedDatastoreException e)
+            finally
             {
-                throw new NucleusDataStoreException(Localiser.msg("056016", e.getMessage()), e);
+                mconn.release();
             }
         }
 
@@ -1093,10 +1064,8 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
      * @param key The key
      * @param value The new value
      * @param executeNow Whether to execute the statement now or wait til any batch
-     * @throws MappedDatastoreException Thrown if an error occurs
      */
-    protected void internalUpdate(DNStateManager ownerSM, ManagedConnection conn, boolean batched, Object key, Object value, boolean executeNow) 
-    throws MappedDatastoreException
+    protected void internalUpdate(DNStateManager ownerSM, ManagedConnection conn, boolean batched, Object key, Object value, boolean executeNow)
     {
         ExecutionContext ec = ownerSM.getExecutionContext();
         SQLController sqlControl = storeMgr.getSQLController();
@@ -1126,7 +1095,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
         }
         catch (SQLException e)
         {
-            throw new MappedDatastoreException(getUpdateStmt(), e);
+            throw new NucleusDataStoreException(Localiser.msg("056011", updateStmt), e);
         }
     }
 
@@ -1139,10 +1108,8 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
      * @param value The value
      * @param executeNow Whether to execute the statement now or wait til batching
      * @return The return codes from any executed statement
-     * @throws MappedDatastoreException Thrown if an error occurs
      */
     protected int[] internalPut(DNStateManager ownerSM, ManagedConnection conn, boolean batched, Object key, Object value, boolean executeNow)
-    throws MappedDatastoreException
     {
         ExecutionContext ec = ownerSM.getExecutionContext();
         SQLController sqlControl = storeMgr.getSQLController();
@@ -1185,7 +1152,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
         }
         catch (SQLException e)
         {
-            throw new MappedDatastoreException(getPutStmt(), e);
+            throw new NucleusDataStoreException(Localiser.msg("056016", putStmt), e);
         }
     }
 

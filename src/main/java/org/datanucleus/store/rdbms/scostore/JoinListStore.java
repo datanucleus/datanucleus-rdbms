@@ -42,7 +42,6 @@ import org.datanucleus.metadata.RelationType;
 import org.datanucleus.metadata.OrderMetaData.FieldOrder;
 import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.connection.ManagedConnection;
-import org.datanucleus.store.rdbms.exceptions.MappedDatastoreException;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.mapping.java.ReferenceMapping;
 import org.datanucleus.store.rdbms.RDBMSPropertyNames;
@@ -246,7 +245,7 @@ public class JoinListStore<E> extends AbstractListStore<E>
                 // Shift any existing elements so that we can insert the new element(s) at their position
                 if (!atEnd && start != currentListSize)
                 {
-                    internalShiftBulk(ownerSM, mconn, true, start-1, shift, true);
+                    internalShiftBulk(ownerSM, start-1, shift, mconn, true, true);
                 }
                 else
                 {
@@ -291,7 +290,7 @@ public class JoinListStore<E> extends AbstractListStore<E>
                 mconn.release();
             }
         }
-        catch (SQLException | MappedDatastoreException e)
+        catch (SQLException e)
         {
             throw new NucleusDataStoreException(Localiser.msg("056009", addStmt), e);
         }
@@ -515,12 +514,6 @@ public class JoinListStore<E> extends AbstractListStore<E>
                     }
                 }
             }
-            catch (MappedDatastoreException sqe)
-            {
-                String msg = Localiser.msg("056012", sqe.getMessage());
-                NucleusLogger.DATASTORE.error(msg, sqe.getCause());
-                throw new NucleusDataStoreException(msg, sqe, ownerSM.getObject());
-            }
             finally
             {
                 mconn.release();
@@ -530,8 +523,7 @@ public class JoinListStore<E> extends AbstractListStore<E>
         return modified;
     }
 
-    private int[] internalRemove(DNStateManager ownerSM, ManagedConnection conn, boolean batched, Object element, boolean executeNow) 
-    throws MappedDatastoreException
+    private int[] internalRemove(DNStateManager ownerSM, ManagedConnection conn, boolean batched, Object element, boolean executeNow)
     {
         ExecutionContext ec = ownerSM.getExecutionContext();
         SQLController sqlControl = storeMgr.getSQLController();
@@ -560,7 +552,7 @@ public class JoinListStore<E> extends AbstractListStore<E>
         }
         catch (SQLException sqle)
         {
-            throw new MappedDatastoreException("SQLException", sqle);
+            throw new NucleusDataStoreException(Localiser.msg("056012", removeStmt), sqle);
         }
     }
 
@@ -641,44 +633,36 @@ public class JoinListStore<E> extends AbstractListStore<E>
 
         // Shift the remaining indices to remove the holes in ordering
         // TODO Make this process use fewer SQL
+        boolean batched = storeMgr.allowsBatching();
+        ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
         try
         {
-            boolean batched = storeMgr.allowsBatching();
-            ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
-            try
+            for (int i = 0; i < currentListSize; i++)
             {
-                for (int i = 0; i < currentListSize; i++)
+                // Find the number of deleted indexes above this index
+                int shift = 0;
+                boolean removed = false;
+                for (int j = 0; j < indices.length; j++)
                 {
-                    // Find the number of deleted indexes above this index
-                    int shift = 0;
-                    boolean removed = false;
-                    for (int j = 0; j < indices.length; j++)
+                    if (indices[j] == i)
                     {
-                        if (indices[j] == i)
-                        {
-                            removed = true;
-                            break;
-                        }
-                        if (indices[j] < i)
-                        {
-                            shift++;
-                        }
+                        removed = true;
+                        break;
                     }
-                    if (!removed && shift > 0)
+                    if (indices[j] < i)
                     {
-                        internalShift(ownerSM, mconn, batched, i, -1 * shift, (i == currentListSize - 1));
+                        shift++;
                     }
                 }
-            }
-            finally
-            {
-                mconn.release();
+                if (!removed && shift > 0)
+                {
+                    internalShift(ownerSM, i, -1 * shift, mconn, batched, (i == currentListSize - 1));
+                }
             }
         }
-        catch (MappedDatastoreException e)
+        finally
         {
-            NucleusLogger.DATASTORE.error(e);
-            throw new NucleusDataStoreException(Localiser.msg("056012", removeAllStmt), e);
+            mconn.release();
         }
 
         // Dependent field
@@ -815,7 +799,7 @@ public class JoinListStore<E> extends AbstractListStore<E>
                 mconn.release();
             }
         }
-        catch (SQLException | MappedDatastoreException e)
+        catch (SQLException e)
         {
             throw new NucleusDataStoreException(Localiser.msg("056006", stmt),e);
         }

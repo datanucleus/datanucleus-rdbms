@@ -23,9 +23,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import org.datanucleus.ExecutionContext;
+import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.state.DNStateManager;
-import org.datanucleus.store.rdbms.exceptions.MappedDatastoreException;
 import org.datanucleus.store.rdbms.mapping.java.EmbeddedElementPCMapping;
 import org.datanucleus.store.rdbms.mapping.java.ReferenceMapping;
 import org.datanucleus.store.rdbms.mapping.java.SerialisedPCMapping;
@@ -47,7 +47,6 @@ class CollectionStoreIterator<E> implements Iterator<E>
     private E lastElement = null;
 
     CollectionStoreIterator(DNStateManager sm, ResultSet rs, ResultObjectFactory rof, AbstractCollectionStore<E> store)
-    throws MappedDatastoreException
     {
         this.sm = sm;
         this.ec = sm.getExecutionContext();
@@ -131,7 +130,7 @@ class CollectionStoreIterator<E> implements Iterator<E>
         lastElement = null;
     }
 
-    protected boolean next(Object rs) throws MappedDatastoreException
+    protected boolean next(Object rs)
     {
         try
         {
@@ -139,7 +138,7 @@ class CollectionStoreIterator<E> implements Iterator<E>
         }
         catch (SQLException e)
         {
-            throw new MappedDatastoreException("SQLException", e);
+            throw new NucleusDataStoreException("SQLException", e);
         }
     }
 

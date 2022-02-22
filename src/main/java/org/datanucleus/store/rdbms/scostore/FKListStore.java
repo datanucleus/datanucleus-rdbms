@@ -43,7 +43,6 @@ import org.datanucleus.metadata.OrderMetaData.FieldOrder;
 import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.FieldValues;
 import org.datanucleus.store.connection.ManagedConnection;
-import org.datanucleus.store.rdbms.exceptions.MappedDatastoreException;
 import org.datanucleus.store.rdbms.mapping.MappingHelper;
 import org.datanucleus.store.rdbms.mapping.MappingType;
 import org.datanucleus.store.rdbms.mapping.java.EmbeddedPCMapping;
@@ -565,28 +564,19 @@ public class FKListStore<E> extends AbstractListStore<E>
         {
             // We need to shift existing elements before positioning the new ones
             // e.g if insert at start then do "UPDATE IDX=IDX+1 WHERE ID={...}" or similar, where the ID values are all ids after the position we insert at
+            // Calculate the amount we need to shift any existing elements by
+            // This is used where inserting between existing elements and have to shift down all elements after the start point
+            int shift = c.size();
+
+            ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ownerSM.getExecutionContext());
             try
             {
-                // Calculate the amount we need to shift any existing elements by
-                // This is used where inserting between existing elements and have to shift down all elements after the start point
-                int shift = c.size();
-
-                ExecutionContext ec = ownerSM.getExecutionContext();
-                ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
-                try
-                {
-                    // shift existing elements after start position by "shift" to make room for new elements
-                    internalShiftBulk(ownerSM, mconn, true, startAt-1, shift, true);
-                }
-                finally
-                {
-                    mconn.release();
-                }
+                // shift existing elements after start position by "shift" to make room for new elements
+                internalShiftBulk(ownerSM, startAt-1, shift, mconn, true, true);
             }
-            catch (MappedDatastoreException e)
+            finally
             {
-                // An error was encountered during the shift process so abort here
-                throw new NucleusDataStoreException(Localiser.msg("056009", e.getMessage()), e.getCause());
+                mconn.release();
             }
         }
 
@@ -666,21 +656,44 @@ public class FKListStore<E> extends AbstractListStore<E>
         {
             // Ensure we have all indices of the elements (highest first)
             int[] indices = (elementIndices != null) ? elementIndices : getIndicesOf(ownerSM, elements);
-            if (indices == null)
+            if (indices == null || indices.length == 0)
             {
                 return false;
             }
 
-            // Remove each element in turn, doing the shifting of indexes each time
-            // TODO : Change this to remove all in one go and then shift to remove gaps
-
-            // Get current size from datastore if not provided
-            int currentListSize = (size < 0) ? size(ownerSM) : size;
-            for (int i=0; i<indices.length; i++)
+            if (ownerMapping.isNullable())
             {
-                internalRemoveAt(ownerSM, indices[i], currentListSize >= 0 ? currentListSize : -1);
-                currentListSize--;
-                modified = true;
+                NucleusLogger.DATASTORE.debug(Localiser.msg("056043"));
+
+                // Get original size (prior to removals) from datastore if not provided
+                int currentListSize = (size < 0) ? size(ownerSM) : size;
+
+                ExecutionContext ec = ownerSM.getExecutionContext();
+                ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
+                try
+                {
+                    // Null out the specified indices
+                    internalRemoveAtNullifyBulk(ownerSM, indices, mconn, false, true);
+
+                    for (int i=0;i<indices.length;i++)
+                    {
+                        // Shift the subsequent elements to fill the gaps
+                        if (indices[i] != currentListSize - 1)
+                        {
+                            // shift all subsequent elements down by 1 in single statement
+                            internalShiftBulk(ownerSM, indices[i], -1, mconn, true, i == indices.length-1);
+                        }
+                        currentListSize--;
+                    }
+                }
+                finally
+                {
+                    mconn.release();
+                }
+            }
+            else
+            {
+                // Indexed list with non-nullable owner!
             }
 
             // Dependent-element
@@ -774,21 +787,124 @@ public class FKListStore<E> extends AbstractListStore<E>
             throw new NucleusUserException("Cannot remove an element from a particular position with an ordered list since no indexes exist");
         }
 
-        String stmt;
         if (ownerMapping.isNullable())
         {
             NucleusLogger.DATASTORE.debug(Localiser.msg("056043"));
-            // TODO When using this statement we need to plug in the element table name, and do it for all possible element tables
-            stmt = getRemoveAtNullifyStmt();
+            ExecutionContext ec = ownerSM.getExecutionContext();
+            ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
+            try
+            {
+                // Null out the element
+                internalRemoveAtNullify(ownerSM, index, mconn, true, false);
+
+                // Get current size from datastore if not provided
+                int currentListSize = (size < 0) ? size(ownerSM) : size;
+
+                // Shift the subsequent elements to fill the gap
+                if (index != currentListSize - 1)
+                {
+                    // shift all subsequent elements down by 1 in single statement
+                    internalShiftBulk(ownerSM, index, -1, mconn, true, true);
+                }
+            }
+            finally
+            {
+                mconn.release();
+            }
         }
         else
         {
-            NucleusLogger.DATASTORE.debug(Localiser.msg("056042"));
+            // Indexed list with owner mapping that is not nullable! Are we going to attempt to support this?
             // TODO Really ought to make this delete via ExecutionContext (sm.getExecutionContext().deleteObjectInternal(element)) but we need the element object
-            stmt = getRemoveAtStmt();
+            NucleusLogger.DATASTORE.debug(Localiser.msg("056042"));
+            String stmt = getRemoveAtStmt();
+            internalRemoveAt(ownerSM, index, stmt, size);
         }
+    }
 
-        internalRemoveAt(ownerSM, index, stmt, size);
+    /**
+     * Internal method to remove an object at a location in the List by nulling its owner and setting its List index to -1.
+     * @param ownerSM StateManager for the list owner
+     * @param index The index to nullify
+     * @param mconn Managed Connection to use for datastore connectivity
+     * @param batched Whether this statement should be batched
+     * @param executeNow Whether we should execute this statement now
+     * @throws NucleusDatastoreException if an error occurs
+     */
+    protected void internalRemoveAtNullify(DNStateManager ownerSM, int index, ManagedConnection mconn, boolean batched, boolean executeNow)
+    {
+        String stmt = getRemoveAtNullifyStmt();
+        ExecutionContext ec = ownerSM.getExecutionContext();
+        try
+        {
+            SQLController sqlControl = storeMgr.getSQLController();
+            PreparedStatement ps = sqlControl.getStatementForUpdate(mconn, stmt, batched);
+            try
+            {
+                int jdbcPosition = 1;
+                jdbcPosition = BackingStoreHelper.populateOwnerInStatement(ownerSM, ec, ps, jdbcPosition, this);
+                jdbcPosition = BackingStoreHelper.populateOrderInStatement(ec, ps, index, jdbcPosition, orderMapping);
+                if (relationDiscriminatorMapping != null)
+                {
+                    jdbcPosition = BackingStoreHelper.populateRelationDiscriminatorInStatement(ec, ps, jdbcPosition, this);
+                }
+
+                /* int[] rowsUpdated = */sqlControl.executeStatementUpdate(ec, mconn, stmt, ps, executeNow);
+            }
+            finally
+            {
+                sqlControl.closeStatement(mconn, ps);
+            }
+        }
+        catch (SQLException e)
+        {
+            throw new NucleusDataStoreException(Localiser.msg("056012", stmt), e);
+        }
+    }
+
+    /**
+     * Internal method to remove an object at a location in the List by nulling its owner and setting its List index to -1.
+     * @param ownerSM StateManager for the list owner
+     * @param indices The indexes to nullify
+     * @param mconn Managed Connection to use for datastore connectivity
+     * @param batched Whether this statement should be batched
+     * @param executeNow Whether we should execute this statement now
+     * @throws NucleusDatastoreException if an error occurs
+     */
+    protected void internalRemoveAtNullifyBulk(DNStateManager ownerSM, int[] indices, ManagedConnection mconn, boolean batched, boolean executeNow)
+    {
+        String stmt = getRemoveAtNullifyBulkStmt(indices);
+        ExecutionContext ec = ownerSM.getExecutionContext();
+        try
+        {
+            SQLController sqlControl = storeMgr.getSQLController();
+            PreparedStatement ps = sqlControl.getStatementForUpdate(mconn, stmt, batched);
+            try
+            {
+                int jdbcPosition = 1;
+                for (int i=0;i<indices.length;i++)
+                {
+                    int index = indices[i];
+
+                    jdbcPosition = BackingStoreHelper.populateOwnerInStatement(ownerSM, ec, ps, jdbcPosition, this);
+                    jdbcPosition = BackingStoreHelper.populateOrderInStatement(ec, ps, index, jdbcPosition, orderMapping);
+                    if (relationDiscriminatorMapping != null)
+                    {
+                        jdbcPosition = BackingStoreHelper.populateRelationDiscriminatorInStatement(ec, ps, jdbcPosition, this);
+                    }
+                }
+
+                /* int[] rowsUpdated = */sqlControl.executeStatementUpdate(ec, mconn, stmt, ps, executeNow);
+            }
+            finally
+            {
+                sqlControl.closeStatement(mconn, ps);
+            }
+        }
+        catch (SQLException e)
+        {
+            throw new NucleusDataStoreException(Localiser.msg("056012", stmt), e);
+        }
     }
 
     /**
@@ -1130,7 +1246,7 @@ public class FKListStore<E> extends AbstractListStore<E>
                 mconn.release();
             }
         }
-        catch (SQLException | MappedDatastoreException e)
+        catch (SQLException e)
         {
             throw new NucleusDataStoreException(Localiser.msg("056006", stmt), e);
         }
@@ -1442,19 +1558,12 @@ public class FKListStore<E> extends AbstractListStore<E>
     }
 
     /**
-     * Generates the statement for removing an item by nulling it out.
+     * Generates the statement for removing an item by nulling it out (setting owner to null, and index to -1).
      * When there is only a single element table the statement will be
      * <PRE>
      * UPDATE LISTTABLE SET OWNERCOL=NULL, INDEXCOL=-1
      * WHERE OWNERCOL = ?
      * AND INDEXCOL = ?
-     * [AND DISTINGUISHER = ?]
-     * </PRE>
-     * and when there are multiple element tables the statement will be
-     * <PRE>
-     * UPDATE ? SET OWNERCOL=NULL, INDEXCOL=-1
-     * WHERE OWNERCOL=?
-     * AND INDEXCOL=?
      * [AND DISTINGUISHER = ?]
      * </PRE>
      * @return The Statement for removing an item from a position
@@ -1465,18 +1574,9 @@ public class FKListStore<E> extends AbstractListStore<E>
         {
             synchronized (this)
             {
-                // TODO If ownerMapping is not for containerTable then use owner table for the UPDATE
-                StringBuilder stmt = new StringBuilder("UPDATE ");
-//                if (elementInfo.length > 1)
-//                {
-//                    stmt.append("?");
-//                }
-//                else
-//                {
-                    // Could use elementInfo[0].getDatastoreClass but need to allow for relation in superclass table
-                    stmt.append(containerTable.toString());
-//                }
-                stmt.append(" SET ");
+                // TODO If ownerMapping is not for containerTable then use owner table for the UPDATE. Allow for multiple elementInfo
+                // Could use elementInfo[0].getDatastoreClass but need to allow for relation in superclass table
+                StringBuilder stmt = new StringBuilder("UPDATE ").append(containerTable.toString()).append(" SET ");
                 for (int i = 0; i < ownerMapping.getNumberOfColumnMappings(); i++)
                 {
                     if (i > 0)
@@ -1508,6 +1608,58 @@ public class FKListStore<E> extends AbstractListStore<E>
             }
         }
         return removeAtNullifyStmt;
+    }
+
+    /**
+     * Generates the statement for removing an item by nulling it out (setting owner to null, and index to -1).
+     * When there is only a single element table the statement will be
+     * <PRE>
+     * UPDATE LISTTABLE SET OWNERCOL=NULL, INDEXCOL=-1
+     * WHERE (OWNERCOL=? AND INDEXCOL=? [AND DISTINGUISHER=?]) OR (OWNERCOL=? AND INDEXCOL=? [AND DISTINGUISHER=?]) OR ...
+     * </PRE>
+     * @param indices The indexes to nullify at (only uses the length of the array)
+     * @return The Statement for removing an item from a position
+     */
+    private String getRemoveAtNullifyBulkStmt(int[] indices)
+    {
+        // TODO If ownerMapping is not for containerTable then use owner table for the UPDATE. Allow for multiple elementInfo
+        // Could use elementInfo[0].getDatastoreClass but need to allow for relation in superclass table
+        StringBuilder stmt = new StringBuilder("UPDATE ").append(containerTable.toString()).append(" SET ");
+        for (int i = 0; i < ownerMapping.getNumberOfColumnMappings(); i++)
+        {
+            if (i > 0)
+            {
+                stmt.append(", ");
+            }
+            stmt.append(ownerMapping.getColumnMapping(i).getColumn().getIdentifier().toString());
+            stmt.append("=NULL");
+        }
+        if (orderMapping != null)
+        {
+            for (int i = 0; i < orderMapping.getNumberOfColumnMappings(); i++)
+            {
+                stmt.append(", ");
+                stmt.append(orderMapping.getColumnMapping(i).getColumn().getIdentifier().toString());
+                stmt.append("=-1");
+            }
+        }
+
+        stmt.append(" WHERE ");
+
+        for (int i=0;i<indices.length;i++)
+        {
+            stmt.append(i == 0 ? "(" : " OR (");
+
+            BackingStoreHelper.appendWhereClauseForMapping(stmt, ownerMapping, null, true);
+            BackingStoreHelper.appendWhereClauseForMapping(stmt, orderMapping, null, false);
+            if (relationDiscriminatorMapping != null)
+            {
+                BackingStoreHelper.appendWhereClauseForMapping(stmt, relationDiscriminatorMapping, null, false);
+            }
+
+            stmt.append(")");
+        }
+        return stmt.toString();
     }
 
     /**

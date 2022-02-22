@@ -39,7 +39,6 @@ import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.metadata.CollectionMetaData;
 import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.connection.ManagedConnection;
-import org.datanucleus.store.rdbms.exceptions.MappedDatastoreException;
 import org.datanucleus.store.rdbms.mapping.java.ReferenceMapping;
 import org.datanucleus.store.types.scostore.ListStore;
 import org.datanucleus.store.rdbms.JDBCUtils;
@@ -72,65 +71,65 @@ public abstract class AbstractListStore<E> extends AbstractCollectionStore<E> im
     }
 
     @Override
-    public Iterator<E> iterator(DNStateManager sm)
+    public Iterator<E> iterator(DNStateManager ownerSM)
     {
-        return listIterator(sm);
+        return listIterator(ownerSM);
     }
 
     @Override
-    public ListIterator<E> listIterator(DNStateManager sm)
+    public ListIterator<E> listIterator(DNStateManager ownerSM)
     {
-        return listIterator(sm, -1, -1);
+        return listIterator(ownerSM, -1, -1);
     }
 
     /**
      * Accessor for an iterator through the list elements.
-     * @param sm StateManager for the container.
+     * @param ownerSM StateManager for the container.
      * @param startIdx The start point in the list (only for indexed lists).
      * @param endIdx The end point in the list (only for indexed lists).
      * @return The List Iterator
      */
-    protected abstract ListIterator<E> listIterator(DNStateManager sm, int startIdx, int endIdx);
+    protected abstract ListIterator<E> listIterator(DNStateManager ownerSM, int startIdx, int endIdx);
 
     @Override
-    public boolean add(DNStateManager sm, E element, int size)
+    public boolean add(DNStateManager ownerSM, E element, int size)
     {
-        return internalAdd(sm, 0, true, Collections.singleton(element), size);
+        return internalAdd(ownerSM, 0, true, Collections.singleton(element), size);
     }
 
     @Override
-    public void add(DNStateManager sm, E element, int index, int size)
+    public void add(DNStateManager ownerSM, E element, int index, int size)
     {
-        internalAdd(sm, index, false, Collections.singleton(element), size);
+        internalAdd(ownerSM, index, false, Collections.singleton(element), size);
     }
 
     @Override
-    public boolean addAll(DNStateManager sm, Collection<E> elements, int size)
+    public boolean addAll(DNStateManager ownerSM, Collection<E> elements, int size)
     {
-        return internalAdd(sm, 0, true, elements, size);
+        return internalAdd(ownerSM, 0, true, elements, size);
     }
 
     @Override
-    public boolean addAll(DNStateManager sm, Collection<E> elements, int index, int size)
+    public boolean addAll(DNStateManager ownerSM, Collection<E> elements, int index, int size)
     {
-        return internalAdd(sm, index, false, elements, size);
+        return internalAdd(ownerSM, index, false, elements, size);
     }
 
     /**
      * Internal method for adding an item to the List.
-     * @param sm StateManager
+     * @param ownerSM StateManager
      * @param startAt The start position
      * @param atEnd Whether to add at the end
      * @param elements The Collection of elements to add.
      * @param size Current size of List (if known). -1 if not known
      * @return Whether it was successful
      */
-    protected abstract boolean internalAdd(DNStateManager sm, int startAt, boolean atEnd, Collection<E> elements, int size);
+    protected abstract boolean internalAdd(DNStateManager ownerSM, int startAt, boolean atEnd, Collection<E> elements, int size);
 
     @Override
-    public E get(DNStateManager sm, int index)
+    public E get(DNStateManager ownerSM, int index)
     {
-        ListIterator<E> iter = listIterator(sm, index, index);
+        ListIterator<E> iter = listIterator(ownerSM, index, index);
         if (iter == null || !iter.hasNext())
         {
             return null;
@@ -155,36 +154,36 @@ public abstract class AbstractListStore<E> extends AbstractCollectionStore<E> im
     }
 
     @Override
-    public int indexOf(DNStateManager sm, Object element)
+    public int indexOf(DNStateManager ownerSM, Object element)
     {
-        validateElementForReading(sm, element);
-        return internalIndexOf(sm, element, getIndexOfStmt(element));
+        validateElementForReading(ownerSM, element);
+        return internalIndexOf(ownerSM, element, getIndexOfStmt(element));
     }
 
     @Override
-    public int lastIndexOf(DNStateManager sm, Object element)
+    public int lastIndexOf(DNStateManager ownerSM, Object element)
     {
-        validateElementForReading(sm, element);
-        return internalIndexOf(sm, element, getLastIndexOfStmt(element));
+        validateElementForReading(ownerSM, element);
+        return internalIndexOf(ownerSM, element, getLastIndexOfStmt(element));
     }
 
     @Override
-    public boolean remove(DNStateManager sm, Object element, int size, boolean allowDependentField)
+    public boolean remove(DNStateManager ownerSM, Object element, int size, boolean allowDependentField)
     {
-        if (!validateElementForReading(sm, element))
+        if (!validateElementForReading(ownerSM, element))
         {
             return false;
         }
 
         Object elementToRemove = element;
-        ExecutionContext ec = sm.getExecutionContext();
+        ExecutionContext ec = ownerSM.getExecutionContext();
         if (ec.getApiAdapter().isDetached(element))
         {
             // Element passed in is detached so find attached version (DON'T attach this object)
             elementToRemove = ec.findObject(ec.getApiAdapter().getIdForObject(element), true, false, element.getClass().getName());
         }
 
-        boolean modified = internalRemove(sm, elementToRemove, size);
+        boolean modified = internalRemove(ownerSM, elementToRemove, size);
 
         if (allowDependentField)
         {
@@ -206,12 +205,12 @@ public abstract class AbstractListStore<E> extends AbstractCollectionStore<E> im
 
     /**
      * Internal method to remove the specified element from the List.
-     * @param sm StateManager of the owner
+     * @param ownerSM StateManager of the owner
      * @param element The element
      * @param size Current size of list if known. -1 if not known
      * @return Whether the List was modified
      */
-    protected abstract boolean internalRemove(DNStateManager sm, Object element, int size);
+    protected abstract boolean internalRemove(DNStateManager ownerSM, Object element, int size);
 
     @Override
     public java.util.List<E> subList(DNStateManager sm, int startIdx, int endIdx)
@@ -238,11 +237,11 @@ public abstract class AbstractListStore<E> extends AbstractCollectionStore<E> im
     /**
      * Utility to find the indices of a collection of elements.
      * The returned list are in reverse order (highest index first).
-     * @param sm StateManager
+     * @param ownerSM StateManager
      * @param elements The elements
      * @return The indices of the elements in the List.
      */
-    protected int[] getIndicesOf(DNStateManager sm, Collection elements)
+    protected int[] getIndicesOf(DNStateManager ownerSM, Collection elements)
     {
         if (elements == null || elements.isEmpty())
         {
@@ -251,13 +250,13 @@ public abstract class AbstractListStore<E> extends AbstractCollectionStore<E> im
 
         for (Object elem : elements)
         {
-            validateElementForReading(sm, elem);
+            validateElementForReading(ownerSM, elem);
         }
 
         String stmt = getIndicesOfStmt(elements);
         try
         {
-            ExecutionContext ec = sm.getExecutionContext();
+            ExecutionContext ec = ownerSM.getExecutionContext();
             ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
             SQLController sqlControl = storeMgr.getSQLController();
             try
@@ -271,7 +270,7 @@ public abstract class AbstractListStore<E> extends AbstractCollectionStore<E> im
                     {
                         Object element = elemIter.next();
 
-                        jdbcPosition = BackingStoreHelper.populateOwnerInStatement(sm, ec, ps, jdbcPosition, this);
+                        jdbcPosition = BackingStoreHelper.populateOwnerInStatement(ownerSM, ec, ps, jdbcPosition, this);
                         jdbcPosition = BackingStoreHelper.populateElementForWhereClauseInStatement(ec, ps, element, jdbcPosition, elementMapping);
                         if (relationDiscriminatorMapping != null)
                         {
@@ -325,16 +324,16 @@ public abstract class AbstractListStore<E> extends AbstractCollectionStore<E> im
 
     /**
      * Internal method to find the index of an element.
-     * @param sm StateManager
+     * @param ownerSM StateManager
      * @param element The element
      * @param stmt The statement to find the element.
      * @return The index of the element in the List.
      */
-    protected int internalIndexOf(DNStateManager sm, Object element, String stmt)
+    protected int internalIndexOf(DNStateManager ownerSM, Object element, String stmt)
     {
         try
         {
-            ExecutionContext ec = sm.getExecutionContext();
+            ExecutionContext ec = ownerSM.getExecutionContext();
             ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
             SQLController sqlControl = storeMgr.getSQLController();
             try
@@ -344,7 +343,7 @@ public abstract class AbstractListStore<E> extends AbstractCollectionStore<E> im
                 {
                     int jdbcPosition = 1;
 
-                    jdbcPosition = BackingStoreHelper.populateOwnerInStatement(sm, ec, ps, jdbcPosition, this);
+                    jdbcPosition = BackingStoreHelper.populateOwnerInStatement(ownerSM, ec, ps, jdbcPosition, this);
                     jdbcPosition = BackingStoreHelper.populateElementForWhereClauseInStatement(ec, ps, element, jdbcPosition, elementMapping);
                     if (relationDiscriminatorMapping != null)
                     {
@@ -397,9 +396,9 @@ public abstract class AbstractListStore<E> extends AbstractCollectionStore<E> im
         // Get current size from datastore if not provided
         int currentListSize = (size < 0) ? size(ownerSM) : size;
 
-        ExecutionContext ec = ownerSM.getExecutionContext();
         try
         {
+            ExecutionContext ec = ownerSM.getExecutionContext();
             ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
             SQLController sqlControl = storeMgr.getSQLController();
             try
@@ -429,7 +428,7 @@ public abstract class AbstractListStore<E> extends AbstractCollectionStore<E> im
                 if (index != currentListSize - 1)
                 {
                     // shift all elements above this down by 1 in single statement
-                    internalShiftBulk(ownerSM, mconn, true, index, -1, true);
+                    internalShiftBulk(ownerSM, index, -1, mconn, true, true);
                 }
             }
             finally
@@ -441,34 +440,29 @@ public abstract class AbstractListStore<E> extends AbstractCollectionStore<E> im
         {
             throw new NucleusDataStoreException(Localiser.msg("056012", stmt), e);
         }
-        catch (MappedDatastoreException e)
-        {
-            throw new NucleusDataStoreException(Localiser.msg("056012", stmt), e);
-        }
     }
 
     /**
      * Method to process a "shift" statement for all rows from the start point, updating the index in the list for the specified owner.
      * @param ownerSM StateManager for the list owner
-     * @param conn The connection
-     * @param batched Whether the statement is batched
      * @param start The start index for the shift
      * @param amount Amount to shift by (negative means shift down)
+     * @param conn The connection
+     * @param batched Whether the statement is batched
      * @param executeNow Whether to execute the statement now (or wait for batching)
      * @return Return code(s) from any executed statements
-     * @throws MappedDatastoreException Thrown if an error occurs
+     * @throws NucleusDataStoreException Thrown if an error occurs
      */
-    protected int[] internalShiftBulk(DNStateManager ownerSM, ManagedConnection conn, boolean batched, int start, int amount, boolean executeNow)
-    throws MappedDatastoreException
+    protected int[] internalShiftBulk(DNStateManager ownerSM, int start, int amount, ManagedConnection conn, boolean batched, boolean executeNow)
     {
-        ExecutionContext ec = ownerSM.getExecutionContext();
-        SQLController sqlControl = storeMgr.getSQLController();
         String shiftBulkStmt = getShiftBulkStmt();
         try
         {
+            SQLController sqlControl = storeMgr.getSQLController();
             PreparedStatement ps = sqlControl.getStatementForUpdate(conn, shiftBulkStmt, batched);
             try
             {
+                ExecutionContext ec = ownerSM.getExecutionContext();
                 int jdbcPosition = 1;
                 jdbcPosition = BackingStoreHelper.populateOrderInStatement(ec, ps, amount, jdbcPosition, orderMapping);
                 jdbcPosition = BackingStoreHelper.populateOwnerInStatement(ownerSM, ec, ps, jdbcPosition, this);
@@ -488,23 +482,22 @@ public abstract class AbstractListStore<E> extends AbstractCollectionStore<E> im
         }
         catch (SQLException sqle)
         {
-            throw new MappedDatastoreException(shiftStmt, sqle);
-        }        
+            throw new NucleusDataStoreException(Localiser.msg("056012", shiftStmt), sqle);
+        }
     }
 
     /**
      * Method to process a "shift" statement, updating the index in the list of the specified index.
      * @param ownerSM StateManager for the list owner
-     * @param conn The connection
-     * @param batched Whether the statement is batched
      * @param oldIndex The old index
      * @param amount Amount to shift by (negative means shift down)
+     * @param conn The connection
+     * @param batched Whether the statement is batched
      * @param executeNow Whether to execute the statement now (or wait for batching)
      * @return Return code(s) from any executed statements
-     * @throws MappedDatastoreException Thrown if an error occurs
+     * @throws NucleusDataStoreException Thrown if an error occurs
      */
-    protected int[] internalShift(DNStateManager ownerSM, ManagedConnection conn, boolean batched, int oldIndex, int amount, boolean executeNow) 
-    throws MappedDatastoreException
+    protected int[] internalShift(DNStateManager ownerSM, int oldIndex, int amount, ManagedConnection conn, boolean batched, boolean executeNow)
     {
         ExecutionContext ec = ownerSM.getExecutionContext();
         SQLController sqlControl = storeMgr.getSQLController();
@@ -533,7 +526,7 @@ public abstract class AbstractListStore<E> extends AbstractCollectionStore<E> im
         }
         catch (SQLException sqle)
         {
-            throw new MappedDatastoreException(shiftStmt, sqle);
+            throw new NucleusDataStoreException(Localiser.msg("056012", shiftStmt), sqle);
         }
     }
 
@@ -602,7 +595,6 @@ public abstract class AbstractListStore<E> extends AbstractCollectionStore<E> im
 
     /**
      * Generates the statement for getting the index of the last item.
-     * 
      * <PRE>
      * SELECT INDEXCOL FROM LISTTABLE
      * WHERE OWNERCOL=?

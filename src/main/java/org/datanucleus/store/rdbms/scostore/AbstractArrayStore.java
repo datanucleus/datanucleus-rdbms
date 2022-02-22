@@ -33,7 +33,6 @@ import org.datanucleus.exceptions.NotYetFlushedException;
 import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.connection.ManagedConnection;
-import org.datanucleus.store.rdbms.exceptions.MappedDatastoreException;
 import org.datanucleus.store.types.scostore.ArrayStore;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.SQLController;
@@ -130,59 +129,43 @@ public abstract class AbstractArrayStore<E> extends ElementContainerStore implem
         List exceptions = new ArrayList();
         boolean batched = allowsBatching() && length > 1;
 
+        ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
         try
         {
-            ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
+            SQLController sqlControl = storeMgr.getSQLController();
             try
             {
-                SQLController sqlControl = storeMgr.getSQLController();
-                try
-                {
-                    sqlControl.processStatementsForConnection(mconn); // Process all waiting batched statements before we start our work
-                }
-                catch (SQLException e)
-                {
-                    throw new MappedDatastoreException("SQLException", e);
-                }
+                sqlControl.processStatementsForConnection(mconn); // Process all waiting batched statements before we start our work
+            }
+            catch (SQLException e)
+            {
+                throw new NucleusDataStoreException("SQLException", e);
+            }
 
-                // Loop through all elements to be added
-                E element = null;
-                for (int i = 0; i < length; i++)
-                {
-                    element = (E) Array.get(array, i);
+            // Loop through all elements to be added
+            E element = null;
+            for (int i = 0; i < length; i++)
+            {
+                element = (E) Array.get(array, i);
 
-                    try
+                // Add the row to the join table
+                int[] rc = internalAdd(sm, element, mconn, batched, i, (i == length - 1));
+                if (rc != null)
+                {
+                    for (int j = 0; j < rc.length; j++)
                     {
-                        // Add the row to the join table
-                        int[] rc = internalAdd(sm, element, mconn, batched, i, (i == length - 1));
-                        if (rc != null)
+                        if (rc[j] > 0)
                         {
-                            for (int j = 0; j < rc.length; j++)
-                            {
-                                if (rc[j] > 0)
-                                {
-                                    // At least one record was inserted
-                                    modified = true;
-                                }
-                            }
+                            // At least one record was inserted
+                            modified = true;
                         }
                     }
-                    catch (MappedDatastoreException mde)
-                    {
-                        exceptions.add(mde);
-                        NucleusLogger.DATASTORE.error("Exception thrown in set of element", mde);
-                    }
                 }
             }
-            finally
-            {
-                mconn.release();
-            }
         }
-        catch (MappedDatastoreException e)
+        finally
         {
-            exceptions.add(e);
-            NucleusLogger.DATASTORE.error("Exception thrown in set of element", e);
+            mconn.release();
         }
 
         if (!exceptions.isEmpty())
@@ -210,28 +193,19 @@ public abstract class AbstractArrayStore<E> extends ElementContainerStore implem
         validateElementForWriting(ec, element, null);
 
         boolean modified = false;
-
+        ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
         try
         {
-            ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
-
-            try
+            // Add a row to the join table
+            int[] returnCode = internalAdd(sm, element, mconn, false, position, true);
+            if (returnCode[0] > 0)
             {
-                // Add a row to the join table
-                int[] returnCode = internalAdd(sm, element, mconn, false, position, true);
-                if (returnCode[0] > 0)
-                {
-                    modified = true;
-                }
-            }
-            finally
-            {
-                mconn.release();
+                modified = true;
             }
         }
-        catch (MappedDatastoreException e)
+        finally
         {
-            throw new NucleusDataStoreException(Localiser.msg("056009", e.getMessage()), e.getCause());
+            mconn.release();
         }
 
         return modified;
@@ -292,10 +266,8 @@ public abstract class AbstractArrayStore<E> extends ElementContainerStore implem
      * @param orderId The order id to use for this element relation
      * @param executeNow Whether to execute the statement now (and not wait for any batch)
      * @return Whether a row was inserted
-     * @throws MappedDatastoreException Thrown if an error occurs
      */
-    public int[] internalAdd(DNStateManager sm, E element, ManagedConnection conn, boolean batched, int orderId, boolean executeNow) 
-            throws MappedDatastoreException
+    public int[] internalAdd(DNStateManager sm, E element, ManagedConnection conn, boolean batched, int orderId, boolean executeNow)
     {
         ExecutionContext ec = sm.getExecutionContext();
         SQLController sqlControl = storeMgr.getSQLController();
@@ -338,7 +310,7 @@ public abstract class AbstractArrayStore<E> extends ElementContainerStore implem
         }
         catch (SQLException e)
         {
-            throw new MappedDatastoreException(addStmt, e);
+            throw new NucleusDataStoreException(Localiser.msg("056009", addStmt), e);
         }
     }
 }

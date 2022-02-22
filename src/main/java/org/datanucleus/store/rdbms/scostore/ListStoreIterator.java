@@ -23,9 +23,9 @@ import java.util.ArrayList;
 import java.util.ListIterator;
 
 import org.datanucleus.ExecutionContext;
+import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.state.DNStateManager;
-import org.datanucleus.store.rdbms.exceptions.MappedDatastoreException;
 import org.datanucleus.store.rdbms.mapping.java.EmbeddedElementPCMapping;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.mapping.java.ReferenceMapping;
@@ -52,7 +52,6 @@ public class ListStoreIterator<E> implements ListIterator<E>
     private final AbstractListStore<E> abstractListStore;
 
     ListStoreIterator(DNStateManager sm, ResultSet resultSet, ResultObjectFactory rof, AbstractListStore<E> als)
-    throws MappedDatastoreException
     {
         this.sm = sm;
         this.abstractListStore = als;
@@ -191,7 +190,7 @@ public class ListStoreIterator<E> implements ListIterator<E>
         return ((JoinTable) containerTable).getOwnerMemberMetaData();
     }
 
-    protected boolean next(Object resultSet) throws MappedDatastoreException
+    protected boolean next(Object resultSet)
     {
         try
         {
@@ -199,7 +198,7 @@ public class ListStoreIterator<E> implements ListIterator<E>
         }
         catch (SQLException e)
         {
-            throw new MappedDatastoreException(e.getMessage(), e);
+            throw new NucleusDataStoreException(e.getMessage(), e);
         }
     }
 }
