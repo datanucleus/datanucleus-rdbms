@@ -212,96 +212,133 @@ public class RDBMSPersistenceHandler extends AbstractPersistenceHandler
         ExecutionContext ec = sm.getExecutionContext();
         ClassLoaderResolver clr = ec.getClassLoaderResolver();
 
-        // Extract metadata of members to process
-        AbstractMemberMetaData[] mmds = null;
+        // Extract metadata of members to fetch/store
+        AbstractMemberMetaData[] mmdsToFetch = null;
+        AbstractMemberMetaData[] mmdsToStore = null;
         if (memberNumbers != null && memberNumbers.length > 0)
         {
-            int[] memberNumbersToProcess = memberNumbers;
+            int[] memberNumbersToFetch = memberNumbers;
+            int[] memberNumbersToStore = null;
             AbstractClassMetaData cmd = sm.getClassMetaData();
 
-            if (storeMgr.getBooleanProperty(RDBMSPropertyNames.PROPERTY_RDBMS_FETCH_UNLOADED_AUTO))
+            // Option to add additional members that are currently unloaded but not requested to this fetch
+            boolean addUnloadedBasic = storeMgr.getBooleanProperty(RDBMSPropertyNames.PROPERTY_RDBMS_FETCH_UNLOADED_BASIC_AUTO);
+            boolean addUnloadedFK = storeMgr.getBooleanProperty(RDBMSPropertyNames.PROPERTY_RDBMS_FETCH_UNLOADED_FK_AUTO);
+            if (!sm.getLifecycleState().isDeleted() && (addUnloadedBasic || addUnloadedFK))
             {
-                // Option to automatically load up any non-loaded fields as deemed appropriate
-                // Here we simply load up any unloaded non-relation or 1-1/N-1 members
-                if (!sm.getLifecycleState().isDeleted())
+                // Check if this fetch selects anything (because we don't want to add anything unnecessarily
+                boolean fetchPerformsSelect = false;
+                for (int i=0;i<memberNumbers.length;i++)
                 {
-                    // Check if this will actually do a SELECT (because we don't want to impose that if not otherwise)
-                    boolean fetchPerformsSelect = false;
+                    AbstractMemberMetaData mmd = cmd.getMetaDataForManagedMemberAtAbsolutePosition(memberNumbers[i]);
+                    RelationType relationType = mmd.getRelationType(clr);
+                    if (relationType == RelationType.NONE || RelationType.isRelationSingleValued(relationType))
+                    {
+                        fetchPerformsSelect = true;
+                        break;
+                    }
+                }
+
+                if (fetchPerformsSelect)
+                {
+                    // Definitely does a SELECT, so try to identify any additional non-relation or 1-1, N-1
+                    // members that aren't loaded that could be fetched right now in this call.
+                    List<Integer> memberNumberList = new ArrayList<>();
                     for (int i=0;i<memberNumbers.length;i++)
                     {
-                        AbstractMemberMetaData mmd = cmd.getMetaDataForManagedMemberAtAbsolutePosition(memberNumbers[i]);
-                        RelationType relationType = mmd.getRelationType(clr);
-                        if (relationType != RelationType.ONE_TO_MANY_UNI && relationType != RelationType.ONE_TO_MANY_BI && relationType != RelationType.MANY_TO_MANY_BI)
-                        {
-                            fetchPerformsSelect = true;
-                            break;
-                        }
+                        memberNumberList.add(memberNumbers[i]);
                     }
+                    List<Integer> memberNumberListStore = new ArrayList<>();
 
-                    if (fetchPerformsSelect)
+                    // Check if we could retrieve any other unloaded fields in this call
+                    boolean[] loadedFlags = sm.getLoadedFields();
+                    for (int i=0;i<loadedFlags.length;i++)
                     {
-                        // Definitely does a SELECT, so try to identify any additional non-relation or 1-1, N-1
-                        // members that aren't loaded that could be fetched right now in this call.
-                        List<Integer> memberNumberList = new ArrayList<>();
-                        for (int i=0;i<memberNumbers.length;i++)
+                        boolean requested = false;
+                        for (int j=0;j<memberNumbers.length;j++)
                         {
-                            memberNumberList.add(memberNumbers[i]);
-                        }
-
-                        // Check if we could retrieve any other unloaded fields in this call
-                        boolean[] loadedFlags = sm.getLoadedFields();
-                        for (int i=0;i<loadedFlags.length;i++)
-                        {
-                            boolean requested = false;
-                            for (int j=0;j<memberNumbers.length;j++)
+                            if (memberNumbers[j] == i)
                             {
-                                if (memberNumbers[j] == i)
-                                {
-                                    requested = true;
-                                    break;
-                                }
+                                requested = true;
+                                break;
                             }
-                            if (!requested && !loadedFlags[i])
+                        }
+                        if (!requested && !loadedFlags[i])
+                        {
+                            AbstractMemberMetaData mmd = cmd.getMetaDataForManagedMemberAtAbsolutePosition(i);
+                            RelationType relType = mmd.getRelationType(clr);
+                            if (relType == RelationType.NONE)
                             {
-                                AbstractMemberMetaData mmd = cmd.getMetaDataForManagedMemberAtAbsolutePosition(i);
-                                RelationType relType = mmd.getRelationType(clr);
-                                if (relType == RelationType.NONE || relType == RelationType.ONE_TO_ONE_BI || relType == RelationType.ONE_TO_ONE_UNI)
+                                if (addUnloadedBasic)
                                 {
+                                    // Basic field is unloaded and not selected, so select it
                                     memberNumberList.add(i);
                                 }
                             }
+                            else if (relType == RelationType.ONE_TO_ONE_UNI || (relType == RelationType.ONE_TO_ONE_BI && mmd.getMappedBy() == null)) // TODO N-1 with FK
+                            {
+                                if (!mmd.getType().isInterface()) // Ignore reference fields for now
+                                {
+                                    if (addUnloadedFK)
+                                    {
+                                        // 1-1 with FK at this side so can select/store the FK
+                                        memberNumberListStore.add(i);
+                                    }
+                                }
+                            }
                         }
-                        memberNumbersToProcess = new int[memberNumberList.size()];
-                        int i=0;
-                        Iterator<Integer> fieldNumberIter = memberNumberList.iterator();
-                        while (fieldNumberIter.hasNext())
-                        {
-                            memberNumbersToProcess[i++] = fieldNumberIter.next();
-                        }
+                    }
+
+                    memberNumbersToFetch = memberNumberList.stream().mapToInt(i -> i).toArray();
+//                    memberNumbersToFetch = new int[memberNumberList.size()];
+//                    int i=0;
+//                    for (Integer memberNumber : memberNumberList)
+//                    {
+//                        memberNumbersToFetch[i++] = memberNumber;
+//                    }
+
+                    if (!memberNumberListStore.isEmpty())
+                    {
+                        memberNumbersToStore = memberNumberListStore.stream().mapToInt(i -> i).toArray();
+//                        i = 0;
+//                        memberNumbersToStore = new int[memberNumberListStore.size()];
+//                        for (Integer memberNumber : memberNumberListStore)
+//                        {
+//                            memberNumbersToStore[i++] = memberNumber;
+//                        }
                     }
                 }
             }
 
-            // Convert the field numbers for this class into their metadata for the class
-            mmds = new AbstractMemberMetaData[memberNumbersToProcess.length];
-            for (int i=0;i<mmds.length;i++)
+            // Convert the member numbers for this class into their member metadata
+            mmdsToFetch = new AbstractMemberMetaData[memberNumbersToFetch.length];
+            for (int i=0;i<mmdsToFetch.length;i++)
             {
-                mmds[i] = cmd.getMetaDataForManagedMemberAtAbsolutePosition(memberNumbersToProcess[i]);
+                mmdsToFetch[i] = cmd.getMetaDataForManagedMemberAtAbsolutePosition(memberNumbersToFetch[i]);
+            }
+
+            if (memberNumbersToStore != null)
+            {
+                mmdsToStore = new AbstractMemberMetaData[memberNumbersToStore.length];
+                for (int i=0;i<mmdsToStore.length;i++)
+                {
+                    mmdsToStore[i] = cmd.getMetaDataForManagedMemberAtAbsolutePosition(memberNumbersToStore[i]);
+                }
             }
         }
 
         if (sm.isEmbedded())
         {
             StringBuilder str = new StringBuilder();
-            if (mmds != null)
+            if (mmdsToFetch != null)
             {
-                for (int i=0;i<mmds.length;i++)
+                for (int i=0;i<mmdsToFetch.length;i++)
                 {
                     if (i > 0)
                     {
                         str.append(',');
                     }
-                    str.append(mmds[i].getName());
+                    str.append(mmdsToFetch[i].getName());
                 }
             }
             NucleusLogger.PERSISTENCE.info("Request to load fields \"" + str.toString() + "\" of class " + sm.getClassMetaData().getFullClassName() + " but object is embedded, so ignored");
@@ -314,7 +351,7 @@ public class RDBMSPersistenceHandler extends AbstractPersistenceHandler
             }
 
             DatastoreClass table = getDatastoreClass(sm.getClassMetaData().getFullClassName(), clr);
-            Request req = getFetchRequest(table, sm.getFetchPlanForClass(), mmds, sm.getClassMetaData(), clr);
+            Request req = getFetchRequest(table, sm.getFetchPlanForClass(), clr, sm.getClassMetaData(), mmdsToFetch, mmdsToStore);
             req.execute(sm);
         }
     }
@@ -323,20 +360,21 @@ public class RDBMSPersistenceHandler extends AbstractPersistenceHandler
      * Returns a request object that will fetch a row from the given table. 
      * The store manager will cache the request object for re-use by subsequent requests to the same table.
      * @param table The table from which to fetch.
-     * @param fpClass FetchPlan for the class being fetched
-     * @param mmds MetaData for the members corresponding to the columns to be fetched.
-     * @param cmd ClassMetaData of the object of the request
+     * @param fpClass FetchPlan for class
      * @param clr ClassLoader resolver
+     * @param cmd ClassMetaData of the object of the request
+     * @param mmdsFetch MetaData for the members to be fetched.
+     * @param mmdsStore MetaData for the members to store the values for later processing
      * @return A fetch request object.
      */
-    private Request getFetchRequest(DatastoreClass table, FetchPlanForClass fpClass, AbstractMemberMetaData[] mmds, AbstractClassMetaData cmd, ClassLoaderResolver clr)
+    private Request getFetchRequest(DatastoreClass table, FetchPlanForClass fpClass, ClassLoaderResolver clr, AbstractClassMetaData cmd, AbstractMemberMetaData[] mmdsFetch, AbstractMemberMetaData[] mmdsStore)
     {
-        // TODO Add fpClass to RequestIdentifier
-        RequestIdentifier reqID = new RequestIdentifier(table, mmds, RequestType.FETCH, cmd.getFullClassName());
+        // TODO Add mmdsToStore, fpClass to RequestIdentifier
+        RequestIdentifier reqID = new RequestIdentifier(table, mmdsFetch, RequestType.FETCH, cmd.getFullClassName());
         Request req = requestsByID.get(reqID);
         if (req == null)
         {
-            req = new FetchRequest(table, fpClass, mmds, cmd, clr);
+            req = new FetchRequest(table, fpClass, clr, cmd, mmdsFetch, mmdsStore);
             requestsByID.put(reqID, req);
         }
         return req;

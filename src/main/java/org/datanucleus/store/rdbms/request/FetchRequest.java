@@ -64,6 +64,7 @@ import org.datanucleus.store.rdbms.table.DatastoreClass;
 import org.datanucleus.store.schema.table.SurrogateColumnType;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
+import org.datanucleus.util.StringUtils;
 
 /**
  * Class to retrieve the fields of an object of a specified class from the datastore.
@@ -86,8 +87,8 @@ public class FetchRequest extends Request
     /** Absolute numbers of the fields/properties of the class to fetch. */
     private int[] memberNumbersToFetch = null;
 
-    /** Absolute numbers of the members of the class to store the FK value for. */
-    private int[] memberNumbersToStoreFK = null;
+    /** Absolute numbers of the members of the class to store the value for. */
+    private int[] memberNumbersToStore = null;
 
     /** The mapping of the results of the SQL statement. */
     private StatementClassMapping mappingDefinition;
@@ -107,14 +108,16 @@ public class FetchRequest extends Request
     private String versionFieldName = null;
 
     /**
-     * Constructor, taking the table. Uses the structure of the datastore table to build a basic query.
+     * Constructor. Uses the structure of the datastore table to build a basic SELECT query.
      * @param classTable The Class Table representing the datastore table to retrieve
-     * @param fpClass FetchPlan for class being loaded
-     * @param mmds MetaData of the fields/properties to retrieve
-     * @param cmd ClassMetaData of objects being fetched
+     * @param fpClass FetchPlan for class
      * @param clr ClassLoader resolver
+     * @param cmd ClassMetaData of the candidate
+     * @param mmds MetaData of the members to fetch
+     * @param mmdsToStore MetaData of the members to store
      */
-    public FetchRequest(DatastoreClass classTable, FetchPlanForClass fpClass, AbstractMemberMetaData[] mmds, AbstractClassMetaData cmd, ClassLoaderResolver clr)
+    public FetchRequest(DatastoreClass classTable, FetchPlanForClass fpClass, ClassLoaderResolver clr, AbstractClassMetaData cmd, 
+            AbstractMemberMetaData[] mmds, AbstractMemberMetaData[] mmdsToStore)
     {
         super(classTable);
 
@@ -171,36 +174,44 @@ public class FetchRequest extends Request
             currentTable = currentTable.getSuperDatastoreClass();
         }
 
-        // TODO Can we skip the statement generation if we know there are no selectable fields?
-
         // Generate the statement for the requested members
         RDBMSStoreManager storeMgr = classTable.getStoreManager();
         SelectStatement sqlStatement = new SelectStatement(storeMgr, table, null, null);
-
         mappingDefinition = new StatementClassMapping();
         mappingCallbacks = new ArrayList<>();
-        List<Integer> memberNumbersToStoreFKTmp = new ArrayList();
-        numberOfFieldsToFetch = processMembersOfClass(sqlStatement, fpClass, mmds, table, sqlStatement.getPrimaryTable(), mappingDefinition, mappingCallbacks, clr, memberNumbersToStoreFKTmp);
+
+        List<Integer> memberNumbersToStoreTmp = new ArrayList<>();
+        numberOfFieldsToFetch = processMembersOfClass(sqlStatement, fpClass, mmds, mmdsToStore, table, sqlStatement.getPrimaryTable(), mappingDefinition, mappingCallbacks, clr,
+            memberNumbersToStoreTmp);
         memberNumbersToFetch = mappingDefinition.getMemberNumbers();
-        if (memberNumbersToStoreFKTmp.size() > 0)
+        if (memberNumbersToStoreTmp.size() > 0)
         {
-            int[] memberNumberTmp = new int[memberNumbersToFetch.length - memberNumbersToStoreFKTmp.size()];
+            // Remove memberNumbersToStoreTmp from memberNumbersToFetch so we have distinct lists
+            int[] memberNumberTmp = new int[memberNumbersToFetch.length - memberNumbersToStoreTmp.size()];
             int j = 0;
             for (int i=0;i<memberNumbersToFetch.length;i++)
             {
-                if (!memberNumbersToStoreFKTmp.contains(memberNumbersToFetch[i]))
+                if (!memberNumbersToStoreTmp.contains(memberNumbersToFetch[i]))
                 {
                     memberNumberTmp[j++] = memberNumbersToFetch[i];
                 }
             }
             memberNumbersToFetch = memberNumberTmp;
-            memberNumbersToStoreFK = new int[memberNumbersToStoreFKTmp.size()];
+            memberNumbersToStore = new int[memberNumbersToStoreTmp.size()];
             j = 0;
-            for (Integer absNum : memberNumbersToStoreFKTmp)
+            for (Integer absNum : memberNumbersToStoreTmp)
             {
-                memberNumbersToStoreFK[j++] = absNum;
+                memberNumbersToStore[j++] = absNum;
+            }
+
+            if (NucleusLogger.PERSISTENCE.isDebugEnabled())
+            {
+                NucleusLogger.PERSISTENCE.debug("FetchRequest fetch=" + StringUtils.intArrayToString(memberNumbersToFetch) + 
+                    " store=" + StringUtils.intArrayToString(memberNumbersToStore));
             }
         }
+
+        // TODO Can we skip the statement generation if we know there are no selectable fields?
 
         // Add WHERE clause restricting to an object of this type
         int inputParamNum = 1;
@@ -487,18 +498,19 @@ public class FetchRequest extends Request
                                 sm.setVersion(datastoreVersion);
                             }
 
-                            // Update all fields
-                            // TODO If we ever support just loading a FK value but not instantiating this needs to store the value in StateManager.
+                            // Fetch requested fields
                             sm.replaceFields(memberNumbersToFetch, rsGetter);
-                            if (memberNumbersToStoreFK != null)
+
+                            // Store requested fields
+                            if (memberNumbersToStore != null)
                             {
-                                for (int i=0;i<memberNumbersToStoreFK.length;i++)
+                                for (int i=0;i<memberNumbersToStore.length;i++)
                                 {
-                                    StatementMappingIndex mapIdx = mappingDefinition.getMappingForMemberPosition(memberNumbersToStoreFK[i]);
+                                    StatementMappingIndex mapIdx = mappingDefinition.getMappingForMemberPosition(memberNumbersToStore[i]);
                                     JavaTypeMapping m = mapIdx.getMapping();
                                     if (m instanceof PersistableMapping)
                                     {
-                                        // Create the identity of the related object
+                                        // FK, so create the identity of the related object
                                         AbstractClassMetaData memberCmd = ((PersistableMapping)m).getClassMetaData();
 
                                         Object memberId = null;
@@ -518,12 +530,12 @@ public class FetchRequest extends Request
                                         if (memberId == null)
                                         {
                                             // Just set the member and don't bother saving the value
-                                            sm.replaceField(memberNumbersToStoreFK[i], null);
+                                            sm.replaceField(memberNumbersToStore[i], null);
                                         }
                                         else
                                         {
                                             // Store the "id" value in case the member is ever accessed
-                                            sm.storeFieldValue(memberNumbersToStoreFK[i], memberId);
+                                            sm.storeFieldValue(memberNumbersToStore[i], memberId);
                                         }
                                     }
                                 }
@@ -572,109 +584,28 @@ public class FetchRequest extends Request
      * Method to process the supplied members of the class, adding to the SQLStatement as required.
      * Can recurse if some of the requested fields are persistent objects in their own right, so we take the opportunity to retrieve some of their fields.
      * @param sqlStatement Statement being built
-     * @param fpClass FetchPlan for the primary class
-     * @param mmds Meta-data for the required fields/properties
+     * @param fpClass FetchPlan for class
+     * @param mmds MetaData for the members to fetch
+     * @param mmdsToStore MetaData for the members to store
      * @param table The table to look for member mappings
      * @param sqlTbl The table in the SQL statement to use for selects
      * @param mappingDef Mapping definition for the result
      * @param fetchCallbacks Any additional required callbacks are added here
      * @param clr ClassLoader resolver
-     * @param membersToStoreFK List of members where we can select the FK column(s) and store the returned FK rather than instantiate the related object
-     * @return Number of members being fetched
+     * @return Number of members being selected in the statement
      */
-    protected int processMembersOfClass(SelectStatement sqlStatement, FetchPlanForClass fpClass, AbstractMemberMetaData[] mmds, 
-            DatastoreClass table, SQLTable sqlTbl, StatementClassMapping mappingDef, Collection fetchCallbacks, ClassLoaderResolver clr, List<Integer> membersToStoreFK)
+    protected int processMembersOfClass(SelectStatement sqlStatement, FetchPlanForClass fpClass, AbstractMemberMetaData[] mmds, AbstractMemberMetaData[] mmdsToStore, 
+            DatastoreClass table, SQLTable sqlTbl, StatementClassMapping mappingDef, Collection fetchCallbacks, ClassLoaderResolver clr, List<Integer> memberNumbersToStore)
     {
         int number = 0;
         if (mmds != null)
         {
+            // Process the members to fetch
             for (int i=0;i<mmds.length;i++)
             {
-                // Get the mapping (in this table, or super-table)
-                AbstractMemberMetaData mmd = mmds[i];
-                JavaTypeMapping mapping = table.getMemberMapping(mmd);
-                if (mapping != null)
+                if (processMemberToFetch(mmds[i], fpClass, clr, fetchCallbacks, sqlStatement, sqlTbl, mappingDef, memberNumbersToStore))
                 {
-                    if (!mmd.isPrimaryKey() && mapping.includeInFetchStatement())
-                    {
-                        // The depth is the number of levels down to load in this statement : 0 is to load just this objects fields
-                        int depth = 0;
-
-                        AbstractMemberMetaData mmdToUse = mmd;
-                        JavaTypeMapping mappingToUse = mapping;
-                        if (mapping instanceof SingleCollectionMapping)
-                        {
-                            // Check the wrapped type
-                            mappingToUse = ((SingleCollectionMapping) mapping).getWrappedMapping();
-                            mmdToUse = ((SingleCollectionMapping) mapping).getWrappedMapping().getMemberMetaData();
-                        }
-
-                        boolean fetchAndSaveFK = false;
-                        if (mappingToUse instanceof PersistableMapping)
-                        {
-                            if (RelationType.isRelationSingleValued(mmd.getRelationType(clr)) && fpClass.getRecursionDepthForMember(mmd.getAbsoluteFieldNumber()) == 0)
-                            {
-                                // Special case of 1-1/N-1 and recursion-depth set as 0 (just retrieve the FK and don't instantiate the related object in the field)
-                                depth = 0;
-                                fetchAndSaveFK = true;
-                            }
-                            else if (mmd.fetchFKOnly())
-                            {
-                                // Special case of 1-1/N-1 and fetch-fk-only extension - same as above
-                                depth = 0;
-                                fetchAndSaveFK = true;
-                            }
-                            else
-                            {
-                                // Special case of 1-1/N-1 where we know the other side type so know what to join to and can load the related object
-                                depth = 1;
-                                if (Modifier.isAbstract(mmdToUse.getType().getModifiers()))
-                                {
-                                    String typeName = mmdToUse.getTypeName();
-                                    DatastoreClass relTable = table.getStoreManager().getDatastoreClass(typeName, clr);
-                                    if (relTable != null && relTable.getSurrogateMapping(SurrogateColumnType.DISCRIMINATOR, false) == null)
-                                    {
-                                        // 1-1 relation to base class with no discriminator and has subclasses
-                                        // hence no way of determining the exact type, hence no point in fetching it
-                                        String[] subclasses = table.getStoreManager().getMetaDataManager().getSubclassesForClass(typeName, false);
-                                        if (subclasses != null && subclasses.length > 0)
-                                        {
-                                            depth = 0;
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        else if (mappingToUse instanceof ReferenceMapping)
-                        {
-                            ReferenceMapping refMapping = (ReferenceMapping)mappingToUse;
-                            if (refMapping.getMappingStrategy() == ReferenceMapping.PER_IMPLEMENTATION_MAPPING)
-                            {
-                                JavaTypeMapping[] subMappings = refMapping.getJavaTypeMapping();
-                                if (subMappings != null && subMappings.length == 1)
-                                {
-                                    // Support special case of reference mapping with single implementation possible
-                                    depth = 1;
-                                }
-                            }
-                        }
-
-                        // TODO We should use the actual FetchPlan, and the max fetch depth, so then it can pull in all related objects within reach.
-                        // But this will mean we cannot cache the statement, since it is for a specific ExecutionContext
-                        // TODO If this field is a 1-1 and the other side has a discriminator or version then we really ought to fetch it
-                        SQLStatementHelper.selectMemberOfSourceInStatement(sqlStatement, mappingDef, null, sqlTbl, mmd, clr, depth, null);
-                        if (fetchAndSaveFK)
-                        {
-                            membersToStoreFK.add(mmd.getAbsoluteFieldNumber());
-                        }
-                        number++;
-                    }
-
-                    if (mapping instanceof MappingCallbacks)
-                    {
-                        // TODO Need to add that this mapping is for base object or base.field1, etc
-                        fetchCallbacks.add(mapping);
-                    }
+                    number++;
                 }
             }
         }
@@ -690,6 +621,170 @@ public class FetchRequest extends Request
             mappingDef.addMappingForMember(SurrogateColumnType.VERSION.getFieldNumber(), verMapIdx);
         }
 
+        if (mmdsToStore != null)
+        {
+            // Process the members to store
+            for (int i=0;i<mmdsToStore.length;i++)
+            {
+                if (processMemberToStore(mmdsToStore[i], fpClass, clr, fetchCallbacks, sqlStatement, sqlTbl, mappingDef, memberNumbersToStore))
+                {
+                    number++;
+                }
+            }
+        }
+
         return number;
+    }
+
+    /**
+     * Method to process the specified member.
+     * @param mmd MetaData for the member
+     * @param fpClass FetchPlan for class
+     * @param clr ClassLoader resolver
+     * @param fetchCallbacks Any fetch callbacks to register the mapping with
+     * @param sqlStmt The SELECT statement
+     * @param sqlTbl The SQL table (of the candidate)
+     * @param mappingDef The mapping definition for this statement
+     * @param store Whether we are just selecting the value of this member for storing (rather than fetching)
+     * @param memberNumbersToStore List of member numbers that are approved to be stored (any fetched ones will be added if recursionDepth=0)
+     * @return Whether this member is selected in the statement
+     */
+    boolean processMemberToFetch(AbstractMemberMetaData mmd, FetchPlanForClass fpClass, ClassLoaderResolver clr, Collection fetchCallbacks, SelectStatement sqlStmt, 
+            SQLTable sqlTbl, StatementClassMapping mappingDef, List<Integer> memberNumbersToStore)
+    {
+        boolean selected = false;
+        JavaTypeMapping mapping = table.getMemberMapping(mmd);
+        if (mapping != null)
+        {
+            if (!mmd.isPrimaryKey() && mapping.includeInFetchStatement())
+            {
+                // The depth is the number of levels down to load in this statement : 0 is to load just this objects fields
+                int depth = 0;
+
+                AbstractMemberMetaData mmdToUse = mmd;
+                JavaTypeMapping mappingToUse = mapping;
+                if (mapping instanceof SingleCollectionMapping)
+                {
+                    // Check the wrapped type
+                    mappingToUse = ((SingleCollectionMapping) mapping).getWrappedMapping();
+                    mmdToUse = ((SingleCollectionMapping) mapping).getWrappedMapping().getMemberMetaData();
+                }
+
+                boolean fetchAndSaveFK = false;
+                if (mappingToUse instanceof PersistableMapping)
+                {
+                    if (RelationType.isRelationSingleValued(mmd.getRelationType(clr)) && fpClass.getRecursionDepthForMember(mmd.getAbsoluteFieldNumber()) == 0)
+                    {
+                        // Special case of 1-1/N-1 and recursion-depth set as 0 (just retrieve the FK and don't instantiate the related object in the field)
+                        depth = 0;
+                        fetchAndSaveFK = true;
+                    }
+                    else if (mmd.fetchFKOnly())
+                    {
+                        // Special case of 1-1/N-1 and fetch-fk-only extension - same as above
+                        depth = 0;
+                        fetchAndSaveFK = true;
+                    }
+                    else
+                    {
+                        // Special case of 1-1/N-1 where we know the other side type so know what to join to and can load the related object
+                        depth = 1;
+                        if (Modifier.isAbstract(mmdToUse.getType().getModifiers()))
+                        {
+                            String typeName = mmdToUse.getTypeName();
+                            DatastoreClass relTable = table.getStoreManager().getDatastoreClass(typeName, clr);
+                            if (relTable != null && relTable.getSurrogateMapping(SurrogateColumnType.DISCRIMINATOR, false) == null)
+                            {
+                                // 1-1 relation to base class with no discriminator and has subclasses
+                                // hence no way of determining the exact type, hence no point in fetching it
+                                String[] subclasses = table.getStoreManager().getMetaDataManager().getSubclassesForClass(typeName, false);
+                                if (subclasses != null && subclasses.length > 0)
+                                {
+                                    depth = 0;
+                                }
+                            }
+                        }
+                    }
+                }
+                else if (mappingToUse instanceof ReferenceMapping)
+                {
+                    ReferenceMapping refMapping = (ReferenceMapping)mappingToUse;
+                    if (refMapping.getMappingStrategy() == ReferenceMapping.PER_IMPLEMENTATION_MAPPING)
+                    {
+                        JavaTypeMapping[] subMappings = refMapping.getJavaTypeMapping();
+                        if (subMappings != null && subMappings.length == 1)
+                        {
+                            // Support special case of reference mapping with single implementation possible
+                            depth = 1;
+                        }
+                    }
+                }
+
+                // TODO We should use the actual FetchPlan, and the max fetch depth, so then it can pull in all related objects within reach.
+                // But this will mean we cannot cache the statement, since it is for a specific ExecutionContext
+                // TODO If this field is a 1-1 and the other side has a discriminator or version then we really ought to fetch it
+                SQLStatementHelper.selectMemberOfSourceInStatement(sqlStmt, mappingDef, null, sqlTbl, mmd, clr, depth, null);
+                if (fetchAndSaveFK)
+                {
+                    memberNumbersToStore.add(mmd.getAbsoluteFieldNumber());
+                }
+                selected = true;
+            }
+
+            if (mapping instanceof MappingCallbacks)
+            {
+                // TODO Need to add that this mapping is for base object or base.field1, etc
+                fetchCallbacks.add(mapping);
+            }
+        }
+        return selected;
+    }
+
+    /**
+     * Method to process the specified member.
+     * @param mmd MetaData for the member
+     * @param fpClass FetchPlan for class
+     * @param clr ClassLoader resolver
+     * @param fetchCallbacks Any fetch callbacks to register the mapping with
+     * @param sqlStmt The SELECT statement
+     * @param sqlTbl The SQL table (of the candidate)
+     * @param mappingDef The mapping definition for this statement
+     * @param memberNumbersToStore List of member numbers that are approved to be stored
+     * @return Whether this member is selected in the statement
+     */
+    boolean processMemberToStore(AbstractMemberMetaData mmd, FetchPlanForClass fpClass, ClassLoaderResolver clr, Collection fetchCallbacks, SelectStatement sqlStmt, 
+            SQLTable sqlTbl, StatementClassMapping mappingDef, List<Integer> memberNumbersToStore)
+    {
+        boolean selected = false;
+        JavaTypeMapping mapping = table.getMemberMapping(mmd);
+        if (mapping != null)
+        {
+            if (!mmd.isPrimaryKey() && mapping.includeInFetchStatement())
+            {
+                AbstractMemberMetaData mmdToUse = mmd;
+                JavaTypeMapping mappingToUse = mapping;
+                if (mapping instanceof SingleCollectionMapping)
+                {
+                    // Check the wrapped type
+                    mappingToUse = ((SingleCollectionMapping) mapping).getWrappedMapping();
+                    mmdToUse = ((SingleCollectionMapping) mapping).getWrappedMapping().getMemberMetaData();
+                }
+
+                if (mappingToUse instanceof PersistableMapping)
+                {
+                    // TODO Omit members that are compound identity
+                    SQLStatementHelper.selectMemberOfSourceInStatement(sqlStmt, mappingDef, null, sqlTbl, mmdToUse, clr, 0, null);
+                    memberNumbersToStore.add(mmd.getAbsoluteFieldNumber());
+                    selected = true;
+                }
+            }
+
+            if (mapping instanceof MappingCallbacks)
+            {
+                // TODO Need to add that this mapping is for base object or base.field1, etc
+                fetchCallbacks.add(mapping);
+            }
+        }
+        return selected;
     }
 }

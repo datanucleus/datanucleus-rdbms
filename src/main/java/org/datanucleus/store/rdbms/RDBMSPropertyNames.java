@@ -50,7 +50,9 @@ public class RDBMSPropertyNames
     public static final String PROPERTY_RDBMS_QUERY_FETCH_DIRECTION = "datanucleus.rdbms.query.fetchDirection";
     public static final String PROPERTY_RDBMS_QUERY_RESULT_SET_TYPE = "datanucleus.rdbms.query.resultSetType";
     public static final String PROPERTY_RDBMS_QUERY_RESULT_SET_CONCURRENCY = "datanucleus.rdbms.query.resultSetConcurrency";
-    public static final String PROPERTY_RDBMS_FETCH_UNLOADED_AUTO = "datanucleus.rdbms.fetchUnloadedAutomatically";
+
+    public static final String PROPERTY_RDBMS_FETCH_UNLOADED_BASIC_AUTO = "datanucleus.rdbms.autoFetchUnloadedBasicFields";
+    public static final String PROPERTY_RDBMS_FETCH_UNLOADED_FK_AUTO = "datanucleus.rdbms.autoFetchUnloadedFKs";
 
     public static final String PROPERTY_RDBMS_SQL_TABLE_NAMING_STRATEGY = "datanucleus.rdbms.sqlTableNamingStrategy";
     public static final String PROPERTY_RDBMS_STATEMENT_LOGGING = "datanucleus.rdbms.statementLogging";

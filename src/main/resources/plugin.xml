@@ -82,7 +82,8 @@ Contributors:
         <persistence-property name="datanucleus.rdbms.useColumnDefaultWhenNull" datastore="true" value="true"/>
 
         <persistence-property name="datanucleus.rdbms.statementLogging" datastore="true" value="JDBC" validator="org.datanucleus.store.rdbms.RDBMSPropertyValidator"/>
-        <persistence-property name="datanucleus.rdbms.fetchUnloadedAutomatically" datastore="true" value="false" validator="org.datanucleus.properties.BooleanPropertyValidator"/>
+        <persistence-property name="datanucleus.rdbms.autoFetchUnloadedBasicFields" datastore="true" value="false" validator="org.datanucleus.properties.BooleanPropertyValidator"/>
+        <persistence-property name="datanucleus.rdbms.autoFetchUnloadedFKs" datastore="true" value="false" validator="org.datanucleus.properties.BooleanPropertyValidator"/>
 
         <!-- Adapter specific properties -->
         <persistence-property name="datanucleus.rdbms.informix.useSerialForIdentity" datastore="true" validator="org.datanucleus.properties.BooleanPropertyValidator"/>
