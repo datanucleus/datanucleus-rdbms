@@ -32,9 +32,9 @@ import org.datanucleus.metadata.ClassMetaData;
 import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.FieldValues;
 import org.datanucleus.store.fieldmanager.FieldManager;
+import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.fieldmanager.ResultSetGetter;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
-import org.datanucleus.store.rdbms.mapping.java.PersistableMapping;
 import org.datanucleus.store.rdbms.query.StatementClassMapping;
 import org.datanucleus.store.rdbms.query.StatementMappingIndex;
 import org.datanucleus.store.rdbms.table.DatastoreClass;
@@ -93,7 +93,7 @@ public class MappingHelper
     }
 
     /**
-     * Get the datastore identity for the object in the passed result set row.
+     * Get the datastore identity for the persistable object from the passed result set row.
      * @param ec ExecutionContext
      * @param mapping The mapping in which this is returned
      * @param rs the ResultSet
@@ -133,86 +133,54 @@ public class MappingHelper
     }
 
     /**
-     * Get the object instance for a class using application identity from the passed result set row.
+     * Get the application identity for the persistable instance from the passed result set row.
      * @param ec ExecutionContext
-     * @param mapIdx Statement mapping index from the query that generated this result set
+     * @param mapping The Java Type mapping for the instance
      * @param rs the ResultSet
+     * @param resultIndexes indexes of the ResultSet for the PK field(s)
      * @param cmd the AbstractClassMetaData
      * @return the id
      */
-    public static Object getApplicationIdentityForResultSetRow(final ExecutionContext ec, StatementMappingIndex mapIdx, final ResultSet rs, AbstractClassMetaData cmd)
+    public static Object getApplicationIdentityForResultSetRow(final ExecutionContext ec, JavaTypeMapping mapping, final ResultSet rs, int[] resultIndexes, AbstractClassMetaData cmd)
     {
-        ClassLoaderResolver clr = ec.getClassLoaderResolver();
-
-        JavaTypeMapping mapping = mapIdx.getMapping();
-        int[] resultIndexes = mapIdx.getColumnPositions();
+        // Check for null FK
+        if (((RDBMSStoreManager)ec.getStoreManager()).getResultValueAtPosition(rs, mapping, resultIndexes[0]) == null)
+        {
+            // Assumption : if the first param is null, then the field is null
+            return null;
+        }
 
         // Abstract class
-        if (cmd instanceof ClassMetaData && ((ClassMetaData)cmd).isAbstract() && cmd.getObjectidClass() != null)
+        if (((ClassMetaData)cmd).isAbstract() && cmd.getObjectidClass() != null)
         {
-            // Abstract class
-            Class objectIdClass = clr.classForName(cmd.getObjectidClass());
-            if (cmd.usesSingleFieldIdentityClass())
-            {
-                return createSingleFieldIdentity(ec, mapping, rs, resultIndexes, cmd, objectIdClass, clr.classForName(cmd.getFullClassName())); 
-            }
-            return createObjectIdentityUsingReflection(ec, mapping, rs, resultIndexes, cmd, objectIdClass);
+            return getObjectForAbstractClass(ec, mapping, rs, resultIndexes, cmd);
         }
 
-        // Create a ResultSetGetter with the data for the primary key column(s) of this class solely
-        int totalMemberCount = cmd.getNoOfManagedMembers() + cmd.getNoOfInheritedManagedMembers();
-        final StatementMappingIndex[] statementExpressionIndex = new StatementMappingIndex[totalMemberCount];
+        int totalFieldCount = cmd.getNoOfManagedMembers() + cmd.getNoOfInheritedManagedMembers();
+        final StatementMappingIndex[] statementExpressionIndex = new StatementMappingIndex[totalFieldCount];
 
-        if (mapping instanceof PersistableMapping)
-        {
-            // Passed a PersistableMapping, which may be a composite PK
-            PersistableMapping pcMapping = (PersistableMapping)mapping;
-            JavaTypeMapping[] pcMappings = pcMapping.getJavaTypeMapping();
-
-            final int[] pkMemberPositions = cmd.getPKMemberPositions();
-            int resultIndexNum = 0;
-            for (int i=0; i<pkMemberPositions.length; ++i)
-            {
-                AbstractMemberMetaData mmd = cmd.getMetaDataForManagedMemberAtAbsolutePosition(pkMemberPositions[i]);
-                JavaTypeMapping m = pcMappings[i];
-                statementExpressionIndex[mmd.getAbsoluteFieldNumber()] = new StatementMappingIndex(m);
-                int expressionsIndex[] = new int[m.getNumberOfColumnMappings()];
-                for (int j = 0; j < expressionsIndex.length; j++)
-                {
-                    expressionsIndex[j] = resultIndexes[resultIndexNum++];
-                }
-                statementExpressionIndex[mmd.getAbsoluteFieldNumber()].setColumnPositions(expressionsIndex);
-            }
-            final StatementClassMapping resultMappings = new StatementClassMapping();
-            for (int i=0;i<pkMemberPositions.length;i++)
-            {
-                resultMappings.addMappingForMember(pkMemberPositions[i], statementExpressionIndex[pkMemberPositions[i]]);
-            }
-
-            final FieldManager resultsFM = new ResultSetGetter(ec, rs, resultMappings, cmd);
-            return IdentityUtils.getApplicationIdentityForResultSetRow(ec, cmd, null, false, resultsFM);
-        }
-
+        ClassLoaderResolver clr = ec.getClassLoaderResolver();
         DatastoreClass datastoreClass = mapping.getStoreManager().getDatastoreClass(cmd.getFullClassName(), clr);
-        final int[] pkMemberPositions = cmd.getPKMemberPositions();
+        final int[] pkFieldNumbers = cmd.getPKMemberPositions();
+
         int paramIndex = 0;
-        for (int i=0; i<pkMemberPositions.length; ++i)
+        for (int i=0; i<pkFieldNumbers.length; ++i)
         {
-            AbstractMemberMetaData mmd = cmd.getMetaDataForManagedMemberAtAbsolutePosition(pkMemberPositions[i]);
-            JavaTypeMapping m = datastoreClass.getMemberMapping(mmd);
-            statementExpressionIndex[mmd.getAbsoluteFieldNumber()] = new StatementMappingIndex(m);
+            AbstractMemberMetaData fmd = cmd.getMetaDataForManagedMemberAtAbsolutePosition(pkFieldNumbers[i]);
+            JavaTypeMapping m = datastoreClass.getMemberMapping(fmd);
+            statementExpressionIndex[fmd.getAbsoluteFieldNumber()] = new StatementMappingIndex(m);
             int expressionsIndex[] = new int[m.getNumberOfColumnMappings()];
             for (int j = 0; j < expressionsIndex.length; j++)
             {
                 expressionsIndex[j] = resultIndexes[paramIndex++];
             }
-            statementExpressionIndex[mmd.getAbsoluteFieldNumber()].setColumnPositions(expressionsIndex);
+            statementExpressionIndex[fmd.getAbsoluteFieldNumber()].setColumnPositions(expressionsIndex);
         }
 
         final StatementClassMapping resultMappings = new StatementClassMapping();
-        for (int i=0;i<pkMemberPositions.length;i++)
+        for (int i=0;i<pkFieldNumbers.length;i++)
         {
-            resultMappings.addMappingForMember(pkMemberPositions[i], statementExpressionIndex[pkMemberPositions[i]]);
+            resultMappings.addMappingForMember(pkFieldNumbers[i], statementExpressionIndex[pkFieldNumbers[i]]);
         }
 
         final FieldManager resultsFM = new ResultSetGetter(ec, rs, resultMappings, cmd);

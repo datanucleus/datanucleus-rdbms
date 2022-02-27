@@ -27,14 +27,13 @@ import org.datanucleus.util.ClassUtils;
 
 /**
  * Maps to identity objects of persistable values.
- * Used only from within JDOQL queries on JDOHelper.getObjectId expressions
+ * Used within JDOQL queries on JDOHelper.getObjectId expressions, as well as on SQL statement results when selecting a PersistableMapping to convert to an identity.
  */
 public class PersistableIdMapping extends PersistableMapping
 {
     /**
-     * Constructor used to generate a PCMapping representing only the identity of the object.
-     * This is typically used where the user has selected the id in a JDOQL query as a result field.
-     * @param pcMapping The mapping to base it on
+     * Constructor used to generate a mapping representing only the identity of the persistable object.
+     * @param pcMapping The persistable mapping to base it on
      */
     public PersistableIdMapping(PersistableMapping pcMapping)
     {
@@ -57,6 +56,7 @@ public class PersistableIdMapping extends PersistableMapping
      */
     public Object getObject(ExecutionContext ec, final ResultSet rs, int[] param)
     {
+        // TODO This instantiates the persistable object just to get the id. Use MappingHelper code to get the id from rs without instantiating.
         Object value = super.getObject(ec, rs, param);
         if (value != null)
         {

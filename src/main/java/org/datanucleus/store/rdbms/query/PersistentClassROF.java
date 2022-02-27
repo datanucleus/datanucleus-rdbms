@@ -569,7 +569,7 @@ public final class PersistentClassROF<T> extends AbstractROF<T>
                             }
                             else if (memberCmd.getIdentityType() == IdentityType.APPLICATION)
                             {
-                                memberId = MappingHelper.getApplicationIdentityForResultSetRow(ec, mapIdx, rs, memberCmd);
+                                memberId = MappingHelper.getApplicationIdentityForResultSetRow(ec, m, rs, mapIdx.getColumnPositions(), memberCmd);
                             }
                             else
                             {

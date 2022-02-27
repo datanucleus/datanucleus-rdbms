@@ -520,7 +520,7 @@ public class FetchRequest extends Request
                                         }
                                         else if (memberCmd.getIdentityType() == IdentityType.APPLICATION)
                                         {
-                                            memberId = MappingHelper.getApplicationIdentityForResultSetRow(ec, mapIdx, rs, memberCmd);
+                                            memberId = MappingHelper.getApplicationIdentityForResultSetRow(ec, m, rs, mapIdx.getColumnPositions(), memberCmd);
                                         }
                                         else
                                         {
