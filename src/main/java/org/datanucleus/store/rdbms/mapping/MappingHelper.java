@@ -33,6 +33,7 @@ import org.datanucleus.metadata.ClassMetaData;
 import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.FieldValues;
 import org.datanucleus.store.fieldmanager.FieldManager;
+import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.fieldmanager.ResultSetGetter;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.query.StatementClassMapping;
@@ -171,9 +172,15 @@ public class MappingHelper
     public static Object getApplicationIdentityForResultSetRow(final ExecutionContext ec, JavaTypeMapping mapping, 
             final ResultSet rs, int[] resultIndexes, AbstractClassMetaData cmd)
     {
-        ClassLoaderResolver clr = ec.getClassLoaderResolver();
+        // Check for null FK
+        if (((RDBMSStoreManager)ec.getStoreManager()).getResultValueAtPosition(rs, mapping, resultIndexes[0]) == null)
+        {
+            // Assumption : if the first param is null, then the field is null
+            return null;
+        }
 
         // Abstract class
+        ClassLoaderResolver clr = ec.getClassLoaderResolver();
         if (cmd instanceof ClassMetaData && ((ClassMetaData)cmd).isAbstract() && cmd.getObjectidClass() != null)
         {
             // Abstract class
