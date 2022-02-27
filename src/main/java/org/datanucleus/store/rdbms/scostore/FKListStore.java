@@ -829,7 +829,6 @@ public class FKListStore<E> extends AbstractListStore<E>
      * @param mconn Managed Connection to use for datastore connectivity
      * @param batched Whether this statement should be batched
      * @param executeNow Whether we should execute this statement now
-     * @throws NucleusDatastoreException if an error occurs
      */
     protected void internalRemoveAtNullify(DNStateManager ownerSM, int index, ManagedConnection mconn, boolean batched, boolean executeNow)
     {
@@ -869,7 +868,6 @@ public class FKListStore<E> extends AbstractListStore<E>
      * @param mconn Managed Connection to use for datastore connectivity
      * @param batched Whether this statement should be batched
      * @param executeNow Whether we should execute this statement now
-     * @throws NucleusDatastoreException if an error occurs
      */
     protected void internalRemoveAtNullifyBulk(DNStateManager ownerSM, int[] indices, ManagedConnection mconn, boolean batched, boolean executeNow)
     {

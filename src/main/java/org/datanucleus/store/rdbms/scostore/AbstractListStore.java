@@ -794,7 +794,7 @@ public abstract class AbstractListStore<E> extends AbstractCollectionStore<E> im
      * <PRE>
      * UPDATE LISTTABLE SET INDEXCOL = INDEXCOL + ?
      * WHERE OWNERCOL = ?
-     * AND INDEXCOL > ?
+     * AND INDEXCOL &gt; ?
      * [AND DISTINGUISHER=?]
      * </PRE>
      * @return The Statement for shifting elements in bulk

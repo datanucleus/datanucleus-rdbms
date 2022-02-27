@@ -592,6 +592,7 @@ public class FetchRequest extends Request
      * @param mappingDef Mapping definition for the result
      * @param fetchCallbacks Any additional required callbacks are added here
      * @param clr ClassLoader resolver
+     * @param memberNumbersToStore Numbers of the members that need storing (populated by this call)
      * @return Number of members being selected in the statement
      */
     protected int processMembersOfClass(SelectStatement sqlStatement, FetchPlanForClass fpClass, AbstractMemberMetaData[] mmds, AbstractMemberMetaData[] mmdsToStore, 
