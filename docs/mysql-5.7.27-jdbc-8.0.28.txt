@@ -1,0 +1,1318 @@
+================ DatabaseAdapter ==================
+Adapter : org.datanucleus.store.rdbms.adapter.MySQLAdapter
+Datastore : name="MySQL" version="5.7.27-log" (major=5, minor=7, revision=27)
+Driver : name="MySQL Connector/J" version="mysql-connector-java-8.0.28 (Revision: 7ff2161da3899f379fb3171b6538b191b1c5c7e2)" (major=8, minor=0)
+===================================================
+
+Database TypeInfo
+JDBC Type=VARCHAR sqlTypes=VARCHAR(M) BINARY,TINYTEXT (default=VARCHAR(M) BINARY)
+    SQLTypeInfo : typeName = VARCHAR(M) BINARY
+      dataType (jdbc)   = 12
+      precision         = 65535
+      literalPrefix     = '
+      literalSuffix     = '
+      createParams      = 
+      nullable          = 1
+      caseSensitive     = true
+      searchable        = 3
+      unsignedAttribute = false
+      fixedPrecScale    = false
+      autoIncrement     = false
+      localTypeName     = VARCHAR
+      minimumScale      = 0
+      maximumScale      = 0
+      numPrecRadix      = 10
+      allowsPrecisionSpec = true
+
+    SQLTypeInfo : typeName = TINYTEXT
+      dataType (jdbc)   = 12
+      precision         = 255
+      literalPrefix     = '
+      literalSuffix     = '
+      createParams      =  [CHARACTER SET charset_name] [COLLATE collation_name]
+      nullable          = 1
+      caseSensitive     = true
+      searchable        = 3
+      unsignedAttribute = false
+      fixedPrecScale    = false
+      autoIncrement     = false
+      localTypeName     = TINYTEXT
+      minimumScale      = 0
+      maximumScale      = 0
+      numPrecRadix      = 10
+      allowsPrecisionSpec = true
+
+JDBC Type=LONGVARCHAR sqlTypes=LONGTEXT,TEXT,MEDIUMTEXT,LONG VARCHAR (default=LONG VARCHAR)
+    SQLTypeInfo : typeName = LONGTEXT
+      dataType (jdbc)   = -1
+      precision         = 2147483647
+      literalPrefix     = '
+      literalSuffix     = '
+      createParams      =  [CHARACTER SET charset_name] [COLLATE collation_name]
+      nullable          = 1
+      caseSensitive     = true
+      searchable        = 3
+      unsignedAttribute = false
+      fixedPrecScale    = false
+      autoIncrement     = false
+      localTypeName     = LONGTEXT
+      minimumScale      = 0
+      maximumScale      = 0
+      numPrecRadix      = 10
+      allowsPrecisionSpec = false
+
+    SQLTypeInfo : typeName = TEXT
+      dataType (jdbc)   = -1
+      precision         = 65535
+      literalPrefix     = '
+      literalSuffix     = '
+      createParams      = [(M)] [CHARACTER SET charset_name] [COLLATE collation_name]
+      nullable          = 1
+      caseSensitive     = true
+      searchable        = 3
+      unsignedAttribute = false
+      fixedPrecScale    = false
+      autoIncrement     = false
+      localTypeName     = TEXT
+      minimumScale      = 0
+      maximumScale      = 0
+      numPrecRadix      = 10
+      allowsPrecisionSpec = false
+
+    SQLTypeInfo : typeName = MEDIUMTEXT
+      dataType (jdbc)   = -1
+      precision         = 16777215
+      literalPrefix     = '
+      literalSuffix     = '
+      createParams      =  [CHARACTER SET charset_name] [COLLATE collation_name]
+      nullable          = 1
+      caseSensitive     = true
+      searchable        = 3
+      unsignedAttribute = false
+      fixedPrecScale    = false
+      autoIncrement     = false
+      localTypeName     = MEDIUMTEXT
+      minimumScale      = 0
+      maximumScale      = 0
+      numPrecRadix      = 10
+      allowsPrecisionSpec = false
+
+    SQLTypeInfo : typeName = LONG VARCHAR
+      dataType (jdbc)   = -1
+      precision         = 16777215
+      literalPrefix     = '
+      literalSuffix     = '
+      createParams      =  [CHARACTER SET charset_name] [COLLATE collation_name]
+      nullable          = 1
+      caseSensitive     = true
+      searchable        = 3
+      unsignedAttribute = false
+      fixedPrecScale    = false
+      autoIncrement     = false
+      localTypeName     = MEDIUMTEXT
+      minimumScale      = 0
+      maximumScale      = 0
+      numPrecRadix      = 10
+      allowsPrecisionSpec = false
+
+JDBC Type=BOOLEAN sqlTypes=BOOL (default=BOOL)
+    SQLTypeInfo : typeName = BOOL
+      dataType (jdbc)   = 16
+      precision         = 3
+      literalPrefix     = 
+      literalSuffix     = 
+      createParams      = 
+      nullable          = 1
+      caseSensitive     = true
+      searchable        = 3
+      unsignedAttribute = false
+      fixedPrecScale    = false
+      autoIncrement     = false
+      localTypeName     = BOOLEAN
+      minimumScale      = 0
+      maximumScale      = 0
+      numPrecRadix      = 10
+      allowsPrecisionSpec = true
+
+JDBC Type=BINARY sqlTypes=BINARY (default=BINARY)
+    SQLTypeInfo : typeName = BINARY
+      dataType (jdbc)   = -2
+      precision         = 255
+      literalPrefix     = '
+      literalSuffix     = '
+      createParams      = (M)
+      nullable          = 1
+      caseSensitive     = true
+      searchable        = 3
+      unsignedAttribute = false
+      fixedPrecScale    = false
+      autoIncrement     = false
+      localTypeName     = BINARY
+      minimumScale      = 0
+      maximumScale      = 0
+      numPrecRadix      = 10
+      allowsPrecisionSpec = true
+
+JDBC Type=VARBINARY sqlTypes=TINYBLOB,VARBINARY (default=VARBINARY)
+    SQLTypeInfo : typeName = TINYBLOB
+      dataType (jdbc)   = -3
+      precision         = 255
+      literalPrefix     = '
+      literalSuffix     = '
+      createParams      = 
+      nullable          = 1
+      caseSensitive     = true
+      searchable        = 3
+      unsignedAttribute = false
+      fixedPrecScale    = false
+      autoIncrement     = false
+      localTypeName     = TINYBLOB
+      minimumScale      = 0
+      maximumScale      = 0
+      numPrecRadix      = 10
+      allowsPrecisionSpec = true
+
+    SQLTypeInfo : typeName = VARBINARY
+      dataType (jdbc)   = -3
+      precision         = 65535
+      literalPrefix     = '
+      literalSuffix     = '
+      createParams      = (M)
+      nullable          = 1
+      caseSensitive     = true
+      searchable        = 3
+      unsignedAttribute = false
+      fixedPrecScale    = false
+      autoIncrement     = false
+      localTypeName     = VARBINARY
+      minimumScale      = 0
+      maximumScale      = 0
+      numPrecRadix      = 10
+      allowsPrecisionSpec = true
+
+JDBC Type=LONGVARBINARY sqlTypes=LONG VARBINARY,BLOB,MEDIUMBLOB,LONGBLOB (default=LONG VARBINARY)
+    SQLTypeInfo : typeName = LONG VARBINARY
+      dataType (jdbc)   = -4
+      precision         = 16777215
+      literalPrefix     = '
+      literalSuffix     = '
+      createParams      = 
+      nullable          = 1
+      caseSensitive     = true
+      searchable        = 3
+      unsignedAttribute = false
+      fixedPrecScale    = false
+      autoIncrement     = false
+      localTypeName     = MEDIUMBLOB
+      minimumScale      = 0
+      maximumScale      = 0
+      numPrecRadix      = 10
+      allowsPrecisionSpec = true
+
+    SQLTypeInfo : typeName = BLOB
+      dataType (jdbc)   = -4
+      precision         = 65535
+      literalPrefix     = '
+      literalSuffix     = '
+      createParams      = [(M)]
+      nullable          = 1
+      caseSensitive     = true
+      searchable        = 3
+      unsignedAttribute = false
+      fixedPrecScale    = false
+      autoIncrement     = false
+      localTypeName     = BLOB
+      minimumScale      = 0
+      maximumScale      = 0
+      numPrecRadix      = 10
+      allowsPrecisionSpec = false
+
+    SQLTypeInfo : typeName = MEDIUMBLOB
+      dataType (jdbc)   = -4
+      precision         = 16777215
+      literalPrefix     = '
+      literalSuffix     = '
+      createParams      = 
+      nullable          = 1
+      caseSensitive     = true
+      searchable        = 3
+      unsignedAttribute = false
+      fixedPrecScale    = false
+      autoIncrement     = false
+      localTypeName     = MEDIUMBLOB
+      minimumScale      = 0
+      maximumScale      = 0
+      numPrecRadix      = 10
+      allowsPrecisionSpec = false
+
+    SQLTypeInfo : typeName = LONGBLOB
+      dataType (jdbc)   = -4
+      precision         = 2147483647
+      literalPrefix     = '
+      literalSuffix     = '
+      createParams      = 
+      nullable          = 1
+      caseSensitive     = true
+      searchable        = 3
+      unsignedAttribute = false
+      fixedPrecScale    = false
+      autoIncrement     = false
+      localTypeName     = LONGBLOB
+      minimumScale      = 0
+      maximumScale      = 0
+      numPrecRadix      = 10
+      allowsPrecisionSpec = false
+
+JDBC Type=BIGINT sqlTypes=BIGINT UNSIGNED,BIGINT (default=BIGINT)
+    SQLTypeInfo : typeName = BIGINT UNSIGNED
+      dataType (jdbc)   = -5
+      precision         = 20
+      literalPrefix     = 
+      literalSuffix     = 
+      createParams      = [(M)] [UNSIGNED] [ZEROFILL]
+      nullable          = 1
+      caseSensitive     = true
+      searchable        = 3
+      unsignedAttribute = true
+      fixedPrecScale    = false
+      autoIncrement     = false
+      localTypeName     = BIGINT UNSIGNED
+      minimumScale      = 0
+      maximumScale      = 0
+      numPrecRadix      = 10
+      allowsPrecisionSpec = true
+
+    SQLTypeInfo : typeName = BIGINT
+      dataType (jdbc)   = -5
+      precision         = 19
+      literalPrefix     = 
+      literalSuffix     = 
+      createParams      = [(M)] [UNSIGNED] [ZEROFILL]
+      nullable          = 1
+      caseSensitive     = true
+      searchable        = 3
+      unsignedAttribute = false
+      fixedPrecScale    = false
+      autoIncrement     = false
+      localTypeName     = BIGINT
+      minimumScale      = 0
+      maximumScale      = 0
+      numPrecRadix      = 10
+      allowsPrecisionSpec = true
+
+JDBC Type=TINYINT sqlTypes=TINYINT UNSIGNED,TINYINT (default=TINYINT)
+    SQLTypeInfo : typeName = TINYINT UNSIGNED
+      dataType (jdbc)   = -6
+      precision         = 3
+      literalPrefix     = 
+      literalSuffix     = 
+      createParams      = [(M)] [UNSIGNED] [ZEROFILL]
+      nullable          = 1
+      caseSensitive     = true
+      searchable        = 3
+      unsignedAttribute = true
+      fixedPrecScale    = false
+      autoIncrement     = false
+      localTypeName     = TINYINT UNSIGNED
+      minimumScale      = 0
+      maximumScale      = 0
+      numPrecRadix      = 10
+      allowsPrecisionSpec = true
+
+    SQLTypeInfo : typeName = TINYINT
+      dataType (jdbc)   = -6
+      precision         = 3
+      literalPrefix     = 
+      literalSuffix     = 
+      createParams      = [(M)] [UNSIGNED] [ZEROFILL]
+      nullable          = 1
+      caseSensitive     = true
+      searchable        = 3
+      unsignedAttribute = false
+      fixedPrecScale    = false
+      autoIncrement     = false
+      localTypeName     = TINYINT
+      minimumScale      = 0
+      maximumScale      = 0
+      numPrecRadix      = 10
+      allowsPrecisionSpec = true
+
+JDBC Type=BIT sqlTypes=BIT (default=BIT)
+    SQLTypeInfo : typeName = BIT
+      dataType (jdbc)   = -7
+      precision         = 1
+      literalPrefix     = 
+      literalSuffix     = 
+      createParams      = [(M)]
+      nullable          = 1
+      caseSensitive     = true
+      searchable        = 3
+      unsignedAttribute = false
+      fixedPrecScale    = false
+      autoIncrement     = false
+      localTypeName     = BIT
+      minimumScale      = 0
+      maximumScale      = 0
+      numPrecRadix      = 10
+      allowsPrecisionSpec = true
+
+JDBC Type=CHAR sqlTypes=ENUM,CHAR(M) BINARY,SET (default=CHAR(M) BINARY)
+    SQLTypeInfo : typeName = ENUM
+      dataType (jdbc)   = 1
+      precision         = 65535
+      literalPrefix     = '
+      literalSuffix     = '
+      createParams      = ('value1','value2',...) [CHARACTER SET charset_name] [COLLATE collation_name]
+      nullable          = 1
+      caseSensitive     = true
+      searchable        = 3
+      unsignedAttribute = false
+      fixedPrecScale    = false
+      autoIncrement     = false
+      localTypeName     = ENUM
+      minimumScale      = 0
+      maximumScale      = 0
+      numPrecRadix      = 10
+      allowsPrecisionSpec = true
+
+    SQLTypeInfo : typeName = CHAR(M) BINARY
+      dataType (jdbc)   = 1
+      precision         = 255
+      literalPrefix     = '
+      literalSuffix     = '
+      createParams      = 
+      nullable          = 1
+      caseSensitive     = true
+      searchable        = 3
+      unsignedAttribute = false
+      fixedPrecScale    = false
+      autoIncrement     = false
+      localTypeName     = CHAR
+      minimumScale      = 0
+      maximumScale      = 0
+      numPrecRadix      = 10
+      allowsPrecisionSpec = true
+
+    SQLTypeInfo : typeName = SET
+      dataType (jdbc)   = 1
+      precision         = 64
+      literalPrefix     = '
+      literalSuffix     = '
+      createParams      = ('value1','value2',...) [CHARACTER SET charset_name] [COLLATE collation_name]
+      nullable          = 1
+      caseSensitive     = true
+      searchable        = 3
+      unsignedAttribute = false
+      fixedPrecScale    = false
+      autoIncrement     = false
+      localTypeName     = SET
+      minimumScale      = 0
+      maximumScale      = 0
+      numPrecRadix      = 10
+      allowsPrecisionSpec = true
+
+JDBC Type=DECIMAL sqlTypes=NUMERIC,DECIMAL (default=DECIMAL)
+    SQLTypeInfo : typeName = NUMERIC
+      dataType (jdbc)   = 3
+      precision         = 65
+      literalPrefix     = 
+      literalSuffix     = 
+      createParams      = [(M[,D])] [UNSIGNED] [ZEROFILL]
+      nullable          = 1
+      caseSensitive     = true
+      searchable        = 3
+      unsignedAttribute = false
+      fixedPrecScale    = false
+      autoIncrement     = false
+      localTypeName     = DECIMAL
+      minimumScale      = -308
+      maximumScale      = 308
+      numPrecRadix      = 10
+      allowsPrecisionSpec = true
+
+    SQLTypeInfo : typeName = DECIMAL
+      dataType (jdbc)   = 3
+      precision         = 65
+      literalPrefix     = 
+      literalSuffix     = 
+      createParams      = [(M[,D])] [UNSIGNED] [ZEROFILL]
+      nullable          = 1
+      caseSensitive     = true
+      searchable        = 3
+      unsignedAttribute = false
+      fixedPrecScale    = false
+      autoIncrement     = false
+      localTypeName     = DECIMAL
+      minimumScale      = -308
+      maximumScale      = 308
+      numPrecRadix      = 10
+      allowsPrecisionSpec = true
+
+JDBC Type=INTEGER sqlTypes=INT UNSIGNED,MEDIUMINT,MEDIUMINT UNSIGNED,INTEGER UNSIGNED,INT,INTEGER (default=INTEGER)
+    SQLTypeInfo : typeName = INT UNSIGNED
+      dataType (jdbc)   = 4
+      precision         = 10
+      literalPrefix     = 
+      literalSuffix     = 
+      createParams      = [(M)] [UNSIGNED] [ZEROFILL]
+      nullable          = 1
+      caseSensitive     = true
+      searchable        = 3
+      unsignedAttribute = true
+      fixedPrecScale    = false
+      autoIncrement     = false
+      localTypeName     = INT UNSIGNED
+      minimumScale      = 0
+      maximumScale      = 0
+      numPrecRadix      = 10
+      allowsPrecisionSpec = true
+
+    SQLTypeInfo : typeName = MEDIUMINT
+      dataType (jdbc)   = 4
+      precision         = 7
+      literalPrefix     = 
+      literalSuffix     = 
+      createParams      = [(M)] [UNSIGNED] [ZEROFILL]
+      nullable          = 1
+      caseSensitive     = true
+      searchable        = 3
+      unsignedAttribute = false
+      fixedPrecScale    = false
+      autoIncrement     = false
+      localTypeName     = MEDIUMINT
+      minimumScale      = 0
+      maximumScale      = 0
+      numPrecRadix      = 10
+      allowsPrecisionSpec = true
+
+    SQLTypeInfo : typeName = MEDIUMINT UNSIGNED
+      dataType (jdbc)   = 4
+      precision         = 8
+      literalPrefix     = 
+      literalSuffix     = 
+      createParams      = [(M)] [UNSIGNED] [ZEROFILL]
+      nullable          = 1
+      caseSensitive     = true
+      searchable        = 3
+      unsignedAttribute = true
+      fixedPrecScale    = false
+      autoIncrement     = false
+      localTypeName     = MEDIUMINT UNSIGNED
+      minimumScale      = 0
+      maximumScale      = 0
+      numPrecRadix      = 10
+      allowsPrecisionSpec = true
+
+    SQLTypeInfo : typeName = INTEGER UNSIGNED
+      dataType (jdbc)   = 4
+      precision         = 10
+      literalPrefix     = 
+      literalSuffix     = 
+      createParams      = [(M)] [UNSIGNED] [ZEROFILL]
+      nullable          = 1
+      caseSensitive     = true
+      searchable        = 3
+      unsignedAttribute = true
+      fixedPrecScale    = false
+      autoIncrement     = false
+      localTypeName     = INT UNSIGNED
+      minimumScale      = 0
+      maximumScale      = 0
+      numPrecRadix      = 10
+      allowsPrecisionSpec = true
+
+    SQLTypeInfo : typeName = INT
+      dataType (jdbc)   = 4
+      precision         = 10
+      literalPrefix     = 
+      literalSuffix     = 
+      createParams      = [(M)] [UNSIGNED] [ZEROFILL]
+      nullable          = 1
+      caseSensitive     = true
+      searchable        = 3
+      unsignedAttribute = false
+      fixedPrecScale    = false
+      autoIncrement     = false
+      localTypeName     = INT
+      minimumScale      = 0
+      maximumScale      = 0
+      numPrecRadix      = 10
+      allowsPrecisionSpec = true
+
+    SQLTypeInfo : typeName = INTEGER
+      dataType (jdbc)   = 4
+      precision         = 10
+      literalPrefix     = 
+      literalSuffix     = 
+      createParams      = [(M)] [UNSIGNED] [ZEROFILL]
+      nullable          = 1
+      caseSensitive     = true
+      searchable        = 3
+      unsignedAttribute = false
+      fixedPrecScale    = false
+      autoIncrement     = false
+      localTypeName     = INT
+      minimumScale      = 0
+      maximumScale      = 0
+      numPrecRadix      = 10
+      allowsPrecisionSpec = true
+
+JDBC Type=CLOB sqlTypes=MEDIUMTEXT (default=MEDIUMTEXT)
+    SQLTypeInfo : typeName = MEDIUMTEXT
+      dataType (jdbc)   = 2005
+      precision         = 2147483647
+      literalPrefix     = null
+      literalSuffix     = null
+      createParams      = null
+      nullable          = 1
+      caseSensitive     = true
+      searchable        = 1
+      unsignedAttribute = false
+      fixedPrecScale    = false
+      autoIncrement     = false
+      localTypeName     = MEDIUMTEXT
+      minimumScale      = 0
+      maximumScale      = 0
+      numPrecRadix      = 0
+      allowsPrecisionSpec = false
+
+JDBC Type=SMALLINT sqlTypes=SMALLINT,SMALLINT UNSIGNED (default=SMALLINT)
+    SQLTypeInfo : typeName = SMALLINT
+      dataType (jdbc)   = 5
+      precision         = 5
+      literalPrefix     = 
+      literalSuffix     = 
+      createParams      = [(M)] [UNSIGNED] [ZEROFILL]
+      nullable          = 1
+      caseSensitive     = true
+      searchable        = 3
+      unsignedAttribute = false
+      fixedPrecScale    = false
+      autoIncrement     = false
+      localTypeName     = SMALLINT
+      minimumScale      = 0
+      maximumScale      = 0
+      numPrecRadix      = 10
+      allowsPrecisionSpec = true
+
+    SQLTypeInfo : typeName = SMALLINT UNSIGNED
+      dataType (jdbc)   = 5
+      precision         = 5
+      literalPrefix     = 
+      literalSuffix     = 
+      createParams      = [(M)] [UNSIGNED] [ZEROFILL]
+      nullable          = 1
+      caseSensitive     = true
+      searchable        = 3
+      unsignedAttribute = true
+      fixedPrecScale    = false
+      autoIncrement     = false
+      localTypeName     = SMALLINT UNSIGNED
+      minimumScale      = 0
+      maximumScale      = 0
+      numPrecRadix      = 10
+      allowsPrecisionSpec = true
+
+JDBC Type=BLOB sqlTypes=MEDIUMBLOB (default=MEDIUMBLOB)
+    SQLTypeInfo : typeName = MEDIUMBLOB
+      dataType (jdbc)   = 2004
+      precision         = 2147483647
+      literalPrefix     = null
+      literalSuffix     = null
+      createParams      = null
+      nullable          = 1
+      caseSensitive     = false
+      searchable        = 1
+      unsignedAttribute = false
+      fixedPrecScale    = false
+      autoIncrement     = false
+      localTypeName     = MEDIUMBLOB
+      minimumScale      = 0
+      maximumScale      = 0
+      numPrecRadix      = 0
+      allowsPrecisionSpec = false
+
+JDBC Type=FLOAT sqlTypes=FLOAT (default=FLOAT)
+    SQLTypeInfo : typeName = FLOAT
+      dataType (jdbc)   = 6
+      precision         = 12
+      literalPrefix     = 
+      literalSuffix     = 
+      createParams      = [(M,D)] [UNSIGNED] [ZEROFILL]
+      nullable          = 1
+      caseSensitive     = true
+      searchable        = 3
+      unsignedAttribute = false
+      fixedPrecScale    = false
+      autoIncrement     = false
+      localTypeName     = FLOAT
+      minimumScale      = -38
+      maximumScale      = 38
+      numPrecRadix      = 10
+      allowsPrecisionSpec = true
+
+JDBC Type=DOUBLE sqlTypes=REAL,DOUBLE,DOUBLE PRECISION (default=DOUBLE)
+    SQLTypeInfo : typeName = REAL
+      dataType (jdbc)   = 8
+      precision         = 22
+      literalPrefix     = 
+      literalSuffix     = 
+      createParams      = [(M,D)] [UNSIGNED] [ZEROFILL]
+      nullable          = 1
+      caseSensitive     = true
+      searchable        = 3
+      unsignedAttribute = false
+      fixedPrecScale    = false
+      autoIncrement     = false
+      localTypeName     = DOUBLE
+      minimumScale      = -308
+      maximumScale      = 308
+      numPrecRadix      = 10
+      allowsPrecisionSpec = true
+
+    SQLTypeInfo : typeName = DOUBLE
+      dataType (jdbc)   = 8
+      precision         = 22
+      literalPrefix     = 
+      literalSuffix     = 
+      createParams      = [(M,D)] [UNSIGNED] [ZEROFILL]
+      nullable          = 1
+      caseSensitive     = true
+      searchable        = 3
+      unsignedAttribute = false
+      fixedPrecScale    = false
+      autoIncrement     = false
+      localTypeName     = DOUBLE
+      minimumScale      = -308
+      maximumScale      = 308
+      numPrecRadix      = 10
+      allowsPrecisionSpec = true
+
+    SQLTypeInfo : typeName = DOUBLE PRECISION
+      dataType (jdbc)   = 8
+      precision         = 22
+      literalPrefix     = 
+      literalSuffix     = 
+      createParams      = [(M,D)] [UNSIGNED] [ZEROFILL]
+      nullable          = 1
+      caseSensitive     = true
+      searchable        = 3
+      unsignedAttribute = false
+      fixedPrecScale    = false
+      autoIncrement     = false
+      localTypeName     = DOUBLE
+      minimumScale      = -308
+      maximumScale      = 308
+      numPrecRadix      = 10
+      allowsPrecisionSpec = true
+
+JDBC Type=DATE sqlTypes=DATE,YEAR (default=DATE)
+    SQLTypeInfo : typeName = DATE
+      dataType (jdbc)   = 91
+      precision         = 10
+      literalPrefix     = '
+      literalSuffix     = '
+      createParams      = 
+      nullable          = 1
+      caseSensitive     = true
+      searchable        = 3
+      unsignedAttribute = false
+      fixedPrecScale    = false
+      autoIncrement     = false
+      localTypeName     = DATE
+      minimumScale      = 0
+      maximumScale      = 0
+      numPrecRadix      = 10
+      allowsPrecisionSpec = true
+
+    SQLTypeInfo : typeName = YEAR
+      dataType (jdbc)   = 91
+      precision         = 4
+      literalPrefix     = 
+      literalSuffix     = 
+      createParams      = [(4)]
+      nullable          = 1
+      caseSensitive     = true
+      searchable        = 3
+      unsignedAttribute = false
+      fixedPrecScale    = false
+      autoIncrement     = false
+      localTypeName     = YEAR
+      minimumScale      = 0
+      maximumScale      = 0
+      numPrecRadix      = 10
+      allowsPrecisionSpec = true
+
+JDBC Type=TIME sqlTypes=TIME (default=TIME)
+    SQLTypeInfo : typeName = TIME
+      dataType (jdbc)   = 92
+      precision         = 16
+      literalPrefix     = '
+      literalSuffix     = '
+      createParams      = [(fsp)]
+      nullable          = 1
+      caseSensitive     = true
+      searchable        = 3
+      unsignedAttribute = false
+      fixedPrecScale    = false
+      autoIncrement     = false
+      localTypeName     = TIME
+      minimumScale      = 0
+      maximumScale      = 0
+      numPrecRadix      = 10
+      allowsPrecisionSpec = true
+
+JDBC Type=TIMESTAMP sqlTypes=DATETIME,TIMESTAMP (default=DATETIME)
+    SQLTypeInfo : typeName = DATETIME
+      dataType (jdbc)   = 93
+      precision         = 26
+      literalPrefix     = '
+      literalSuffix     = '
+      createParams      = [(fsp)]
+      nullable          = 1
+      caseSensitive     = true
+      searchable        = 3
+      unsignedAttribute = false
+      fixedPrecScale    = false
+      autoIncrement     = false
+      localTypeName     = DATETIME
+      minimumScale      = 0
+      maximumScale      = 0
+      numPrecRadix      = 10
+      allowsPrecisionSpec = true
+
+    SQLTypeInfo : typeName = TIMESTAMP
+      dataType (jdbc)   = 93
+      precision         = 26
+      literalPrefix     = '
+      literalSuffix     = '
+      createParams      = [(fsp)]
+      nullable          = 1
+      caseSensitive     = true
+      searchable        = 3
+      unsignedAttribute = false
+      fixedPrecScale    = false
+      autoIncrement     = false
+      localTypeName     = TIMESTAMP
+      minimumScale      = 0
+      maximumScale      = 0
+      numPrecRadix      = 10
+      allowsPrecisionSpec = true
+
+
+Database Keywords
+PATH
+WARNINGS
+GROUPS
+PURGE
+TRIM
+TRANSLATION
+MUMPS
+STATIC
+CATALOG
+YEAR
+EXPLAIN
+MESSAGE_LENGTH
+DISCONNECT
+PARTITION
+HOUR_MINUTE
+LEFT
+SEARCH
+CURRENT_PATH
+SIZE
+CURRENT_DEFAULT_TRANSFORM_GROUP
+RESTRICT
+CUBE
+RELEASE
+WHERE
+SQLWARNING
+AS
+AT
+DATABASE
+TIMEZONE_MINUTE
+XOR
+ALTER
+BDB
+DOMAIN
+SET
+C
+MERGE
+CONSTRAINT
+PRECISION
+SPACE
+ROLE
+UPPER
+COLLATION_NAME
+BY
+STRAIGHT_JOIN
+CHARACTER
+DUAL
+OCTET_LENGTH
+TINYINT
+INTERVAL
+NTH_VALUE
+COLLATION_SCHEMA
+CATALOG_NAME
+MASTER_SSL_VERIFY_SERVER_CERT
+CONNECTION
+CONTINUE
+DIV
+PAD
+REF
+SETS
+VARBINARY
+ADA
+CURSOR
+VIRTUAL
+SYSTEM
+CONSTRAINT_SCHEMA
+ADD
+TABLE_NAME
+SQLERROR
+DO
+TYPES
+LOW_PRIORITY
+INDEX
+ESCAPED
+FOUND
+HOLD
+EXTRACT
+VARYING
+SQL_BIG_RESULT
+FOR
+ITERATE
+CURRENT
+USING
+EXEC
+RETURNED_SQLSTATE
+DEFERRABLE
+END
+CONNECTION_NAME
+PRESERVE
+UNDO
+LOAD
+TERMINATED
+BINARY
+STATE
+MASTER_SERVER_ID
+WITHIN
+NCHAR
+ABSOLUTE
+SOME
+SCHEMA
+OUTER
+COLUMNS
+INFILE
+GEOMETRY
+RENAME
+FILTER
+GO
+BIT
+INTERSECT
+WITH
+INITIALLY
+OVER
+GRANT
+CURRENT_ROLE
+CLASS_ORIGIN
+ACTION
+USER_RESOURCES
+SONAME
+START
+CHAR_LENGTH
+DEFAULT
+CHARACTER_LENGTH
+ERRORS
+JOIN
+LOCK
+UNNEST
+NULLIF
+SESSION_USER
+MULTISET
+ELSE
+IF
+BIT_LENGTH
+PARAMETER
+LANGUAGE
+NCLOB
+CHARACTER_SET_SCHEMA
+FIELDS
+NATIONAL
+IN
+DISTINCT
+BTREE
+IS
+MASTER_BIND
+HASH
+CURRENT_TRANSFORM_GROUP_FOR_TYPE
+SPECIFICTYPE
+FORCE
+FORTRAN
+MAP
+EXIT
+ASYMMETRIC
+COLLATION
+GOTO
+MAX
+CASCADE
+TRANSACTION
+IGNORE
+SYSTEM_USER
+MEDIUMTEXT
+USAGE
+CURSOR_NAME
+RIGHT
+UPDATE
+REQUIRE
+FETCH
+NUMERIC
+STARTING
+REVOKE
+DISTINCTROW
+USE
+RETURNS
+SQLEXCEPTION
+FIRST
+SELECT
+DYNAMIC
+TABLES
+CALLED
+ELEMENT
+OUTFILE
+LAG
+UTC_DATE
+VARCHARACTER
+DEPTH
+IO_AFTER_GTIDS
+ALL
+CURRENT_USER
+NEW
+ARRAY
+ATOMIC
+COLUMN_NAME
+COLUMN
+DECIMAL
+VALUE
+SERIALIZABLE
+READ_WRITE
+AUTO_INCREMENT
+COALESCE
+MINUTE_MICROSECOND
+ALLOCATE
+CORRESPONDING
+TIMESTAMP
+MINUTE
+SCALE
+TINYTEXT
+DESCRIBE
+MESSAGE_OCTET_LENGTH
+NULL
+INNODB
+RETURNED_LENGTH
+TRUE
+OBJECT
+UTC_TIME
+PRIVILEGES
+SQL
+READ
+MODULE
+AND
+SQLCODE
+REAL
+ROW
+CURRENT_DATE
+MESSAGE_TEXT
+DIAGNOSTICS
+RANGE
+NO
+FLOAT
+CURRENT_TIMESTAMP
+STORED
+HOUR
+ROUTINE
+ANY
+PLI
+ROLLBACK
+MEMBER
+NATURAL
+EXTERNAL
+UNNAMED
+OF
+GROUPING
+KEYS
+LAST_VALUE
+CHANGE
+READS
+ON
+OR
+EQUALS
+PRIMARY
+SSL
+TRANSLATE
+SECOND
+UNKNOWN
+HOUR_SECOND
+MATCH
+REFERENCES
+ROWS
+SPATIAL
+MONTH
+ELSEIF
+CREATE
+OLD
+TRIGGER
+BETWEEN
+AFTER
+CLOSE
+CONVERT
+POSITION
+END-EXEC
+DEALLOCATE
+INNER
+EACH
+OPTIONALLY
+PRIOR
+SUM
+BIGINT
+IDENTITY
+MIN
+ARE
+FULLTEXT
+VARCHAR
+PERSIST_ONLY
+THEN
+CONDITION
+KEY
+UNLOCK
+ORDINALITY
+CALL
+INTO
+REPEAT
+EXCEPTION
+INDICATOR
+FREE
+RETURNED_OCTET_LENGTH
+RLIKE
+ASC
+GROUP
+DELETE
+DATETIME_INTERVAL_PRECISION
+TEMPORARY
+RTREE
+SIMILAR
+GENERATED
+LONG
+INT1
+INT2
+PROCEDURE
+COBOL
+INT3
+INT4
+SECOND_MICROSECOND
+UNDER
+NULLABLE
+ANALYZE
+COMMITTED
+INT8
+OPEN
+DELAYED
+NO_WRITE_TO_BINLOG
+REFERENCING
+TO
+CONSTRUCTOR
+UNION
+BREADTH
+LOCATOR
+SCOPE
+LOOP
+HIGH_PRIORITY
+IMMEDIATE
+VIEW
+DESC
+LINES
+ASSERTION
+CONSTRAINTS
+CURRENT_TIME
+DEFERRED
+REPLACE
+INTEGER
+NUMBER
+OUTPUT
+LONGTEXT
+UNIQUE
+TRAILING
+DATABASES
+FULL
+BOOLEAN
+NAME
+AVG
+NOT
+ROW_COUNT
+LAST
+LOWER
+SPECIFIC
+MAXVALUE
+MINUTE_SECOND
+FLOAT8
+HAVING
+FLOAT4
+SQLSTATE
+LOCALTIME
+COMMAND_FUNCTION
+GENERAL
+DROP
+RETURN
+REGEXP
+FOREIGN
+NEXT
+SQL_SMALL_RESULT
+GLOBAL
+LEAVE
+SERVER_NAME
+SHOW
+EMPTY
+MOD
+EXISTS
+IO_BEFORE_GTIDS
+PARTIAL
+TIME
+MEDIUMINT
+ESCAPE
+FALSE
+LINEAR
+SECTION
+DATETIME_INTERVAL_CODE
+SYMMETRIC
+FIRST_VALUE
+LOCALTIMESTAMP
+TABLE
+WHEN
+BERKELEYDB
+LOCAL
+CONSTRAINT_CATALOG
+COLLATION_CATALOG
+NONE
+TYPE
+DAY_MINUTE
+LONGBLOB
+CYCLE
+CAST
+DESCRIPTOR
+OPTION
+WHENEVER
+ENCLOSED
+LEVEL
+LEADING
+FUNCTION
+MODIFIES
+ASENSITIVE
+CASE
+OUT
+OPTIMIZE
+TINYBLOB
+STRIPED
+OVERLAPS
+PREPARE
+GET
+CHECK
+PUBLIC
+WORK
+WITHOUT
+COUNT
+HANDLER
+TREAT
+NAMES
+LENGTH
+DAY_HOUR
+UNSIGNED
+CHAR
+CONNECT
+BEGIN
+MRG_MYISAM
+TABLESAMPLE
+WRITE
+ORDER
+MIDDLEINT
+ISOLATION
+SQL_CALC_FOUND_ROWS
+RELATIVE
+LARGE
+ACCESSIBLE
+VALUES
+DOUBLE
+CHARACTER_SET_NAME
+SIGNAL
+HELP
+TIMEZONE_HOUR
+SUBMULTISET
+COLLATE
+UNCOMMITTED
+SESSION
+RESIGNAL
+WINDOW
+EXECUTE
+MORE
+REPEATABLE
+DAY
+KILL
+AUTHORIZATION
+JSON_TABLE
+LEAD
+BLOB
+INPUT
+SUBSTRING
+ZONE
+RECURSIVE
+ONLY
+FROM
+DEREF
+NTILE
+LATERAL
+INSENSITIVE
+BOTH
+HOUR_MICROSECOND
+SENSITIVE
+SUBCLASS_ORIGIN
+CHARACTER_SET_CATALOG
+DAY_MICROSECOND
+SEPARATOR
+OPTIMIZER_COSTS
+EXCEPT
+DATE
+SCHEMA_NAME
+ROLLUP
+UTC_TIMESTAMP
+LIKE
+ZEROFILL
+SCROLL
+DATA
+METHOD
+INSERT
+YEAR_MONTH
+DAY_SECOND
+INOUT
+SCHEMAS
+CONSTRAINT_NAME
+LIMIT
+INT
+PASCAL
+DEC
+CLOB
+CASCADED
+COMMIT
+DETERMINISTIC
+USER
+SAVEPOINT
+UNTIL
+DYNAMIC_FUNCTION
+PERSIST
+CONDITION_NUMBER
+BEFORE
+DECLARE
+MEDIUMBLOB
+CROSS
+SMALLINT
+WHILE
+RESULT
+
+DataNucleus SchemaTool completed successfully
