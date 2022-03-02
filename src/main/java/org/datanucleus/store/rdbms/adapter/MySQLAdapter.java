@@ -179,10 +179,18 @@ public class MySQLAdapter extends BaseDatastoreAdapter
         super.initialiseTypes(handler, mconn);
 
         // Add on any missing JDBC types
+
+        // MySQL JDBC v8 has no NUMERIC, try to map it as DECIMAL SQL type - unconfirmed whether this works
         SQLTypeInfo sqlType = new org.datanucleus.store.rdbms.adapter.MySQLTypeInfo(
+            "DECIMAL", (short)Types.NUMERIC, 65, null, null, "[(M,D])] [ZEROFILL]", 1, true, (short)3, false, false, false, "DECIMAL", (short)-308, (short)308, 10);
+        addSQLTypeForJDBCType(handler, mconn, (short)Types.NUMERIC, sqlType, true);
+
+        // Map BLOB JDBC type to MEDIUMBLOB SQL type if no BLOB provided
+        sqlType = new org.datanucleus.store.rdbms.adapter.MySQLTypeInfo(
             "MEDIUMBLOB", (short)Types.BLOB, 2147483647, null, null, null, 1, false, (short)1, false, false, false, "MEDIUMBLOB", (short)0, (short)0, 0);
         addSQLTypeForJDBCType(handler, mconn, (short)Types.BLOB, sqlType, true);
 
+        // Map CLOB JDBC type to MEDIUMTEXT SQL type if no CLOB provided
         sqlType = new org.datanucleus.store.rdbms.adapter.MySQLTypeInfo(
             "MEDIUMTEXT", (short)Types.CLOB, 2147483647, null, null, null, 1, true, (short)1, false, false, false, "MEDIUMTEXT", (short)0, (short)0, 0);
         addSQLTypeForJDBCType(handler, mconn, (short)Types.CLOB, sqlType, true);
