@@ -1,0 +1,4002 @@
+DataNucleus SchemaTool : Database information
+StoreManager : "rdbms" using the URL "jdbc:postgresql:nucleus" - datastore-mode=read-write
+================ DatabaseAdapter ==================
+Adapter : org.datanucleus.store.rdbms.adapter.PostgreSQLAdapter
+Datastore : name="PostgreSQL" version="13.5" (major=13, minor=5, revision=0)
+Driver : name="PostgreSQL JDBC Driver" version="42.3.3" (major=42, minor=3)
+===================================================
+
+Database TypeInfo
+JDBC Type=VARCHAR sqlTypes=varchar,name (default=varchar)
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = varchar, jdbcId = 12, localName = null, createParams = null
+      precision = 65000, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = name, jdbcId = 12, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+JDBC Type=LONGVARCHAR sqlTypes=text (default=text)
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = text, jdbcId = -1, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+JDBC Type=BOOLEAN sqlTypes=bool (default=bool)
+    SQLTypeInfo : [DATANUCLEUS]
+      type : name = bool, jdbcId = 16, localName = bool, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = null, suffix = null
+      nullable = 1, caseSensitive = false, searchable = 3, unsigned = true, autoIncrement = false
+
+JDBC Type=LONGVARBINARY sqlTypes=bytea (default=bytea)
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = bytea, jdbcId = -4, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+JDBC Type=BIGINT sqlTypes=bigserial,int8,oid (default=int8)
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = bigserial, jdbcId = -5, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = null, suffix = null
+      nullable = 1, caseSensitive = false, searchable = 3, unsigned = false, autoIncrement = true
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = int8, jdbcId = -5, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = null, suffix = null
+      nullable = 1, caseSensitive = false, searchable = 3, unsigned = false, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = oid, jdbcId = -5, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = null, suffix = null
+      nullable = 1, caseSensitive = false, searchable = 3, unsigned = true, autoIncrement = false
+
+JDBC Type=DISTINCT sqlTypes=character_data,time_stamp,cardinal_number,sql_identifier,yes_or_no (default=cardinal_number)
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = character_data, jdbcId = 2001, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = time_stamp, jdbcId = 2001, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = cardinal_number, jdbcId = 2001, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = sql_identifier, jdbcId = 2001, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = yes_or_no, jdbcId = 2001, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+JDBC Type=REF_CURSOR sqlTypes=refcursor (default=refcursor)
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = refcursor, jdbcId = 2012, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+JDBC Type=TINYINT sqlTypes=int2 (default=int2)
+    SQLTypeInfo : [DATANUCLEUS]
+      type : name = int2, jdbcId = -6, localName = int2, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = null, suffix = null
+      nullable = 1, caseSensitive = false, searchable = 3, unsigned = false, autoIncrement = false
+
+JDBC Type=BIT sqlTypes=bool,bit (default=bool)
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = bool, jdbcId = -7, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = false, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = bit, jdbcId = -7, localName = null, createParams = null
+      precision = 65000, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = false, searchable = 3, unsigned = true, autoIncrement = false
+
+JDBC Type=SQLXML sqlTypes=xml (default=xml)
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = xml, jdbcId = 2009, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+JDBC Type=CHAR sqlTypes=bpchar,char (default=char)
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = bpchar, jdbcId = 1, localName = null, createParams = null
+      precision = 65000, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [DATANUCLEUS]
+      type : name = char, jdbcId = 1, localName = char, createParams = null
+      precision = 65000, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = null, suffix = null
+      nullable = 0, caseSensitive = false, searchable = 3, unsigned = false, autoIncrement = false
+
+JDBC Type=NUMERIC sqlTypes=numeric (default=numeric)
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = numeric, jdbcId = 2, localName = null, createParams = null
+      precision = 64, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 1000, fixedPrec = false
+      literals : prefix = null, suffix = null
+      nullable = 1, caseSensitive = false, searchable = 3, unsigned = false, autoIncrement = false
+
+JDBC Type=INTEGER sqlTypes=int4,serial (default=int4)
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = int4, jdbcId = 4, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = null, suffix = null
+      nullable = 1, caseSensitive = false, searchable = 3, unsigned = false, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = serial, jdbcId = 4, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = null, suffix = null
+      nullable = 1, caseSensitive = false, searchable = 3, unsigned = false, autoIncrement = true
+
+JDBC Type=CLOB sqlTypes=text (default=text)
+    SQLTypeInfo : [DATANUCLEUS]
+      type : name = text, jdbcId = 2005, localName = text, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = null, suffix = null
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+JDBC Type=SMALLINT sqlTypes=int2,smallserial (default=int2)
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = int2, jdbcId = 5, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = null, suffix = null
+      nullable = 1, caseSensitive = false, searchable = 3, unsigned = false, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = smallserial, jdbcId = 5, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = null, suffix = null
+      nullable = 1, caseSensitive = false, searchable = 3, unsigned = false, autoIncrement = true
+
+JDBC Type=BLOB sqlTypes=bytea (default=bytea)
+    SQLTypeInfo : [DATANUCLEUS]
+      type : name = bytea, jdbcId = 2004, localName = bytea, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = null, suffix = null
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+JDBC Type=ARRAY sqlTypes=_uuidholder,_publicfields,_name,_genericselement,_intarray,_user1,_regoperator,_circon,_currencyholder,_detachholder,_pcfksetelementshare,_user2,_user3,_instancecallbackcontainer_ictestersbypersistentvalue,_sampletransfer,_account_customer,_hashsetwidget_normalset,_array_longobjarray,_colorholder,_tsvector,_sdperson,_array_objectarray,_office_departments,_inet,_petroleum_oil_supplier,_uriholder_strings,_macaddr8,_classowner_maptocheckprefetch,_square,_array_floatobjarray,_array_bigintegerarray,_simpledatastoreid,_lseg,_regconfig,_mapholder_non_non,_bigintegerarray,_magazine,_person,_genericsbasesubsub,_login,_stringarray,_classsuperelements_tocheckprefetchinsuper,_house,_animal,_classwithtransactionalfield,_gym_partners,_detachlistelement,_manager,_category,_developer,_directory_children,_shapeholder,_genericscontainer_elements,_jdo_an_network,_department_projects,_jdo_an_computer_card,_meeting,_yourcompactdisc,_organisation,_mapfkkeyitem,_array_bytearray,_instancecallbackcontainer,_dog,_otherdetail,_pcjoinelement,_floatholder,_serialised_holder,_objectarray,_qualification,_intobjectarray,_bit,_fp2base,_bitsetholder,_int8,_calendarholder,_stringbuilderholder,_int4,_client,_path,_shortobjectarray,_int2,_timetz,_loginaccount,_detachlist_elements,_datewidget,_house_windows,_fp2sub,_mapvalueitem,_sqldateholder,_array_intarray,_jdo_an_film_library_films,_sdcar,_uuidholder_othercollection,_interfacearray,_optionalsample1,_manager_subordinates,_optionalsample2,_optionalsample3,_pcfksetelementsub2,_farm,_pcfksetelementsub1,_hashsetwidget,_array_shortobjarray,_topic,_employee,_petroleum_gas_supplier,_setwidget,_gymequipment,_primitive,_account,_petroleum_supplier,_sqltimestampholder,_sdaddress,_timezoneholder,_xid8,_cstring,_stringclobwidget,_regrole,_array_interfacearray,_moderatedusergroup,_numeric,_array_stringarray,_book,_bool,_wardrobe_clothes,_regprocedure,_bufferedimageholder,_detail,_json,_shortarray,_mapconverterholder_convertedkeymap,_mapkeyitem,_mycompactdisc,_character_data,_logentry,_collectionfieldtester_primitivecollection,_petroleum_customer,_int2vector,_customer,_vote,_decimalholder,_classelements,_customer_supplier,_bpchar,_regcollation,_mapconverterholder,_classholder,_record,_refcursor,_array_booleanobjarray,_doubleobjectarray,_elementwidget,_gym_wardrobes2,_localeholder,_gym,_jfirebase_organisation,_timestamptz,_usergroup_members,_base,_cloth,_time,_cardinal_number,_bytea,_jodasample6,_setholder,_jodasample5,_jodasample4,_mapholder_non_pcserial,_compactdisc,_jodasample3,_subbase,_collectionfieldtester,_array_persistablearray,_point,_regoper,_jodasample2,_jdo_an_network_devices,_jodasample1,_jdo_an_music_player,_booleanobjectarray,_palette_coloursasints,_attachdetachcallbacktester,_genericscontainer,_charobjectarray,_xid,_pg_lsn,_tstzrange,_stringbufferholder,_detachlist,_newspaper,_numrange,_regnamespace,_dateholderb,_dateholdera,_serialisedobject,_dateholderc,_guarantee,_heating_timer,_directory,_array_charobjarray,_array_booleanarray,_collectionfieldtester_personset,_varchar,_widget,_decimalwidget,_pcfksetelement,_timestamp,_array_doubleobjarray,_shapeholder_shapelist1,_box,_javatimesample2,_gym_codes,_javatimesample3,_longarray,_javatimesample1,_javatimesample6,_gym_equipments,_javatimesample7,_polygon,_javatimesample4,_oid,_javatimesample5,_setholder_nonpc1,_regclass,_setholder_nonpc2,_setholder_nonpc3,_int4range,_instancecallbacktester,_gtsvector,_array_bigdecimalarray,_collectionconverterholder_convertedelementcollection,_cidr,_macaddr,_interval,_floatarray,_array_floatarray,_collectionfieldtester_personcollection,_sequence_table,_stringwidget,_tsrange,_regdictionary,_classsuperelements,_mapholder_pc_pc,_pcembedded,_array_chararray,_mapfkvalueitem,_jsonb,_byteobjectarray,_genericsvalue,_expertgroupmember,_serialised_holder2,_persistablearray,_char,_int8range,_oidvector,_serialised_holder3,_equipment,_supplier,_datearray,_mapholder_non_pc,_setholder_pcserial,_jdo_an_printer,_array_longarray,_setholder_shared,_xml,_window,_alternativepalette,_relatedpropertytype,_usergroup3,_usergroup2,_usergroup1,_text,_master,_office,_array_doublearray,_aclitem,_collectionconverterholder,_detachpc,_classelements_tocheckprefetch,_owner_elements,_yes_or_no,_enhancerfieldnames,_localearray,_inverseprimitive,_owner_setelements,_money,_classowner_elements,_classwithnonpccollection,_array_datearray,_tenantedobject,_wardrobe,_uriholder,_department,_validatedperson2,_validatedperson3,_longobjectarray,_singlefieldlongid,int array,_mapholder_non_non2,_heating_boiler,_petroleum_customer_supplier,_classowner,_pg_snapshot,_txid_snapshot,_genericscontainer_valuemap,_groupmember,_product,_bigdecimalarray,_palette_colours,_circle,_composedintid,_classmoreelements,_trade1,_daterange,_line,_floatwidget,_mapholder,_container,_sampleaccount,_owner,_booleanarray,_project,_mapholder_pc_non,_basictypeholder,_chararray,_bytearray,_array_byteobjarray,_instancecallbackcontainer_ictesters,_setholder_pc,_triangle,_palette,_stringblobwidget,_gym_wardrobes,_gym_equipments2,_jdo_an_film_library,_cid,_float4,_array_intobjarray,_detachdates,_mapconverterholder_convertedvaluemap,_jsonpath,_array_shortarray,_shapeholder_shapeset1,_arrayelement,_setwidget_normalset,_jdo_an_computer,_classwithnonpccollection_elements,_fp3base,_regtype,_float8,_basepropertytype,_collectionfieldtester_objectcollection,_a,_validatedperson,_b,_time_stamp,_date,_regproc,_tsquery,_c,_sql_identifier,_rectangle,_jdo_an_printer_toner,_oneoff_customer,text array,_urlholder,_uuid,_array_localearray,_sqltimeholder,_container_members,_genericsbasesubrelated,_doublearray,_gym_partners2,_usergroup,_tid,_varbit,_floatobjectarray (default=_aclitem)
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _uuidholder, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _publicfields, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _name, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _genericselement, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _intarray, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _user1, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _regoperator, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _circon, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _currencyholder, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _detachholder, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _pcfksetelementshare, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _user2, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _user3, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _instancecallbackcontainer_ictestersbypersistentvalue, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _sampletransfer, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _account_customer, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _hashsetwidget_normalset, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _array_longobjarray, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _colorholder, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _tsvector, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _sdperson, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _array_objectarray, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _office_departments, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _inet, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _petroleum_oil_supplier, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _uriholder_strings, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _macaddr8, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _classowner_maptocheckprefetch, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _square, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _array_floatobjarray, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _array_bigintegerarray, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _simpledatastoreid, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _lseg, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _regconfig, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _mapholder_non_non, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _bigintegerarray, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _magazine, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _person, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _genericsbasesubsub, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _login, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _stringarray, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _classsuperelements_tocheckprefetchinsuper, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _house, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _animal, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _classwithtransactionalfield, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _gym_partners, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _detachlistelement, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _manager, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _category, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _developer, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _directory_children, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _shapeholder, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _genericscontainer_elements, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _jdo_an_network, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _department_projects, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _jdo_an_computer_card, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _meeting, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _yourcompactdisc, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _organisation, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _mapfkkeyitem, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _array_bytearray, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _instancecallbackcontainer, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _dog, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _otherdetail, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _pcjoinelement, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _floatholder, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _serialised_holder, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _objectarray, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _qualification, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _intobjectarray, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _bit, jdbcId = 2003, localName = null, createParams = null
+      precision = 65000, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = false, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _fp2base, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _bitsetholder, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _int8, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = false, searchable = 3, unsigned = false, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _calendarholder, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _stringbuilderholder, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _int4, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = false, searchable = 3, unsigned = false, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _client, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _path, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _shortobjectarray, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _int2, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = false, searchable = 3, unsigned = false, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _timetz, jdbcId = 2003, localName = null, createParams = null
+      precision = 6, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = false, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _loginaccount, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _detachlist_elements, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _datewidget, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _house_windows, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _fp2sub, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _mapvalueitem, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _sqldateholder, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _array_intarray, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _jdo_an_film_library_films, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _sdcar, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _uuidholder_othercollection, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _interfacearray, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _optionalsample1, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _manager_subordinates, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _optionalsample2, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _optionalsample3, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _pcfksetelementsub2, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _farm, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _pcfksetelementsub1, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _hashsetwidget, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _array_shortobjarray, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _topic, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _employee, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _petroleum_gas_supplier, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _setwidget, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _gymequipment, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _primitive, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _account, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _petroleum_supplier, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _sqltimestampholder, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _sdaddress, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _timezoneholder, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _xid8, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _cstring, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _stringclobwidget, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _regrole, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _array_interfacearray, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _moderatedusergroup, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _numeric, jdbcId = 2003, localName = null, createParams = null
+      precision = 1000, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = false, searchable = 3, unsigned = false, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _array_stringarray, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _book, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _bool, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = false, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _wardrobe_clothes, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _regprocedure, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _bufferedimageholder, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _detail, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _json, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _shortarray, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _mapconverterholder_convertedkeymap, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _mapkeyitem, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _mycompactdisc, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _character_data, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _logentry, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _collectionfieldtester_primitivecollection, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _petroleum_customer, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _int2vector, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _customer, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _vote, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _decimalholder, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _classelements, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _customer_supplier, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _bpchar, jdbcId = 2003, localName = null, createParams = null
+      precision = 65000, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _regcollation, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _mapconverterholder, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _classholder, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _record, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _refcursor, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _array_booleanobjarray, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _doubleobjectarray, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _elementwidget, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _gym_wardrobes2, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _localeholder, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _gym, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _jfirebase_organisation, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _timestamptz, jdbcId = 2003, localName = null, createParams = null
+      precision = 6, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = false, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _usergroup_members, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _base, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _cloth, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _time, jdbcId = 2003, localName = null, createParams = null
+      precision = 6, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = false, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _cardinal_number, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _bytea, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _jodasample6, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _setholder, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _jodasample5, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _jodasample4, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _mapholder_non_pcserial, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _compactdisc, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _jodasample3, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _subbase, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _collectionfieldtester, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _array_persistablearray, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _point, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _regoper, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _jodasample2, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _jdo_an_network_devices, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _jodasample1, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _jdo_an_music_player, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _booleanobjectarray, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _palette_coloursasints, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _attachdetachcallbacktester, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _genericscontainer, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _charobjectarray, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _xid, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _pg_lsn, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _tstzrange, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _stringbufferholder, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _detachlist, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _newspaper, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _numrange, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _regnamespace, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _dateholderb, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _dateholdera, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _serialisedobject, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _dateholderc, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _guarantee, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _heating_timer, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _directory, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _array_charobjarray, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _array_booleanarray, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _collectionfieldtester_personset, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _varchar, jdbcId = 2003, localName = null, createParams = null
+      precision = 65000, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _widget, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _decimalwidget, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _pcfksetelement, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _timestamp, jdbcId = 2003, localName = null, createParams = null
+      precision = 6, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = false, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _array_doubleobjarray, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _shapeholder_shapelist1, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _box, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _javatimesample2, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _gym_codes, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _javatimesample3, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _longarray, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _javatimesample1, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _javatimesample6, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _gym_equipments, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _javatimesample7, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _polygon, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _javatimesample4, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _oid, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = false, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _javatimesample5, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _setholder_nonpc1, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _regclass, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _setholder_nonpc2, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _setholder_nonpc3, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _int4range, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _instancecallbacktester, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _gtsvector, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _array_bigdecimalarray, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _collectionconverterholder_convertedelementcollection, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _cidr, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _macaddr, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _interval, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _floatarray, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _array_floatarray, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _collectionfieldtester_personcollection, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _sequence_table, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _stringwidget, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _tsrange, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _regdictionary, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _classsuperelements, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _mapholder_pc_pc, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _pcembedded, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _array_chararray, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _mapfkvalueitem, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _jsonb, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _byteobjectarray, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _genericsvalue, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _expertgroupmember, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _serialised_holder2, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _persistablearray, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _char, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _int8range, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _oidvector, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _serialised_holder3, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _equipment, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _supplier, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _datearray, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _mapholder_non_pc, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _setholder_pcserial, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _jdo_an_printer, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _array_longarray, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _setholder_shared, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _xml, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _window, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _alternativepalette, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _relatedpropertytype, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _usergroup3, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _usergroup2, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _usergroup1, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _text, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _master, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _office, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _array_doublearray, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _aclitem, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _collectionconverterholder, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _detachpc, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _classelements_tocheckprefetch, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _owner_elements, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _yes_or_no, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _enhancerfieldnames, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _localearray, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _inverseprimitive, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _owner_setelements, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _money, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _classowner_elements, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _classwithnonpccollection, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _array_datearray, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _tenantedobject, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _wardrobe, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _uriholder, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _department, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _validatedperson2, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _validatedperson3, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _longobjectarray, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _singlefieldlongid, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [DATANUCLEUS]
+      type : name = int array, jdbcId = 2003, localName = int array, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = null, suffix = null
+      nullable = 1, caseSensitive = false, searchable = 3, unsigned = false, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _mapholder_non_non2, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _heating_boiler, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _petroleum_customer_supplier, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _classowner, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _pg_snapshot, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _txid_snapshot, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _genericscontainer_valuemap, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _groupmember, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _product, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _bigdecimalarray, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _palette_colours, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _circle, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _composedintid, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _classmoreelements, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _trade1, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _daterange, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _line, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _floatwidget, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _mapholder, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _container, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _sampleaccount, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _owner, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _booleanarray, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _project, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _mapholder_pc_non, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _basictypeholder, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _chararray, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _bytearray, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _array_byteobjarray, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _instancecallbackcontainer_ictesters, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _setholder_pc, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _triangle, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _palette, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _stringblobwidget, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _gym_wardrobes, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _gym_equipments2, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _jdo_an_film_library, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _cid, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _float4, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = false, searchable = 3, unsigned = false, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _array_intobjarray, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _detachdates, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _mapconverterholder_convertedvaluemap, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _jsonpath, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _array_shortarray, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _shapeholder_shapeset1, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _arrayelement, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _setwidget_normalset, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _jdo_an_computer, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _classwithnonpccollection_elements, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _fp3base, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _regtype, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _float8, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = false, searchable = 3, unsigned = false, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _basepropertytype, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _collectionfieldtester_objectcollection, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _a, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _validatedperson, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _b, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _time_stamp, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _date, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = false, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _regproc, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _tsquery, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _c, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _sql_identifier, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _rectangle, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _jdo_an_printer_toner, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _oneoff_customer, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [DATANUCLEUS]
+      type : name = text array, jdbcId = 2003, localName = text array, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = null, suffix = null
+      nullable = 1, caseSensitive = false, searchable = 3, unsigned = false, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _urlholder, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _uuid, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _array_localearray, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _sqltimeholder, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _container_members, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _genericsbasesubrelated, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _doublearray, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _gym_partners2, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _usergroup, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _tid, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _varbit, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = _floatobjectarray, jdbcId = 2003, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+JDBC Type=REAL sqlTypes=float4 (default=float4)
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = float4, jdbcId = 7, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = null, suffix = null
+      nullable = 1, caseSensitive = false, searchable = 3, unsigned = false, autoIncrement = false
+
+JDBC Type=OTHER sqlTypes=regcollation,int2vector,tstzrange,pg_lsn,tsvector,uuid,tid,regtype,pg_dependencies,path,xid,language_handler,pg_mcv_list,record,anycompatible,numrange,tsrange,anyelement,int8range,oidvector,index_am_handler,anycompatiblerange,void,regprocedure,inet,anyenum,anyarray,pg_node_tree,regdictionary,pg_ndistinct,anycompatiblenonarray,interval,regoperator,xid8,cid,regnamespace,internal,tsm_handler,line,box,regrole,point,unknown,event_trigger,aclitem,regproc,tsquery,jsonpath,json,cidr,lseg,regoper,regclass,daterange,txid_snapshot,regconfig,cstring,macaddr8,trigger,any,int4range,anycompatiblearray,macaddr,varbit,jsonb,polygon,pg_ddl_command,pg_snapshot,table_am_handler,anynonarray,fdw_handler,gtsvector,anyrange (default=aclitem)
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = regcollation, jdbcId = 1111, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = int2vector, jdbcId = 1111, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = tstzrange, jdbcId = 1111, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = pg_lsn, jdbcId = 1111, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = tsvector, jdbcId = 1111, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = uuid, jdbcId = 1111, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = tid, jdbcId = 1111, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = regtype, jdbcId = 1111, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = pg_dependencies, jdbcId = 1111, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = path, jdbcId = 1111, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = xid, jdbcId = 1111, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = language_handler, jdbcId = 1111, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = pg_mcv_list, jdbcId = 1111, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = record, jdbcId = 1111, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = anycompatible, jdbcId = 1111, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = numrange, jdbcId = 1111, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = tsrange, jdbcId = 1111, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = anyelement, jdbcId = 1111, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = int8range, jdbcId = 1111, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = oidvector, jdbcId = 1111, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = index_am_handler, jdbcId = 1111, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = anycompatiblerange, jdbcId = 1111, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = void, jdbcId = 1111, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = regprocedure, jdbcId = 1111, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = inet, jdbcId = 1111, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = anyenum, jdbcId = 1111, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = anyarray, jdbcId = 1111, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = pg_node_tree, jdbcId = 1111, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = regdictionary, jdbcId = 1111, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = pg_ndistinct, jdbcId = 1111, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = anycompatiblenonarray, jdbcId = 1111, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = interval, jdbcId = 1111, localName = null, createParams = null
+      precision = 6, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = false, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = regoperator, jdbcId = 1111, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = xid8, jdbcId = 1111, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = cid, jdbcId = 1111, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = regnamespace, jdbcId = 1111, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = internal, jdbcId = 1111, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = tsm_handler, jdbcId = 1111, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = line, jdbcId = 1111, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = box, jdbcId = 1111, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = regrole, jdbcId = 1111, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = point, jdbcId = 1111, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = unknown, jdbcId = 1111, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = event_trigger, jdbcId = 1111, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = aclitem, jdbcId = 1111, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = regproc, jdbcId = 1111, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = tsquery, jdbcId = 1111, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = jsonpath, jdbcId = 1111, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = json, jdbcId = 1111, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = cidr, jdbcId = 1111, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = lseg, jdbcId = 1111, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = regoper, jdbcId = 1111, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = regclass, jdbcId = 1111, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = daterange, jdbcId = 1111, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = txid_snapshot, jdbcId = 1111, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = regconfig, jdbcId = 1111, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = cstring, jdbcId = 1111, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = macaddr8, jdbcId = 1111, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = trigger, jdbcId = 1111, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = any, jdbcId = 1111, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = int4range, jdbcId = 1111, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = anycompatiblearray, jdbcId = 1111, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = macaddr, jdbcId = 1111, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = varbit, jdbcId = 1111, localName = null, createParams = null
+      precision = 65000, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = false, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = jsonb, jdbcId = 1111, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = polygon, jdbcId = 1111, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = pg_ddl_command, jdbcId = 1111, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = pg_snapshot, jdbcId = 1111, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = table_am_handler, jdbcId = 1111, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = anynonarray, jdbcId = 1111, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = fdw_handler, jdbcId = 1111, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = gtsvector, jdbcId = 1111, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = anyrange, jdbcId = 1111, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+JDBC Type=STRUCT sqlTypes=circle (default=circle)
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = circle, jdbcId = 2002, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+JDBC Type=DOUBLE sqlTypes=money,float8 (default=float8)
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = money, jdbcId = 8, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = null, suffix = null
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = float8, jdbcId = 8, localName = null, createParams = null
+      precision = 0, allowsSpec = false, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = null, suffix = null
+      nullable = 1, caseSensitive = false, searchable = 3, unsigned = false, autoIncrement = false
+
+JDBC Type=DATE sqlTypes=date (default=date)
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = date, jdbcId = 91, localName = null, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = false, searchable = 3, unsigned = true, autoIncrement = false
+
+JDBC Type=TIME sqlTypes=time,timetz (default=time)
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = time, jdbcId = 92, localName = null, createParams = null
+      precision = 6, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = false, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = timetz, jdbcId = 92, localName = null, createParams = null
+      precision = 6, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = false, searchable = 3, unsigned = true, autoIncrement = false
+
+JDBC Type=TIMESTAMP sqlTypes=timestamp,timestamptz (default=timestamptz)
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = timestamp, jdbcId = 93, localName = null, createParams = null
+      precision = 6, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = false, searchable = 3, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = timestamptz, jdbcId = 93, localName = null, createParams = null
+      precision = 6, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = false, searchable = 3, unsigned = true, autoIncrement = false
+
+
+Database Keywords
+PATH
+GROUPS
+TRIM
+DEPENDS
+TRANSLATION
+MUMPS
+STATIC
+STANDALONE
+CATALOG
+YEAR
+EXPLAIN
+MESSAGE_LENGTH
+MAPPING
+DISCONNECT
+PARTITION
+LISTEN
+STORAGE
+PARSER
+XMLPARSE
+LEFT
+SEARCH
+CURRENT_PATH
+SIZE
+CONFIGURATION
+CURRENT_DEFAULT_TRANSFORM_GROUP
+STDOUT
+RESTRICT
+CUBE
+IMMUTABLE
+RELEASE
+WHERE
+SQLWARNING
+AS
+POLICY
+AT
+SYSID
+DATABASE
+TIMEZONE_MINUTE
+CONCURRENTLY
+LOCATION
+ALTER
+DOMAIN
+SET
+C
+MERGE
+HEADER
+CONSTRAINT
+PRECISION
+FAMILY
+SPACE
+ROLE
+UPPER
+COLLATION_NAME
+BY
+XMLFOREST
+CHARACTER
+INSTEAD
+OCTET_LENGTH
+INTERVAL
+COLLATION_SCHEMA
+CATALOG_NAME
+UNLISTEN
+DETACH
+CONNECTION
+CONTINUE
+PAD
+REF
+OPERATOR
+SETS
+ADA
+TRUNCATE
+CURSOR
+SYSTEM
+CONSTRAINT_SCHEMA
+ADD
+TABLE_NAME
+SQLERROR
+DO
+REPLICA
+TYPES
+TRUSTED
+INDEX
+FOUND
+HOLD
+EXTRACT
+VARYING
+DISABLE
+LEAKPROOF
+STRICT
+ABORT
+XMLCONCAT
+FOR
+ITERATE
+CACHE
+CURRENT
+IMPLICIT
+USING
+EXEC
+RETURNED_SQLSTATE
+DEFERRABLE
+END
+CONNECTION_NAME
+VALIDATOR
+PRESERVE
+UNDO
+LOAD
+BINARY
+STATE
+WITHIN
+FORWARD
+XMLPI
+NCHAR
+ABSOLUTE
+SOME
+SCHEMA
+OUTER
+COLUMNS
+RENAME
+EXCLUSIVE
+FILTER
+GO
+BIT
+INTERSECT
+WITH
+INITIALLY
+OVER
+GRANT
+CURRENT_ROLE
+CLASS_ORIGIN
+ACTION
+ISNULL
+VALIDATE
+START
+CHAR_LENGTH
+DEFAULT
+CHARACTER_LENGTH
+JOIN
+LOCK
+UNNEST
+TEXT
+NULLIF
+SESSION_USER
+AGGREGATE
+MULTISET
+ELSE
+IF
+BIT_LENGTH
+PARAMETER
+LANGUAGE
+NCLOB
+CHARACTER_SET_SCHEMA
+ENUM
+NATIONAL
+LOCKED
+IN
+DISTINCT
+IS
+SETOF
+CURRENT_TRANSFORM_GROUP_FOR_TYPE
+SPECIFICTYPE
+FORCE
+NFKC
+NFKD
+FORTRAN
+MAP
+EXIT
+ASYMMETRIC
+PROCEDURES
+COLLATION
+GOTO
+MAX
+CASCADE
+DELIMITERS
+TRANSACTION
+SYSTEM_USER
+COMMENT
+OFF
+USAGE
+CURSOR_NAME
+RIGHT
+SKIP
+UPDATE
+STABLE
+FETCH
+NUMERIC
+REVOKE
+RETURNS
+SQLEXCEPTION
+FIRST
+SELECT
+DYNAMIC
+TABLES
+CALLED
+ELEMENT
+GREATEST
+DEPTH
+ALL
+CURRENT_USER
+NEW
+ARRAY
+ATOMIC
+PASSING
+COLUMN_NAME
+COLUMN
+MODE
+DECIMAL
+EXTENSION
+NFC
+VALUE
+RESET
+NFD
+SERIALIZABLE
+EVENT
+COALESCE
+ALLOCATE
+WRAPPER
+CORRESPONDING
+TIMESTAMP
+MINUTE
+SCALE
+DESCRIBE
+XMLNAMESPACES
+MESSAGE_OCTET_LENGTH
+NULL
+RETURNED_LENGTH
+TRUE
+OBJECT
+TABLESPACE
+PRIVILEGES
+SQL
+READ
+MODULE
+PASSWORD
+VARIADIC
+AND
+SQLCODE
+REAL
+ROW
+CURRENT_DATE
+MESSAGE_TEXT
+DIAGNOSTICS
+RANGE
+NO
+VACUUM
+FLOAT
+CURRENT_TIMESTAMP
+STORED
+HOUR
+REFRESH
+ROUTINE
+ANY
+PLI
+ROLLBACK
+MEMBER
+NATURAL
+EXTERNAL
+UNNAMED
+OF
+GROUPING
+RECHECK
+READS
+ON
+OR
+EQUALS
+CSV
+PRIMARY
+CURRENT_CATALOG
+ATTACH
+ENCODING
+TRANSLATE
+REINDEX
+SECOND
+UNKNOWN
+MATCH
+REFERENCES
+ROWS
+MONTH
+ELSEIF
+INHERIT
+PUBLICATION
+CREATE
+OWNED
+OLD
+TRIGGER
+LEAST
+BETWEEN
+AFTER
+CLOSE
+CONVERT
+POSITION
+OWNER
+DISCARD
+END-EXEC
+NOTHING
+DEALLOCATE
+INCLUDE
+INNER
+EACH
+PRIOR
+SUM
+BIGINT
+IDENTITY
+MIN
+ARE
+VARCHAR
+THEN
+CONDITION
+PROCEDURAL
+KEY
+PROGRAM
+ORDINALITY
+XMLEXISTS
+CALL
+STRIP
+INTO
+REPEAT
+EXCEPTION
+INDICATOR
+FREE
+RETURNED_OCTET_LENGTH
+RETURNING
+ASC
+GROUP
+DELETE
+DATETIME_INTERVAL_PRECISION
+TEMPORARY
+OFFSET
+PREPARED
+SIMILAR
+GENERATED
+PROCEDURE
+SNAPSHOT
+STATISTICS
+COBOL
+UNDER
+NULLABLE
+ANALYZE
+COMMITTED
+OPEN
+REFERENCING
+TO
+CONSTRUCTOR
+UNION
+BREADTH
+INDEXES
+PARALLEL
+FREEZE
+LOCATOR
+SCOPE
+LOOP
+CLASS
+IMMEDIATE
+VIEW
+DESC
+VIEWS
+ASSERTION
+CONSTRAINTS
+LABEL
+CURRENT_TIME
+DEFERRED
+REPLACE
+INTEGER
+NUMBER
+OUTPUT
+UNIQUE
+TRAILING
+FULL
+BOOLEAN
+NAME
+AVG
+NOT
+ROW_COUNT
+PLACING
+LAST
+LOWER
+SPECIFIC
+HAVING
+SQLSTATE
+PLANS
+QUOTE
+BACKWARD
+YES
+LOCALTIME
+COMMAND_FUNCTION
+GENERAL
+FUNCTIONS
+DELIMITER
+DROP
+STDIN
+RETURN
+FOREIGN
+NOTIFY
+ROUTINES
+SERVER
+NEXT
+GLOBAL
+LEAVE
+RULE
+SERVER_NAME
+SHOW
+VERBOSE
+EXISTS
+PARTIAL
+TIME
+ESCAPE
+INHERITS
+FALSE
+XMLATTRIBUTES
+SECTION
+XMLTABLE
+NOTNULL
+SEQUENCES
+DATETIME_INTERVAL_CODE
+SYMMETRIC
+VALID
+SHARE
+LOCALTIMESTAMP
+TABLE
+WHEN
+ANALYSE
+WHITESPACE
+LOCAL
+CONSTRAINT_CATALOG
+DICTIONARY
+DOCUMENT
+COLLATION_CATALOG
+NONE
+CLUSTER
+TYPE
+CYCLE
+CAST
+DESCRIPTOR
+OPTION
+WHENEVER
+LEVEL
+LEADING
+FUNCTION
+MODIFIES
+NOWAIT
+ASENSITIVE
+CASE
+OUT
+REASSIGN
+OVERLAPS
+PREPARE
+GET
+XMLSERIALIZE
+CHECK
+PUBLIC
+WORK
+WITHOUT
+MATERIALIZED
+COUNT
+HANDLER
+TREAT
+NAMES
+LENGTH
+ILIKE
+CHAR
+COMMENTS
+CONNECT
+BEGIN
+TABLESAMPLE
+WRITE
+UNLOGGED
+ORDER
+IMPORT
+ISOLATION
+RELATIVE
+LARGE
+XMLELEMENT
+VALUES
+DOUBLE
+CHARACTER_SET_NAME
+SIGNAL
+TIMEZONE_HOUR
+SUBMULTISET
+COLLATE
+UNCOMMITTED
+CURRENT_SCHEMA
+SUBSCRIPTION
+SESSION
+COPY
+RESIGNAL
+WINDOW
+EXECUTE
+MORE
+REPEATABLE
+VERSION
+CHECKPOINT
+DAY
+EXPRESSION
+AUTHORIZATION
+VOLATILE
+BLOB
+INPUT
+SUBSTRING
+ZONE
+RECURSIVE
+XMLROOT
+ONLY
+FROM
+DEREF
+SUPPORT
+LATERAL
+INLINE
+TEMPLATE
+INSENSITIVE
+BOTH
+SENSITIVE
+SUBCLASS_ORIGIN
+CHARACTER_SET_CATALOG
+CONVERSION
+LOGGED
+ENABLE
+EXCEPT
+DATE
+SCHEMA_NAME
+ROLLUP
+UNENCRYPTED
+LIKE
+SCROLL
+DATA
+METHOD
+INSERT
+INOUT
+CONFLICT
+SCHEMAS
+CONSTRAINT_NAME
+LIMIT
+OIDS
+INT
+PASCAL
+COST
+ALSO
+CONTENT
+ACCESS
+DEC
+CLOB
+CASCADED
+COMMIT
+DETERMINISTIC
+USER
+SAVEPOINT
+UNTIL
+ENCRYPTED
+DYNAMIC_FUNCTION
+CONDITION_NUMBER
+BEFORE
+DECLARE
+TEMP
+MOVE
+CROSS
+XML
+SMALLINT
+WHILE
+RESULT
+
+DataNucleus SchemaTool completed successfully
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  2.859 s
+[INFO] Finished at: 2022-03-03T08:27:56Z
+[INFO] ------------------------------------------------------------------------
