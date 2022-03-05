@@ -215,8 +215,7 @@ public class SQLController
                                 state.processable = false; // Have to wait til we process this part til processable again
                                 if (NucleusLogger.DATASTORE_PERSIST.isDebugEnabled())
                                 {
-                                    NucleusLogger.DATASTORE_PERSIST.debug(Localiser.msg("052100", 
-                                        stmtText, "" + state.batchSize));
+                                    NucleusLogger.DATASTORE_PERSIST.debug(Localiser.msg("052100", stmtText, "" + state.batchSize));
                                 }
                                 return state.stmt;
                             }
@@ -268,7 +267,7 @@ public class SQLController
 
         if (batchable && supportsBatching)
         {
-            // This statement is batchable so save it as the current batchable
+            // This statement is batchable so save it since we support batching
             if (NucleusLogger.DATASTORE_PERSIST.isDebugEnabled())
             {
                 NucleusLogger.DATASTORE_PERSIST.debug(Localiser.msg("052103", stmtText));
@@ -587,8 +586,7 @@ public class SQLController
 
     /**
      * Convenience method to close a PreparedStatement.
-     * If the statement is currently being used as a batch, will register it for closing when
-     * executing the batch
+     * If the statement is currently being used as a batch, will register it for closing when executing the batch
      * @param conn The Connection
      * @param ps The PreparedStatement
      * @throws SQLException if an error occurs closing the statement
@@ -604,14 +602,14 @@ public class SQLController
         }
         else
         {
-            try 
+            try
             {
                 if (NucleusLogger.DATASTORE.isDebugEnabled())
                 {
                     NucleusLogger.DATASTORE.debug(Localiser.msg("052110", StringUtils.toJVMIDString(ps)));
                 }
                 ps.close();
-            } 
+            }
             catch (SQLException sqle)
             {
                 // workaround for DBCP bug: even though PreparedStatement.close() is defined as having no effect if already closed, DBCP will throw SQLException

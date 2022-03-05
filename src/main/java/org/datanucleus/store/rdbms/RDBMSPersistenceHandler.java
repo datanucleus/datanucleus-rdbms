@@ -21,7 +21,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -367,10 +366,11 @@ public class RDBMSPersistenceHandler extends AbstractPersistenceHandler
      * @param mmdsStore MetaData for the members to store the values for later processing
      * @return A fetch request object.
      */
-    private Request getFetchRequest(DatastoreClass table, FetchPlanForClass fpClass, ClassLoaderResolver clr, AbstractClassMetaData cmd, AbstractMemberMetaData[] mmdsFetch, AbstractMemberMetaData[] mmdsStore)
+    private Request getFetchRequest(DatastoreClass table, FetchPlanForClass fpClass, ClassLoaderResolver clr, AbstractClassMetaData cmd, 
+            AbstractMemberMetaData[] mmdsFetch, AbstractMemberMetaData[] mmdsStore)
     {
-        // TODO Add mmdsToStore, fpClass to RequestIdentifier
-        RequestIdentifier reqID = new RequestIdentifier(table, mmdsFetch, RequestType.FETCH, cmd.getFullClassName());
+        // TODO Add fpClass to RequestIdentifier
+        RequestIdentifier reqID = new RequestIdentifier(table, mmdsFetch, mmdsStore, RequestType.FETCH, cmd.getFullClassName());
         Request req = requestsByID.get(reqID);
         if (req == null)
         {
@@ -501,7 +501,7 @@ public class RDBMSPersistenceHandler extends AbstractPersistenceHandler
             ec.getStatistics().incrementDeleteCount();
         }
 
-        ClassLoaderResolver clr = sm.getExecutionContext().getClassLoaderResolver();
+        ClassLoaderResolver clr = ec.getClassLoaderResolver();
         DatastoreClass dc = getDatastoreClass(sm.getClassMetaData().getFullClassName(), clr);
         deleteObjectFromTable(dc, sm, clr);
     }
@@ -587,10 +587,8 @@ public class RDBMSPersistenceHandler extends AbstractPersistenceHandler
             smsByTable.put(table, smList);
         }
 
-        Iterator<Map.Entry<DatastoreClass, List<DNStateManager>>> tableIter = smsByTable.entrySet().iterator();
-        while (tableIter.hasNext())
+        for (Map.Entry<DatastoreClass, List<DNStateManager>> entry : smsByTable.entrySet())
         {
-            Map.Entry<DatastoreClass, List<DNStateManager>> entry = tableIter.next();
             DatastoreClass table = entry.getKey();
             List<DNStateManager> tableSMs = entry.getValue();
 
@@ -644,11 +642,10 @@ public class RDBMSPersistenceHandler extends AbstractPersistenceHandler
      * already created). Most relational databases leave the in-memory object instantion to Core, but some 
      * object databases may manage the in-memory object instantion, effectively preventing Core of doing this.
      * <p>
-     * StoreManager implementations may simply return null, indicating that they leave the object instantiate to 
-     * us. Other implementations may instantiate the object in question (whether the implementation may trust 
-     * that the object is not already instantiated has still to be determined). If an implementation believes
-     * that an object with the given ID should exist, but in fact does not exist, then the implementation should 
-     * throw a RuntimeException. It should not silently return null in this case.
+     * StoreManager implementations may simply return null, indicating that they leave the object instantiate to us. 
+     * Other implementations may instantiate the object in question (whether the implementation may trust that the object is not already instantiated 
+     * has still to be determined). If an implementation believes that an object with the given ID should exist, but in fact does not exist, 
+     * then the implementation should throw a RuntimeException. It should not silently return null in this case.
      * </p>
      * @param ec execution context
      * @param id the id of the object in question.
@@ -684,7 +681,7 @@ public class RDBMSPersistenceHandler extends AbstractPersistenceHandler
         synchronized(requestsByID)
         {
             // Synchronise on the "requestsById" set since while it is "synchronised itself, all iterators needs this sync
-            Set<RequestIdentifier> keySet = new HashSet(requestsByID.keySet());
+            Set<RequestIdentifier> keySet = new HashSet<>(requestsByID.keySet());
             for (RequestIdentifier reqId : keySet)
             {
                 if (reqId.getTable() == table)

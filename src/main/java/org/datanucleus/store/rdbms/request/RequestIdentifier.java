@@ -30,6 +30,7 @@ public class RequestIdentifier
 {
     private final DatastoreClass table;
     private final int[] memberNumbers;
+    private final int[] secondaryMemberNumbers;
     private final RequestType type;
     private final int hashCode;
     private final String className;
@@ -45,6 +46,7 @@ public class RequestIdentifier
     {
         this.table = table;
         this.type = type;
+        this.secondaryMemberNumbers = null;
 
         if (mmds == null)
         {
@@ -72,6 +74,73 @@ public class RequestIdentifier
                 h ^= this.memberNumbers[i];
             }
         }
+        hashCode = h;
+    }
+
+    /**
+     * Constructor.
+     * @param table Datastore class for which this is a request
+     * @param mmds MetaData of members to use in the request (if required)
+     * @param secondaryMmds MetaData of secondary members to use the in the request
+     * @param type The type being represented
+     * @param className The name of the class
+     */
+    public RequestIdentifier(DatastoreClass table, AbstractMemberMetaData[] mmds, AbstractMemberMetaData[] secondaryMmds, RequestType type, String className)
+    {
+        this.table = table;
+        this.type = type;
+        this.className = className;
+
+        if (mmds == null)
+        {
+            this.memberNumbers = null;
+        }
+        else
+        {
+            this.memberNumbers = new int[mmds.length];
+            for (int i=0;i<this.memberNumbers.length;i++)
+            {
+                this.memberNumbers[i] = mmds[i].getAbsoluteFieldNumber();
+            }
+
+            // The key uniqueness is dependent on memberNumbers being sorted
+            Arrays.sort(this.memberNumbers);
+        }
+        if (secondaryMmds == null)
+        {
+            this.secondaryMemberNumbers = null;
+        }
+        else
+        {
+            this.secondaryMemberNumbers = new int[secondaryMmds.length];
+            for (int i=0;i<this.secondaryMemberNumbers.length;i++)
+            {
+                this.secondaryMemberNumbers[i] = secondaryMmds[i].getAbsoluteFieldNumber();
+            }
+
+            // The key uniqueness is dependent on memberNumbers being sorted
+            Arrays.sort(this.secondaryMemberNumbers);
+        }
+
+        // Since we are an immutable object, pre-compute the hash code for improved performance in equals()
+        int h = table.hashCode() ^ type.hashCode() ^ className.hashCode();
+
+        if (this.memberNumbers != null)
+        {
+            for (int i = 0; i < this.memberNumbers.length; ++i)
+            {
+                h ^= this.memberNumbers[i];
+            }
+        }
+
+        if (this.secondaryMemberNumbers != null)
+        {
+            for (int i = 0; i < this.secondaryMemberNumbers.length; ++i)
+            {
+                h ^= this.secondaryMemberNumbers[i];
+            }
+        }
+
         hashCode = h;
     }
 
@@ -115,6 +184,8 @@ public class RequestIdentifier
             return false;
         }
 
-        return table.equals(ri.table) && type.equals(ri.type) && Arrays.equals(memberNumbers, ri.memberNumbers) && className.equals(ri.className);
+        return table.equals(ri.table) && type.equals(ri.type) && className.equals(ri.className) &&
+                Arrays.equals(memberNumbers, ri.memberNumbers) && 
+                Arrays.equals(secondaryMemberNumbers, ri.secondaryMemberNumbers);
     }
 }
