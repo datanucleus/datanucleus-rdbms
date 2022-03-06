@@ -581,7 +581,7 @@ public abstract class EmbeddedMapping extends SingleFieldMapping
         }
 
         // Create a persistable to put the values into
-        DNStateManager embSM = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, embCmd, ownerSM, mmd.getAbsoluteFieldNumber(), objectType);
+        DNStateManager embSM = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, embCmd, ownerSM, ownerFieldNumber, objectType);
         value = embSM.getObject();
 
         String nullColumn = (emd != null) ? emd.getNullIndicatorColumn() : null;
