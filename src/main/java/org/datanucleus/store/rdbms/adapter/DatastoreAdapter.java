@@ -404,6 +404,13 @@ public interface DatastoreAdapter
     public static final String COLUMN_LENGTH_SEMANTICS = "ColumnLengthSemantics";
 
     /**
+     * Cloud Spanner needs to use raw strings (r'') so that it can escape /_% characters
+     * by only one / character. Otherwise, double // is required. StringMatches method uses this
+     * functionality.
+     */
+    public static final String RAW_PREFIX_LIKE_STATEMENTS = "RawPrefixLikeStatements";
+
+    /**
      * Initialise the datastore adapter.
      * @param handler SchemaHandler that we initialise the types for
      * @param mconn Managed connection to use

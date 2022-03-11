@@ -17,7 +17,6 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.store.rdbms.sql.method;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.datanucleus.store.rdbms.sql.SQLStatement;
@@ -25,7 +24,7 @@ import org.datanucleus.store.rdbms.sql.expression.NumericExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
 
 /**
- * Method for evaluating {dateExpr}.getDay() for Firebird.
+ * Method for evaluating {dateExpr}.getDay() for Firebird and CloudSpanner.
  * Returns a NumericExpression that equates to <pre>extract(DAY FROM expr)</pre>
  */
 public class TemporalDayMethod5 extends TemporalBaseMethod
@@ -38,8 +37,6 @@ public class TemporalDayMethod5 extends TemporalBaseMethod
         SQLExpression invokedExpr = getInvokedExpression(expr, args, "DAY");
 
         expr.toSQLText().prepend("DAY FROM ");
-        ArrayList funcArgs = new ArrayList();
-        funcArgs.add(invokedExpr);
-        return new NumericExpression(stmt, stmt.getSQLExpressionFactory().getMappingForType(int.class), "EXTRACT", funcArgs);
+        return new NumericExpression(stmt, stmt.getSQLExpressionFactory().getMappingForType(int.class), "EXTRACT", List.of(invokedExpr));
     }
 }
