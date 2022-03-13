@@ -94,7 +94,7 @@ public class RDBMSTableFKInfo implements ListStoreSchemaData
      * Accessor for the columns
      * @return Column schema information
      */
-    public List getChildren()
+    public List<StoreSchemaData> getChildren()
     {
         return fks;
     }

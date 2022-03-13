@@ -94,7 +94,7 @@ public class RDBMSTablePKInfo implements ListStoreSchemaData
      * Accessor for the primary keys
      * @return PK information
      */
-    public List getChildren()
+    public List<StoreSchemaData> getChildren()
     {
         return pks;
     }

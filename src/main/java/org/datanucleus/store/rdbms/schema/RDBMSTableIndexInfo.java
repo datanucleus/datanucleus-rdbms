@@ -94,7 +94,7 @@ public class RDBMSTableIndexInfo implements ListStoreSchemaData
      * Accessor for the indices.
      * @return PK information
      */
-    public List getChildren()
+    public List<StoreSchemaData> getChildren()
     {
         return indices;
     }
