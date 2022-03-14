@@ -49,6 +49,7 @@
                         <Bundle-SymbolicName>org.datanucleus.store.rdbms;singleton:=true</Bundle-SymbolicName>
                         <Import-Package>
                             org.datanucleus*;version="${dn.core.version}",
+                            com.google.cloud.spanner.jdbc;resolution:=optional,
                             com.ibm.db2.jcc;resolution:=optional,
                             com.informix.jdbc;resolution:=optional,
                             com.jolbox.bonecp;resolution:=optional,
