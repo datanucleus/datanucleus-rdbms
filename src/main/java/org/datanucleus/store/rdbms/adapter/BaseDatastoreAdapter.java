@@ -1843,6 +1843,9 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
             else if ("CURRENT_DATE".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.CurrentDateFunction.class;
             else if ("CURRENT_TIME".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.CurrentTimeFunction.class;
             else if ("CURRENT_TIMESTAMP".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.CurrentTimestampFunction.class;
+            else if ("LOCAL_DATE".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.LocalDateFunction.class;
+            else if ("LOCAL_TIME".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.LocalTimeFunction.class;
+            else if ("LOCAL_DATETIME".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.LocalDateTimeFunction.class;
             else if ("Math.abs".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.MathAbsMethod.class;
             else if ("Math.acos".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.MathAcosMethod.class;
             else if ("Math.asin".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.MathAsinMethod.class;
