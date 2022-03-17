@@ -1869,6 +1869,7 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
             else if ("SQL_function".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.SQLFunctionMethod.class;
 
             else if ("ROUND".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.RoundMethod.class;
+            else if ("SIGN".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.SignFunction.class;
 
             else if ("YEAR".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalYearMethod.class;
             else if ("MONTH".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalMonthMethod.class;
