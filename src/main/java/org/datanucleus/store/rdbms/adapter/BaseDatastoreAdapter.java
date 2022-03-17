@@ -1788,9 +1788,6 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
         return null;
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.rdbms.adapter.DatastoreAdapter#getSQLMethodClass(java.lang.String, java.lang.String)
-     */
     @Override
     public Class getSQLMethodClass(String className, String methodName, ClassLoaderResolver clr)
     {
@@ -1801,42 +1798,52 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
             else if ("asin".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.AsinFunction.class;
             else if ("atan".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.AtanFunction.class;
             else if ("avg".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.AvgFunction.class;
+            else if ("ceiling".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.CeilFunction.class;
             else if ("ceil".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.CeilFunction.class;
             else if ("cos".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.CosFunction.class;
             else if ("count".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.CountFunction.class;
+            else if ("degrees".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.DegreesFunction.class;
             else if ("exp".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.ExpFunction.class;
             else if ("floor".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.FloorFunction.class;
             else if ("log".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.LogFunction.class;
+            else if ("ln".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.LogFunction.class;
             else if ("max".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.MaxFunction.class;
             else if ("min".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.MinFunction.class;
             else if ("power".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.PowerFunction.class;
+            else if ("radians".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.RadiansFunction.class;
+            else if ("round".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.RoundMethod.class;
+            else if ("sign".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.SignFunction.class;
             else if ("sin".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.SinFunction.class;
             else if ("sqrt".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.SqrtFunction.class;
             else if ("sum".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.SumFunction.class;
             else if ("tan".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TanFunction.class;
-            else if ("degrees".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.DegreesFunction.class;
-            else if ("radians".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.RadiansFunction.class;
+
             else if ("ABS".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.AbsFunction.class;
             else if ("ACOS".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.AcosFunction.class;
             else if ("ASIN".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.AsinFunction.class;
             else if ("ATAN".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.AtanFunction.class;
             else if ("AVG".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.AvgFunction.class;
+            else if ("CEILING".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.CeilFunction.class;
             else if ("CEIL".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.CeilFunction.class;
             else if ("COS".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.CosFunction.class;
             else if ("COUNT".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.CountFunction.class;
             else if ("COUNTSTAR".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.CountStarFunction.class;
+            else if ("DEGREES".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.DegreesFunction.class;
             else if ("EXP".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.ExpFunction.class;
             else if ("FLOOR".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.FloorFunction.class;
             else if ("LOG".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.LogFunction.class;
+            else if ("LN".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.LogFunction.class;
             else if ("MAX".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.MaxFunction.class;
             else if ("MIN".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.MinFunction.class;
             else if ("POWER".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.PowerFunction.class;
+            else if ("RADIANS".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.RadiansFunction.class;
+            else if ("ROUND".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.RoundMethod.class;
+            else if ("SIGN".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.SignFunction.class;
             else if ("SIN".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.SinFunction.class;
             else if ("SQRT".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.SqrtFunction.class;
             else if ("SUM".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.SumFunction.class;
             else if ("TAN".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TanFunction.class;
-            else if ("RADIANS".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.RadiansFunction.class;
-            else if ("DEGREES".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.DegreesFunction.class;
+
             else if ("COALESCE".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.CoalesceFunction.class;
             else if ("NULLIF".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.NullIfFunction.class;
             else if ("INDEX".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.ListIndexOfMethod.class;
@@ -1867,9 +1874,6 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
             else if ("SQL_boolean".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.SQLBooleanMethod.class;
             else if ("SQL_numeric".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.SQLNumericMethod.class;
             else if ("SQL_function".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.SQLFunctionMethod.class;
-
-            else if ("ROUND".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.RoundMethod.class;
-            else if ("SIGN".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.SignFunction.class;
 
             else if ("YEAR".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalYearMethod.class;
             else if ("MONTH".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalMonthMethod.class;
