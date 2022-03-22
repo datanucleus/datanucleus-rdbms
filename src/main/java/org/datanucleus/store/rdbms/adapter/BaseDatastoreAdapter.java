@@ -1797,6 +1797,7 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
             else if ("acos".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.AcosFunction.class;
             else if ("asin".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.AsinFunction.class;
             else if ("atan".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.AtanFunction.class;
+            else if ("atan2".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.Atan2Function.class;
             else if ("avg".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.AvgFunction.class;
             else if ("ceiling".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.CeilFunction.class;
             else if ("ceil".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.CeilFunction.class;
@@ -1822,6 +1823,7 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
             else if ("ACOS".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.AcosFunction.class;
             else if ("ASIN".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.AsinFunction.class;
             else if ("ATAN".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.AtanFunction.class;
+            else if ("ATAN2".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.Atan2Function.class;
             else if ("AVG".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.AvgFunction.class;
             else if ("CEILING".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.CeilFunction.class;
             else if ("CEIL".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.CeilFunction.class;
