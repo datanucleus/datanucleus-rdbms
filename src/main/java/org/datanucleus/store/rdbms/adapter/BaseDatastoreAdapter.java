@@ -1802,6 +1802,7 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
             else if ("ceiling".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.CeilFunction.class;
             else if ("ceil".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.CeilFunction.class;
             else if ("cos".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.CosFunction.class;
+            else if ("cosh".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.CoshFunction.class;
             else if ("cot".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.CotFunction.class;
             else if ("count".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.CountFunction.class;
             else if ("degrees".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.DegreesFunction.class;
@@ -1816,9 +1817,11 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
             else if ("round".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.RoundMethod.class;
             else if ("sign".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.SignFunction.class;
             else if ("sin".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.SinFunction.class;
+            else if ("sinh".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.SinhFunction.class;
             else if ("sqrt".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.SqrtFunction.class;
             else if ("sum".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.SumFunction.class;
             else if ("tan".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TanFunction.class;
+            else if ("tanh".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TanhFunction.class;
 
             else if ("ABS".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.AbsFunction.class;
             else if ("ACOS".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.AcosFunction.class;
@@ -1829,6 +1832,7 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
             else if ("CEILING".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.CeilFunction.class;
             else if ("CEIL".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.CeilFunction.class;
             else if ("COS".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.CosFunction.class;
+            else if ("COSH".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.CoshFunction.class;
             else if ("COT".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.CotFunction.class;
             else if ("COUNT".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.CountFunction.class;
             else if ("COUNTSTAR".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.CountStarFunction.class;
@@ -1844,9 +1848,11 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
             else if ("ROUND".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.RoundMethod.class;
             else if ("SIGN".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.SignFunction.class;
             else if ("SIN".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.SinFunction.class;
+            else if ("SINH".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.SinhFunction.class;
             else if ("SQRT".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.SqrtFunction.class;
             else if ("SUM".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.SumFunction.class;
             else if ("TAN".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TanFunction.class;
+            else if ("TANH".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TanhFunction.class;
 
             else if ("COALESCE".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.CoalesceFunction.class;
             else if ("NULLIF".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.NullIfFunction.class;
