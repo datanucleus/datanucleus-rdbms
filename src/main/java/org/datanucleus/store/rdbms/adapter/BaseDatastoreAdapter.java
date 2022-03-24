@@ -1802,6 +1802,7 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
             else if ("ceiling".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.CeilFunction.class;
             else if ("ceil".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.CeilFunction.class;
             else if ("cos".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.CosFunction.class;
+            else if ("cot".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.CotFunction.class;
             else if ("count".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.CountFunction.class;
             else if ("degrees".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.DegreesFunction.class;
             else if ("exp".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.ExpFunction.class;
@@ -1828,6 +1829,7 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
             else if ("CEILING".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.CeilFunction.class;
             else if ("CEIL".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.CeilFunction.class;
             else if ("COS".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.CosFunction.class;
+            else if ("COT".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.CotFunction.class;
             else if ("COUNT".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.CountFunction.class;
             else if ("COUNTSTAR".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.CountStarFunction.class;
             else if ("DEGREES".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.DegreesFunction.class;
