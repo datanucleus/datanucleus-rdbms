@@ -135,7 +135,7 @@ public abstract class AbstractClassTable extends TableImpl
     /**
      * Method to initialise the table primary key field(s).
      * @param clr The ClassLoaderResolver
-     **/
+     */
     protected abstract void initializePK(ClassLoaderResolver clr);
 
     /**

@@ -30,7 +30,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -69,19 +68,19 @@ import org.datanucleus.util.NucleusLogger;
 public abstract class AbstractTable implements Table
 {
     /** Table object has just been created. */
-    static final protected int TABLE_STATE_NEW = 0;
+    static final protected short TABLE_STATE_NEW = 0;
 
     /** Table object is created and PK initialised. */
-    static final protected int TABLE_STATE_PK_INITIALIZED = 1;
+    static final protected short TABLE_STATE_PK_INITIALIZED = 1;
 
     /** Table object has been initialised. */
-    static final protected int TABLE_STATE_INITIALIZED = 2;
+    static final protected short TABLE_STATE_INITIALIZED = 2;
 
     /** Table object has been initialized but has had structural modifications since. */
-    static final protected int TABLE_STATE_INITIALIZED_MODIFIED = 3;
+    static final protected short TABLE_STATE_INITIALIZED_MODIFIED = 3;
 
     /** Table object has been validated. */
-    static final protected int TABLE_STATE_VALIDATED = 4;
+    static final protected short TABLE_STATE_VALIDATED = 4;
 
     /** Manager for this table. */
     protected final RDBMSStoreManager storeMgr;
@@ -93,7 +92,7 @@ public abstract class AbstractTable implements Table
     protected final DatastoreIdentifier identifier;
 
     /** State of the table */
-    protected int state = TABLE_STATE_NEW;
+    protected short state = TABLE_STATE_NEW;
 
     /** Columns for this table. */
     protected List<org.datanucleus.store.schema.table.Column> columns = new ArrayList<>();
@@ -121,14 +120,23 @@ public abstract class AbstractTable implements Table
         this.hashCode = identifier.hashCode() ^ storeMgr.hashCode();
     }
 
-    /**
-     * Accessor for whether the table is initialised.
-     * @return Whether it is initialised
-     */
+    @Override
     public boolean isInitialized()
     {
         // All of the states from initialised onwards imply that it has (at some time) been initialised
         return state >= TABLE_STATE_INITIALIZED;
+    }
+
+    @Override
+    public void preInitialize(final ClassLoaderResolver clr)
+    {
+        assertIsUninitialized();
+    }    
+
+    @Override
+    public void postInitialize(final ClassLoaderResolver clr)
+    {
+        assertIsInitialized();
     }
 
     /**
@@ -140,10 +148,7 @@ public abstract class AbstractTable implements Table
         return state >= TABLE_STATE_PK_INITIALIZED;
     }
 
-    /**
-     * Accessor for whether the table is validated.
-     * @return Whether it is validated.
-     */
+    @Override
     public boolean isValidated()
     {
         return state == TABLE_STATE_VALIDATED;
@@ -182,6 +187,7 @@ public abstract class AbstractTable implements Table
      * the catalog in the MetaData, OR if they have specified the catalog in the PMF.
      * @return Catalog Name
      **/
+    @Override
     public String getCatalogName()
     {
         return identifier.getCatalogName();
@@ -193,6 +199,7 @@ public abstract class AbstractTable implements Table
      * the schema in the MetaData, OR if they have specified the schema in the PMF.
      * @return Schema Name
      **/
+    @Override
     public String getSchemaName()
     {
         return identifier.getSchemaName();
@@ -202,14 +209,12 @@ public abstract class AbstractTable implements Table
      * Accessor for the SQL identifier (the table name).
      * @return The name
      **/
+    @Override
     public DatastoreIdentifier getIdentifier()
     {
         return identifier;
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.schema.table.Table#getClassMetaData()
-     */
     @Override
     public AbstractClassMetaData getClassMetaData()
     {
@@ -217,81 +222,54 @@ public abstract class AbstractTable implements Table
         return null;
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.schema.table.Table#getNumberOfColumns()
-     */
     @Override
     public int getNumberOfColumns()
     {
         return columns.size();
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.schema.table.Table#getColumns()
-     */
     @Override
     public List<org.datanucleus.store.schema.table.Column> getColumns()
     {
         return columns;
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.schema.table.Table#getColumnForPosition(int)
-     */
     @Override
     public org.datanucleus.store.schema.table.Column getColumnForPosition(int pos)
     {
         throw new UnsupportedOperationException("Not supported on this table");
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.schema.table.Table#getSurrogateColumn(org.datanucleus.store.schema.table.SurrogateColumnType)
-     */
     @Override
     public Column getSurrogateColumn(SurrogateColumnType colType)
     {
         throw new UnsupportedOperationException("Not supported on this table");
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.schema.table.Table#getColumnForName(java.lang.String)
-     */
     @Override
     public org.datanucleus.store.schema.table.Column getColumnForName(String name)
     {
         throw new UnsupportedOperationException("Not supported on this table");
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.schema.table.Table#getMemberColumnMappingForMember(org.datanucleus.metadata.AbstractMemberMetaData)
-     */
     @Override
     public MemberColumnMapping getMemberColumnMappingForMember(AbstractMemberMetaData mmd)
     {
         throw new UnsupportedOperationException("Not supported on this table");
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.schema.table.Table#getMemberColumnMappingForEmbeddedMember(java.util.List)
-     */
     @Override
     public MemberColumnMapping getMemberColumnMappingForEmbeddedMember(List<AbstractMemberMetaData> mmds)
     {
         throw new UnsupportedOperationException("Not supported on this table");
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.schema.table.Table#getMemberColumnMappings()
-     */
     @Override
     public Set<MemberColumnMapping> getMemberColumnMappings()
     {
         throw new UnsupportedOperationException("Not supported on this table");
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.rdbms.table.Table#getSurrogateMapping(org.datanucleus.store.schema.table.SurrogateColumnType, boolean)
-     */
     @Override
     public JavaTypeMapping getSurrogateMapping(SurrogateColumnType colType, boolean allowSuperclasses)
     {
@@ -335,19 +313,13 @@ public abstract class AbstractTable implements Table
         return null;
     }
 
-    /**
-     * Accessor for Version MetaData
-     * @return Returns the Version MetaData.
-     */
+    @Override
     public VersionMetaData getVersionMetaData()
     {
         return null;
     }  
 
-    /**
-     * Accessor for Discriminator MetaData
-     * @return Returns the Discriminator MetaData.
-     */
+    @Override
     public DiscriminatorMetaData getDiscriminatorMetaData()
     {
         return null;
@@ -369,6 +341,7 @@ public abstract class AbstractTable implements Table
      * @return the new Column
      * @throws DuplicateColumnException if a column already exists with same name and not a supported situation.
      */
+    @Override
     public synchronized Column addColumn(String storedJavaType, DatastoreIdentifier name, JavaTypeMapping mapping, ColumnMetaData colmd)
     {
         // TODO If already initialized and this is called we should check if exists in current representation
@@ -488,33 +461,19 @@ public abstract class AbstractTable implements Table
         return col;
     }
 
-	/**
-	 * Checks if there is a column for the identifier
-	 * @param identifier the identifier of the column
-	 * @return true if the column exists for the identifier
-	 */
+    @Override
 	public boolean hasColumn(DatastoreIdentifier identifier)
 	{
         return (hasColumnName(identifier));
 	}
 
-	/**
-	 * Accessor for the column with the specified identifier.
-	 * Returns null if has no column of this name.
-	 * @param identifier The name of the column
-	 * @return The column
-	 */
+    @Override
 	public Column getColumn(DatastoreIdentifier identifier)
 	{
 	    return columnsByIdentifier.get(identifier);
 	}
 
-    /**
-     * Method to create this table.
-     * @param conn Connection to the datastore.
-     * @return true if the table was created
-     * @throws SQLException Thrown if an error occurs creating the table.
-     */
+    @Override
     public boolean create(Connection conn)
     throws SQLException
     {
@@ -539,11 +498,7 @@ public abstract class AbstractTable implements Table
         return !createStmts.isEmpty();
     }
 
-    /**
-     * Method to drop this table.
-     * @param conn Connection to the datastore.
-     * @throws SQLException Thrown if an error occurs dropping the table.
-     */
+    @Override
     public void drop(Connection conn)
     throws SQLException
     {
@@ -556,14 +511,14 @@ public abstract class AbstractTable implements Table
     protected Boolean existsInDatastore = null;
     
     /**
-     * Method to check the existence of the table/view, optionally auto creating it
-     * where required. If it doesn't exist and auto creation isn't specified this
-     * throws a MissingTableException.
+     * Method to check the existence of the table/view, optionally auto creating it where required. 
+     * If it doesn't exist and auto creation isn't specified this throws a MissingTableException.
      * @param conn The JDBC Connection
      * @param auto_create Whether to auto create the table if not existing
      * @return Whether the table was added
      * @throws SQLException Thrown when an error occurs in the JDBC calls
      */
+    @Override
     public boolean exists(Connection conn, boolean auto_create) 
     throws SQLException
     {
@@ -606,11 +561,7 @@ public abstract class AbstractTable implements Table
         return false;
     } 
 
-    /**
-     * Equality operator.
-     * @param obj The object to compare against
-     * @return Whether the objects are equal
-     */
+    @Override
     public final boolean equals(Object obj)
     {
         if (obj == this)
@@ -627,23 +578,20 @@ public abstract class AbstractTable implements Table
         return getClass().equals(t.getClass()) && identifier.equals(t.identifier) && storeMgr.equals(t.storeMgr);
     }
 
-    /**
-     * Accessor for the hash code of this table.
-     * @return The hash code.
-     */
+    @Override
     public final int hashCode()
     {
         return hashCode;
     }
 
     /**
-     * Method to return a string version of this table. This name is the
-     * fully-qualified name of the table,including catalog/schema names, where
-     * these are appropriate. They are included where the user has either specified
-     * the catalog/schema for the PMF, or in the MetaData. They are also only included
-     * where the datastore adapter supports their use.
+     * Method to return a string version of this table. 
+     * This name is the fully-qualified name of the table,including catalog/schema names, where these are appropriate.
+     * They are included where the user has either specified the catalog/schema for the PMF, or in the MetaData. 
+     * They are also only included where the datastore adapter supports their use.
      * @return String name of the table (catalog.schema.table)
      */
+    @Override
     public final String toString()
     {
         if (fullyQualifiedName != null)
@@ -688,8 +636,6 @@ public abstract class AbstractTable implements Table
         return di;
     }
 
-    // -------------------------------- Internal Implementation ---------------------------
-    
     /**
      * Utility method to add a column to the internal representation
      * @param col The column
@@ -701,7 +647,7 @@ public abstract class AbstractTable implements Table
         columns.add(col);
         columnsByIdentifier.put(colName, col);
     }
-    
+
     /**
      * Utility to return if a column of this name exists.
      * @param colName The column name
@@ -787,27 +733,27 @@ public abstract class AbstractTable implements Table
      * Method to perform the required SQL statements.
      * @param stmts A List of statements
      * @param conn The Connection to the datastore
-     * @throws SQLException Any exceptions thrown by the statements 
-     **/
+     * @throws SQLException Any exception thrown by the statements 
+     */
     protected void executeDdlStatementList(List<String> stmts, Connection conn)
     throws SQLException
     {
         Statement stmt = conn.createStatement();
 
-        String stmtText=null;
         try
         {
-            Iterator<String> i = stmts.iterator();
-            while (i.hasNext())
+            for (String stmtTxt : stmts)
             {
-                stmtText = i.next();
-                executeDdlStatement(stmt, stmtText);
+                try
+                {
+                    executeDdlStatement(stmt, stmtTxt);
+                }
+                catch (SQLException sqe)
+                {
+                    NucleusLogger.DATASTORE.error(Localiser.msg("057028", stmtTxt, sqe));
+                    throw sqe;
+                }
             }
-        }
-        catch (SQLException sqe)
-        {
-            NucleusLogger.DATASTORE.error(Localiser.msg("057028",stmtText,sqe));
-            throw sqe;
         }
         finally
         {

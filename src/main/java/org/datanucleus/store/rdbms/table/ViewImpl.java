@@ -27,7 +27,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.exceptions.MissingColumnException;
 import org.datanucleus.store.rdbms.exceptions.MissingTableException;
@@ -57,25 +56,7 @@ public abstract class ViewImpl extends AbstractTable
     }
 
     /**
-     * Pre-initialise. For things that must be initialised right after constructor.
-     * @param clr the ClassLoaderResolver
-     */
-    public void preInitialize(final ClassLoaderResolver clr)
-    {
-        assertIsUninitialized();
-    }
-
-    /**
-     * Post initialise. For things that must be set after all classes have been initialised before.
-     * @param clr the ClassLoaderResolver
-     */
-    public void postInitialize(final ClassLoaderResolver clr)
-    {
-        assertIsInitialized();
-    }
-
-    /**
-     * Method to validate the view in the datastore. Validates the existence of the table, and then the specifications of the Columns.
+     * Method to validate the view in the datastore. Validates the existence of the view, and then the specifications of the Columns.
      * @param conn The JDBC Connection
      * @param validateColumnStructure Whether to validate down to column structure, or just their existence
      * @param autoCreate Whether to update the view to fix errors (not used).
@@ -83,6 +64,7 @@ public abstract class ViewImpl extends AbstractTable
      * @return Whether the database was modified
      * @throws SQLException Thrown when an error occurs in the JDBC calls 
      */
+    @Override
     public boolean validate(Connection conn, boolean validateColumnStructure, boolean autoCreate, Collection<Throwable> autoCreateErrors)
     throws SQLException
     {

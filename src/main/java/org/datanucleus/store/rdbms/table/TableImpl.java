@@ -97,24 +97,6 @@ public abstract class TableImpl extends AbstractTable
     }
 
     /**
-     * Pre-initialise. For things that must be initialised right after constructor.
-     * @param clr the ClassLoaderResolver
-     */
-    public void preInitialize(final ClassLoaderResolver clr)
-    {
-        assertIsUninitialized();
-    }    
-
-    /**
-     * Post initialise. For things that must be set after all classes have been initialised.
-     * @param clr the ClassLoaderResolver
-     */
-    public void postInitialize(final ClassLoaderResolver clr)
-    {
-        assertIsInitialized();
-    }
-
-    /**
      * Accessor for the primary key for this table. 
      * Will always return a PrimaryKey but if we have defined no columns, the pk.size() will be 0.
      * @return The primary key.
@@ -144,6 +126,7 @@ public abstract class TableImpl extends AbstractTable
      * @return Whether the database was modified
      * @throws SQLException Thrown when an error occurs in the JDBC calls
      */
+    @Override
     public boolean validate(Connection conn, boolean validateColumnStructure, boolean autoCreate, Collection<Throwable> autoCreateErrors)
     throws SQLException
     {
@@ -241,11 +224,8 @@ public abstract class TableImpl extends AbstractTable
             {
                 // Add all missing columns
                 List<String> stmts = new ArrayList<>();
-                Iterator<Map.Entry<DatastoreIdentifier, Column>> columnsIter = unvalidated.entrySet().iterator();
-                while (columnsIter.hasNext())
+                for (Column col : unvalidated.values())
                 {
-                    Map.Entry<DatastoreIdentifier, Column> entry = columnsIter.next();
-                    Column col = entry.getValue();
                     String addColStmt = dba.getAddColumnStatement(this, col);
                     stmts.add(addColStmt);
                 }
@@ -295,10 +275,8 @@ public abstract class TableImpl extends AbstractTable
     public void initializeColumnInfoForPrimaryKeyColumns(Connection conn)
     throws SQLException
     {
-        Iterator<Column> i = columnsByIdentifier.values().iterator();
-        while (i.hasNext())
+        for (Column col : columnsByIdentifier.values())
         {
-            Column col = i.next();
             if (col.isPrimaryKey())
             {
                 RDBMSColumnInfo ci = storeMgr.getColumnInfoForColumnName(this, conn, col.getIdentifier());
@@ -376,7 +354,6 @@ public abstract class TableImpl extends AbstractTable
     throws SQLException
     {
         assertIsInitialized();
-
         boolean cksWereModified;
         boolean fksWereModified;
         boolean idxsWereModified;
@@ -500,16 +477,12 @@ public abstract class TableImpl extends AbstractTable
     throws SQLException
     {
         // Auto Create any missing foreign keys
-        Map stmtsByFKName = getSQLAddFKStatements(actualForeignKeysByName, clr);
+        Map<String, String> stmtsByFKName = getSQLAddFKStatements(actualForeignKeysByName, clr);
         Statement stmt = conn.createStatement();
         try
         {
-            Iterator i = stmtsByFKName.entrySet().iterator();
-            while (i.hasNext())
+            for (String stmtText : stmtsByFKName.values())
             {
-                Map.Entry e = (Map.Entry) i.next();
-                String stmtText = (String) e.getValue();
-
                 try
                 {
                     executeDdlStatement(stmt, stmtText);
@@ -548,20 +521,17 @@ public abstract class TableImpl extends AbstractTable
         boolean dbWasModified = false;
 
         // Retrieve the number of indexes in the datastore for this table.
-        Map actualIndicesByName = null;
+        Map<DatastoreIdentifier, Index> actualIndicesByName = null;
         int numActualIdxs = 0;
         if (storeMgr.getCompleteDDL())
         {
-            actualIndicesByName = new HashMap();
+            actualIndicesByName = new HashMap<>();
         }
         else
         {
             actualIndicesByName = getExistingIndices(conn);
-            Iterator<Map.Entry> iter = actualIndicesByName.entrySet().iterator();
-            while (iter.hasNext())
+            for (Index idx : actualIndicesByName.values())
             {
-                Map.Entry entry = iter.next();
-                Index idx = (Index)entry.getValue();
                 if (idx.getTable().getIdentifier().toString().equals(identifier.toString()))
                 {
                     // Table of the index is the same as this table so must be ours
@@ -613,16 +583,12 @@ public abstract class TableImpl extends AbstractTable
     throws SQLException
     {
         // Auto Create any missing indices
-        Map stmtsByIdxName = getSQLCreateIndexStatements(actualIndicesByName, clr);
+        Map<String, String> stmtsByIdxName = getSQLCreateIndexStatements(actualIndicesByName, clr);
         Statement stmt = conn.createStatement();
         try
         {
-            Iterator i = stmtsByIdxName.entrySet().iterator();
-            while (i.hasNext())
+            for (String stmtText : stmtsByIdxName.values())
             {
-                Map.Entry e = (Map.Entry) i.next();
-                String stmtText = (String) e.getValue();
-
                 try
                 {
                     executeDdlStatement(stmt, stmtText);
@@ -724,12 +690,8 @@ public abstract class TableImpl extends AbstractTable
         Statement stmt = conn.createStatement();
         try
         {
-            Iterator<Map.Entry<String, String>> i = stmtsByCKName.entrySet().iterator();
-            while (i.hasNext())
+            for (String stmtText : stmtsByCKName.values())
             {
-                Map.Entry<String, String> e = i.next();
-                String stmtText = e.getValue();
-
                 try
                 {
                     executeDdlStatement(stmt, stmtText);
@@ -821,8 +783,6 @@ public abstract class TableImpl extends AbstractTable
         }
     }
 
-    // ----------------------- Internal Implementation Methods -----------------
-
     /**
      * Accessor for the expected foreign keys for this table in the datastore.
      * Currently only checks the columns for referenced tables (i.e relationships) and returns those.
@@ -894,10 +854,9 @@ public abstract class TableImpl extends AbstractTable
          */
         Set<Index> indices = new HashSet<>();
         PrimaryKey pk = getPrimaryKey();
-        Iterator<ForeignKey> i = getExpectedForeignKeys(clr).iterator();
-        while (i.hasNext())
+        List<ForeignKey> expectedFKs = getExpectedForeignKeys(clr);
+        for (ForeignKey fk : expectedFKs)
         {
-            ForeignKey fk = i.next();
             if (!pk.getColumnList().equals(fk.getColumnList()))
             {
                 indices.add(new Index(fk));
@@ -1249,12 +1208,10 @@ public abstract class TableImpl extends AbstractTable
 
         Map<String, String> stmtsByFKName = new HashMap<>();
         List<ForeignKey> expectedForeignKeys = getExpectedForeignKeys(clr);
-        Iterator<ForeignKey> i = expectedForeignKeys.iterator();
         int n = 1;
         IdentifierFactory idFactory = storeMgr.getIdentifierFactory();
-        while (i.hasNext())
+        for (ForeignKey fk : expectedForeignKeys)
         {
-            ForeignKey fk = i.next();
             if (!actualForeignKeysByName.containsValue(fk))
             {
                 // If no name assigned, make one up
@@ -1292,12 +1249,10 @@ public abstract class TableImpl extends AbstractTable
 
         Map<String, String> stmtsByCKName = new HashMap<>();
         List<CandidateKey> expectedCandidateKeys = getExpectedCandidateKeys();
-        Iterator<CandidateKey> i = expectedCandidateKeys.iterator();
         int n = 1;
         IdentifierFactory idFactory = storeMgr.getIdentifierFactory();
-        while (i.hasNext())
+        for (CandidateKey ck : expectedCandidateKeys)
         {
-            CandidateKey ck = i.next();
             if (!actualCandidateKeysByName.containsValue(ck))
             {
                 // If no name assigned, make one up
@@ -1378,11 +1333,9 @@ public abstract class TableImpl extends AbstractTable
         Set<Index> expectedIndices = getExpectedIndices(clr);
 
         int n = 1;
-        Iterator<Index> indexIter = expectedIndices.iterator();
         IdentifierFactory idFactory = storeMgr.getIdentifierFactory();
-        while (indexIter.hasNext())
+        for (Index idx : expectedIndices)
         {
-            Index idx = indexIter.next();
             if (isIndexReallyNeeded(idx, actualIndicesByName.values()))
             {
                 // If no name assigned, make one up
