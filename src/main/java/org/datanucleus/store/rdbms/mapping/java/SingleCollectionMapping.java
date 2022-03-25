@@ -138,6 +138,7 @@ public class SingleCollectionMapping extends JavaTypeMapping implements MappingC
         return wrappedMapping.getJavaTypeForColumnMapping(index);
     }
 
+    @Override
     public void postInsert(DNStateManager sm)
     {
         if (wrappedMapping instanceof MappingCallbacks)
@@ -146,6 +147,7 @@ public class SingleCollectionMapping extends JavaTypeMapping implements MappingC
         }
     }
 
+    @Override
     public void postFetch(DNStateManager sm)
     {
         if (wrappedMapping instanceof MappingCallbacks)
@@ -154,6 +156,7 @@ public class SingleCollectionMapping extends JavaTypeMapping implements MappingC
         }
     }
 
+    @Override
     public void postUpdate(DNStateManager sm)
     {
         if (wrappedMapping instanceof MappingCallbacks)
@@ -162,6 +165,7 @@ public class SingleCollectionMapping extends JavaTypeMapping implements MappingC
         }
     }
 
+    @Override
     public void preDelete(DNStateManager sm)
     {
         if (wrappedMapping instanceof MappingCallbacks)

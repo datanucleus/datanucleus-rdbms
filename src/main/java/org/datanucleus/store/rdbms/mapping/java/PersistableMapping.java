@@ -797,20 +797,7 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
 
     // ----------------------- Implementation of MappingCallbacks --------------------------
 
-    /**
-     * Method executed just after a fetch of the owning object, allowing any necessary action
-     * to this field and the object stored in it.
-     * @param sm StateManager for the owner.
-     */
-    public void postFetch(DNStateManager sm)
-    {
-    }
-
-    /**
-     * Method executed just after the insert of the owning object, allowing any necessary action
-     * to this field and the object stored in it.
-     * @param sm StateManager for the owner
-     */
+    @Override
     public void postInsert(DNStateManager sm)
     {
         Object pc = sm.provideField(mmd.getAbsoluteFieldNumber());
@@ -907,10 +894,7 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
         }
     }
 
-    /**
-     * Method executed just afer any update of the owning object, allowing any necessary action to this field and the object stored in it.
-     * @param sm StateManager for the owner
-     */
+    @Override
     public void postUpdate(DNStateManager sm)
     {
         Object pc = sm.provideField(mmd.getAbsoluteFieldNumber());
@@ -948,10 +932,7 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
         }
     }
 
-    /**
-     * Method executed just before the owning object is deleted, allowing tidying up of any relation information.
-     * @param sm StateManager for the owner
-     */
+    @Override
     public void preDelete(DNStateManager sm)
     {
         int fieldNumber = mmd.getAbsoluteFieldNumber();

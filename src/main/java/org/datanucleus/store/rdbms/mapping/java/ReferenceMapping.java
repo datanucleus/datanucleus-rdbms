@@ -744,38 +744,7 @@ public abstract class ReferenceMapping extends MultiPersistableMapping implement
 
     // -------------------------- MappingCallbacks methods ----------------------------
 
-    /**
-     * Method executed just after a fetch of the owning object, allowing any necessary action
-     * to this field and the object stored in it.
-     * @param sm StateManager for the owner.
-     */
-    public void postFetch(DNStateManager sm)
-    {
-    }
-
-    /**
-     * Method executed just after the insert of the owning object, allowing any necessary action
-     * to this field and the object stored in it.
-     * @param sm StateManager for the owner.
-     */
-    public void postInsert(DNStateManager sm)
-    {
-    }
-
-    /**
-     * Method executed just afer any update of the owning object, allowing any necessary action
-     * to this field and the object stored in it.
-     * @param sm StateManager for the owner.
-     */
-    public void postUpdate(DNStateManager sm)
-    {
-    }
-
-    /**
-     * Method executed just before the owning object is deleted, allowing tidying up of any
-     * relation information.
-     * @param sm StateManager for the owner.
-     */
+    @Override
     public void preDelete(DNStateManager sm)
     {
         boolean isDependentElement = mmd.isDependent();

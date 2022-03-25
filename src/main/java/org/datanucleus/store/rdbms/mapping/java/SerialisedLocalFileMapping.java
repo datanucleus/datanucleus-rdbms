@@ -99,6 +99,7 @@ public class SerialisedLocalFileMapping extends JavaTypeMapping implements Mappi
         return mmd.getType();
     }
 
+    @Override
     public void postInsert(final DNStateManager sm)
     {
         Object val = sm.provideField(mmd.getAbsoluteFieldNumber());
@@ -132,12 +133,14 @@ public class SerialisedLocalFileMapping extends JavaTypeMapping implements Mappi
         }
     }
 
+    @Override
     public void postFetch(DNStateManager sm)
     {
         Object value = deserialiseFieldValue(sm);
         sm.replaceField(mmd.getAbsoluteFieldNumber(), value);
     }
 
+    @Override
     public void postUpdate(final DNStateManager sm)
     {
         final Object oldValue = deserialiseFieldValue(sm);
@@ -169,6 +172,7 @@ public class SerialisedLocalFileMapping extends JavaTypeMapping implements Mappi
         }
     }
 
+    @Override
     public void preDelete(final DNStateManager sm)
     {
         final Object oldValue = sm.provideField(mmd.getAbsoluteFieldNumber());

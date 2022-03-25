@@ -56,10 +56,7 @@ public class CollectionMapping extends AbstractContainerMapping implements Mappi
 
     // --------------- Implementation of MappingCallbacks -------------------
 
-    /**
-     * Method to be called after the insert of the owner class element.
-     * @param ownerSM StateManager of the owner
-     */
+    @Override
     public void postInsert(DNStateManager ownerSM)
     {
         ExecutionContext ec = ownerSM.getExecutionContext();
@@ -183,6 +180,7 @@ public class CollectionMapping extends AbstractContainerMapping implements Mappi
      * </ul>
      * @param ownerSM StateManager of the owner
      */
+    @Override
     public void postUpdate(DNStateManager ownerSM)
     {
         ExecutionContext ec = ownerSM.getExecutionContext();
@@ -252,10 +250,7 @@ public class CollectionMapping extends AbstractContainerMapping implements Mappi
         }
     }
 
-    /**
-     * Method to be called before any delete of the owner class element.
-     * @param ownerSM StateManager of the owner
-     */
+    @Override
     public void preDelete(DNStateManager ownerSM)
     {
         if (containerIsStoredInSingleColumn())

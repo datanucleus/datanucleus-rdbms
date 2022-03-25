@@ -59,10 +59,7 @@ public class MapMapping extends AbstractContainerMapping implements MappingCallb
 
     // ---------------- Implementation of MappingCallbacks --------------------
 
-    /**
-     * Method to be called after the insert of the owner class element.
-     * @param ownerSM StateManager of the owner
-     */
+    @Override
     public void postInsert(DNStateManager ownerSM)
     {
         ExecutionContext ec = ownerSM.getExecutionContext();
@@ -176,10 +173,7 @@ public class MapMapping extends AbstractContainerMapping implements MappingCallb
         }
     }
 
-    /**
-     * Method to be called after any update of the owner class element.
-     * @param ownerSM StateManager of the owner
-     */
+    @Override
     public void postUpdate(DNStateManager ownerSM)
     {
         ExecutionContext ec = ownerSM.getExecutionContext();
@@ -262,7 +256,7 @@ public class MapMapping extends AbstractContainerMapping implements MappingCallb
         else
         {
             // TODO Should this throw exception if the element doesn't exist?
-            // User doesnt want to update by reachability
+            // User doesn't want to update by reachability
             if (NucleusLogger.PERSISTENCE.isDebugEnabled())
             {
                 NucleusLogger.PERSISTENCE.debug(Localiser.msg("007008", IdentityUtils.getPersistableIdentityForId(ownerSM.getInternalObjectId()), mmd.getFullFieldName()));
@@ -271,10 +265,7 @@ public class MapMapping extends AbstractContainerMapping implements MappingCallb
         }
     }
 
-    /**
-     * Method to be called before any delete of the owner class element.
-     * @param ownerSM StateManager of the owner
-     */
+    @Override
     public void preDelete(DNStateManager ownerSM)
     {
         if (containerIsStoredInSingleColumn())

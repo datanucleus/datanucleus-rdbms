@@ -31,23 +31,35 @@ public interface MappingCallbacks
      * Method called after the insert of the object so that additional operations can be performed if necessary.
      * @param sm StateManager of the owner
      */
-    void postInsert(DNStateManager sm);
+    default void postInsert(DNStateManager sm)
+    {
+        // Do nothing
+    }
 
     /**
      * Method called after the retrieval of the object, so that additional operations can be performed if necessary.
      * @param sm StateManager of the owner
      */
-    void postFetch(DNStateManager sm);
+    default void postFetch(DNStateManager sm)
+    {
+        // Do nothing
+    }
 
     /**
      * Method called after the update of the object, so that additional operations can be performed if necessary.
      * @param sm StateManager of the owner
      */
-    void postUpdate(DNStateManager sm);
+    default void postUpdate(DNStateManager sm)
+    {
+        // Do nothing
+    }
 
     /**
      * Method called before the delete of objects, so that additional operations can be performed if necessary.
      * @param sm StateManager of the owner
      */
-    void preDelete(DNStateManager sm);
+    default void preDelete(DNStateManager sm)
+    {
+        // Do nothing
+    }
 }

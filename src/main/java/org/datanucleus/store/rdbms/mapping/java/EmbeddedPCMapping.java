@@ -47,10 +47,7 @@ public class EmbeddedPCMapping extends EmbeddedMapping implements MappingCallbac
         initialize(mmd, table, clr, mmd.getEmbeddedMetaData(), mmd.getTypeName(), PersistableObjectType.EMBEDDED_PC);
     }
 
-    /**
-     * MappingCallback called when the owning object is being fetched.
-     * @param sm StateManager of the owning object
-     */
+    @Override
     public void postFetch(DNStateManager sm)
     {
         // Find the StateManager for the embedded PC object
@@ -70,10 +67,7 @@ public class EmbeddedPCMapping extends EmbeddedMapping implements MappingCallbac
         }
     }
 
-    /**
-     * MappingCallback called when the owning object has just being inserted.
-     * @param sm StateManager of the owning object
-     */
+    @Override
     public void postInsert(DNStateManager sm)
     {
         // Find the StateManager for the embedded PC object
@@ -94,10 +88,7 @@ public class EmbeddedPCMapping extends EmbeddedMapping implements MappingCallbac
         }
     }
 
-    /**
-     * MappingCallback called when the owning object has just being udpated.
-     * @param sm StateManager of the owning object
-     */
+    @Override
     public void postUpdate(DNStateManager sm)
     {
         // Find the StateManager for the embedded PC object
@@ -118,10 +109,7 @@ public class EmbeddedPCMapping extends EmbeddedMapping implements MappingCallbac
         }
     }
 
-    /**
-     * MappingCallback called when the owning object is about to be deleted.
-     * @param sm StateManager of the owning object
-     */
+    @Override
     public void preDelete(DNStateManager sm)
     {
         // Find the StateManager for the embedded PC object
