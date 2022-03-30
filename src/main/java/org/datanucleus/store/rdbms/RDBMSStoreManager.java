@@ -904,15 +904,15 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
             }
 
             Class expectedMappingType = null;
-            if (mmd.getMap() != null)
+            if (mmd.hasMap())
             {
                 expectedMappingType = MapMapping.class;
             }
-            else if (mmd.getArray() != null)
+            else if (mmd.hasArray())
             {
                 expectedMappingType = ArrayMapping.class;
             }
-            else if (mmd.getCollection() != null)
+            else if (mmd.hasCollection())
             {
                 expectedMappingType = CollectionMapping.class;
             }
@@ -953,7 +953,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                 // Embedded, so just pass through
             }
 
-            if (mmd.getMap() != null)
+            if (mmd.hasMap())
             {
                 Table datastoreTable = getTable(mmd);
                 if (datastoreTable == null)
@@ -965,7 +965,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                     store = new JoinMapStore((MapTable)datastoreTable, clr);
                 }
             }
-            else if (mmd.getArray() != null)
+            else if (mmd.hasArray())
             {
                 Table datastoreTable = getTable(mmd);
                 if (datastoreTable != null)
@@ -977,7 +977,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                     store = new FKArrayStore(mmd, this, clr);
                 }
             }
-            else if (mmd.getCollection() != null)
+            else if (mmd.hasCollection())
             {
                 Table datastoreTable = getTable(mmd);
                 if (type == null)
