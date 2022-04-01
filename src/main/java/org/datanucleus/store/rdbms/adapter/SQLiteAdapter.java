@@ -61,6 +61,11 @@ public class SQLiteAdapter extends BaseDatastoreAdapter
         supportedOptions.add(IDENTITY_COLUMNS);
         supportedOptions.add(IDENTITY_PK_IN_CREATE_TABLE_COLUMN_DEF);
         supportedOptions.add(ORDERBY_NULLS_USING_COLUMN_IS_NULL);
+        if ((datastoreMajorVersion == 3 && datastoreMinorVersion >= 30) || datastoreMajorVersion > 3)
+        {
+            // ORDER BY ... NULLS FIRST|LAST
+            supportedOptions.add(ORDERBY_NULLS_DIRECTIVES);
+        }
 
         supportedOptions.remove(TX_ISOLATION_READ_COMMITTED);
         supportedOptions.remove(TX_ISOLATION_REPEATABLE_READ);
