@@ -522,7 +522,7 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
                 if (ec.getApiAdapter().isDetached(value))
                 {
                     // Field value is detached and not yet started attaching, so attach
-                    Object attachedValue = ec.persistObjectInternal(value, null, -1, PersistableObjectType.PC);
+                    Object attachedValue = ec.persistObjectInternal(value, null, PersistableObjectType.PC);
                     if (attachedValue != value && ownerSM != null)
                     {
                         // Replace the field value if using copy-on-attach
@@ -629,7 +629,7 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
 
                     try
                     {
-                        Object pcNew = ec.persistObjectInternal(value, null, -1, PersistableObjectType.PC);
+                        Object pcNew = ec.persistObjectInternal(value, null, PersistableObjectType.PC);
                         if (hasDatastoreAttributedPrimaryKeyValues)
                         {
                             ec.flushInternal(false);
@@ -884,7 +884,7 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
             if (otherSM == null)
             {
                 // Related object is not yet persisted so persist it
-                Object other = sm.getExecutionContext().persistObjectInternal(pc, null, -1, PersistableObjectType.PC);
+                Object other = sm.getExecutionContext().persistObjectInternal(pc, null, PersistableObjectType.PC);
                 otherSM = sm.getExecutionContext().findStateManager(other);
             }
 
@@ -919,7 +919,7 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
             if (relationType == RelationType.ONE_TO_ONE_BI || relationType == RelationType.MANY_TO_ONE_BI || relationType == RelationType.MANY_TO_ONE_UNI)
             {
                 // Related object is not yet persisted (e.g 1-1 with FK at other side) so persist it
-                Object other = sm.getExecutionContext().persistObjectInternal(pc, null, -1, PersistableObjectType.PC);
+                Object other = sm.getExecutionContext().persistObjectInternal(pc, null, PersistableObjectType.PC);
                 otherSM = sm.getExecutionContext().findStateManager(other);
             }
         }

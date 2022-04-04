@@ -539,7 +539,7 @@ public class InsertRequest extends Request
                         Object value = sm.provideField(relationFieldNumbers[i]);
                         if (value != null && ec.getApiAdapter().isDetached(value))
                         {
-                            Object valueAttached = ec.persistObjectInternal(value, null, -1, PersistableObjectType.PC);
+                            Object valueAttached = ec.persistObjectInternal(value, null, PersistableObjectType.PC);
                             sm.replaceField(relationFieldNumbers[i], valueAttached);
                         }
                     }

@@ -180,7 +180,7 @@ public abstract class MultiPersistableMapping extends MultiMapping
                 if (requiresPersisting)
                 {
                     // The object is either not yet persistent or is detached and so needs attaching
-                    Object pcNew = ec.persistObjectInternal(value, null, -1, PersistableObjectType.PC);
+                    Object pcNew = ec.persistObjectInternal(value, null, PersistableObjectType.PC);
                     ec.flushInternal(false);
                     id = api.getIdForObject(pcNew);
                     if (ec.getApiAdapter().isDetached(value) && ownerSM != null)

@@ -70,7 +70,7 @@ public class DatastoreIdMapping extends SingleFieldMapping
                     }
 
                     // Object is not persist, nor in the process of being made persistent
-                    ec.persistObjectInternal(value, null, -1, PersistableObjectType.PC);
+                    ec.persistObjectInternal(value, null, PersistableObjectType.PC);
                     ec.flushInternal(false);
                 }
                 id = api.getIdForObject(value);

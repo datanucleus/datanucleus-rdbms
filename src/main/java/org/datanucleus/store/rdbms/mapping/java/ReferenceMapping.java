@@ -641,7 +641,7 @@ public abstract class ReferenceMapping extends MultiPersistableMapping implement
             if (sm == null)
             {
                 // Referenced object is not yet persistent, so persist it
-                ec.persistObjectInternal(value, null, -1, PersistableObjectType.PC);
+                ec.persistObjectInternal(value, null, PersistableObjectType.PC);
                 sm = ec.findStateManager(value);
                 sm.flush(); // Make sure the object is in the datastore so the id is set
             }
