@@ -314,7 +314,7 @@ public class JDOQLQuery extends AbstractJDOQLQuery
         {
             // Check if we have any parameters set to null, since this can invalidate a datastore compilation
             // e.g " field == :val" can be "COL IS NULL" or "COL = <val>"
-            boolean nullParameter = false;
+            boolean useCachedDatastoreCompilation = true;
             if (parameterValues != null)
             {
                 Iterator iter = parameterValues.values().iterator();
@@ -323,13 +323,21 @@ public class JDOQLQuery extends AbstractJDOQLQuery
                     Object val = iter.next();
                     if (val == null)
                     {
-                        nullParameter = true;
+                        useCachedDatastoreCompilation = false;
                         break;
                     }
                 }
             }
+            if (useCachedDatastoreCompilation && extensions != null)
+            {
+                // Dont use cached datastore compilations when using extensions that can affect the generated SQL
+                if (extensions.containsKey(Query.EXTENSION_USE_FETCH_PLAN))
+                {
+                    useCachedDatastoreCompilation = false;
+                }
+            }
 
-            if (!nullParameter)
+            if (useCachedDatastoreCompilation)
             {
                 // Allowing caching so try to find compiled (datastore) query
                 datastoreCompilation = (RDBMSQueryCompilation)qm.getDatastoreQueryCompilation(datastoreKey, getLanguage(), queryCacheKey);
@@ -548,13 +556,23 @@ public class JDOQLQuery extends AbstractJDOQLQuery
 
                 if (!statementReturnsEmpty && queryCacheKey != null && useCaching())
                 {
+                    boolean cache = true;
                     // TODO Allow caching of queries with subqueries
                     if (!datastoreCompilation.isPrecompilable() || (datastoreCompilation.getSQL().indexOf('?') < 0 && hasParams))
                     {
                         // Some parameters had their clauses evaluated during compilation so the query didn't gain any parameters, so don't cache it
                         NucleusLogger.QUERY.debug(Localiser.msg("021075"));
+                        cache = false;
                     }
-                    else
+                    if (extensions != null)
+                    {
+                        // Check for extensions that affect the generated SQL
+                        if (extensions.containsKey(Query.EXTENSION_USE_FETCH_PLAN))
+                        {
+                            cache = false;
+                        }
+                    }
+                    if (cache)
                     {
                         qm.addDatastoreQueryCompilation(datastoreKey, getLanguage(), queryCacheKey, datastoreCompilation);
                     }
@@ -910,6 +928,10 @@ public class JDOQLQuery extends AbstractJDOQLQuery
         if (getBooleanExtensionProperty(EXTENSION_NON_DISTINCT_IMPLICIT_JOIN, false))
         {
             options.add(QueryToSQLMapper.OPTION_NON_DISTINCT_IMPLICIT_JOINS);
+        }
+        if (!getBooleanExtensionProperty(EXTENSION_USE_FETCH_PLAN, true))
+        {
+            options.add(QueryToSQLMapper.OPTION_SELECT_CANDIDATE_ID_ONLY);
         }
         QueryToSQLMapper sqlMapper = new QueryToSQLMapper(stmt, compilation, parameters, datastoreCompilation.getResultDefinitionForClass(), datastoreCompilation.getResultDefinition(),
             candidateCmd, subclasses, getFetchPlan(), ec, getParsedImports(), options, extensions);
