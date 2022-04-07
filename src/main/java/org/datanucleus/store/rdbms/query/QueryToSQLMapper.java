@@ -4116,6 +4116,8 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                     }
                     if (expr.getSymbol().getValueType() != paramValue.getClass())
                     {
+                        // TODO Cater for Collection correctly here, if subtype of the symbol
+                        NucleusLogger.GENERAL.info(">> QueryToSQL.processParamExpr paramType=" + paramValue.getClass().getName());
                         // Mark as not precompilable since the supplied type implies a subclass of the declared type
                         setNotPrecompilable();
                     }

@@ -34,6 +34,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
@@ -103,22 +104,22 @@ public class JPQLQuery extends AbstractJPQLQuery
     private static final long serialVersionUID = -3735379324740714088L;
 
     /** Extension for whether to convert "== ?" with null parameter to "IS NULL". Defaults to false to comply with JPA spec 4.11. */
-    public static final String EXTENSION_USE_IS_NULL_WHEN_EQUALS_NULL_PARAM = "datanucleus.query.useIsNullWhenEqualsNullParameter";
+    public static final String EXTENSION_USE_IS_NULL_WHEN_EQUALS_NULL_PARAM = "datanucleus.query.useIsNullWhenEqualsNullParameter".toLowerCase(Locale.ENGLISH);
 
     /** Extension to add NOWAIT when using FOR UPDATE (when supported). */
-    public static final String EXTENSION_FOR_UPDATE_NOWAIT = "datanucleus.query.forUpdateNowait";
+    public static final String EXTENSION_FOR_UPDATE_NOWAIT = "datanucleus.query.forUpdateNowait".toLowerCase(Locale.ENGLISH);
 
     /** Extension to not apply a discriminator restriction on the candidate of the query. */
-    public static final String EXTENSION_CANDIDATE_DONT_RESTRICT_DISCRIMINATOR = "datanucleus.query.dontRestrictDiscriminator";
+    public static final String EXTENSION_CANDIDATE_DONT_RESTRICT_DISCRIMINATOR = "datanucleus.query.dontRestrictDiscriminator".toLowerCase(Locale.ENGLISH);
 
     /** Extension to include soft-deleted objects in any results. */
-    public static final String EXTENSION_INCLUDE_SOFT_DELETES = "datanucleus.query.includeSoftDeletes";
+    public static final String EXTENSION_INCLUDE_SOFT_DELETES = "datanucleus.query.includeSoftDeletes".toLowerCase(Locale.ENGLISH);
 
     /** Extension to define the JOIN TYPE to use when navigating single-valued relations, when part of the filter. */
-    public static final String EXTENSION_NAVIGATION_JOIN_TYPE_FILTER = "datanucleus.query.jpql.navigationJoinTypeForFilter";
+    public static final String EXTENSION_NAVIGATION_JOIN_TYPE_FILTER = "datanucleus.query.jpql.navigationJoinTypeForFilter".toLowerCase(Locale.ENGLISH);
 
     /** Extension to define the JOIN TYPE to use when navigating single-valued relations. */
-    public static final String EXTENSION_NAVIGATION_JOIN_TYPE = "datanucleus.query.jpql.navigationJoinType";
+    public static final String EXTENSION_NAVIGATION_JOIN_TYPE = "datanucleus.query.jpql.navigationJoinType".toLowerCase(Locale.ENGLISH);
 
     /** The compilation of the query for this datastore. Not applicable if totally in-memory. */
     protected transient RDBMSQueryCompilation datastoreCompilation;
