@@ -45,6 +45,8 @@ public class RDBMSPropertyNames
     public static final String PROPERTY_RDBMS_REFRESH_ALL_TABLES_ON_REFRESH_COLUMNS = "datanucleus.rdbms.refreshAllTablesOnRefreshColumns".toLowerCase();
     public static final String PROPERTY_RDBMS_ALLOW_COLUMN_REUSE = "datanucleus.rdbms.allowColumnReuse".toLowerCase();
     public static final String PROPERTY_RDBMS_DEFAULT_SQL_TYPE = "datanucleus.rdbms.useDefaultSqlType".toLowerCase();
+    
+    public static final String PROPERTY_RDBMS_CLONE_CALENDAR_FOR_DATE_TIMEZONE = "datanucleus.rdbms.cloneCalendarForDateTimezone".toLowerCase();
 
     public static final String PROPERTY_RDBMS_QUERY_MULTIVALUED_FETCH = "datanucleus.rdbms.query.multivaluedFetch".toLowerCase();
     public static final String PROPERTY_RDBMS_QUERY_FETCH_DIRECTION = "datanucleus.rdbms.query.fetchDirection".toLowerCase();

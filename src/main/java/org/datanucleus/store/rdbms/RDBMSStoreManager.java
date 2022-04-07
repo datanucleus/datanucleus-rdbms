@@ -2780,9 +2780,14 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
             }
             dateTimezoneCalendar = new GregorianCalendar(tz);
         }
-        // This returns a clone because Oracle JDBC driver was taking the Calendar and modifying it in calls. Hence passing a clone gets around that. 
-        // May be best to just return it direct here and then in Oracle usage we pass in a clone to its JDBC driver
-        return (Calendar) dateTimezoneCalendar.clone();
+
+        if (getBooleanProperty(RDBMSPropertyNames.PROPERTY_RDBMS_CLONE_CALENDAR_FOR_DATE_TIMEZONE))
+        {
+            // This returns a clone because Oracle JDBC driver was taking the Calendar and modifying it in calls. Hence passing a clone gets around that.
+            // May be best to just return it direct here and then in Oracle usage we pass in a clone to its JDBC driver
+            return (Calendar) dateTimezoneCalendar.clone();
+        }
+        return dateTimezoneCalendar;
     }
 
     // --------------------------------- Schema Management -------------------------------------------
