@@ -83,7 +83,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -103,25 +102,25 @@ public class JDOQLQuery extends AbstractJDOQLQuery
     private static final long serialVersionUID = -937448796638243699L;
 
     /** Extension for whether to convert "== ?" with null parameter to "IS NULL". Defaults to true to match Java semantics. */
-    public static final String EXTENSION_USE_IS_NULL_WHEN_EQUALS_NULL_PARAM = "datanucleus.query.useIsNullWhenEqualsNullParameter".toLowerCase(Locale.ENGLISH);
+    public static final String EXTENSION_USE_IS_NULL_WHEN_EQUALS_NULL_PARAM = "datanucleus.query.useIsNullWhenEqualsNullParameter".toLowerCase();
 
     /** Extension to add NOWAIT when using FOR UPDATE (when supported). */
-    public static final String EXTENSION_FOR_UPDATE_NOWAIT = "datanucleus.query.forUpdateNowait".toLowerCase(Locale.ENGLISH);
+    public static final String EXTENSION_FOR_UPDATE_NOWAIT = "datanucleus.query.forUpdateNowait".toLowerCase();
 
     /** Extension to not apply a discriminator restriction on the candidate of the query. */
-    public static final String EXTENSION_CANDIDATE_DONT_RESTRICT_DISCRIMINATOR = "datanucleus.query.dontRestrictDiscriminator".toLowerCase(Locale.ENGLISH);
+    public static final String EXTENSION_CANDIDATE_DONT_RESTRICT_DISCRIMINATOR = "datanucleus.query.dontRestrictDiscriminator".toLowerCase();
 
     /** Extension to include soft-deleted objects in any results. */
-    public static final String EXTENSION_INCLUDE_SOFT_DELETES = "datanucleus.query.includeSoftDeletes".toLowerCase(Locale.ENGLISH);
+    public static final String EXTENSION_INCLUDE_SOFT_DELETES = "datanucleus.query.includeSoftDeletes".toLowerCase();
 
     /** Extension for whether to disable the setting of DISTINCT when joining with JDOQL. */
-    public static final String EXTENSION_NON_DISTINCT_IMPLICIT_JOIN = "datanucleus.query.jdoql.dropDistinctFromImplicitJoin".toLowerCase(Locale.ENGLISH);
+    public static final String EXTENSION_NON_DISTINCT_IMPLICIT_JOIN = "datanucleus.query.jdoql.dropDistinctFromImplicitJoin".toLowerCase();
 
     /** Extension to define the JOIN TYPE to use when navigating single-valued relations, when part of the filter. */
-    public static final String EXTENSION_NAVIGATION_JOIN_TYPE_FILTER = "datanucleus.query.jdoql.navigationJoinTypeForFilter".toLowerCase(Locale.ENGLISH);
+    public static final String EXTENSION_NAVIGATION_JOIN_TYPE_FILTER = "datanucleus.query.jdoql.navigationJoinTypeForFilter".toLowerCase();
 
     /** Extension to define the JOIN TYPE to use when navigating single-valued relations. */
-    public static final String EXTENSION_NAVIGATION_JOIN_TYPE = "datanucleus.query.jdoql.navigationJoinType".toLowerCase(Locale.ENGLISH);
+    public static final String EXTENSION_NAVIGATION_JOIN_TYPE = "datanucleus.query.jdoql.navigationJoinType".toLowerCase();
 
     /** The compilation of the query for this datastore. Not applicable if totally in-memory. */
     protected transient RDBMSQueryCompilation datastoreCompilation = null;
