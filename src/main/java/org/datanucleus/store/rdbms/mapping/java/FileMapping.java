@@ -24,9 +24,7 @@ import java.io.File;
  */
 public class FileMapping extends SingleFieldMapping
 {
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping#getJavaType()
-     */
+    @Override
     public Class getJavaType()
     {
         return File.class;

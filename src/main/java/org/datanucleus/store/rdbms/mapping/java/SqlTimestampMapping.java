@@ -20,18 +20,17 @@ Contributors:
 package org.datanucleus.store.rdbms.mapping.java;
 
 /**
- * SCO Mapping for an SQLTimestamp type.
+ * SCO Mapping for a java.sql.Timestamp type.
  */
 public class SqlTimestampMapping extends TemporalMapping
 {
+    @Override
     public Class getJavaType()
     {
         return java.sql.Timestamp.class;
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.rdbms.mapping.TemporalMapping#getDefaultLengthAsString()
-     */
+    @Override
     protected int getDefaultLengthAsString()
     {
         // String-based storage when persisted as "YYYY-MM-DD HH:MM:SS.FFFFFFFFF"

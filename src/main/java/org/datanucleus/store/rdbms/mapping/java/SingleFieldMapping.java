@@ -45,6 +45,7 @@ public abstract class SingleFieldMapping extends JavaTypeMapping
      * @param clr the ClassLoaderResolver
      * @param fmd FieldMetaData for the field to be mapped (if any)
      */
+    @Override
     public void initialize(AbstractMemberMetaData fmd, Table table, ClassLoaderResolver clr)
     {
 		super.initialize(fmd, table, clr);
@@ -89,6 +90,7 @@ public abstract class SingleFieldMapping extends JavaTypeMapping
      * @param index requested column index.
      * @return the name of java-type for the requested column.
      */
+    @Override
     public String getJavaTypeForColumnMapping(int index)
     {
         if (getJavaType() == null)
@@ -98,101 +100,121 @@ public abstract class SingleFieldMapping extends JavaTypeMapping
         return getJavaType().getName();
     }
 
+    @Override
     public void setBoolean(ExecutionContext ec, PreparedStatement ps, int[] exprIndex, boolean value)
     {
         getColumnMapping(0).setBoolean(ps, exprIndex[0], value);
     }
 
+    @Override
     public boolean getBoolean(ExecutionContext ec, ResultSet resultSet, int[] exprIndex)
     {
         return getColumnMapping(0).getBoolean(resultSet, exprIndex[0]);
     }
 
+    @Override
     public void setChar(ExecutionContext ec, PreparedStatement ps, int[] exprIndex, char value)
     {
         getColumnMapping(0).setChar(ps, exprIndex[0], value);
     }
 
+    @Override
     public char getChar(ExecutionContext ec, ResultSet resultSet, int[] exprIndex)
     {
         return getColumnMapping(0).getChar(resultSet, exprIndex[0]);
     }
 
+    @Override
     public void setByte(ExecutionContext ec, PreparedStatement ps, int[] exprIndex, byte value)
     {
         getColumnMapping(0).setByte(ps, exprIndex[0], value);
     }
 
+    @Override
     public byte getByte(ExecutionContext ec, ResultSet resultSet, int[] exprIndex)
     {
         return getColumnMapping(0).getByte(resultSet, exprIndex[0]);
     }
 
+    @Override
     public void setShort(ExecutionContext ec, PreparedStatement ps, int[] exprIndex, short value)
     {
         getColumnMapping(0).setShort(ps, exprIndex[0], value);
     }
 
+    @Override
     public short getShort(ExecutionContext ec, ResultSet resultSet, int[] exprIndex)
     {
         return getColumnMapping(0).getShort(resultSet, exprIndex[0]);
     }
 
+    @Override
     public void setInt(ExecutionContext ec, PreparedStatement ps, int[] exprIndex, int value)
     {
         getColumnMapping(0).setInt(ps, exprIndex[0], value);
     }
 
+    @Override
     public int getInt(ExecutionContext ec, ResultSet resultSet, int[] exprIndex)
     {
         return getColumnMapping(0).getInt(resultSet, exprIndex[0]);
     }
 
+    @Override
     public void setLong(ExecutionContext ec, PreparedStatement ps, int[] exprIndex, long value)
     {
         getColumnMapping(0).setLong(ps, exprIndex[0], value);
     }
 
+    @Override
     public long getLong(ExecutionContext ec, ResultSet resultSet, int[] exprIndex)
     {
         return getColumnMapping(0).getLong(resultSet, exprIndex[0]);
     }
 
+    @Override
     public void setFloat(ExecutionContext ec, PreparedStatement ps, int[] exprIndex, float value)
     {
         getColumnMapping(0).setFloat(ps, exprIndex[0], value);
     }
 
+    @Override
     public float getFloat(ExecutionContext ec, ResultSet resultSet, int[] exprIndex)
     {
         return getColumnMapping(0).getFloat(resultSet, exprIndex[0]);
     }
 
+    @Override
     public void setDouble(ExecutionContext ec, PreparedStatement ps, int[] exprIndex, double value)
     {
         getColumnMapping(0).setDouble(ps, exprIndex[0], value);
     }
 
+    @Override
     public double getDouble(ExecutionContext ec, ResultSet resultSet, int[] exprIndex)
     {
         return getColumnMapping(0).getDouble(resultSet, exprIndex[0]);
     }
 
+    @Override
     public void setString(ExecutionContext ec, PreparedStatement ps, int[] exprIndex, String value)
     {
         getColumnMapping(0).setString(ps, exprIndex[0], value);
     }
 
+    @Override
     public String getString(ExecutionContext ec, ResultSet resultSet, int[] exprIndex)
     {
         return getColumnMapping(0).getString(resultSet, exprIndex[0]);
     }
 
+    @Override
     public void setObject(ExecutionContext ec, PreparedStatement ps, int[] exprIndex, Object value)
     {
         getColumnMapping(0).setObject(ps, exprIndex[0], value);
     }
 
+    @Override
     public Object getObject(ExecutionContext ec, ResultSet resultSet, int[] exprIndex)
     {
         if (exprIndex == null)

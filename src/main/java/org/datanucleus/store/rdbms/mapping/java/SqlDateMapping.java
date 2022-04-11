@@ -19,19 +19,18 @@ Contributors:
 package org.datanucleus.store.rdbms.mapping.java;
 
 /**
- * SCO Mapping for an SQLDate type.
+ * SCO Mapping for a java.sql.Date type.
  * Maps between a java.sql.Date object and an SQL "DATE" type in the datatsore.
  */
 public class SqlDateMapping extends TemporalMapping
 {
+    @Override
     public Class getJavaType()
     {
         return java.sql.Date.class;
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.rdbms.mapping.TemporalMapping#getDefaultLengthAsString()
-     */
+    @Override
     protected int getDefaultLengthAsString()
     {
         // String-based storage when persisted as "YYYY-MM-DD"

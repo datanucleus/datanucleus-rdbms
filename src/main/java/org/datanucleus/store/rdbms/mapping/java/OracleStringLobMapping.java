@@ -38,6 +38,7 @@ public class OracleStringLobMapping extends StringMapping
      * Retrieve the empty BLOB/CLOB locator created by the insert statement and write out the current BLOB/CLOB field value to the Oracle BLOB/CLOB object
      * @param sm StateManager owner of this field
      */
+    @Override
     public void performSetPostProcessing(DNStateManager sm)
     {
         // Generate the contents for the BLOB/CLOB

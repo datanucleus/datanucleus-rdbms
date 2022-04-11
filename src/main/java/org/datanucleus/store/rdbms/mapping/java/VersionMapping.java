@@ -84,80 +84,49 @@ public class VersionMapping extends SingleFieldMapping
         table.getStoreManager().getMappingManager().createColumnMapping(delegate, column, getType());
     }
 
-    /**
-     * Accessor for whether to include this column in any fetch statement
-     * @return Whether to include the column when fetching.
-     */
+    @Override
     public boolean includeInFetchStatement()
     {
         return false;
     }
 
-    /**
-     * Accessor for the number of columns.
-     * @return Number of columns.
-     */
+    @Override
     public int getNumberOfColumnMappings()
     {
         return delegate.getNumberOfColumnMappings();
     }
 
-    /**
-     * Accessor for a datastore mapping.
-     * @param index The mapping index
-     * @return the datastore mapping
-     */
+    @Override
     public ColumnMapping getColumnMapping(int index)
     {
         return delegate.getColumnMapping(index);
     }
 
-    /**
-     * Accessor for the datastore mappings for this java type.
-     * @return The datastore mapping(s)
-     */
+    @Override
     public ColumnMapping[] getColumnMappings()
     {
         return delegate.getColumnMappings();
     }
 
-    /**
-     * Method to add a column mapping.
-     * @param colMapping The mapping
-     */
+    @Override
     public void addColumnMapping(ColumnMapping colMapping)
     {
         delegate.addColumnMapping(colMapping);
     }
 
-    /**
-     * Accessor for the type represented here, returning the class itself
-     * @return This class.
-     */
+    @Override
     public Class getJavaType()
     {
         return VersionMapping.class;
     }
 
-    /**
-     * Mutator for the object in this column
-     * @param ec execution context
-     * @param ps The statement
-     * @param exprIndex The indexes
-     * @param value The value to set it to
-     */
+    @Override
     public void setObject(ExecutionContext ec, PreparedStatement ps, int[] exprIndex, Object value)
     {
         delegate.setObject(ec, ps, exprIndex, value);
     }
 
-    /**
-     * Accessor for the object in this column
-     * @param ec execution context
-     * @param resultSet The ResultSet to get the value from
-     * @param exprIndex The indexes
-     * @return The object
-     */
+    @Override
     public Object getObject(ExecutionContext ec, ResultSet resultSet, int[] exprIndex)
     {
         return delegate.getObject(ec, resultSet, exprIndex);

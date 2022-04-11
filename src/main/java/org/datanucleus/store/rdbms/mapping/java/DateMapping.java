@@ -25,14 +25,13 @@ import java.util.Date;
  */
 public class DateMapping extends TemporalMapping
 {
+    @Override
     public Class getJavaType()
     {
         return Date.class;
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.rdbms.mapping.TemporalMapping#getDefaultLengthAsString()
-     */
+    @Override
     protected int getDefaultLengthAsString()
     {
         return 28;

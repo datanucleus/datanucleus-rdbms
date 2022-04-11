@@ -40,9 +40,6 @@ public class UUIDMapping extends SingleFieldMapping
 {
     TypeConverter converter;
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping#initialize(org.datanucleus.store.rdbms.RDBMSStoreManager, java.lang.String)
-     */
     @Override
     public void initialize(RDBMSStoreManager storeMgr, String type)
     {
@@ -57,9 +54,6 @@ public class UUIDMapping extends SingleFieldMapping
         super.initialize(storeMgr, type);
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.rdbms.mapping.java.SingleFieldMapping#initialize(org.datanucleus.metadata.AbstractMemberMetaData, org.datanucleus.store.rdbms.table.Table, org.datanucleus.ClassLoaderResolver)
-     */
     @Override
     public void initialize(AbstractMemberMetaData mmd, Table table, ClassLoaderResolver clr)
     {
@@ -97,18 +91,12 @@ public class UUIDMapping extends SingleFieldMapping
         super.initialize(mmd, table, clr);
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping#getJavaType()
-     */
     @Override
     public Class getJavaType()
     {
         return UUID.class;
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.rdbms.mapping.java.SingleFieldMapping#getJavaTypeForColumnMapping(int)
-     */
     @Override
     public String getJavaTypeForColumnMapping(int index)
     {
@@ -119,9 +107,6 @@ public class UUIDMapping extends SingleFieldMapping
         return storeMgr.getNucleusContext().getTypeManager().getDatastoreTypeForTypeConverter(converter, getJavaType()).getName();
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.rdbms.mapping.java.SingleFieldMapping#setObject(org.datanucleus.ExecutionContext, java.sql.PreparedStatement, int[], java.lang.Object)
-     */
     @Override
     public void setObject(ExecutionContext ec, PreparedStatement ps, int[] exprIndex, Object value)
     {
@@ -149,9 +134,6 @@ public class UUIDMapping extends SingleFieldMapping
         }
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.rdbms.mapping.java.SingleFieldMapping#getObject(org.datanucleus.ExecutionContext, java.sql.ResultSet, int[])
-     */
     @Override
     public Object getObject(ExecutionContext ec, ResultSet resultSet, int[] exprIndex)
     {

@@ -34,16 +34,19 @@ public class NullMapping extends SingleFieldMapping
         initialize(storeMgr, null);
     }
 
+    @Override
     public Class getJavaType()
     {
         return null;
     }
 
+    @Override
     public Object getObject(ExecutionContext ec, ResultSet resultSet, int[] exprIndex)
     {
         return null;
     }
-    
+
+    @Override
     public void setObject(ExecutionContext ec, PreparedStatement ps, int[] exprIndex, Object value)
     {
     }

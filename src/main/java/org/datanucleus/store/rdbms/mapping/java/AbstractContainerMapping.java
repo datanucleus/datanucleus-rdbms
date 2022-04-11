@@ -69,6 +69,7 @@ public abstract class AbstractContainerMapping extends SingleFieldMapping
      * @param table The datastore container storing this mapping (if any)
      * @param clr the ClassLoaderResolver
      */
+    @Override
     public void initialize(AbstractMemberMetaData mmd, Table table, ClassLoaderResolver clr)
     {
 		super.initialize(mmd, table, clr);
@@ -89,6 +90,7 @@ public abstract class AbstractContainerMapping extends SingleFieldMapping
      * Whether the mapping has a simple (single column) datastore representation.
      * @return Whether it has a simple datastore representation (single column)
      */
+    @Override
     public boolean hasSimpleDatastoreRepresentation()
     {
         return false;
@@ -98,6 +100,7 @@ public abstract class AbstractContainerMapping extends SingleFieldMapping
      * Method to prepare a column mapping for use in the datastore.
      * This creates the column in the table.
      */
+    @Override
     protected void prepareColumnMapping()
     {
         if (containerIsStoredInSingleColumn())
@@ -131,6 +134,7 @@ public abstract class AbstractContainerMapping extends SingleFieldMapping
      * @param index requested column index.
      * @return the name of java-type for the requested column.
      */
+    @Override
     public String getJavaTypeForColumnMapping(int index)
     {
         if (containerIsStoredInSingleColumn())
@@ -167,6 +171,7 @@ public abstract class AbstractContainerMapping extends SingleFieldMapping
      * @param exprIndex The parameter positions in the JDBC statement to populate.
      * @param value The value to populate into it
      */
+    @Override
     public void setObject(ExecutionContext ec, PreparedStatement ps, int[] exprIndex, Object value)
     {
         if (mmd == null || !containerIsStoredInSingleColumn())
@@ -266,6 +271,7 @@ public abstract class AbstractContainerMapping extends SingleFieldMapping
      * @param exprIndex The parameter position(s) to extract the object from
      * @return The collection object
      */
+    @Override
     public Object getObject(ExecutionContext ec, ResultSet resultSet, int[] exprIndex)
     {
         if (mmd == null || !containerIsStoredInSingleColumn())
@@ -279,6 +285,7 @@ public abstract class AbstractContainerMapping extends SingleFieldMapping
      * Accessor for the datastore class.
      * @return The datastore class
      */
+    @Override
     public Table getTable()
     {
         if (containerIsStoredInSingleColumn())
@@ -294,6 +301,7 @@ public abstract class AbstractContainerMapping extends SingleFieldMapping
      * Accessor for the number of columns
      * @return The number of columns
      */
+    @Override
     public int getNumberOfColumnMappings()
     {
         if (containerIsStoredInSingleColumn())
@@ -311,6 +319,7 @@ public abstract class AbstractContainerMapping extends SingleFieldMapping
      * @param index The id of the mapping
      * @return The datastore mapping
      */
+    @Override
     public ColumnMapping getColumnMapping(int index)
     {
         if (containerIsStoredInSingleColumn())
@@ -326,6 +335,7 @@ public abstract class AbstractContainerMapping extends SingleFieldMapping
      * Accessor for the datastore mappings for this java type
      * @return The datastore mapping(s)
      */
+    @Override
     public ColumnMapping[] getColumnMappings()
     {
         if (containerIsStoredInSingleColumn())
@@ -381,6 +391,7 @@ public abstract class AbstractContainerMapping extends SingleFieldMapping
      * This mapping is included in the select statement.
      * @return Whether to include in select statement
      */
+    @Override
     public boolean includeInFetchStatement()
     {
         // Only include in a fetch when it is serialised into 1 column
@@ -391,6 +402,7 @@ public abstract class AbstractContainerMapping extends SingleFieldMapping
      * This mapping is included in the update statement.
      * @return Whether to include in update statement
      */
+    @Override
     public boolean includeInUpdateStatement()
     {
         // Only include in an update when it is serialised into 1 column
@@ -401,6 +413,7 @@ public abstract class AbstractContainerMapping extends SingleFieldMapping
      * This mapping is included in the insert statement.
      * @return Whether to include in insert statement
      */
+    @Override
     public boolean includeInInsertStatement()
     {
         // Only include in an insert when it is serialised into 1 column

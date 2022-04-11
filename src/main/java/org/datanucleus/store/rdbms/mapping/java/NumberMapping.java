@@ -24,18 +24,14 @@ import org.datanucleus.ClassNameConstants;
  */
 public class NumberMapping extends SingleFieldMapping
 {
-    /**
-     * Accessor for the name of the java-type actually used when mapping the particular datastore
-     * field. This java-type must have an entry in the datastore mappings.
-     * @param index requested column index.
-     * @return the name of java-type for the requested column.
-     */
+    @Override
     public String getJavaTypeForColumnMapping(int index)
     {
         // Assume it has the highest precision possible so we can store all subtypes of Number
         return ClassNameConstants.JAVA_MATH_BIGDECIMAL;
     }
 
+    @Override
     public Class getJavaType()
     {
         return Number.class;

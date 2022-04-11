@@ -27,6 +27,7 @@ import org.datanucleus.util.StringUtils;
  */
 public class ShortMapping extends SingleFieldMapping
 {
+    @Override
     public Class getJavaType()
     {
         return Short.class;

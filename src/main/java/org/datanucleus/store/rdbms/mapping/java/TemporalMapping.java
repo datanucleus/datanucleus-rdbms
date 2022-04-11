@@ -24,11 +24,7 @@ import org.datanucleus.ClassNameConstants;
  */
 public abstract class TemporalMapping extends SingleFieldMapping
 {
-    /**
-     * Method to return the default length of this type in the datastore.
-     * @param index The index position
-     * @return The default length
-     */
+    @Override
     public int getDefaultLength(int index)
     {
         if (columnMappings != null && columnMappings.length > 0 && columnMappings[0].isStringBased())
@@ -40,12 +36,7 @@ public abstract class TemporalMapping extends SingleFieldMapping
 
     protected abstract int getDefaultLengthAsString();
 
-    /**
-     * Accessor for the name of the java-type actually used when mapping the particular datastore
-     * field. This java-type must have an entry in the datastore mappings.
-     * @param index requested column index.
-     * @return the name of java-type for the requested column.
-     */
+    @Override
     public String getJavaTypeForColumnMapping(int index)
     {
         if (columnMappings != null && columnMappings.length > 0 && columnMappings[0].isStringBased())

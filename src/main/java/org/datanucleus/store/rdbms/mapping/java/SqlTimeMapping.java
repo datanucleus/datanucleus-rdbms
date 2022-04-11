@@ -18,18 +18,17 @@ Contributors:
 package org.datanucleus.store.rdbms.mapping.java;
 
 /**
- * SCO Mapping for an SQLTime type.
+ * SCO Mapping for a java.sql.Time type.
  */
 public class SqlTimeMapping extends TemporalMapping
 {
+    @Override
     public Class getJavaType()
     {
         return java.sql.Time.class;
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.rdbms.mapping.TemporalMapping#getDefaultLengthAsString()
-     */
+    @Override
     protected int getDefaultLengthAsString()
     {
         // java.sql.Time requires 8 characters ("hh:mm:ss")

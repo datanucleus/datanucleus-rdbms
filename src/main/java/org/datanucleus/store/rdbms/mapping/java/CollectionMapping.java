@@ -49,6 +49,7 @@ public class CollectionMapping extends AbstractContainerMapping implements Mappi
      * Accessor for the Java type represented here.
      * @return The java type
      */
+    @Override
     public Class getJavaType()
     {
         return Collection.class;

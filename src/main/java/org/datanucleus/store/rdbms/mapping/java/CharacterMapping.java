@@ -28,6 +28,7 @@ package org.datanucleus.store.rdbms.mapping.java;
  */
 public class CharacterMapping extends SingleFieldMapping
 {
+    @Override
     public Class getJavaType()
     {
         return Character.class;
@@ -39,6 +40,7 @@ public class CharacterMapping extends SingleFieldMapping
      * @param index The index position
      * @return The default length
      */
+    @Override
     public int getDefaultLength(int index)
     {
         return 1;

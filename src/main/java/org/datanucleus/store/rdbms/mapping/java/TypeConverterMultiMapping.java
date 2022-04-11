@@ -38,9 +38,6 @@ public class TypeConverterMultiMapping extends SingleFieldMultiMapping
 {
     TypeConverter converter;
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping#initialize(org.datanucleus.store.rdbms.RDBMSStoreManager, java.lang.String)
-     */
     @Override
     public void initialize(RDBMSStoreManager storeMgr, String type)
     {
@@ -68,6 +65,7 @@ public class TypeConverterMultiMapping extends SingleFieldMultiMapping
         }
     }
 
+    @Override
     public void initialize(AbstractMemberMetaData mmd, Table table, ClassLoaderResolver clr)
     {
         this.initialize(mmd, table, clr, null);
@@ -115,18 +113,12 @@ public class TypeConverterMultiMapping extends SingleFieldMultiMapping
         return converter;
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.rdbms.mapping.JavaTypeMapping#getJavaType()
-     */
     @Override
     public Class getJavaType()
     {
         return mmd != null ? mmd.getType() : storeMgr.getNucleusContext().getClassLoaderResolver(null).classForName(type);
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.rdbms.mapping.SingleFieldMapping#setObject(org.datanucleus.store.ExecutionContext, java.lang.Object, int[], java.lang.Object)
-     */
     @Override
     public void setObject(ExecutionContext ec, PreparedStatement ps, int[] exprIndex, Object value)
     {
@@ -185,9 +177,6 @@ public class TypeConverterMultiMapping extends SingleFieldMultiMapping
         }
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.rdbms.mapping.SingleFieldMapping#getObject(org.datanucleus.store.ExecutionContext, java.lang.Object, int[])
-     */
     @Override
     public Object getObject(ExecutionContext ec, ResultSet resultSet, int[] exprIndex)
     {
@@ -223,7 +212,7 @@ public class TypeConverterMultiMapping extends SingleFieldMultiMapping
         {
             valuesArr = new Object[exprIndex.length];
         }
-        boolean isNull = true;
+       boolean isNull = true;
         for (int i=0;i<exprIndex.length;i++)
         {
             String colJavaType = getJavaTypeForColumnMapping(i);

@@ -28,9 +28,7 @@ import org.datanucleus.util.StringUtils;
  */
 public class IntegerMapping extends SingleFieldMapping
 {
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.mapping.JavaTypeMapping#getJavaType()
-     */
+    @Override
     public Class getJavaType()
     {
         return Integer.class;

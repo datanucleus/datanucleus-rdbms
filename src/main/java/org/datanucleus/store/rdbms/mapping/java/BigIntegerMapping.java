@@ -24,6 +24,7 @@ import java.math.BigInteger;
  */
 public class BigIntegerMapping extends SingleFieldMapping
 {
+    @Override
     public Class getJavaType()
     {
         return BigInteger.class;

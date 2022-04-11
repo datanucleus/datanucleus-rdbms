@@ -24,6 +24,7 @@ import java.math.BigDecimal;
  */
 public class BigDecimalMapping extends SingleFieldMapping
 {
+    @Override
     public Class getJavaType()
     {
         return BigDecimal.class;

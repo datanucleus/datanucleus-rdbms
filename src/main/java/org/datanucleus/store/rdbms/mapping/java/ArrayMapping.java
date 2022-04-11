@@ -44,6 +44,7 @@ public class ArrayMapping extends AbstractContainerMapping implements MappingCal
      * Accessor for the Java type represented here.
      * @return The java type
      */
+    @Override
     public Class getJavaType()
     {
         if (mmd != null)
@@ -59,6 +60,7 @@ public class ArrayMapping extends AbstractContainerMapping implements MappingCal
      * specified and the array is of a primitive/wrapper type.
      * @return Whether it is stored in a single column in the main table.
      */
+    @Override
     protected boolean containerIsStoredInSingleColumn()
     {
         if (super.containerIsStoredInSingleColumn())

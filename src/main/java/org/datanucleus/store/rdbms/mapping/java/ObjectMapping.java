@@ -32,21 +32,19 @@ import org.datanucleus.ClassNameConstants;
  */
 public class ObjectMapping extends ReferenceMapping
 {
-    /**
-     * Accessor for the Java type being represented.
-     * @return java.lang.Object
-     */
+    @Override
     public Class getJavaType()
     {
         return Object.class;
     }
 
     /**
-     * Accessor for the name of the java-type actually used when mapping the particular datastore
-     * field. Returns Serializable since the object needs to be serialisable
+     * Accessor for the name of the java-type actually used when mapping the particular datastore field.
+     * Returns Serializable since the object needs to be serialisable
      * @param index requested column index.
      * @return the name of java-type for the requested column.
      */
+    @Override
     public String getJavaTypeForColumnMapping(int index)
     {
         return ClassNameConstants.JAVA_IO_SERIALIZABLE;

@@ -38,9 +38,6 @@ public class TypeConverterMapping extends SingleFieldMapping
 {
     TypeConverter converter;
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping#initialize(org.datanucleus.store.rdbms.RDBMSStoreManager, java.lang.String)
-     */
     @Override
     public void initialize(RDBMSStoreManager storeMgr, String type)
     {
@@ -60,6 +57,7 @@ public class TypeConverterMapping extends SingleFieldMapping
         super.initialize(storeMgr, type);
     }
 
+    @Override
     public void initialize(AbstractMemberMetaData mmd, Table table, ClassLoaderResolver clr)
     {
         this.initialize(mmd, table, clr, null);
@@ -93,9 +91,6 @@ public class TypeConverterMapping extends SingleFieldMapping
         return converter;
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.rdbms.mapping.java.SingleFieldMapping#getDefaultLength(int)
-     */
     @Override
     public int getDefaultLength(int index)
     {
@@ -106,20 +101,12 @@ public class TypeConverterMapping extends SingleFieldMapping
         return super.getDefaultLength(index);
     }
 
-    /**
-     * Accessor for the name of the java-type actually used when mapping the particular column. 
-     * This java-type must have an entry in the column mappings.
-     * @param index requested column index.
-     * @return the name of java-type for the requested column.
-     */
+    @Override
     public String getJavaTypeForColumnMapping(int index)
     {
         return storeMgr.getNucleusContext().getTypeManager().getDatastoreTypeForTypeConverter(converter, getJavaType()).getName();
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.rdbms.mapping.JavaTypeMapping#getJavaType()
-     */
     @Override
     public Class getJavaType()
     {
@@ -256,9 +243,6 @@ public class TypeConverterMapping extends SingleFieldMapping
         return converter.toMemberType(datastoreValue);
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.rdbms.mapping.SingleFieldMapping#setBoolean(org.datanucleus.store.ExecutionContext, java.lang.Object, int[], boolean)
-     */
     @Override
     public void setBoolean(ExecutionContext ec, PreparedStatement ps, int[] exprIndex, boolean value)
     {
@@ -270,9 +254,6 @@ public class TypeConverterMapping extends SingleFieldMapping
         setDatastoreFromMemberValue(ps, exprIndex, value);
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.rdbms.mapping.SingleFieldMapping#getBoolean(org.datanucleus.store.ExecutionContext, java.lang.Object, int[])
-     */
     @Override
     public boolean getBoolean(ExecutionContext ec, ResultSet resultSet, int[] exprIndex)
     {
@@ -284,9 +265,6 @@ public class TypeConverterMapping extends SingleFieldMapping
         return (Boolean)getMemberValueFromDatastore(resultSet, exprIndex);
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.rdbms.mapping.SingleFieldMapping#setByte(org.datanucleus.store.ExecutionContext, java.lang.Object, int[], byte)
-     */
     @Override
     public void setByte(ExecutionContext ec, PreparedStatement ps, int[] exprIndex, byte value)
     {
@@ -298,9 +276,6 @@ public class TypeConverterMapping extends SingleFieldMapping
         setDatastoreFromMemberValue(ps, exprIndex, value);
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.rdbms.mapping.SingleFieldMapping#getByte(org.datanucleus.store.ExecutionContext, java.lang.Object, int[])
-     */
     @Override
     public byte getByte(ExecutionContext ec, ResultSet resultSet, int[] exprIndex)
     {
@@ -312,9 +287,6 @@ public class TypeConverterMapping extends SingleFieldMapping
         return (Byte)getMemberValueFromDatastore(resultSet, exprIndex);
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.rdbms.mapping.SingleFieldMapping#setChar(org.datanucleus.store.ExecutionContext, java.lang.Object, int[], char)
-     */
     @Override
     public void setChar(ExecutionContext ec, PreparedStatement ps, int[] exprIndex, char value)
     {
@@ -326,9 +298,6 @@ public class TypeConverterMapping extends SingleFieldMapping
         setDatastoreFromMemberValue(ps, exprIndex, value);
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.rdbms.mapping.SingleFieldMapping#getChar(org.datanucleus.store.ExecutionContext, java.lang.Object, int[])
-     */
     @Override
     public char getChar(ExecutionContext ec, ResultSet resultSet, int[] exprIndex)
     {
@@ -340,9 +309,6 @@ public class TypeConverterMapping extends SingleFieldMapping
         return (Character)getMemberValueFromDatastore(resultSet, exprIndex);
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.rdbms.mapping.SingleFieldMapping#setDouble(org.datanucleus.store.ExecutionContext, java.lang.Object, int[], double)
-     */
     @Override
     public void setDouble(ExecutionContext ec, PreparedStatement ps, int[] exprIndex, double value)
     {
@@ -354,9 +320,6 @@ public class TypeConverterMapping extends SingleFieldMapping
         setDatastoreFromMemberValue(ps, exprIndex, value);
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.rdbms.mapping.SingleFieldMapping#getDouble(org.datanucleus.store.ExecutionContext, java.lang.Object, int[])
-     */
     @Override
     public double getDouble(ExecutionContext ec, ResultSet resultSet, int[] exprIndex)
     {
@@ -368,9 +331,6 @@ public class TypeConverterMapping extends SingleFieldMapping
         return (Double)getMemberValueFromDatastore(resultSet, exprIndex);
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.rdbms.mapping.SingleFieldMapping#setFloat(org.datanucleus.store.ExecutionContext, java.lang.Object, int[], float)
-     */
     @Override
     public void setFloat(ExecutionContext ec, PreparedStatement ps, int[] exprIndex, float value)
     {
@@ -382,9 +342,6 @@ public class TypeConverterMapping extends SingleFieldMapping
         setDatastoreFromMemberValue(ps, exprIndex, value);
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.rdbms.mapping.SingleFieldMapping#getFloat(org.datanucleus.store.ExecutionContext, java.lang.Object, int[])
-     */
     @Override
     public float getFloat(ExecutionContext ec, ResultSet resultSet, int[] exprIndex)
     {
@@ -396,9 +353,6 @@ public class TypeConverterMapping extends SingleFieldMapping
         return (Float)getMemberValueFromDatastore(resultSet, exprIndex);
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.rdbms.mapping.SingleFieldMapping#setInt(org.datanucleus.store.ExecutionContext, java.lang.Object, int[], int)
-     */
     @Override
     public void setInt(ExecutionContext ec, PreparedStatement ps, int[] exprIndex, int value)
     {
@@ -410,9 +364,6 @@ public class TypeConverterMapping extends SingleFieldMapping
         setDatastoreFromMemberValue(ps, exprIndex, value);
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.rdbms.mapping.SingleFieldMapping#getInt(org.datanucleus.store.ExecutionContext, java.lang.Object, int[])
-     */
     @Override
     public int getInt(ExecutionContext ec, ResultSet resultSet, int[] exprIndex)
     {
@@ -424,9 +375,6 @@ public class TypeConverterMapping extends SingleFieldMapping
         return (Integer)getMemberValueFromDatastore(resultSet, exprIndex);
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.rdbms.mapping.SingleFieldMapping#setLong(org.datanucleus.store.ExecutionContext, java.lang.Object, int[], long)
-     */
     @Override
     public void setLong(ExecutionContext ec, PreparedStatement ps, int[] exprIndex, long value)
     {
@@ -438,9 +386,6 @@ public class TypeConverterMapping extends SingleFieldMapping
         setDatastoreFromMemberValue(ps, exprIndex, value);
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.rdbms.mapping.SingleFieldMapping#getLong(org.datanucleus.store.ExecutionContext, java.lang.Object, int[])
-     */
     @Override
     public long getLong(ExecutionContext ec, ResultSet resultSet, int[] exprIndex)
     {
@@ -452,9 +397,6 @@ public class TypeConverterMapping extends SingleFieldMapping
         return (Long)getMemberValueFromDatastore(resultSet, exprIndex);
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.rdbms.mapping.SingleFieldMapping#setShort(org.datanucleus.store.ExecutionContext, java.lang.Object, int[], short)
-     */
     @Override
     public void setShort(ExecutionContext ec, PreparedStatement ps, int[] exprIndex, short value)
     {
@@ -466,9 +408,6 @@ public class TypeConverterMapping extends SingleFieldMapping
         setDatastoreFromMemberValue(ps, exprIndex, value);
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.rdbms.mapping.SingleFieldMapping#getShort(org.datanucleus.store.ExecutionContext, java.lang.Object, int[])
-     */
     @Override
     public short getShort(ExecutionContext ec, ResultSet resultSet, int[] exprIndex)
     {
@@ -480,9 +419,6 @@ public class TypeConverterMapping extends SingleFieldMapping
         return (Short)getMemberValueFromDatastore(resultSet, exprIndex);
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.rdbms.mapping.SingleFieldMapping#setString(org.datanucleus.store.ExecutionContext, java.lang.Object, int[], java.lang.String)
-     */
     @Override
     public void setString(ExecutionContext ec, PreparedStatement ps, int[] exprIndex, String value)
     {
@@ -494,9 +430,6 @@ public class TypeConverterMapping extends SingleFieldMapping
         setDatastoreFromMemberValue(ps, exprIndex, value);
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.rdbms.mapping.SingleFieldMapping#getString(org.datanucleus.store.ExecutionContext, java.lang.Object, int[])
-     */
     @Override
     public String getString(ExecutionContext ec, ResultSet resultSet, int[] exprIndex)
     {
@@ -508,9 +441,6 @@ public class TypeConverterMapping extends SingleFieldMapping
         return (String)getMemberValueFromDatastore(resultSet, exprIndex);
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.rdbms.mapping.SingleFieldMapping#setObject(org.datanucleus.store.ExecutionContext, java.lang.Object, int[], java.lang.Object)
-     */
     @Override
     public void setObject(ExecutionContext ec, PreparedStatement ps, int[] exprIndex, Object value)
     {
@@ -522,9 +452,6 @@ public class TypeConverterMapping extends SingleFieldMapping
         setDatastoreFromMemberValue(ps, exprIndex, value);
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.rdbms.mapping.SingleFieldMapping#getObject(org.datanucleus.store.ExecutionContext, java.lang.Object, int[])
-     */
     @Override
     public Object getObject(ExecutionContext ec, ResultSet resultSet, int[] exprIndex)
     {

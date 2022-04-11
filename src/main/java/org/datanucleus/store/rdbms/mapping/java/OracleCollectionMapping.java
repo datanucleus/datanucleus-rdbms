@@ -32,6 +32,7 @@ import org.datanucleus.store.rdbms.mapping.column.ColumnMappingPostSet;
  */
 public class OracleCollectionMapping extends CollectionMapping
 {
+    @Override
     public void performSetPostProcessing(DNStateManager sm)
     {
         if (containerIsStoredInSingleColumn())
@@ -62,6 +63,7 @@ public class OracleCollectionMapping extends CollectionMapping
         }
     }
 
+    @Override
     public void postInsert(DNStateManager ownerSM)
     {
         if (containerIsStoredInSingleColumn())
@@ -96,6 +98,7 @@ public class OracleCollectionMapping extends CollectionMapping
         }
     }
 
+    @Override
     public void postUpdate(DNStateManager ownerSM)
     {
         if (containerIsStoredInSingleColumn())

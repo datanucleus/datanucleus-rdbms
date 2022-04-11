@@ -88,9 +88,9 @@ public abstract class JavaTypeMapping
     /**
      * Initialise this JavaTypeMapping with the given StoreManager for the given type.
      * Used when the mapping is for a parameter in a query.
-     * This will not set the "mmd" and "datastoreContainer" parameters. If these are required for
-     * usage of the mapping then you should call
-     * "setFieldInformation(AbstractMemberMetaData, DatastoreContainerObject)" below
+     * This will not set the "mmd" and "datastoreContainer" parameters. 
+     * If these are required for usage of the mapping then you should call
+     * <I>setFieldInformation(AbstractMemberMetaData, DatastoreContainerObject)</I> below.
      * Subclasses should override this method to perform any datastore initialization operations.
      * @param storeMgr The Datastore Adapter that this Mapping should use.
      * @param type The Class that this mapping maps to the database.

@@ -27,6 +27,7 @@ import org.datanucleus.util.StringUtils;
  */
 public class StringMapping extends SingleFieldMapping
 {
+    @Override
     public Class getJavaType()
     {
         return String.class;

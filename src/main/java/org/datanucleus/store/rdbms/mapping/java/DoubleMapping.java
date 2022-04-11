@@ -24,9 +24,7 @@ package org.datanucleus.store.rdbms.mapping.java;
  */
 public class DoubleMapping extends SingleFieldMapping
 {
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.mapping.JavaTypeMapping#getJavaType()
-     */
+    @Override
     public Class getJavaType()
     {
         return Double.class;

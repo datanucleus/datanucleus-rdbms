@@ -26,10 +26,7 @@ package org.datanucleus.store.rdbms.mapping.java;
  */
 public class BooleanMapping extends SingleFieldMapping
 {
-    /**
-     * Accessor for the Java type being represented here.
-     * @return The Java type
-     */
+    @Override
     public Class getJavaType()
     {
         return Boolean.class;

@@ -50,6 +50,7 @@ public class EnumMapping extends SingleFieldMapping
      * @param table The table storing this mapping (if any)
      * @param clr the ClassLoaderResolver
      */
+    @Override
     public void initialize(AbstractMemberMetaData mmd, Table table, ClassLoaderResolver clr)
     {
         if (mmd != null && mmd.isSerialized())
@@ -77,6 +78,7 @@ public class EnumMapping extends SingleFieldMapping
      * @param index The index of the datastore column
      * @return The valid value(s)
      */
+    @Override
     public Object[] getValidValues(int index)
     {
         if (mmd != null)
@@ -120,26 +122,19 @@ public class EnumMapping extends SingleFieldMapping
      * @param index requested column index.
      * @return the name of java-type for the requested column.
      */
+    @Override
     public String getJavaTypeForColumnMapping(int index)
     {
         return datastoreJavaType;
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.rdbms.mapping.JavaTypeMapping#getJavaType()
-     */
+    @Override
     public Class getJavaType()
     {
         return Enum.class;
     }
 
-    /**
-     * Method to set the Enum in the datastore statement.
-     * @param ec ExecutionContext
-     * @param ps Statement for the datastore
-     * @param exprIndex Index position(s) to set the Enum at in the statement
-     * @param value The Enum value to set
-     */
+    @Override
     public void setObject(ExecutionContext ec, PreparedStatement ps, int[] exprIndex, Object value)
     {
         if (value == null)
@@ -180,13 +175,7 @@ public class EnumMapping extends SingleFieldMapping
         }
     }
 
-    /**
-     * Method to extract the Enum object from the passed result set.
-     * @param ec ExecutionContext
-     * @param resultSet The result set
-     * @param exprIndex The index position(s) in the result set to use.
-     * @return The Enum
-     */
+    @Override
     public Object getObject(ExecutionContext ec, ResultSet resultSet, int[] exprIndex)
     {
         if (exprIndex == null)

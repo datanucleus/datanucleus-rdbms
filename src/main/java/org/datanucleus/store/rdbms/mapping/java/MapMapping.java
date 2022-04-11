@@ -52,6 +52,7 @@ public class MapMapping extends AbstractContainerMapping implements MappingCallb
      * Accessor for the Java type represented here.
      * @return The java type
      */
+    @Override
     public Class getJavaType()
     {
         return Map.class;
