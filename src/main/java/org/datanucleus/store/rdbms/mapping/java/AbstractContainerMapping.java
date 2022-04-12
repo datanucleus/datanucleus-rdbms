@@ -452,7 +452,7 @@ public abstract class AbstractContainerMapping extends SingleFieldMapping
             mmd = ec.getMetaDataManager().getMetaDataForClass(mmd.getClassName(true), ec.getClassLoaderResolver()).getMetaDataForMember(mmd.getName());
         }
 
-        return ec.getTypeManager().createSCOInstance(sm, mmd, type, value, true);
+        return SCOUtils.wrapSCOField(sm, mmd, type, value, true);
     }
 
     // ---------------- Implementation of MappingCallbacks --------------------
