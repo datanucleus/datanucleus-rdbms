@@ -177,7 +177,6 @@ import org.datanucleus.transaction.TransactionUtils;
 import org.datanucleus.util.ClassUtils;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.MacroString;
-import org.datanucleus.util.MultiMap;
 import org.datanucleus.util.NucleusLogger;
 import org.datanucleus.util.StringUtils;
 
@@ -256,7 +255,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
     private Set<String> writtenDdlStatements = null;
 
     /** State variable for schema generation of the callback information to be processed. TODO Move to ClassTable. */
-    private MultiMap schemaCallbacks = new MultiMap();
+    private Map<String, Collection<AbstractMemberMetaData>> schemaCallbacks = new HashMap<>();
 
     private Map<String, Store> backingStoreByMemberName = new ConcurrentHashMap<>();
 
@@ -1076,17 +1075,23 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
         return "UPPERCASE";
     }
 
-    public MultiMap getSchemaCallbacks()
+    public Map<String, Collection<AbstractMemberMetaData>> getSchemaCallbacks()
     {
         return schemaCallbacks;
     }
 
     public void addSchemaCallback(String className, AbstractMemberMetaData mmd)
     {
-        Collection coll = (Collection)schemaCallbacks.get(className);
-        if (coll == null || !coll.contains(mmd))
+        Collection<AbstractMemberMetaData> coll = schemaCallbacks.get(className);
+        if (coll == null)
         {
-            schemaCallbacks.put(className, mmd);
+            coll = new HashSet<>();
+            coll.add(mmd);
+            schemaCallbacks.put(className, coll);
+        }
+        else if (!coll.contains(mmd))
+        {
+            coll.add(mmd);
         }
         else
         {

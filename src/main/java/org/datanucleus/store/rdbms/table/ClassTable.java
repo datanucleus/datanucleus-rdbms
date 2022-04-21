@@ -1415,7 +1415,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
             }
 
             Collection processedCallbacks = callbacksAppliedForManagedClass.get(managedCmd.getFullClassName());
-            Collection c = (Collection)storeMgr.getSchemaCallbacks().get(managedCmd.getFullClassName());
+            Collection<AbstractMemberMetaData> c = storeMgr.getSchemaCallbacks().get(managedCmd.getFullClassName());
             if (c != null)
             {
                 if (processedCallbacks == null)
@@ -1423,9 +1423,9 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                     processedCallbacks = new HashSet();
                     callbacksAppliedForManagedClass.put(managedCmd.getFullClassName(), processedCallbacks);
                 }
-                for (Iterator it = c.iterator(); it.hasNext();)
+                for (Iterator<AbstractMemberMetaData> it = c.iterator(); it.hasNext();)
                 {
-                    AbstractMemberMetaData callbackMmd = (AbstractMemberMetaData) it.next();
+                    AbstractMemberMetaData callbackMmd = it.next();
                     if (processedCallbacks.contains(callbackMmd))
                     {
                         continue;
