@@ -38,7 +38,6 @@ import java.util.Set;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ExecutionContext;
-import org.datanucleus.PropertyNames;
 import org.datanucleus.exceptions.ClassNotPersistableException;
 import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.exceptions.NucleusUserException;
@@ -189,12 +188,7 @@ public final class SQLQuery extends Query
         if (ec.getApiAdapter().getName().equalsIgnoreCase("JDO"))
         {
             // Check for strict SQL where the API restricts the usage
-            boolean allowAllSyntax = ec.getNucleusContext().getConfiguration().getBooleanProperty(PropertyNames.PROPERTY_QUERY_SQL_ALLOWALL);
-            if (ec.getProperty(PropertyNames.PROPERTY_QUERY_SQL_ALLOWALL) != null)
-            {
-                allowAllSyntax = ec.getBooleanProperty(PropertyNames.PROPERTY_QUERY_SQL_ALLOWALL);
-            }
-            if (!allowAllSyntax)
+            if (!getBooleanExtensionProperty(EXTENSION_SQL_ALLOW_ALL, false))
             {
                 // JDO spec [14.7] : SQL queries must start with SELECT
                 if (!firstToken.equals("SELECT"))
