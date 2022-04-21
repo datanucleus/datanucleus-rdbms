@@ -51,10 +51,10 @@ public class StringIndexOf3Method implements SQLMethod
         // {stringExpr}.indexOf(strExpr1 [,numExpr2])
         SQLExpression one = ExpressionUtils.getLiteralForOne(stmt);
 
-        ArrayList funcArgs = new ArrayList();
+        List<SQLExpression> funcArgs = new ArrayList<>();
         funcArgs.add(expr);
 
-        List funcArgs2 = new ArrayList();
+        List<SQLExpression> funcArgs2 = new ArrayList<>();
         SQLExpression substrExpr = args.get(0);
         if (!(substrExpr instanceof StringExpression) && !(substrExpr instanceof CharacterExpression) && !(substrExpr instanceof ParameterLiteral))
         {
@@ -63,7 +63,7 @@ public class StringIndexOf3Method implements SQLMethod
         }
         funcArgs2.add(substrExpr);
 
-        List types = new ArrayList();
+        List<String> types = new ArrayList<>();
         types.add("VARCHAR(4000)"); // max 4000 according DB2 docs
         funcArgs.add(new StringExpression(stmt, stmt.getSQLExpressionFactory().getMappingForType(String.class, true), "CAST", funcArgs2, types));
 
@@ -74,10 +74,10 @@ public class StringIndexOf3Method implements SQLMethod
             {
                 throw new NucleusException(Localiser.msg("060003", "indexOf", "StringExpression", 1, "NumericExpression"));
             }
-            types = new ArrayList();
+            types = new ArrayList<>();
             types.add("BIGINT");
 
-            List funcArgs3 = new ArrayList();
+            List<SQLExpression> funcArgs3 = new ArrayList<>();
             funcArgs3.add(new NumericExpression(fromExpr, Expression.OP_ADD, one));
 
             // Add 1 to the passed in value so that it is of origin 1 to be compatible with LOCATE

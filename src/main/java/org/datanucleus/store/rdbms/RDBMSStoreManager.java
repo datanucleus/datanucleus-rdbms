@@ -222,7 +222,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
      * Map of DatastoreClass keyed by StateManager, for objects currently being inserted.
      * Defines to what level an object is inserted in the datastore.
      */
-    protected Map<DNStateManager, DatastoreClass> insertedDatastoreClassByStateManager = new ConcurrentHashMap();
+    protected Map<DNStateManager, DatastoreClass> insertedDatastoreClassByStateManager = new ConcurrentHashMap<>();
 
     /** 
      * Lock object aimed at providing a lock on the schema definition managed here, preventing
@@ -411,7 +411,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
         try
         {
             // Create the control properties for identifier generation
-            Map props = new HashMap();
+            Map<Object, Object> props = new HashMap<>();
             if (catalogName != null)
             {
                 props.put(IdentifierFactory.PROPERTY_DEFAULT_CATALOG, catalogName);
@@ -2344,7 +2344,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
             return Collections.EMPTY_LIST;
         }
 
-        List<StoreSchemaData> cols = new ArrayList(tableInfo.getNumberOfChildren());
+        List<StoreSchemaData> cols = new ArrayList<>(tableInfo.getNumberOfChildren());
         cols.addAll(tableInfo.getChildren());
         return cols;
     }

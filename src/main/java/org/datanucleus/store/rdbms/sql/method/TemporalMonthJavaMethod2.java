@@ -49,10 +49,10 @@ public class TemporalMonthJavaMethod2 extends TemporalBaseMethod
         SQLExpressionFactory exprFactory = stmt.getSQLExpressionFactory();
         SQLExpression mm = exprFactory.newLiteral(stmt, mapping2, "MM");
 
-        ArrayList funcArgs = new ArrayList();
+        List<SQLExpression> funcArgs = new ArrayList<>();
         funcArgs.add(invokedExpr);
         funcArgs.add(mm);
-        ArrayList funcArgs2 = new ArrayList();
+        List<SQLExpression> funcArgs2 = new ArrayList<>();
         funcArgs2.add(new StringExpression(stmt, stmt.getSQLExpressionFactory().getMappingForType(int.class, true), "TO_CHAR", funcArgs));
 
         // Delete one from the SQL "month" (origin=1) to be compatible with Java month (origin=0)

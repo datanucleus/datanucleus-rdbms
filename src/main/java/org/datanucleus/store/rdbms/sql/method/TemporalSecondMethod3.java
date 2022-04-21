@@ -47,11 +47,11 @@ public class TemporalSecondMethod3 extends TemporalBaseMethod
         SQLExpressionFactory exprFactory = stmt.getSQLExpressionFactory();
         SQLExpression day = exprFactory.newLiteral(stmt, mapping, "second");
 
-        ArrayList funcArgs = new ArrayList();
+        List<SQLExpression> funcArgs = new ArrayList<>();
         funcArgs.add(day);
         funcArgs.add(invokedExpr);
         NumericExpression secondExpr = new NumericExpression(stmt, stmt.getSQLExpressionFactory().getMappingForType(int.class, true), "date_part", funcArgs);
-        List castArgs = new ArrayList();
+        List<SQLExpression> castArgs = new ArrayList<>();
         castArgs.add(secondExpr);
         return new NumericExpression(stmt, stmt.getSQLExpressionFactory().getMappingForType(Integer.class, true), "CAST", castArgs, asList("INTEGER"));
     }

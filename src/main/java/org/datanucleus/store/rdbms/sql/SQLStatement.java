@@ -248,7 +248,7 @@ public abstract class SQLStatement
 
         if (extensions == null)
         {
-            extensions = new HashMap();
+            extensions = new HashMap<>();
         }
         extensions.put(key, value);
     }
@@ -477,7 +477,7 @@ public abstract class SQLStatement
         // Create the SQLTable to join to.
         if (tables == null)
         {
-            tables = new HashMap();
+            tables = new HashMap<>();
         }
         if (tableGrpName == null)
         {
@@ -522,7 +522,7 @@ public abstract class SQLStatement
         // Create the SQLTable to join to.
         if (tables == null)
         {
-            tables = new HashMap();
+            tables = new HashMap<>();
         }
         if (tableGrpName == null)
         {

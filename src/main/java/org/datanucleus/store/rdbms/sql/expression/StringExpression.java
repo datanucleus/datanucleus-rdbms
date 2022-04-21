@@ -70,7 +70,7 @@ public class StringExpression extends SQLExpression
      * @param functionName Name of the function
      * @param args ScalarExpression list
      */
-    public StringExpression(SQLStatement stmt, JavaTypeMapping mapping, String functionName, List args)
+    public StringExpression(SQLStatement stmt, JavaTypeMapping mapping, String functionName, List<SQLExpression> args)
     {
         super(stmt, mapping, functionName, args, null);
     }
@@ -83,7 +83,7 @@ public class StringExpression extends SQLExpression
      * @param args ScalarExpression list
      * @param types String or ScalarExpression list
      */
-    public StringExpression(SQLStatement stmt, JavaTypeMapping mapping, String functionName, List args, List types)
+    public StringExpression(SQLStatement stmt, JavaTypeMapping mapping, String functionName, List<SQLExpression> args, List types)
     {
         super(stmt, mapping, functionName, args, types);
     }    

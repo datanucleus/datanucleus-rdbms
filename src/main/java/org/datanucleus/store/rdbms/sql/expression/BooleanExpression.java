@@ -63,7 +63,7 @@ public class BooleanExpression extends SQLExpression
      * @param functionName Name of function
      * @param args SQLExpression list
      */
-    public BooleanExpression(SQLStatement stmt, JavaTypeMapping mapping, String functionName, List args)
+    public BooleanExpression(SQLStatement stmt, JavaTypeMapping mapping, String functionName, List<SQLExpression> args)
     {
         super(stmt, mapping, functionName, args, null);
         hasClosure = true;

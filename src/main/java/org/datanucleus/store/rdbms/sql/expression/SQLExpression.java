@@ -629,7 +629,7 @@ public abstract class SQLExpression
 
     public static class ColumnExpressionList
     {
-        private List<ColumnExpression> exprs = new ArrayList();
+        private List<ColumnExpression> exprs = new ArrayList<>();
 
         public void addExpression(ColumnExpression expression)
         {

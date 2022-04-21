@@ -219,7 +219,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
 
     Imports importsDefinition = null;
 
-    Map<String, Object> compileProperties = new HashMap();
+    Map<String, Object> compileProperties = new HashMap<>();
 
     /** State variable for the component being compiled. */
     CompilationComponent compileComponent;
@@ -236,7 +236,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
     /** Map of the join primary expression string keyed by the join alias (explicit joins only). */
     Map<String, String> explicitJoinPrimaryByAlias = null;
 
-    Map<String, JavaTypeMapping> paramMappingForName = new HashMap();
+    Map<String, JavaTypeMapping> paramMappingForName = new HashMap<>();
 
     /** Options for the SQL generation process. See OPTION_xxx above. */
     Set<String> options = new HashSet<>();
@@ -4305,10 +4305,10 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
 
         // Process the arguments for invoking
         List args = expr.getArguments();
-        List sqlExprArgs = null;
+        List<SQLExpression> sqlExprArgs = null;
         if (args != null)
         {
-            sqlExprArgs = new ArrayList<SQLExpression>();
+            sqlExprArgs = new ArrayList<>();
             Iterator<Expression> iter = args.iterator();
             while (iter.hasNext())
             {
@@ -4836,7 +4836,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
             }
 
             // Use Collection.contains(element)/Array.contains(element)
-            List<SQLExpression> sqlExprArgs = new ArrayList();
+            List<SQLExpression> sqlExprArgs = new ArrayList<>();
             sqlExprArgs.add(left);
             SQLExpression sqlExpr = right.invoke("contains", sqlExprArgs);
             stack.push(sqlExpr);
@@ -4886,7 +4886,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
             }
 
             // Use !Collection.contains(element)
-            List<SQLExpression> sqlExprArgs = new ArrayList();
+            List<SQLExpression> sqlExprArgs = new ArrayList<>();
             sqlExprArgs.add(left);
             SQLExpression sqlExpr = right.invoke("contains", sqlExprArgs);
             sqlExpr.not();
@@ -5000,7 +5000,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
     {
         SQLExpression right = stack.pop();
         SQLExpression left = stack.pop();
-        List args = new ArrayList();
+        List<SQLExpression> args = new ArrayList<>();
         args.add(right);
 
         SQLExpression likeExpr = exprFactory.invokeMethod(stmt, String.class.getName(), "like", left, args);

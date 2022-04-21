@@ -67,7 +67,7 @@ public class SelectStatement extends SQLStatement
     protected boolean distinct = false;
 
     /** List of selected items, including any alias to use. */
-    protected List<SelectedItem> selectedItems = new ArrayList();
+    protected List<SelectedItem> selectedItems = new ArrayList<>();
 
     /** whether there is an aggregate expression present in the select **/
     protected boolean aggregated = false;
@@ -478,7 +478,7 @@ public class SelectStatement extends SQLStatement
 
         if (groupingExpressions == null)
         {
-            groupingExpressions = new ArrayList();
+            groupingExpressions = new ArrayList<>();
         }
         groupingExpressions.add(expr);
         aggregated = true;
@@ -658,7 +658,7 @@ public class SelectStatement extends SQLStatement
         // GROUP BY ...
         if (groupingExpressions != null)
         {
-            List<SQLText> groupBy = new ArrayList();
+            List<SQLText> groupBy = new ArrayList<>();
             Iterator<SQLExpression> groupIter = groupingExpressions.iterator();
             while (groupIter.hasNext())
             {
@@ -913,9 +913,9 @@ public class SelectStatement extends SQLStatement
      * @param joinsToAdd List of joins
      * @return The ordered list of joins
      */
-    private List<SQLJoin> reorderJoins(List joinsToAdd)
+    private List<SQLJoin> reorderJoins(List<SQLJoin> joinsToAdd)
     {
-        List orderedJoins = new ArrayList<>();
+        List<SQLJoin> orderedJoins = new ArrayList<>();
         if (joinsToAdd == null)
         {
             requiresJoinReorder = false;
@@ -1371,7 +1371,7 @@ public class SelectStatement extends SQLStatement
         // Create the SQLTable to join to.
         if (tables == null)
         {
-            tables = new HashMap();
+            tables = new HashMap<>();
         }
         if (tableGrpName == null)
         {
@@ -1416,7 +1416,7 @@ public class SelectStatement extends SQLStatement
         // Create the SQLTable to join to.
         if (tables == null)
         {
-            tables = new HashMap();
+            tables = new HashMap<>();
         }
         if (tableGrpName == null)
         {

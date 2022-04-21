@@ -47,14 +47,14 @@ public class SQLText
 
     private boolean encloseInParentheses = false;
     private String postpend;
-    private List appended;
+    private List<Object> appended;
 
     /**
      * Constructor
      */
     public SQLText()
     {
-        appended = new ArrayList();
+        appended = new ArrayList<>();
     }
 
     /**
@@ -172,7 +172,7 @@ public class SQLText
         {
             if (parameters == null)
             {
-                parameters = new ArrayList();
+                parameters = new ArrayList<>();
             }
             parameters.addAll(st.parameters);
         }
@@ -356,7 +356,7 @@ public class SQLText
                 {
                     if (parameters == null)
                     {
-                        parameters = new ArrayList();
+                        parameters = new ArrayList<>();
                     }
                     parameters.addAll(st.parameters);
                 }
@@ -368,7 +368,7 @@ public class SQLText
 
                 if (parameters == null)
                 {
-                    parameters = new ArrayList();
+                    parameters = new ArrayList<>();
                 }
                 parameters.add(param);
             }
@@ -381,7 +381,7 @@ public class SQLText
                 {
                     if (parameters == null)
                     {
-                        parameters = new ArrayList();
+                        parameters = new ArrayList<>();
                     }
                     parameters.addAll(st.parameters);
                 }
@@ -394,7 +394,7 @@ public class SQLText
                 {
                     if (parameters == null)
                     {
-                        parameters = new ArrayList();
+                        parameters = new ArrayList<>();
                     }
                     parameters.addAll(st.parameters);
                 }

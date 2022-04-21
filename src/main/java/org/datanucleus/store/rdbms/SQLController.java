@@ -138,7 +138,7 @@ public class SQLController
     }
 
     /** Map of the ConnectionStatementState keyed by the Connection */
-    Map<ManagedConnection, ConnectionStatementState> connectionStatements = new ConcurrentHashMap();
+    Map<ManagedConnection, ConnectionStatementState> connectionStatements = new ConcurrentHashMap<>();
 
     /**
      * Constructor.

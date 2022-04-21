@@ -83,7 +83,7 @@ public class NumericExpression extends SQLExpression
      * @param functionName Name of function
      * @param args SQLExpression list
      */
-    public NumericExpression(SQLStatement stmt, JavaTypeMapping mapping, String functionName, List args)
+    public NumericExpression(SQLStatement stmt, JavaTypeMapping mapping, String functionName, List<SQLExpression> args)
     {
         super(stmt, mapping, functionName, args, null);
     }
@@ -96,7 +96,7 @@ public class NumericExpression extends SQLExpression
      * @param args SQLExpression list
      * @param types Optional String/SQLExpression list of types for the args
      */
-    public NumericExpression(SQLStatement stmt, JavaTypeMapping mapping, String functionName, List args, List types)
+    public NumericExpression(SQLStatement stmt, JavaTypeMapping mapping, String functionName, List<SQLExpression> args, List types)
     {
         super(stmt, mapping, functionName, args, types);
     }
