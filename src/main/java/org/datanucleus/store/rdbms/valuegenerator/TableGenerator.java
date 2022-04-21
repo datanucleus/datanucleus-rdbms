@@ -233,8 +233,10 @@ public final class TableGenerator extends AbstractConnectedGenerator<Long>
         if (repositoryExists)
         {
             return true;
-        } else if (storeMgr.getBooleanProperty(RDBMSPropertyNames.PROPERTY_RDBMS_OMIT_DATABASEMETADATA_GETCOLUMNS) ||
-            storeMgr.getBooleanProperty(RDBMSPropertyNames.PROPERTY_RDBMS_OMIT_VALUE_GENERATION_GETCOLUMNS)) {
+        }
+        else if (storeMgr.getBooleanProperty(RDBMSPropertyNames.PROPERTY_RDBMS_OMIT_DATABASEMETADATA_GETCOLUMNS) ||
+            storeMgr.getBooleanProperty(RDBMSPropertyNames.PROPERTY_RDBMS_OMIT_VALUE_GENERATION_GETCOLUMNS)) 
+        {
             // Assumed to exist if ignoring DMD.getColumns()
             NucleusLogger.VALUEGENERATION.debug("Omitting information schema call during the creation of value generation");
             repositoryExists = true;

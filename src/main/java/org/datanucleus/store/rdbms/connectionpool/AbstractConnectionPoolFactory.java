@@ -86,9 +86,9 @@ public abstract class AbstractConnectionPoolFactory implements ConnectionPoolFac
         }
         dbProps.setProperty("password", dbPassword);
 
-        // Optional driver properties
+        // Optional driver properties (comma-separated)
         Configuration conf = storeMgr.getNucleusContext().getConfiguration();
-        String drvPropsString = (String) conf.getProperty(RDBMSPropertyNames.PROPERTY_CONNECTION_POOL_DRIVER_PROPS);
+        String drvPropsString = conf.getStringProperty(RDBMSPropertyNames.PROPERTY_CONNECTION_POOL_DRIVER_PROPS);
         if (drvPropsString != null) 
         {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
