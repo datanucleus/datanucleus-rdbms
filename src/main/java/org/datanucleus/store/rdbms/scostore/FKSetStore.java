@@ -1146,7 +1146,7 @@ public class FKSetStore<E> extends AbstractSetStore<E>
                         {
                             throw new NucleusException("Cannot have FK set with non-persistent objects");
                         }
-                        rof = new PersistentClassROF(ec, rs, false, ec.getFetchPlan(), iteratorMappingClass, elementCmd, clr.classForName(elementType));
+                        rof = new PersistentClassROF(ec, rs, ec.getFetchPlan(), iteratorMappingClass, elementCmd, clr.classForName(elementType));
 
                         return new CollectionStoreIterator(ownerSM, rs, rof, this);
                     }

@@ -86,15 +86,14 @@ public final class PersistentClassROF<T> extends AbstractROF<T>
      * Constructor.
      * @param ec ExecutionContext
      * @param rs ResultSet being processed
-     * @param ignoreCache Whether to ignore the cache
      * @param fp FetchPlan
      * @param resultMapping Mapping information for the result set and how it maps to the class
      * @param acmd MetaData for the (root) candidate class
      * @param persistentClass Class that this factory will create instances of (or subclasses)
      */
-    public PersistentClassROF(ExecutionContext ec, ResultSet rs, boolean ignoreCache, FetchPlan fp, StatementClassMapping resultMapping, AbstractClassMetaData acmd, Class<T> persistentClass)
+    public PersistentClassROF(ExecutionContext ec, ResultSet rs, FetchPlan fp, StatementClassMapping resultMapping, AbstractClassMetaData acmd, Class<T> persistentClass)
     {
-        super(ec, rs, ignoreCache, fp);
+        super(ec, rs, fp);
 
         this.resultMapping = resultMapping;
         this.rootCmd = acmd;
@@ -594,8 +593,18 @@ public final class PersistentClassROF<T> extends AbstractROF<T>
             {
                 resultSetGetter.setStateManager(sm);
 
-                // TODO Use membersToStore here?
-                sm.replaceNonLoadedFields(membersToLoad, resultSetGetter);
+                if (updateAllFields)
+                {
+                    // User requested to update all fields regardless of loaded state
+                    // TODO Use membersToStore here?
+                    sm.replaceFields(membersToLoad, resultSetGetter);
+                }
+                else
+                {
+                    // Default to just update unloaded fields
+                    // TODO Use membersToStore here?
+                    sm.replaceNonLoadedFields(membersToLoad, resultSetGetter);
+                }
             }
 
             public FetchPlan getFetchPlanForLoading()

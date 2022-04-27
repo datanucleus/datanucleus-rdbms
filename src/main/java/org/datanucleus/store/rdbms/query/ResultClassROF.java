@@ -90,14 +90,13 @@ public class ResultClassROF extends AbstractROF
      * Constructor for a resultClass object factory where we have a result clause specified.
      * @param ec ExecutionContext
      * @param rs ResultSet being processed
-     * @param ignoreCache Whether we should ignore the cache(s) when instantiating persistable objects
      * @param fp FetchPlan
      * @param cls The result class to use (if any)
      * @param resultDefinition The mapping information for the result expressions
      */
-    public ResultClassROF(ExecutionContext ec, ResultSet rs, boolean ignoreCache, FetchPlan fp, Class cls, StatementResultMapping resultDefinition)
+    public ResultClassROF(ExecutionContext ec, ResultSet rs, FetchPlan fp, Class cls, StatementResultMapping resultDefinition)
     {
-        super(ec, rs, ignoreCache, fp);
+        super(ec, rs, fp);
 
         // Set the result class that we convert each row into
         if (cls != null && cls.getName().equals("java.util.Map"))
@@ -161,7 +160,7 @@ public class ResultClassROF extends AbstractROF
      */
     public ResultClassROF(ExecutionContext ec, ResultSet rs, Class cls, StatementClassMapping classDefinition)
     {
-        super(ec, rs, false, null);
+        super(ec, rs, null);
 
         // JDO Spec 14.6.12 If user specifies java.util.Map, then impl chooses its own implementation Map class
         this.resultClass = (cls != null && cls.getName().equals("java.util.Map")) ? HashMap.class : cls;
@@ -190,7 +189,7 @@ public class ResultClassROF extends AbstractROF
      */
     public ResultClassROF(ExecutionContext ec, ResultSet rs, Class cls, String[] resultFieldNames)
     {
-        super(ec, rs, false, null);
+        super(ec, rs, null);
 
         // JDO Spec 14.6.12 If user specifies java.util.Map, then impl chooses its own implementation Map class
         this.resultClass = (cls != null && cls.getName().equals("java.util.Map")) ? HashMap.class : cls;
@@ -243,7 +242,8 @@ public class ResultClassROF extends AbstractROF
                     StatementClassMapping classMap = (StatementClassMapping)stmtMap;
                     Class cls = ec.getClassLoaderResolver().classForName(classMap.getClassName());
                     AbstractClassMetaData acmd = ec.getMetaDataManager().getMetaDataForClass(cls, ec.getClassLoaderResolver());
-                    PersistentClassROF rof = new PersistentClassROF(ec, rs, ignoreCache, fp, classMap, acmd, cls);
+                    PersistentClassROF rof = new PersistentClassROF(ec, rs, fp, classMap, acmd, cls);
+                    rof.setIgnoreCache(ignoreCache);
                     resultFieldValues[i] = rof.getObject();
 
                     if (resultDefinition.getNumberOfResultExpressions() == 1)

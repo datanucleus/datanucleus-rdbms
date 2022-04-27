@@ -42,4 +42,16 @@ public interface ResultObjectFactory<T>
      * @return The object(s) for this row of the ResultSet.
      */
     T getObject();
+
+    /**
+     * Specify whether when processing the results we should ignore the L1 cache.
+     * @param ignore Whether to ignore the L1 cache
+     */
+    void setIgnoreCache(boolean ignore);
+
+    /**
+     * Specify whether when processing the results we should just update fields that are not currently loaded.
+     * @param update Whether to update all fields rather than just the non-loaded fields
+     */
+    void setUpdateAllFields(boolean update);
 }

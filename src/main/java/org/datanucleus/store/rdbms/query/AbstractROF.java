@@ -33,29 +33,36 @@ public abstract class AbstractROF<T> implements ResultObjectFactory<T>
 
     protected boolean ignoreCache = false;
 
+    protected boolean updateAllFields = false;
+
     protected FetchPlan fp;
 
     /**
      * Constructor.
      * @param ec ExecutionContext
      * @param rs The JDBC ResultSet
-     * @param ignoreCache Whether to ignore the cache(s) when instantiating any persistable objects in the results.
      * @param fp FetchPlan
      */
-    public AbstractROF(ExecutionContext ec, ResultSet rs, boolean ignoreCache, FetchPlan fp)
+    public AbstractROF(ExecutionContext ec, ResultSet rs, FetchPlan fp)
     {
         this.ec = ec;
         this.rs = rs;
-        this.ignoreCache = ignoreCache;
         this.fp = fp;
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.rdbms.query.ResultObjectFactory#getResultSet()
-     */
     @Override
     public ResultSet getResultSet()
     {
         return rs;
+    }
+
+    public void setIgnoreCache(boolean ignore)
+    {
+        this.ignoreCache = ignore;
+    }
+
+    public void setUpdateAllFields(boolean update)
+    {
+        this.updateAllFields = update;
     }
 }

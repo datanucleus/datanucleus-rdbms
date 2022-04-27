@@ -674,7 +674,8 @@ public final class SQLQuery extends Query
                             if (resultMetaData != null)
                             {
                                 // Each row of the ResultSet is defined by MetaData
-                                rof = new ResultMetaDataROF(ec, rs, ignoreCache, getFetchPlan(), resultMetaData);
+                                rof = new ResultMetaDataROF(ec, rs, getFetchPlan(), resultMetaData);
+                                rof.setIgnoreCache(ignoreCache);
                             }
                             else if (resultClass != null || candidateClass == null)
                             {
@@ -1244,7 +1245,9 @@ public final class SQLQuery extends Query
             mappingDefinition.addMappingForMember(SurrogateColumnType.VERSION.getFieldNumber(), versionMappingIdx);
         }
 
-        return new PersistentClassROF(ec, rs, ignoreCache, getFetchPlan(), mappingDefinition, candidateCmd, getCandidateClass());
+        ResultObjectFactory rof = new PersistentClassROF(ec, rs, getFetchPlan(), mappingDefinition, candidateCmd, getCandidateClass());
+        rof.setIgnoreCache(ignoreCache);
+        return rof;
     }
 
     /**

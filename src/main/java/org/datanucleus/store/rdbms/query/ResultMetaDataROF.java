@@ -101,13 +101,12 @@ public class ResultMetaDataROF extends AbstractROF
      * Constructor.
      * @param ec ExecutionContext
      * @param rs ResultSet
-     * @param ignoreCache Whether we should ignore the cache(s) when instantiating persistable objects
      * @param fp FetchPlan
      * @param qrmd MetaData defining the results from the query.
      */
-    public ResultMetaDataROF(ExecutionContext ec, ResultSet rs, boolean ignoreCache, FetchPlan fp, QueryResultMetaData qrmd)
+    public ResultMetaDataROF(ExecutionContext ec, ResultSet rs, FetchPlan fp, QueryResultMetaData qrmd)
     {
-        super(ec, rs, ignoreCache, fp);
+        super(ec, rs, fp);
 
         this.queryResultMetaData = qrmd;
 

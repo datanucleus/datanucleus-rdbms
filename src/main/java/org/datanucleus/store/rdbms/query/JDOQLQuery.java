@@ -665,7 +665,8 @@ public class JDOQLQuery extends AbstractJDOQLQuery
                         if (inMemory)
                         {
                             // IN-MEMORY EVALUATION
-                            ResultObjectFactory rof = new PersistentClassROF(ec, rs, ignoreCache, getFetchPlan(), datastoreCompilation.getResultDefinitionForClass(), acmd, candidateClass);
+                            ResultObjectFactory rof = new PersistentClassROF(ec, rs, getFetchPlan(), datastoreCompilation.getResultDefinitionForClass(), acmd, candidateClass);
+                            rof.setIgnoreCache(ignoreCache);
 
                             // Just instantiate the candidates for later in-memory processing
                             // TODO Use a queryResult rather than an ArrayList so we load when required
@@ -685,7 +686,8 @@ public class JDOQLQuery extends AbstractJDOQLQuery
                             if (result != null)
                             {
                                 // Each result row is of a result type
-                                rof = new ResultClassROF(ec, rs, ignoreCache, getFetchPlan(), resultClass, datastoreCompilation.getResultDefinition());
+                                rof = new ResultClassROF(ec, rs, getFetchPlan(), resultClass, datastoreCompilation.getResultDefinition());
+                                rof.setIgnoreCache(ignoreCache);
                             }
                             else if (resultClass != null && resultClass != candidateClass)
                             {
@@ -694,7 +696,12 @@ public class JDOQLQuery extends AbstractJDOQLQuery
                             else
                             {
                                 // Each result row is a candidate object
-                                rof = new PersistentClassROF(ec, rs, ignoreCache, getFetchPlan(), datastoreCompilation.getResultDefinitionForClass(), acmd, candidateClass);
+                                rof = new PersistentClassROF(ec, rs, getFetchPlan(), datastoreCompilation.getResultDefinitionForClass(), acmd, candidateClass);
+                                if (getBooleanExtensionProperty(EXTENSION_UPDATE_ALL_CANDIDATE_FIELDS, false))
+                                {
+                                    rof.setUpdateAllFields(true);
+                                }
+                                rof.setIgnoreCache(ignoreCache);
                             }
 
                             // Create the required type of QueryResult

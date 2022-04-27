@@ -1158,7 +1158,7 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
                         else
                         {
                             // Value = PC
-                            value = new PersistentClassROF(ec, rs, false, ec.getFetchPlan(), getMappingDef, valueCmd, clr.classForName(valueType)).getObject();
+                            value = new PersistentClassROF(ec, rs, ec.getFetchPlan(), getMappingDef, valueCmd, clr.classForName(valueType)).getObject();
                         }
 
                         JDBCUtils.logWarnings(rs);
