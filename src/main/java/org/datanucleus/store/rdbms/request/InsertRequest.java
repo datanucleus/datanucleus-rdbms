@@ -278,18 +278,14 @@ public class InsertRequest extends Request
                 {
                     JavaTypeMapping mapping = table.getSurrogateMapping(SurrogateColumnType.DATASTORE_ID, true);
                     ColumnMapping[] columnMappings = mapping.getColumnMappings();
-                    pkColumnNames = Stream.of(columnMappings)
-                        .map(cm -> cm.getColumn().getIdentifier().getName())
-                        .collect(toList());
+                    pkColumnNames = Stream.of(columnMappings).map(cm -> cm.getColumn().getIdentifier().getName()).collect(toList());
                 }
-                else if (table.getIdentityType() == IdentityType.APPLICATION && 
-                        storeMgr.getDatastoreAdapter().supportsOption(DatastoreAdapter.GET_GENERATED_KEYS_COLUMNS_STATEMENT))
+                else if (table.getIdentityType() == IdentityType.APPLICATION)
                 {
-                    // This datastore requires column names specifying to get the generatedKeys
                     List<Column> pkColumns = ((AbstractClassTable)table).getPrimaryKey().getColumns();
                     if (!pkColumns.isEmpty())
                     {
-                        pkColumnNames = pkColumns.stream().map(cm->cm.getName()).collect(toList());
+                        pkColumnNames = pkColumns.stream().map(cm -> cm.getIdentifier().getName()).collect(toList());
                     }
                 }
 
