@@ -267,7 +267,6 @@ public class InsertRequest extends Request
             ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
             try
             {
-                List<Column> pkColumns = ((AbstractClassTable)table).getPrimaryKey().getColumns();
                 List<String> pkColumnNames = new ArrayList<>();
                 if (table.getIdentityType() == IdentityType.DATASTORE)
                 {
@@ -277,10 +276,14 @@ public class InsertRequest extends Request
                         .map(cm -> cm.getColumn().getIdentifier().getName())
                         .collect(toList());
                 }
-                else if (table.getIdentityType() == IdentityType.APPLICATION && !pkColumns.isEmpty() &&
+                else if (table.getIdentityType() == IdentityType.APPLICATION &&
                     storeMgr.getDatastoreAdapter().supportsOption(DatastoreAdapter.GET_GENERATED_KEYS_COLUMNS_STATEMENT))
                 {
-                    pkColumnNames = pkColumns.stream().map(cm->cm.getName()).collect(toList());
+                    List<Column> pkColumns = ((AbstractClassTable)table).getPrimaryKey().getColumns();
+                    if (!pkColumns.isEmpty())
+                    {
+                        pkColumnNames = pkColumns.stream().map(cm->cm.getName()).collect(toList());
+                    }
                 }
 
                 PreparedStatement ps = sqlControl.getStatementForUpdate(mconn, insertStmt, batch,
@@ -308,9 +311,12 @@ public class InsertRequest extends Request
                             table.getSurrogateMapping(SurrogateColumnType.DATASTORE_ID, false).setObject(ec, ps, paramNumber, op.getInternalObjectId());
                         }
                     }
-                    else if (table.getIdentityType() == IdentityType.APPLICATION && ! pkColumns.isEmpty())
+                    else if (table.getIdentityType() == IdentityType.APPLICATION)
                     {
-                        op.provideFields(pkFieldNumbers, new ParameterSetter(op, ps, mappingDefinition));
+                        if (pkFieldNumbers != null && pkFieldNumbers.length > 0)
+                        {
+                            op.provideFields(pkFieldNumbers, new ParameterSetter(op, ps, mappingDefinition));
+                        }
                     }
 
                     // Provide all non-key fields needed for the insert.
