@@ -267,8 +267,8 @@ public class InsertRequest extends Request
             ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
             try
             {
-                List<String> pkColumnNames = new ArrayList<>();
                 List<Column> pkColumns = ((AbstractClassTable)table).getPrimaryKey().getColumns();
+                List<String> pkColumnNames = new ArrayList<>();
                 if (table.getIdentityType() == IdentityType.DATASTORE)
                 {
                     JavaTypeMapping mapping = table.getSurrogateMapping(SurrogateColumnType.DATASTORE_ID, true);
@@ -277,7 +277,8 @@ public class InsertRequest extends Request
                         .map(cm -> cm.getColumn().getIdentifier().getName())
                         .collect(toList());
                 }
-                else if (table.getIdentityType() == IdentityType.APPLICATION && ! pkColumns.isEmpty())
+                else if (table.getIdentityType() == IdentityType.APPLICATION && !pkColumns.isEmpty() &&
+                    storeMgr.getDatastoreAdapter().supportsOption(DatastoreAdapter.GET_GENERATED_KEYS_COLUMNS_STATEMENT))
                 {
                     pkColumnNames = pkColumns.stream().map(cm->cm.getName()).collect(toList());
                 }
