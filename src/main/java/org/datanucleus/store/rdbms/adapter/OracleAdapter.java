@@ -159,6 +159,7 @@ public class OracleAdapter extends BaseDatastoreAdapter
         supportedOptions.add(ORDERBY_NULLS_DIRECTIVES);
         supportedOptions.add(GROUP_BY_REQUIRES_ALL_SELECT_PRIMARIES);
         supportedOptions.add(PRIMARYKEY_IN_CREATE_STATEMENTS);
+        supportedOptions.add(GET_GENERATED_KEYS_COLUMNS_STATEMENT);
 
         supportedOptions.remove(BOOLEAN_COMPARISON);
         if (datastoreMajorVersion < 9)

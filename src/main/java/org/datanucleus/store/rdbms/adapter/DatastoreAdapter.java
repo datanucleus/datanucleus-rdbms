@@ -260,6 +260,11 @@ public interface DatastoreAdapter
     public static final String GET_GENERATED_KEYS_STATEMENT = "GetGeneratedKeysStatement";
 
     /**
+     * Whether the datastore requires "Statement.getGeneratedKeys.columnNames" to be specified.
+     */
+    public static final String GET_GENERATED_KEYS_COLUMNS_STATEMENT = "GetGeneratedKeysColumnsStatement";
+
+    /**
      * Whether we support NULLs in candidate keys.
      */
     public static final String NULLS_IN_CANDIDATE_KEYS = "NullsInCandidateKeys";
