@@ -701,24 +701,30 @@ public class SQLStatementHelper
     public static void selectMemberOfSourceInStatement(SelectStatement stmt, StatementClassMapping mappingDefinition, FetchPlan fetchPlan,
             SQLTable sourceSqlTbl, AbstractMemberMetaData mmd, ClassLoaderResolver clr, int maxFetchPlanLimit, JoinType inputJoinType)
     {
-        boolean selectSubobjects = false;
-        if (maxFetchPlanLimit > 0)
-        {
-            selectSubobjects = true;
-        }
-        if (mmd.fetchFKOnly())
-        {
-            // Equivalent to recursion-depth=0
-            selectSubobjects = false;
-        }
+        // Determine whether to select sub-objects
+        boolean selectSubobjects = (maxFetchPlanLimit > 0);
         if (fetchPlan != null)
         {
             FetchPlanForClass fpClass = fetchPlan.getFetchPlanForClass(mmd.getAbstractClassMetaData());
-            if (RelationType.isRelationSingleValued(mmd.getRelationType(clr)) && fpClass.getRecursionDepthForMember(mmd.getAbsoluteFieldNumber()) == 0)
+            int recDepth = fpClass.getRecursionDepthForMember(mmd.getAbsoluteFieldNumber());
+            if (RelationType.isRelationSingleValued(mmd.getRelationType(clr)))
             {
-                // User has marked this member as recursion-depth=0 meaning pull in just the FK and dont join to the sub-object
-                selectSubobjects = false;
+                if (recDepth == 0)
+                {
+                    // User has marked this member as recursion-depth=0 meaning pull in just the FK and dont join to the sub-object
+                    selectSubobjects = false;
+                }
+                else if (recDepth == 1 && mmd.fetchFKOnly())
+                {
+                    // fetch-fk-only but recursionDepth still defaulted so use fetch-fk-only to limit sub-objects
+                    selectSubobjects = false;
+                }
             }
+        }
+        else if (mmd.fetchFKOnly())
+        {
+            // Equivalent to recursion-depth=0
+            selectSubobjects = false;
         }
 
         // Set table-group name for any related object we join to (naming based on member name)
@@ -1009,160 +1015,169 @@ public class SQLStatementHelper
             SQLTable sourceSqlTbl, AbstractMemberMetaData mmd, ClassLoaderResolver clr, int maxFetchPlanLimit, JavaTypeMapping m, String tableGroupName,
             StatementMappingIndex stmtMapping, SQLTable sqlTbl, JoinType inputJoinType)
     {
-        boolean selectFK = true;
-        if (mmd.fetchFKOnly())
+        if (fetchPlan != null)
+        {
+            FetchPlanForClass fpClass = fetchPlan.getFetchPlanForClass(mmd.getAbstractClassMetaData());
+            int recDepth = fpClass.getRecursionDepthForMember(mmd.getAbsoluteFieldNumber());
+            if (mmd.fetchFKOnly() && recDepth == 1)
+            {
+                // Only want FK fetching, and not the fields of the object (so avoid the join)
+                return true;
+            }
+        }
+        else if (mmd.fetchFKOnly())
         {
             // Only want FK fetching, and not the fields of the object (so avoid the join)
+            return true;
         }
-        else
-        {
-            RDBMSStoreManager storeMgr = stmt.getRDBMSManager();
 
-            Class type = mmd.isSingleCollection() ? clr.classForName(mmd.getCollection().getElementType()) : mmd.getType();
-            if (m instanceof ReferenceMapping)
+        boolean selectFK = true;
+        RDBMSStoreManager storeMgr = stmt.getRDBMSManager();
+
+        Class type = mmd.isSingleCollection() ? clr.classForName(mmd.getCollection().getElementType()) : mmd.getType();
+        if (m instanceof ReferenceMapping)
+        {
+            ReferenceMapping refMapping = (ReferenceMapping)m;
+            if (refMapping.getMappingStrategy() == ReferenceMapping.PER_IMPLEMENTATION_MAPPING && refMapping.getJavaTypeMapping().length == 1)
             {
-                ReferenceMapping refMapping = (ReferenceMapping)m;
-                if (refMapping.getMappingStrategy() == ReferenceMapping.PER_IMPLEMENTATION_MAPPING && refMapping.getJavaTypeMapping().length == 1)
+                JavaTypeMapping[] subMappings = refMapping.getJavaTypeMapping();
+                if (subMappings != null && subMappings.length == 1)
                 {
-                    JavaTypeMapping[] subMappings = refMapping.getJavaTypeMapping();
-                    if (subMappings != null && subMappings.length == 1)
-                    {
-                        // Special case of reference mapping with single FK implementation
-                        type = clr.classForName(refMapping.getJavaTypeMapping()[0].getType());
-                    }
+                    // Special case of reference mapping with single FK implementation
+                    type = clr.classForName(refMapping.getJavaTypeMapping()[0].getType());
                 }
             }
+        }
 
-            // select fetch plan fields of this object
-            AbstractClassMetaData relatedCmd = storeMgr.getMetaDataManager().getMetaDataForClass(type, clr);
-            if (relatedCmd != null)
+        // select fetch plan fields of this object
+        AbstractClassMetaData relatedCmd = storeMgr.getMetaDataManager().getMetaDataForClass(type, clr);
+        if (relatedCmd != null)
+        {
+            if (relatedCmd.isEmbeddedOnly())
             {
-                if (relatedCmd.isEmbeddedOnly())
+                return true;
+            }
+            if (relatedCmd.getBaseAbstractClassMetaData().getInheritanceMetaData().getStrategy() == InheritanceStrategy.COMPLETE_TABLE)
+            {
+                // Related object uses complete-table
+                Collection<String> relSubclassNames = storeMgr.getSubClassesForClass(relatedCmd.getFullClassName(), true, clr);
+                if (relatedCmd.isMappedSuperclass() && relSubclassNames.size() > 1)
                 {
+                    // Multiple possible related types and we don't have the FK so omit
                     return true;
                 }
-                if (relatedCmd.getBaseAbstractClassMetaData().getInheritanceMetaData().getStrategy() == InheritanceStrategy.COMPLETE_TABLE)
+                else if (!relatedCmd.isMappedSuperclass() && relSubclassNames.size() > 0)
                 {
-                    // Related object uses complete-table
-                    Collection<String> relSubclassNames = storeMgr.getSubClassesForClass(relatedCmd.getFullClassName(), true, clr);
-                    if (relatedCmd.isMappedSuperclass() && relSubclassNames.size() > 1)
-                    {
-                        // Multiple possible related types and we don't have the FK so omit
-                        return true;
-                    }
-                    else if (!relatedCmd.isMappedSuperclass() && relSubclassNames.size() > 0)
-                    {
-                        // Multiple possible related types and we don't have the FK so omit
-                        return true;
-                    }
-                    // TODO Maybe do a LEFT OUTER JOIN to each possible?
+                    // Multiple possible related types and we don't have the FK so omit
+                    return true;
                 }
+                // TODO Maybe do a LEFT OUTER JOIN to each possible?
+            }
 
-                // Check if we are only fetching the PK field(s), in which case we can avoid any join
-                if (fetchPlan != null)
+            // Check if we are only fetching the PK field(s), in which case we can avoid any join
+            if (fetchPlan != null)
+            {
+                FetchPlanForClass relatedFP = fetchPlan.getFetchPlanForClass(relatedCmd);
+                int[] fpFieldNums = relatedFP.getMemberNumbers();
+                if (relatedCmd.getIdentityType() == IdentityType.APPLICATION)
                 {
-                    FetchPlanForClass relatedFP = fetchPlan.getFetchPlanForClass(relatedCmd);
-                    int[] fpFieldNums = relatedFP.getMemberNumbers();
-                    if (relatedCmd.getIdentityType() == IdentityType.APPLICATION)
+                    int[] pkFieldNums = relatedCmd.getPKMemberPositions();
+                    if (fpFieldNums != null && pkFieldNums != null && fpFieldNums.length == pkFieldNums.length)
                     {
-                        int[] pkFieldNums = relatedCmd.getPKMemberPositions();
-                        if (fpFieldNums != null && pkFieldNums != null && fpFieldNums.length == pkFieldNums.length)
+                        boolean equal = true;
+                        for (int i=0;i<fpFieldNums.length;i++)
                         {
-                            boolean equal = true;
-                            for (int i=0;i<fpFieldNums.length;i++)
+                            if (fpFieldNums[i] != pkFieldNums[i])
                             {
-                                if (fpFieldNums[i] != pkFieldNums[i])
-                                {
-                                    equal = false;
-                                    break;
-                                }
-                            }
-                            if (equal)
-                            {
-                                // Solely fetching the PK fields, so no need to join (just like fetchFkOnly case above)
-                                return true;
+                                equal = false;
+                                break;
                             }
                         }
-                    }
-                    else if (relatedCmd.getIdentityType() == IdentityType.DATASTORE)
-                    {
-                        if (fpFieldNums == null || fpFieldNums.length == 0)
+                        if (equal)
                         {
+                            // Solely fetching the PK fields, so no need to join (just like fetchFkOnly case above)
                             return true;
                         }
                     }
                 }
-
-                // Find the table of the related class
-                DatastoreClass relatedTbl = storeMgr.getDatastoreClass(relatedCmd.getFullClassName(), clr);
-                if (relatedTbl == null)
+                else if (relatedCmd.getIdentityType() == IdentityType.DATASTORE)
                 {
-                    // Class doesn't have its own table (subclass-table) so find where it persists
-                    AbstractClassMetaData[] ownerParentCmds = storeMgr.getClassesManagingTableForClass(relatedCmd, clr);
-                    if (ownerParentCmds.length > 1)
+                    if (fpFieldNums == null || fpFieldNums.length == 0)
                     {
-                        // TODO Fix this
-                        NucleusLogger.QUERY.warn("Relation (" + mmd.getFullFieldName() + ") with multiple related tables (using subclass-table). Not supported so selecting FK of related object only");
                         return true;
                     }
-
-                    relatedTbl = storeMgr.getDatastoreClass(ownerParentCmds[0].getFullClassName(), clr);
-                }
-
-                String requiredGroupName = null;
-                if (sourceSqlTbl.getGroupName() != null)
-                {
-                    // JPQL will have table groups defined already, named as per "alias.fieldName"
-                    requiredGroupName = sourceSqlTbl.getGroupName() + "." + mmd.getName();
-                }
-                SQLTable relatedSqlTbl = stmt.getTable(relatedTbl, requiredGroupName);
-                if (relatedSqlTbl == null)
-                {
-                    // Join the 1-1 relation
-                    JoinType joinType = getJoinTypeForOneToOneRelationJoin(m, sqlTbl, inputJoinType);
-                    if (joinType == JoinType.LEFT_OUTER_JOIN || joinType == JoinType.RIGHT_OUTER_JOIN)
-                    {
-                        inputJoinType = joinType;
-                    }
-                    relatedSqlTbl = addJoinForOneToOneRelation(stmt, m, sqlTbl, relatedTbl.getIdMapping(), relatedTbl, null, null, tableGroupName, joinType);
-                }
-
-                StatementClassMapping subMappingDefinition =
-                    new StatementClassMapping(mmd.getClassName(), mmd.getName());
-                selectFetchPlanOfSourceClassInStatement(stmt, subMappingDefinition, fetchPlan, relatedSqlTbl, relatedCmd, maxFetchPlanLimit-1, inputJoinType);
-                if (mappingDefinition != null)
-                {
-                    if (relatedCmd.getIdentityType() == IdentityType.APPLICATION)
-                    {
-                        int[] pkFields = relatedCmd.getPKMemberPositions();
-                        int[] pkCols = new int[m.getNumberOfColumnMappings()];
-                        int pkColNo = 0;
-                        for (int pkField : pkFields)
-                        {
-                            StatementMappingIndex pkIdx = subMappingDefinition.getMappingForMemberPosition(pkField);
-                            int[] pkColNumbers = pkIdx.getColumnPositions();
-                            for (int pkColNumber : pkColNumbers)
-                            {
-                                pkCols[pkColNo] = pkColNumber;
-                                pkColNo++;
-                            }
-                        }
-                        selectFK = false;
-                        stmtMapping.setColumnPositions(pkCols);
-                    }
-                    else if (relatedCmd.getIdentityType() == IdentityType.DATASTORE)
-                    {
-                        StatementMappingIndex pkIdx = subMappingDefinition.getMappingForMemberPosition(SurrogateColumnType.DATASTORE_ID.getFieldNumber());
-                        selectFK = false;
-                        stmtMapping.setColumnPositions(pkIdx.getColumnPositions());
-                    }
-                    mappingDefinition.addMappingDefinitionForMember(mmd.getAbsoluteFieldNumber(), subMappingDefinition);
                 }
             }
-            else
+
+            // Find the table of the related class
+            DatastoreClass relatedTbl = storeMgr.getDatastoreClass(relatedCmd.getFullClassName(), clr);
+            if (relatedTbl == null)
             {
-                // TODO 1-1 interface relation
+                // Class doesn't have its own table (subclass-table) so find where it persists
+                AbstractClassMetaData[] ownerParentCmds = storeMgr.getClassesManagingTableForClass(relatedCmd, clr);
+                if (ownerParentCmds.length > 1)
+                {
+                    // TODO Fix this
+                    NucleusLogger.QUERY.warn("Relation (" + mmd.getFullFieldName() + ") with multiple related tables (using subclass-table). Not supported so selecting FK of related object only");
+                    return true;
+                }
+
+                relatedTbl = storeMgr.getDatastoreClass(ownerParentCmds[0].getFullClassName(), clr);
             }
+
+            String requiredGroupName = null;
+            if (sourceSqlTbl.getGroupName() != null)
+            {
+                // JPQL will have table groups defined already, named as per "alias.fieldName"
+                requiredGroupName = sourceSqlTbl.getGroupName() + "." + mmd.getName();
+            }
+            SQLTable relatedSqlTbl = stmt.getTable(relatedTbl, requiredGroupName);
+            if (relatedSqlTbl == null)
+            {
+                // Join the 1-1 relation
+                JoinType joinType = getJoinTypeForOneToOneRelationJoin(m, sqlTbl, inputJoinType);
+                if (joinType == JoinType.LEFT_OUTER_JOIN || joinType == JoinType.RIGHT_OUTER_JOIN)
+                {
+                    inputJoinType = joinType;
+                }
+                relatedSqlTbl = addJoinForOneToOneRelation(stmt, m, sqlTbl, relatedTbl.getIdMapping(), relatedTbl, null, null, tableGroupName, joinType);
+            }
+
+            StatementClassMapping subMappingDefinition =
+                    new StatementClassMapping(mmd.getClassName(), mmd.getName());
+            selectFetchPlanOfSourceClassInStatement(stmt, subMappingDefinition, fetchPlan, relatedSqlTbl, relatedCmd, maxFetchPlanLimit-1, inputJoinType);
+            if (mappingDefinition != null)
+            {
+                if (relatedCmd.getIdentityType() == IdentityType.APPLICATION)
+                {
+                    int[] pkFields = relatedCmd.getPKMemberPositions();
+                    int[] pkCols = new int[m.getNumberOfColumnMappings()];
+                    int pkColNo = 0;
+                    for (int pkField : pkFields)
+                    {
+                        StatementMappingIndex pkIdx = subMappingDefinition.getMappingForMemberPosition(pkField);
+                        int[] pkColNumbers = pkIdx.getColumnPositions();
+                        for (int pkColNumber : pkColNumbers)
+                        {
+                            pkCols[pkColNo] = pkColNumber;
+                            pkColNo++;
+                        }
+                    }
+                    selectFK = false;
+                    stmtMapping.setColumnPositions(pkCols);
+                }
+                else if (relatedCmd.getIdentityType() == IdentityType.DATASTORE)
+                {
+                    StatementMappingIndex pkIdx = subMappingDefinition.getMappingForMemberPosition(SurrogateColumnType.DATASTORE_ID.getFieldNumber());
+                    selectFK = false;
+                    stmtMapping.setColumnPositions(pkIdx.getColumnPositions());
+                }
+                mappingDefinition.addMappingDefinitionForMember(mmd.getAbsoluteFieldNumber(), subMappingDefinition);
+            }
+        }
+        else
+        {
+            // TODO 1-1 interface relation
         }
         return selectFK;
     }

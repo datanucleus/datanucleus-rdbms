@@ -45,6 +45,7 @@ import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.DiscriminatorMetaData;
 import org.datanucleus.metadata.IdentityType;
 import org.datanucleus.metadata.InterfaceMetaData;
+import org.datanucleus.metadata.RelationType;
 import org.datanucleus.metadata.VersionMetaData;
 import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.FieldValues;
@@ -334,19 +335,26 @@ public final class PersistentClassROF<T> extends AbstractROF<T>
         List<Integer> memberNumbersToStoreTmp = new ArrayList<>();
         for (int i=0;i<mappedFieldNumbers.length;i++)
         {
-            if (fpClass.getRecursionDepthForMember(mappedFieldNumbers[i]) == 0)
+            AbstractMemberMetaData mmd = cmd.getMetaDataForManagedMemberAtAbsolutePosition(mappedFieldNumbers[i]);
+            if (RelationType.isRelationSingleValued(mmd.getRelationType(clr)))
             {
-                memberNumbersToStoreTmp.add(mappedFieldNumbers[i]);
-            }
-            else
-            {
-                AbstractMemberMetaData mmd = cmd.getMetaDataForManagedMemberAtAbsolutePosition(mappedFieldNumbers[i]);
-                if (mmd.fetchFKOnly())
+                int recDepth = fpClass.getRecursionDepthForMember(mappedFieldNumbers[i]);
+                if (recDepth == 0)
                 {
+                    // recursion-depth=0 so fetch fk only and store it
                     memberNumbersToStoreTmp.add(mappedFieldNumbers[i]);
+                }
+                else
+                {
+                    if (mmd.fetchFKOnly() && recDepth == 1)
+                    {
+                        // fetch-fk-only and recursion-depth set to default, so fetch fk only and store it
+                        memberNumbersToStoreTmp.add(mappedFieldNumbers[i]);
+                    }
                 }
             }
         }
+
         int[] memberNumbersToStore = null;
         int[] memberNumbersToLoad = mappedFieldNumbers;
         if (memberNumbersToStoreTmp.size() > 0)

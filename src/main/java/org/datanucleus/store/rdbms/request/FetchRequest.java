@@ -34,7 +34,6 @@ import org.datanucleus.identity.IdentityUtils;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.IdentityType;
-import org.datanucleus.metadata.RelationType;
 import org.datanucleus.metadata.VersionMetaData;
 import org.datanucleus.state.LockMode;
 import org.datanucleus.state.DNStateManager;
@@ -674,15 +673,17 @@ public class FetchRequest extends Request
                 boolean fetchAndSaveFK = false;
                 if (mappingToUse instanceof PersistableMapping)
                 {
-                    if (RelationType.isRelationSingleValued(mmd.getRelationType(clr)) && fpClass.getRecursionDepthForMember(mmd.getAbsoluteFieldNumber()) == 0)
+                    // Special cases : 1-1/N-1 (FK)
+                    int recDepth = fpClass.getRecursionDepthForMember(mmd.getAbsoluteFieldNumber());
+                    if (recDepth == 0)
                     {
-                        // Special case of 1-1/N-1 and recursion-depth set as 0 (just retrieve the FK and don't instantiate the related object in the field)
+                        // recursion-depth set as 0 (just retrieve the FK and don't instantiate the related object in the field)
                         depth = 0;
                         fetchAndSaveFK = true;
                     }
-                    else if (mmd.fetchFKOnly())
+                    else if (mmd.fetchFKOnly() && recDepth == 1)
                     {
-                        // Special case of 1-1/N-1 and fetch-fk-only extension - same as above
+                        // fetch-fk-only extension and recursion-depth not changed from default (set to 2 or more will override fetch-fk-only)
                         depth = 0;
                         fetchAndSaveFK = true;
                     }
