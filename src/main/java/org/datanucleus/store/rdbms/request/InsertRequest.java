@@ -267,7 +267,6 @@ public class InsertRequest extends Request
 
             // Set the state to "inserting" (may already be at this state if multiple inheritance level INSERT)
             sm.setInserting();
-//            sm.changeActivityState(ActivityState.INSERTING);
 
             SQLController sqlControl = storeMgr.getSQLController();
             ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
