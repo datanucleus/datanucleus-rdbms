@@ -709,7 +709,7 @@ public class SQLStatementHelper
             int recDepth = fpClass.getRecursionDepthForMember(mmd.getAbsoluteFieldNumber());
             if (RelationType.isRelationSingleValued(mmd.getRelationType(clr)))
             {
-                if (recDepth == 0)
+                if (recDepth == FetchPlan.RECURSION_DEPTH_FK_ONLY)
                 {
                     // User has marked this member as recursion-depth=0 meaning pull in just the FK and dont join to the sub-object
                     selectSubobjects = false;

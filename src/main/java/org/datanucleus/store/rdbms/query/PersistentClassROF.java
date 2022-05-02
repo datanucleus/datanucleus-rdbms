@@ -339,7 +339,7 @@ public final class PersistentClassROF<T> extends AbstractROF<T>
             if (RelationType.isRelationSingleValued(mmd.getRelationType(clr)))
             {
                 int recDepth = fpClass.getRecursionDepthForMember(mappedFieldNumbers[i]);
-                if (recDepth == 0)
+                if (recDepth == FetchPlan.RECURSION_DEPTH_FK_ONLY)
                 {
                     // recursion-depth=0 so fetch fk only and store it
                     memberNumbersToStoreTmp.add(mappedFieldNumbers[i]);

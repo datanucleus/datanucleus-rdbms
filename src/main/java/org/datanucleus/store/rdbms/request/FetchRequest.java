@@ -27,6 +27,7 @@ import java.util.List;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ExecutionContext;
+import org.datanucleus.FetchPlan;
 import org.datanucleus.FetchPlanForClass;
 import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.exceptions.NucleusObjectNotFoundException;
@@ -675,7 +676,7 @@ public class FetchRequest extends Request
                 {
                     // Special cases : 1-1/N-1 (FK)
                     int recDepth = fpClass.getRecursionDepthForMember(mmd.getAbsoluteFieldNumber());
-                    if (recDepth == 0)
+                    if (recDepth == FetchPlan.RECURSION_DEPTH_FK_ONLY)
                     {
                         // recursion-depth set as 0 (just retrieve the FK and don't instantiate the related object in the field)
                         depth = 0;
