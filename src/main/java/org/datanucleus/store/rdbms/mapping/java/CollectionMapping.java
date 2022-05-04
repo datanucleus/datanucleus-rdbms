@@ -64,13 +64,13 @@ public class CollectionMapping extends AbstractContainerMapping implements Mappi
         Collection value = (Collection) ownerSM.provideField(getAbsoluteFieldNumber());
         if (containerIsStoredInSingleColumn())
         {
+            // Will have been inserted in INSERT statement for table
             if (value != null)
             {
                 if (mmd.getCollection().elementIsPersistent())
                 {
                     // Make sure all persistable elements have StateManagers
-                    Object[] collElements = value.toArray();
-                    for (Object elem : collElements)
+                    for (Object elem : value)
                     {
                         if (elem != null)
                         {
@@ -87,33 +87,29 @@ public class CollectionMapping extends AbstractContainerMapping implements Mappi
             return;
         }
 
+        // No elements either means null field or no elements, or specified at other side of a bidir M-N.
         if (value == null)
         {
-            // replace null collections with an empty SCO wrapper
+            // Create SCO wrapper - note that this can trigger a load of the other side depending on whether the field is marked for lazy loading
             replaceFieldWithWrapper(ownerSM, null);
             return;
         }
-
-        Object[] collElements = value.toArray();
-
-        if (!mmd.isCascadePersist())
+        else if (value.isEmpty())
         {
-            // Check that all elements are persistent before continuing and throw exception if necessary
-            if (NucleusLogger.PERSISTENCE.isDebugEnabled())
+            if (mmd.getRelationType(ec.getClassLoaderResolver()) == RelationType.MANY_TO_MANY_BI)
             {
-                NucleusLogger.PERSISTENCE.debug(Localiser.msg("007006", mmd.getFullFieldName()));
+                // Create a SCO wrapper, pass in null so it loads any from the datastore (on other side?)
+                replaceFieldWithWrapper(ownerSM, null);
             }
-
-            for (Object collElement : collElements)
+            else
             {
-                if (!ec.getApiAdapter().isDetached(collElement) && !ec.getApiAdapter().isPersistent(collElement))
-                {
-                    // Element is not persistent so throw exception
-                    throw new ReachableObjectNotCascadedException(mmd.getFullFieldName(), collElement);
-                }
+                // Create a SCO wrapper passing in empty collection to avoid loading from DB (extra SQL)
+                replaceFieldWithWrapper(ownerSM, value);
             }
+            return;
         }
-        else
+
+        if (mmd.isCascadePersist())
         {
             // Reachability
             if (NucleusLogger.PERSISTENCE.isDebugEnabled())
@@ -121,19 +117,34 @@ public class CollectionMapping extends AbstractContainerMapping implements Mappi
                 NucleusLogger.PERSISTENCE.debug(Localiser.msg("007007", IdentityUtils.getPersistableIdentityForId(ownerSM.getInternalObjectId()), mmd.getFullFieldName()));
             }
         }
+        else
+        {
+            // Check that all elements are persistent before continuing and throw exception if necessary
+            if (NucleusLogger.PERSISTENCE.isDebugEnabled())
+            {
+                NucleusLogger.PERSISTENCE.debug(Localiser.msg("007006", mmd.getFullFieldName()));
+            }
+
+            for (Object elem : value)
+            {
+                if (!ec.getApiAdapter().isDetached(elem) && !ec.getApiAdapter().isPersistent(elem))
+                {
+                    // Element is not persistent so throw exception
+                    throw new ReachableObjectNotCascadedException(mmd.getFullFieldName(), elem);
+                }
+            }
+        }
 
         // Check if some elements need attaching
-        // TODO Investigate if we can just use the attachCopy route below and skip off this check
         boolean needsAttaching = false;
-        for (Object collElement : collElements)
+        for (Object elem : value)
         {
-            if (ec.getApiAdapter().isDetached(collElement))
+            if (ec.getApiAdapter().isDetached(elem))
             {
                 needsAttaching = true;
                 break;
             }
         }
-
         if (needsAttaching)
         {
             // Create a wrapper and attach the elements (and add the others)
@@ -148,27 +159,11 @@ public class CollectionMapping extends AbstractContainerMapping implements Mappi
         }
         else
         {
-            if (value.size() > 0)
-            {
-                // Add the elements direct to the datastore
-                ((CollectionStore) storeMgr.getBackingStoreForField(ec.getClassLoaderResolver(),mmd, value.getClass())).addAll(ownerSM, value, 0);
+            // Add the elements direct to the datastore
+            ((CollectionStore) storeMgr.getBackingStoreForField(ec.getClassLoaderResolver(), mmd, value.getClass())).addAll(ownerSM, value, 0);
 
-                // Create a SCO wrapper with the elements loaded
-                replaceFieldWithWrapper(ownerSM, value);
-            }
-            else
-            {
-                if (mmd.getRelationType(ec.getClassLoaderResolver()) == RelationType.MANY_TO_MANY_BI)
-                {
-                    // Create a SCO wrapper, pass in null so it loads any from the datastore (on other side?)
-                    replaceFieldWithWrapper(ownerSM, null);
-                }
-                else
-                {
-                    // Create a SCO wrapper, pass in empty collection to avoid loading from DB (extra SQL)
-                    replaceFieldWithWrapper(ownerSM, value);
-                }
-            }
+            // Create a SCO wrapper with the elements loaded
+            replaceFieldWithWrapper(ownerSM, value);
         }
     }
 

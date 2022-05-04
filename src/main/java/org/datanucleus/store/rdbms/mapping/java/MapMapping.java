@@ -23,7 +23,6 @@ Contributors:
 package org.datanucleus.store.rdbms.mapping.java;
 
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -73,11 +72,9 @@ public class MapMapping extends AbstractContainerMapping implements MappingCallb
                 if (mmd.getMap().keyIsPersistent() || mmd.getMap().valueIsPersistent())
                 {
                     // Make sure all persistable keys/values have StateManagers
-                    Set entries = value.entrySet();
-                    Iterator iter = entries.iterator();
-                    while (iter.hasNext())
+                    Set<Map.Entry> entries = value.entrySet();
+                    for (Map.Entry entry : entries)
                     {
-                        Map.Entry entry = (Map.Entry)iter.next();
                         if (mmd.getMap().keyIsPersistent() && entry.getKey() != null)
                         {
                             Object key = entry.getKey();
@@ -102,14 +99,36 @@ public class MapMapping extends AbstractContainerMapping implements MappingCallb
             return;
         }
 
+        // No entries either means null field or no entries, or specified at other side of a bidir M-N.
         if (value == null)
         {
-            // replace null map with an empty SCO wrapper
+            // Create SCO wrapper - note that this can trigger a load of the other side depending on whether the field is marked for lazy loading
             replaceFieldWithWrapper(ownerSM, null);
             return;
         }
+        else if (value.isEmpty())
+        {
+            if (mmd.getRelationType(ec.getClassLoaderResolver()) == RelationType.MANY_TO_MANY_BI)
+            {
+                // Create a SCO wrapper, pass in null so it loads any from the datastore (on other side?)
+                replaceFieldWithWrapper(ownerSM, null);
+            }
+            else
+            {
+                // Create a SCO wrapper, pass in empty map to avoid loading from DB (extra SQL)
+                replaceFieldWithWrapper(ownerSM, value);
+            }
+        }
 
-        if (!mmd.isCascadePersist())
+        if (mmd.isCascadePersist())
+        {
+            // Reachability
+            if (NucleusLogger.PERSISTENCE.isDebugEnabled())
+            {
+                NucleusLogger.PERSISTENCE.debug(Localiser.msg("007007", IdentityUtils.getPersistableIdentityForId(ownerSM.getInternalObjectId()), mmd.getFullFieldName()));
+            }
+        }
+        else
         {
             // Check that all keys/values are persistent before continuing and throw exception if necessary
             if (NucleusLogger.PERSISTENCE.isDebugEnabled())
@@ -118,11 +137,9 @@ public class MapMapping extends AbstractContainerMapping implements MappingCallb
             }
 
             ApiAdapter api = ec.getApiAdapter();
-            Set entries = value.entrySet();
-            Iterator iter = entries.iterator();
-            while (iter.hasNext())
+            Set<Map.Entry> entries = value.entrySet();
+            for (Map.Entry entry : entries)
             {
-                Map.Entry entry = (Map.Entry)iter.next();
                 if (api.isPersistable(entry.getKey()))
                 {
                     if (!api.isPersistent(entry.getKey()) && !api.isDetached(entry.getKey()))
@@ -142,36 +159,12 @@ public class MapMapping extends AbstractContainerMapping implements MappingCallb
                 }
             }
         }
-        else
-        {
-            // Reachability
-            if (NucleusLogger.PERSISTENCE.isDebugEnabled())
-            {
-                NucleusLogger.PERSISTENCE.debug(Localiser.msg("007007", IdentityUtils.getPersistableIdentityForId(ownerSM.getInternalObjectId()), mmd.getFullFieldName()));
-            }
-        }
 
-        if (value.size() > 0)
-        {
-            // Add the entries direct to the datastore
-            ((MapStore) table.getStoreManager().getBackingStoreForField(ec.getClassLoaderResolver(), mmd, value.getClass())).putAll(ownerSM, value, Collections.emptyMap());
+        // Add the entries direct to the datastore
+        ((MapStore) table.getStoreManager().getBackingStoreForField(ec.getClassLoaderResolver(), mmd, value.getClass())).putAll(ownerSM, value, Collections.emptyMap());
 
-            // Create a SCO wrapper with the entries loaded
-            replaceFieldWithWrapper(ownerSM, value);
-        }
-        else
-        {
-            if (mmd.getRelationType(ec.getClassLoaderResolver()) == RelationType.MANY_TO_MANY_BI)
-            {
-                // Create a SCO wrapper, pass in null so it loads any from the datastore (on other side?)
-                replaceFieldWithWrapper(ownerSM, null);
-            }
-            else
-            {
-                // Create a SCO wrapper, pass in empty map to avoid loading from DB (extra SQL)
-                replaceFieldWithWrapper(ownerSM, value);
-            }
-        }
+        // Create a SCO wrapper with the entries loaded
+        replaceFieldWithWrapper(ownerSM, value);
     }
 
     @Override
@@ -188,11 +181,9 @@ public class MapMapping extends AbstractContainerMapping implements MappingCallb
                 if (mmd.getMap().keyIsPersistent() || mmd.getMap().valueIsPersistent())
                 {
                     // Make sure all persistable keys/values have StateManagers
-                    Set entries = value.entrySet();
-                    Iterator iter = entries.iterator();
-                    while (iter.hasNext())
+                    Set<Map.Entry> entries = value.entrySet();
+                    for (Map.Entry entry : entries)
                     {
-                        Map.Entry entry = (Map.Entry)iter.next();
                         if (mmd.getMap().keyIsPersistent() && entry.getKey() != null)
                         {
                             Object key = entry.getKey();
