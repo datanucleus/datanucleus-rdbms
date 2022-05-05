@@ -530,7 +530,6 @@ public final class PersistentClassROF<T> extends AbstractROF<T>
     {
         return (T) ec.findObject(id, new FieldValues()
         {
-            // TODO If we ever support just loading a FK value but not instantiating this needs to store the value in StateManager.
             public void fetchFields(DNStateManager sm)
             {
                 resultSetGetter.setStateManager(sm);
@@ -604,14 +603,55 @@ public final class PersistentClassROF<T> extends AbstractROF<T>
                 if (updateAllFields)
                 {
                     // User requested to update all fields regardless of loaded state
-                    // TODO Use membersToStore here?
                     sm.replaceFields(membersToLoad, resultSetGetter);
                 }
                 else
                 {
-                    // Default to just update unloaded fields
-                    // TODO Use membersToStore here?
+                    // Default to just updating the unloaded fields, and storing any unloaded store fields
                     sm.replaceNonLoadedFields(membersToLoad, resultSetGetter);
+                }
+
+                // If any members are marked to store, only do it if the member is not loaded
+                if (membersToStore != null)
+                {
+                    for (int i=0;i<membersToStore.length;i++)
+                    {
+                        if (!sm.isFieldLoaded(membersToStore[i]))
+                        {
+                            StatementMappingIndex mapIdx = mappingDefinition.getMappingForMemberPosition(membersToStore[i]);
+                            JavaTypeMapping m = mapIdx.getMapping();
+                            if (m instanceof PersistableMapping)
+                            {
+                                // Create the identity of the related object
+                                AbstractClassMetaData memberCmd = ((PersistableMapping)m).getClassMetaData();
+
+                                Object memberId = null;
+                                if (memberCmd.getIdentityType() == IdentityType.DATASTORE)
+                                {
+                                    memberId = MappingHelper.getDatastoreIdentityForResultSetRow(ec, m, rs, mapIdx.getColumnPositions(), memberCmd);
+                                }
+                                else if (memberCmd.getIdentityType() == IdentityType.APPLICATION)
+                                {
+                                    memberId = MappingHelper.getApplicationIdentityForResultSetRow(ec, m, rs, mapIdx.getColumnPositions(), memberCmd);
+                                }
+                                else
+                                {
+                                    break;
+                                }
+
+                                if (memberId == null)
+                                {
+                                    // Just set the member to null and don't bother saving the value
+                                    sm.replaceField(membersToStore[i], null);
+                                }
+                                else
+                                {
+                                    // Store the "id" value in case the member is ever accessed
+                                    sm.storeFieldValue(membersToStore[i], memberId);
+                                }
+                            }
+                        }
+                    }
                 }
             }
 
