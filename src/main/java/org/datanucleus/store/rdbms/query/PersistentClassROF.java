@@ -343,14 +343,6 @@ public final class PersistentClassROF<T> extends AbstractROF<T>
                     // recursion-depth=0 so fetch fk only and store it
                     memberNumbersToStoreTmp.add(mappedFieldNumbers[i]);
                 }
-                else
-                {
-                    if (mmd.fetchFKOnly() && recDepth == 1)
-                    {
-                        // fetch-fk-only and recursion-depth set to default, so fetch fk only and store it
-                        memberNumbersToStoreTmp.add(mappedFieldNumbers[i]);
-                    }
-                }
             }
         }
 

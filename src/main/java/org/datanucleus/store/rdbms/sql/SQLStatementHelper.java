@@ -714,17 +714,7 @@ public class SQLStatementHelper
                     // User has marked this member as recursion-depth=0 meaning pull in just the FK and dont join to the sub-object
                     selectSubobjects = false;
                 }
-                else if (recDepth == 1 && mmd.fetchFKOnly())
-                {
-                    // fetch-fk-only but recursionDepth still defaulted so use fetch-fk-only to limit sub-objects
-                    selectSubobjects = false;
-                }
             }
-        }
-        else if (mmd.fetchFKOnly())
-        {
-            // Equivalent to recursion-depth=0
-            selectSubobjects = false;
         }
 
         // Set table-group name for any related object we join to (naming based on member name)
@@ -1015,22 +1005,6 @@ public class SQLStatementHelper
             SQLTable sourceSqlTbl, AbstractMemberMetaData mmd, ClassLoaderResolver clr, int maxFetchPlanLimit, JavaTypeMapping m, String tableGroupName,
             StatementMappingIndex stmtMapping, SQLTable sqlTbl, JoinType inputJoinType)
     {
-        if (fetchPlan != null)
-        {
-            FetchPlanForClass fpClass = fetchPlan.getFetchPlanForClass(mmd.getAbstractClassMetaData());
-            int recDepth = fpClass.getRecursionDepthForMember(mmd.getAbsoluteFieldNumber());
-            if (mmd.fetchFKOnly() && recDepth == 1)
-            {
-                // Only want FK fetching, and not the fields of the object (so avoid the join)
-                return true;
-            }
-        }
-        else if (mmd.fetchFKOnly())
-        {
-            // Only want FK fetching, and not the fields of the object (so avoid the join)
-            return true;
-        }
-
         boolean selectFK = true;
         RDBMSStoreManager storeMgr = stmt.getRDBMSManager();
 
