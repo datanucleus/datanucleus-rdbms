@@ -211,9 +211,8 @@ public final class PersistentClassROF<T> extends AbstractROF<T>
         if (Modifier.isAbstract(pcClassForObject.getModifiers()))
         {
             // Persistent class is abstract so we can't create instances of that type!
-            // This can happen if the user is using subclass-table and hasn't provided a discriminator in 
-            // the table. Try going out one level and find a (single) concrete subclass 
-            // TODO make this more robust and go out further
+            // This can happen if the user is using subclass-table and hasn't provided a discriminator in the table.
+            // Try going out one level and find a (single) concrete subclass. TODO make this more robust and go out further
             String[] subclasses = ec.getMetaDataManager().getSubclassesForClass(pcClassForObject.getName(), false);
             if (subclasses != null)
             {
@@ -480,8 +479,7 @@ public final class PersistentClassROF<T> extends AbstractROF<T>
             }
             else
             {
-                // TODO Not passing in memberNumbersToStore. Why are we using fieldNumbers anyway?
-                obj = findObjectWithIdAndLoadFields(id, fieldNumbers, null, pcClassForObject, cmd, surrogateVersion);
+                obj = findObjectWithIdAndLoadFields(id, fieldNumbers, memberNumbersToStore, pcClassForObject, cmd, surrogateVersion);
             }
         }
 
@@ -616,16 +614,16 @@ public final class PersistentClassROF<T> extends AbstractROF<T>
                 {
                     for (int i=0;i<membersToStore.length;i++)
                     {
-                        if (!sm.isFieldLoaded(membersToStore[i]))
+                        if (!sm.isFieldLoaded(membersToStore[i]) || updateAllFields)
                         {
                             StatementMappingIndex mapIdx = mappingDefinition.getMappingForMemberPosition(membersToStore[i]);
                             JavaTypeMapping m = mapIdx.getMapping();
+                            Object memberId = null;
                             if (m instanceof PersistableMapping)
                             {
                                 // Create the identity of the related object
                                 AbstractClassMetaData memberCmd = ((PersistableMapping)m).getClassMetaData();
 
-                                Object memberId = null;
                                 if (memberCmd.getIdentityType() == IdentityType.DATASTORE)
                                 {
                                     memberId = MappingHelper.getDatastoreIdentityForResultSetRow(ec, m, rs, mapIdx.getColumnPositions(), memberCmd);
@@ -638,17 +636,22 @@ public final class PersistentClassROF<T> extends AbstractROF<T>
                                 {
                                     break;
                                 }
+                            }
+                            if (updateAllFields && sm.isFieldLoaded(membersToStore[i]))
+                            {
+                                sm.unloadField(sm.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(membersToStore[i]).getName());
+                            }
 
-                                if (memberId == null)
-                                {
-                                    // Just set the member to null and don't bother saving the value
-                                    sm.replaceField(membersToStore[i], null);
-                                }
-                                else
-                                {
-                                    // Store the "id" value in case the member is ever accessed
-                                    sm.storeFieldValue(membersToStore[i], memberId);
-                                }
+                            // Store the member
+                            if (memberId == null)
+                            {
+                                // Field is null, so just set the member to null and don't bother saving the value
+                                sm.replaceField(membersToStore[i], null);
+                            }
+                            else
+                            {
+                                // Store the "id" value in case the member is ever accessed
+                                sm.storeFieldValue(membersToStore[i], memberId);
                             }
                         }
                     }
