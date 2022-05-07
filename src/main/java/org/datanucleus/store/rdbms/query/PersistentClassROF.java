@@ -48,7 +48,9 @@ import org.datanucleus.metadata.InterfaceMetaData;
 import org.datanucleus.metadata.VersionMetaData;
 import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.FieldValues;
+import org.datanucleus.store.rdbms.mapping.MappingHelper;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
+import org.datanucleus.store.rdbms.mapping.java.PersistableMapping;
 import org.datanucleus.store.schema.table.SurrogateColumnType;
 import org.datanucleus.store.rdbms.fieldmanager.ResultSetGetter;
 import org.datanucleus.util.ConcurrentReferenceHashMap;
@@ -473,7 +475,7 @@ public final class PersistentClassROF<T> extends AbstractROF<T>
             }
             else
             {
-                obj = findObjectWithIdAndLoadFields(id, fieldNumbers, null, pcClassForObject, cmd, surrogateVersion);
+                obj = findObjectWithIdAndLoadFields(id, fieldNumbers, memberNumbersToStore, pcClassForObject, cmd, surrogateVersion);
             }
         }
 
@@ -548,12 +550,95 @@ public final class PersistentClassROF<T> extends AbstractROF<T>
                     }
                 }
 
+                if (membersToStore != null)
+                {
+                    for (int i=0;i<membersToStore.length;i++)
+                    {
+                        StatementMappingIndex mapIdx = mappingDefinition.getMappingForMemberPosition(membersToStore[i]);
+                        JavaTypeMapping m = mapIdx.getMapping();
+                        if (m instanceof PersistableMapping)
+                        {
+                            // Create the identity of the related object
+                            AbstractClassMetaData memberCmd = ((PersistableMapping)m).getClassMetaData();
+
+                            Object memberId = null;
+                            if (memberCmd.getIdentityType() == IdentityType.DATASTORE)
+                            {
+                                memberId = MappingHelper.getDatastoreIdentityForResultSetRow(ec, m, rs, mapIdx.getColumnPositions(), memberCmd);
+                            }
+                            else if (memberCmd.getIdentityType() == IdentityType.APPLICATION)
+                            {
+                                memberId = MappingHelper.getApplicationIdentityForResultSetRow(ec, m, rs, mapIdx.getColumnPositions(), memberCmd);
+                            }
+                            else
+                            {
+                                break;
+                            }
+
+                            if (memberId == null)
+                            {
+                                // Just set the member to null and don't bother saving the value
+                                op.replaceField(membersToStore[i], null);
+                            }
+                            else
+                            {
+                                // Store the "id" value in case the member is ever accessed
+                                op.storeFieldValue(membersToStore[i], memberId);
+                            }
+                        }
+                    }
+                }
             }
             public void fetchNonLoadedFields(ObjectProvider op)
             {
                 resultSetGetter.setObjectProvider(op);
 
+                // Default to just updating the unloaded fields, and storing any unloaded store fields
                 op.replaceNonLoadedFields(membersToLoad, resultSetGetter);
+
+                // If any members are marked to store, only do it if the member is not loaded
+                if (membersToStore != null)
+                {
+                    for (int i=0;i<membersToStore.length;i++)
+                    {
+                        if (!op.isFieldLoaded(membersToStore[i]))
+                        {
+                            StatementMappingIndex mapIdx = mappingDefinition.getMappingForMemberPosition(membersToStore[i]);
+                            JavaTypeMapping m = mapIdx.getMapping();
+                            Object memberId = null;
+                            if (m instanceof PersistableMapping)
+                            {
+                                // Create the identity of the related object
+                                AbstractClassMetaData memberCmd = ((PersistableMapping)m).getClassMetaData();
+
+                                if (memberCmd.getIdentityType() == IdentityType.DATASTORE)
+                                {
+                                    memberId = MappingHelper.getDatastoreIdentityForResultSetRow(ec, m, rs, mapIdx.getColumnPositions(), memberCmd);
+                                }
+                                else if (memberCmd.getIdentityType() == IdentityType.APPLICATION)
+                                {
+                                    memberId = MappingHelper.getApplicationIdentityForResultSetRow(ec, m, rs, mapIdx.getColumnPositions(), memberCmd);
+                                }
+                                else
+                                {
+                                    break;
+                                }
+                            }
+
+                            // Store the member
+                            if (memberId == null)
+                            {
+                                // Field is null, so just set the member to null and don't bother saving the value
+                                op.replaceField(membersToStore[i], null);
+                            }
+                            else
+                            {
+                                // Store the "id" value in case the member is ever accessed
+                                op.storeFieldValue(membersToStore[i], memberId);
+                            }
+                        }
+                    }
+                }
             }
 
             public FetchPlan getFetchPlanForLoading()

@@ -526,7 +526,7 @@ public class FetchRequest extends Request
                                         else
                                         {
                                             // Store the "id" value in case the member is ever accessed
-                                            op.setAssociatedValue(ObjectProvider.MEMBER_VALUE_STORED_PREFIX + memberNumbersToStoreFK[i], memberId);
+                                            op.storeFieldValue(memberNumbersToStoreFK[i], memberId);
                                         }
                                     }
                                 }
