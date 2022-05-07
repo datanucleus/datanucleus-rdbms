@@ -16,6 +16,7 @@
  **********************************************************************/
 package org.datanucleus.store.rdbms.sql.method;
 
+import java.util.ArrayList;
 import java.util.List;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.store.rdbms.sql.SQLStatement;
@@ -48,6 +49,9 @@ public class StringStartsWith4Method implements SQLMethod
             throw new NucleusException(Localiser.msg("060003", "startswith", "StringExpression", 0, "StringExpression/CharacterExpression/Parameter"));
         }
 
-        return new BooleanExpression(stmt, stmt.getSQLExpressionFactory().getMappingForType(String.class), "STARTS_WITH", List.of(expr, otherExpr));
+        List<SQLExpression> funcArgs = new ArrayList<>();
+        funcArgs.add(expr);
+        funcArgs.add(otherExpr);
+        return new BooleanExpression(stmt, stmt.getSQLExpressionFactory().getMappingForType(String.class), "STARTS_WITH", funcArgs);
     }
 }

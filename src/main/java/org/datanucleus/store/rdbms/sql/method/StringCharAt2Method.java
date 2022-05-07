@@ -16,6 +16,7 @@
  **********************************************************************/
 package org.datanucleus.store.rdbms.sql.method;
 
+import java.util.ArrayList;
 import java.util.List;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.store.rdbms.sql.SQLStatement;
@@ -50,6 +51,10 @@ public class StringCharAt2Method implements SQLMethod
         }
 
         // Invoke substring(startExpr, numExpr, 1)
-        return new StringExpression(stmt, stmt.getSQLExpressionFactory().getMappingForType(String.class), "SUBSTR", List.of(expr, numExpr, ExpressionUtils.getLiteralForOne(stmt)));
+        List<SQLExpression> funcArgs = new ArrayList<>();
+        funcArgs.add(expr);
+        funcArgs.add(numExpr);
+        funcArgs.add(ExpressionUtils.getLiteralForOne(stmt));
+        return new StringExpression(stmt, stmt.getSQLExpressionFactory().getMappingForType(String.class), "SUBSTR", funcArgs);
     }
 }

@@ -16,6 +16,7 @@
  **********************************************************************/
 package org.datanucleus.store.rdbms.sql.method;
 
+import java.util.ArrayList;
 import java.util.List;
 import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.expression.NumericExpression;
@@ -35,6 +36,8 @@ public class TemporalIsoWeekMethod extends TemporalBaseMethod
         SQLExpression invokedExpr = getInvokedExpression(expr, args, "ISOWEEK");
 
         invokedExpr.toSQLText().prepend("ISOWEEK FROM ");
-        return new NumericExpression(stmt, stmt.getSQLExpressionFactory().getMappingForType(int.class, true), "EXTRACT", List.of(invokedExpr));
+        List<SQLExpression> funcArgs = new ArrayList<>();
+        funcArgs.add(invokedExpr);
+        return new NumericExpression(stmt, stmt.getSQLExpressionFactory().getMappingForType(int.class, true), "EXTRACT", funcArgs);
     }
 }
