@@ -631,7 +631,7 @@ public final class PersistentClassROF<T> extends AbstractROF<T>
                             }
                             if (updateAllFields && sm.isFieldLoaded(membersToStore[i]))
                             {
-                                sm.unloadField(sm.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(membersToStore[i]).getName());
+                                sm.unloadField(membersToStore[i]);
                             }
 
                             // Store the member
