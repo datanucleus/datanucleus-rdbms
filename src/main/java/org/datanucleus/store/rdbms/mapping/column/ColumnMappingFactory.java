@@ -22,8 +22,8 @@ package org.datanucleus.store.rdbms.mapping.column;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
@@ -42,7 +42,7 @@ public final class ColumnMappingFactory
     }
 
     /** cache of constructors keyed by mapping class **/
-    private static Map DATASTORE_MAPPING_CONSTRUCTOR_BY_CLASS = new HashMap();
+    private static Map<Class<? extends ColumnMapping>, Constructor> DATASTORE_MAPPING_CONSTRUCTOR_BY_CLASS = new ConcurrentHashMap<>();
 
     /** constructor arguments **/
     private static final Class[] DATASTORE_MAPPING_CTR_ARG_CLASSES = new Class[] {JavaTypeMapping.class, RDBMSStoreManager.class, Column.class};
@@ -61,8 +61,8 @@ public final class ColumnMappingFactory
         try
         {
             Object[] args = new Object[]{mapping, storeMgr, column};
-            Constructor ctr = (Constructor) DATASTORE_MAPPING_CONSTRUCTOR_BY_CLASS.get(mappingClass);
-            if( ctr == null )
+            Constructor ctr = DATASTORE_MAPPING_CONSTRUCTOR_BY_CLASS.get(mappingClass);
+            if (ctr == null)
             {
                 ctr = mappingClass.getConstructor(DATASTORE_MAPPING_CTR_ARG_CLASSES);
                 DATASTORE_MAPPING_CONSTRUCTOR_BY_CLASS.put(mappingClass, ctr);
@@ -73,8 +73,7 @@ public final class ColumnMappingFactory
             }
             catch (InvocationTargetException e)
             {
-                throw new NucleusException(Localiser.msg("041009", mappingClass.getName(), 
-                    e.getTargetException()), e.getTargetException()).setFatal();
+                throw new NucleusException(Localiser.msg("041009", mappingClass.getName(), e.getTargetException()), e.getTargetException()).setFatal();
             }
             catch (Exception e)
             {
