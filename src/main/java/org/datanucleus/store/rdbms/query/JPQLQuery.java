@@ -21,8 +21,6 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -356,135 +354,126 @@ public class JPQLQuery extends AbstractJPQLQuery
 
             if (resultClass != null && result != null)
             {
-                // Do as PrivilegedAction since uses reflection
-                AccessController.doPrivileged(new PrivilegedAction()
+                // Check that this class has the necessary constructor/setters/fields to be used
+                StatementResultMapping resultMapping = datastoreCompilation.getResultDefinition();
+                if (QueryUtils.resultClassIsSimple(resultClass.getName()))
                 {
-                    public Object run()
+                    if (resultMapping.getNumberOfResultExpressions() > 1)
                     {
-                        // Check that this class has the necessary constructor/setters/fields to be used
-                        StatementResultMapping resultMapping = datastoreCompilation.getResultDefinition();
-                        if (QueryUtils.resultClassIsSimple(resultClass.getName()))
-                        {
-                            if (resultMapping.getNumberOfResultExpressions() > 1)
-                            {
-                                // Invalid number of result expressions
-                                throw new NucleusUserException(Localiser.msg("021201", resultClass.getName()));
-                            }
-
-                            Object stmtMap = resultMapping.getMappingForResultExpression(0);
-                            // TODO Handle StatementNewObjectMapping
-                            StatementMappingIndex idx = (StatementMappingIndex)stmtMap;
-                            Class exprType = idx.getMapping().getJavaType();
-                            boolean typeConsistent = false;
-                            if (exprType == resultClass)
-                            {
-                                typeConsistent = true;
-                            }
-                            else if (exprType.isPrimitive())
-                            {
-                                Class resultClassPrimitive = ClassUtils.getPrimitiveTypeForType(resultClass);
-                                if (resultClassPrimitive == exprType)
-                                {
-                                    typeConsistent = true;
-                                }
-                            }
-                            if (!typeConsistent)
-                            {
-                                // Inconsistent expression type not matching the result class type
-                                throw new NucleusUserException(Localiser.msg("021202", resultClass.getName(), exprType));
-                            }
-                        }
-                        else if (QueryUtils.resultClassIsUserType(resultClass.getName()))
-                        {
-                            // Check for valid constructor (either using param types, or using default ctr)
-                            Class[] ctrTypes = new Class[resultMapping.getNumberOfResultExpressions()];
-                            for (int i=0;i<ctrTypes.length;i++)
-                            {
-                                Object stmtMap = resultMapping.getMappingForResultExpression(i);
-                                if (stmtMap instanceof StatementMappingIndex)
-                                {
-                                    ctrTypes[i] = ((StatementMappingIndex)stmtMap).getMapping().getJavaType();
-                                }
-                                else if (stmtMap instanceof StatementNewObjectMapping)
-                                {
-                                    // TODO Handle this
-                                }
-                            }
-                            Constructor ctr = ClassUtils.getConstructorWithArguments(resultClass, ctrTypes);
-                            if (ctr == null && !ClassUtils.hasDefaultConstructor(resultClass))
-                            {
-                                // No valid constructor found!
-                                throw new NucleusUserException(Localiser.msg("021205", resultClass.getName()));
-                            }
-                            else if (ctr == null)
-                            {
-                                // We are using default constructor, so check the types of the result expressions for means of input
-                                for (int i=0;i<resultMapping.getNumberOfResultExpressions();i++)
-                                {
-                                    Object stmtMap = resultMapping.getMappingForResultExpression(i);
-                                    if (stmtMap instanceof StatementMappingIndex)
-                                    {
-                                        StatementMappingIndex mapIdx = (StatementMappingIndex)stmtMap;
-                                        AbstractMemberMetaData mmd = mapIdx.getMapping().getMemberMetaData();
-                                        String fieldName = mapIdx.getColumnAlias();
-                                        Class fieldType = mapIdx.getMapping().getJavaType();
-                                        if (fieldName == null && mmd != null)
-                                        {
-                                            fieldName = mmd.getName();
-                                        }
-
-                                        if (fieldName != null)
-                                        {
-                                            // Check for the field of that name in the result class
-                                            Class resultFieldType = null;
-                                            boolean publicField = true;
-                                            try
-                                            {
-                                                Field fld = resultClass.getDeclaredField(fieldName);
-                                                resultFieldType = fld.getType();
-
-                                                // Check the type of the field
-                                                if (!ClassUtils.typesAreCompatible(fieldType, resultFieldType) && !ClassUtils.typesAreCompatible(resultFieldType, fieldType))
-                                                {
-                                                    throw new NucleusUserException(Localiser.msg("021211", fieldName, fieldType.getName(), resultFieldType.getName()));
-                                                }
-                                                if (!Modifier.isPublic(fld.getModifiers()))
-                                                {
-                                                    publicField = false;
-                                                }
-                                            }
-                                            catch (NoSuchFieldException nsfe)
-                                            {
-                                                publicField = false;
-                                            }
-
-                                            // Check for a public set method
-                                            if (!publicField)
-                                            {
-                                                Method setMethod = QueryUtils.getPublicSetMethodForFieldOfResultClass(resultClass, fieldName, resultFieldType);
-                                                if (setMethod == null)
-                                                {
-                                                    // No setter, so check for a public put(Object, Object) method
-                                                    Method putMethod = QueryUtils.getPublicPutMethodForResultClass(resultClass);
-                                                    if (putMethod == null)
-                                                    {
-                                                        throw new NucleusUserException(Localiser.msg("021212", resultClass.getName(), fieldName));
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                    else if (stmtMap instanceof StatementNewObjectMapping)
-                                    {
-                                        // TODO Handle this
-                                    }
-                                }
-                            }
-                        }
-
-                        return null;
+                        // Invalid number of result expressions
+                        throw new NucleusUserException(Localiser.msg("021201", resultClass.getName()));
                     }
-                });
+
+                    Object stmtMap = resultMapping.getMappingForResultExpression(0);
+                    // TODO Handle StatementNewObjectMapping
+                    StatementMappingIndex idx = (StatementMappingIndex)stmtMap;
+                    Class exprType = idx.getMapping().getJavaType();
+                    boolean typeConsistent = false;
+                    if (exprType == resultClass)
+                    {
+                        typeConsistent = true;
+                    }
+                    else if (exprType.isPrimitive())
+                    {
+                        Class resultClassPrimitive = ClassUtils.getPrimitiveTypeForType(resultClass);
+                        if (resultClassPrimitive == exprType)
+                        {
+                            typeConsistent = true;
+                        }
+                    }
+                    if (!typeConsistent)
+                    {
+                        // Inconsistent expression type not matching the result class type
+                        throw new NucleusUserException(Localiser.msg("021202", resultClass.getName(), exprType));
+                    }
+                }
+                else if (QueryUtils.resultClassIsUserType(resultClass.getName()))
+                {
+                    // Check for valid constructor (either using param types, or using default ctr)
+                    Class[] ctrTypes = new Class[resultMapping.getNumberOfResultExpressions()];
+                    for (int i=0;i<ctrTypes.length;i++)
+                    {
+                        Object stmtMap = resultMapping.getMappingForResultExpression(i);
+                        if (stmtMap instanceof StatementMappingIndex)
+                        {
+                            ctrTypes[i] = ((StatementMappingIndex)stmtMap).getMapping().getJavaType();
+                        }
+                        else if (stmtMap instanceof StatementNewObjectMapping)
+                        {
+                            // TODO Handle this
+                        }
+                    }
+                    Constructor ctr = ClassUtils.getConstructorWithArguments(resultClass, ctrTypes);
+                    if (ctr == null && !ClassUtils.hasDefaultConstructor(resultClass))
+                    {
+                        // No valid constructor found!
+                        throw new NucleusUserException(Localiser.msg("021205", resultClass.getName()));
+                    }
+                    else if (ctr == null)
+                    {
+                        // We are using default constructor, so check the types of the result expressions for means of input
+                        for (int i=0;i<resultMapping.getNumberOfResultExpressions();i++)
+                        {
+                            Object stmtMap = resultMapping.getMappingForResultExpression(i);
+                            if (stmtMap instanceof StatementMappingIndex)
+                            {
+                                StatementMappingIndex mapIdx = (StatementMappingIndex)stmtMap;
+                                AbstractMemberMetaData mmd = mapIdx.getMapping().getMemberMetaData();
+                                String fieldName = mapIdx.getColumnAlias();
+                                Class fieldType = mapIdx.getMapping().getJavaType();
+                                if (fieldName == null && mmd != null)
+                                {
+                                    fieldName = mmd.getName();
+                                }
+
+                                if (fieldName != null)
+                                {
+                                    // Check for the field of that name in the result class
+                                    Class resultFieldType = null;
+                                    boolean publicField = true;
+                                    try
+                                    {
+                                        Field fld = resultClass.getDeclaredField(fieldName);
+                                        resultFieldType = fld.getType();
+
+                                        // Check the type of the field
+                                        if (!ClassUtils.typesAreCompatible(fieldType, resultFieldType) && !ClassUtils.typesAreCompatible(resultFieldType, fieldType))
+                                        {
+                                            throw new NucleusUserException(Localiser.msg("021211", fieldName, fieldType.getName(), resultFieldType.getName()));
+                                        }
+                                        if (!Modifier.isPublic(fld.getModifiers()))
+                                        {
+                                            publicField = false;
+                                        }
+                                    }
+                                    catch (NoSuchFieldException nsfe)
+                                    {
+                                        publicField = false;
+                                    }
+
+                                    // Check for a public set method
+                                    if (!publicField)
+                                    {
+                                        Method setMethod = QueryUtils.getPublicSetMethodForFieldOfResultClass(resultClass, fieldName, resultFieldType);
+                                        if (setMethod == null)
+                                        {
+                                            // No setter, so check for a public put(Object, Object) method
+                                            Method putMethod = QueryUtils.getPublicPutMethodForResultClass(resultClass);
+                                            if (putMethod == null)
+                                            {
+                                                throw new NucleusUserException(Localiser.msg("021212", resultClass.getName(), fieldName));
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            else if (stmtMap instanceof StatementNewObjectMapping)
+                            {
+                                // TODO Handle this
+                            }
+                        }
+                    }
+                }
             }
 
             boolean hasParams = false;

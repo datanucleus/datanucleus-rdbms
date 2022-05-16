@@ -22,8 +22,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.math.BigDecimal;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -196,14 +194,7 @@ public class ResultClassROF extends AbstractROF
 
         if (QueryUtils.resultClassIsUserType(resultClass.getName()))
         {
-            AccessController.doPrivileged(new PrivilegedAction()
-            {
-                public Object run()
-                {
-                    populateDeclaredFieldsForUserType(resultClass);
-                    return null;
-                }
-            });
+            populateDeclaredFieldsForUserType(resultClass);
         }
 
         this.stmtMappings = null;
@@ -519,13 +510,7 @@ public class ResultClassROF extends AbstractROF
                             else if (setMethod == null)
                             {
                                 // Find a method with the right name and a single argument and try conversion of the supplied value
-                                Method[] methods = (Method[])AccessController.doPrivileged(new PrivilegedAction() 
-                                {
-                                    public Object run()
-                                    {
-                                        return resultClass.getDeclaredMethods();
-                                    }
-                                });
+                                Method[] methods = resultClass.getDeclaredMethods();
                                 for (int j=0;j<methods.length;j++)
                                 {
                                     Class[] args = methods[j].getParameterTypes();
