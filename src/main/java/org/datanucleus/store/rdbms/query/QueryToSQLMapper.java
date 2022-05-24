@@ -35,12 +35,12 @@ import org.datanucleus.metadata.InheritanceStrategy;
 import org.datanucleus.metadata.MapMetaData;
 import org.datanucleus.metadata.MapMetaData.MapType;
 import org.datanucleus.metadata.MetaDataManager;
+import org.datanucleus.metadata.QueryLanguage;
 import org.datanucleus.metadata.RelationType;
 import org.datanucleus.metadata.VersionMetaData;
 import org.datanucleus.metadata.VersionStrategy;
 import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.query.NullOrderingType;
-import org.datanucleus.store.query.Query;
 import org.datanucleus.store.query.QueryUtils;
 import org.datanucleus.store.query.compiler.CompilationComponent;
 import org.datanucleus.store.query.compiler.QueryCompilation;
@@ -4297,7 +4297,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
         }
 
         String operation = expr.getOperation();
-        if (invokedSqlExpr instanceof MapExpression && operation.equals("contains") && compilation.getQueryLanguage().equalsIgnoreCase(Query.LANGUAGE_JPQL))
+        if (invokedSqlExpr instanceof MapExpression && operation.equals("contains") && compilation.getQueryLanguage().equals(QueryLanguage.JPQL.name()))
         {
             // JPQL "MEMBER OF" will be passed through from generic compilation as "contains" since we don't know types at that point
             operation = "containsValue";
@@ -5429,7 +5429,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                 cls = importsDefinition.resolveClassDeclaration(className, clr, null);
             }
         }
-        if (cls == null && compilation.getQueryLanguage().equalsIgnoreCase(Query.LANGUAGE_JPQL))
+        if (cls == null && compilation.getQueryLanguage().equals(QueryLanguage.JPQL.name()))
         {
             // JPQL also allows use of EntityName in queries
             AbstractClassMetaData cmd = ec.getMetaDataManager().getMetaDataForEntityName(className);

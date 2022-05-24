@@ -1114,7 +1114,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
     @Override
     public String getNativeQueryLanguage()
     {
-        return QueryLanguage.SQL.toString();
+        return QueryLanguage.SQL.name();
     }
 
     /* (non-Javadoc)
@@ -1124,8 +1124,8 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
     public Collection<String> getSupportedQueryLanguages()
     {
         Collection<String> languages = super.getSupportedQueryLanguages();
-        languages.add("SQL");
-        languages.add("STOREDPROC");
+        languages.add(QueryLanguage.SQL.name());
+        languages.add(QueryLanguage.STOREDPROC.name());
         return languages;
     }
 
@@ -1135,8 +1135,8 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
     @Override
     public boolean supportsQueryLanguage(String language)
     {
-        if (language != null && (language.equalsIgnoreCase(Query.LANGUAGE_JDOQL) || language.equalsIgnoreCase(Query.LANGUAGE_JPQL) || language.equals(Query.LANGUAGE_SQL) || 
-            language.equals("STOREDPROC")))
+        if (language != null && (language.equals(QueryLanguage.JDOQL.name()) || language.equals(QueryLanguage.JPQL.name()) || language.equals(QueryLanguage.SQL.name()) || 
+            language.equals(QueryLanguage.STOREDPROC.name())))
         {
             return true;
         }
@@ -1149,19 +1149,19 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
     @Override
     public Query newQuery(String language, ExecutionContext ec)
     {
-        if (language.equalsIgnoreCase(Query.LANGUAGE_JDOQL))
+        if (language.equals(QueryLanguage.JDOQL.name()))
         {
             return new JDOQLQuery(this, ec);
         }
-        else if (language.equalsIgnoreCase(Query.LANGUAGE_JPQL))
+        else if (language.equals(QueryLanguage.JPQL.name()))
         {
             return new JPQLQuery(this, ec);
         }
-        else if (language.equalsIgnoreCase(Query.LANGUAGE_SQL))
+        else if (language.equals(QueryLanguage.SQL.name()))
         {
             return new SQLQuery(this, ec);
         }
-        else if (language.equalsIgnoreCase("STOREDPROC"))
+        else if (language.equals(QueryLanguage.STOREDPROC.name()))
         {
             return new StoredProcedureQuery(this, ec);
         }
@@ -1174,19 +1174,19 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
     @Override
     public Query newQuery(String language, ExecutionContext ec, String queryString)
     {
-        if (language.equalsIgnoreCase(Query.LANGUAGE_JDOQL))
+        if (language.equals(QueryLanguage.JDOQL.name()))
         {
             return new JDOQLQuery(this, ec, queryString);
         }
-        else if (language.equalsIgnoreCase(Query.LANGUAGE_JPQL))
+        else if (language.equals(QueryLanguage.JPQL.name()))
         {
             return new JPQLQuery(this, ec, queryString);
         }
-        else if (language.equalsIgnoreCase(Query.LANGUAGE_SQL))
+        else if (language.equals(QueryLanguage.SQL.name()))
         {
             return new SQLQuery(this, ec, queryString);
         }
-        else if (language.equalsIgnoreCase("STOREDPROC"))
+        else if (language.equals(QueryLanguage.STOREDPROC.name()))
         {
             return new StoredProcedureQuery(this, ec, queryString);
         }
@@ -1199,19 +1199,19 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
     @Override
     public Query newQuery(String language, ExecutionContext ec, Query q)
     {
-        if (language.equalsIgnoreCase(Query.LANGUAGE_JDOQL))
+        if (language.equals(QueryLanguage.JDOQL.name()))
         {
             return new JDOQLQuery(this, ec, (JDOQLQuery) q);
         }
-        else if (language.equalsIgnoreCase(Query.LANGUAGE_JPQL))
+        else if (language.equals(QueryLanguage.JPQL.name()))
         {
             return new JPQLQuery(this, ec, (JPQLQuery) q);
         }
-        else if (language.equalsIgnoreCase(Query.LANGUAGE_SQL))
+        else if (language.equals(QueryLanguage.SQL.name()))
         {
             return new SQLQuery(this, ec, (SQLQuery) q);
         }
-        else if (language.equalsIgnoreCase("STOREDPROC"))
+        else if (language.equals(QueryLanguage.STOREDPROC.name()))
         {
             return new StoredProcedureQuery(this, ec, (StoredProcedureQuery) q);
         }

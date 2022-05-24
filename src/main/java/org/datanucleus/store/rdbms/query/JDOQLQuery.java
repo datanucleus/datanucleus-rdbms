@@ -25,6 +25,7 @@ import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.InheritanceStrategy;
+import org.datanucleus.metadata.QueryLanguage;
 import org.datanucleus.metadata.RelationType;
 import org.datanucleus.store.StoreManager;
 import org.datanucleus.store.connection.ManagedConnection;
@@ -254,7 +255,7 @@ public class JDOQLQuery extends AbstractJDOQLQuery
         {
             // If using an extension that can change the datastore query then evict any existing compilation
             QueryManager qm = getQueryManager();
-            qm.removeQueryCompilation(Query.LANGUAGE_JDOQL, getQueryCacheKey());
+            qm.removeQueryCompilation(QueryLanguage.JDOQL.name(), getQueryCacheKey());
         }
 
         // Compile the generic query expressions

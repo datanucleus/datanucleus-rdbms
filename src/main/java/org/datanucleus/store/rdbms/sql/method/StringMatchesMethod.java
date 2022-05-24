@@ -20,7 +20,7 @@ package org.datanucleus.store.rdbms.sql.method;
 import java.util.List;
 
 import org.datanucleus.exceptions.NucleusException;
-import org.datanucleus.store.query.Query;
+import org.datanucleus.metadata.QueryLanguage;
 import org.datanucleus.store.query.expression.Expression;
 import org.datanucleus.store.rdbms.adapter.BaseDatastoreAdapter;
 import org.datanucleus.store.rdbms.adapter.DatastoreAdapter;
@@ -97,7 +97,7 @@ public class StringMatchesMethod implements SQLMethod
             // Convert the pattern to use the regex constructs suitable for the datastore
             String pattern = (String)((StringLiteral)likeExpr).getValue();
 
-            if (stmt.getQueryGenerator().getQueryLanguage().equalsIgnoreCase(Query.LANGUAGE_JDOQL))
+            if (stmt.getQueryGenerator().getQueryLanguage().equals(QueryLanguage.JDOQL.name()))
             {
                 // JDOQL input is in java.lang.String regular expression format, so convert to SQL like
                 boolean caseSensitive = false;
