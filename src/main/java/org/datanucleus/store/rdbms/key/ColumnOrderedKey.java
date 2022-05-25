@@ -81,9 +81,9 @@ public abstract class ColumnOrderedKey extends Key
         int i = 0;
         while (tokeniser.hasMoreTokens())
         {
-            String orderingToken = tokeniser.nextToken();
+            String orderingToken = tokeniser.nextToken().toUpperCase();
             colIter.next();
-            columnOrdering.set(i, orderingToken.equalsIgnoreCase("ASC") ? Boolean.TRUE : orderingToken.equalsIgnoreCase("DESC") ? Boolean.FALSE : null);
+            columnOrdering.set(i, orderingToken.equals("ASC") ? Boolean.TRUE : orderingToken.equals("DESC") ? Boolean.FALSE : null);
 
             i++;
         }

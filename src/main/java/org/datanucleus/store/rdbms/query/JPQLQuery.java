@@ -1385,11 +1385,12 @@ public class JPQLQuery extends AbstractJPQLQuery
         String defaultJoinTypeFilter = getStringExtensionProperty(EXTENSION_NAVIGATION_JOIN_TYPE_FILTER, null);
         if (defaultJoinTypeFilter != null)
         {
-            if (defaultJoinTypeFilter.equalsIgnoreCase("INNERJOIN"))
+            defaultJoinTypeFilter = defaultJoinTypeFilter.toUpperCase();
+            if (defaultJoinTypeFilter.equals("INNERJOIN"))
             {
                 sqlMapper.setDefaultJoinTypeFilter(JoinType.INNER_JOIN);
             }
-            else if (defaultJoinTypeFilter.equalsIgnoreCase("LEFTOUTERJOIN"))
+            else if (defaultJoinTypeFilter.equals("LEFTOUTERJOIN"))
             {
                 sqlMapper.setDefaultJoinTypeFilter(JoinType.LEFT_OUTER_JOIN);
             }
@@ -1402,11 +1403,12 @@ public class JPQLQuery extends AbstractJPQLQuery
         String defaultJoinType = getStringExtensionProperty(EXTENSION_NAVIGATION_JOIN_TYPE, null);
         if (defaultJoinType != null)
         {
-            if (defaultJoinType.equalsIgnoreCase("INNERJOIN"))
+            defaultJoinType = defaultJoinType.toUpperCase();
+            if (defaultJoinType.equals("INNERJOIN"))
             {
                 sqlMapper.setDefaultJoinType(JoinType.INNER_JOIN);
             }
-            else if (defaultJoinType.equalsIgnoreCase("LEFTOUTERJOIN"))
+            else if (defaultJoinType.equals("LEFTOUTERJOIN"))
             {
                 sqlMapper.setDefaultJoinType(JoinType.LEFT_OUTER_JOIN);
             }

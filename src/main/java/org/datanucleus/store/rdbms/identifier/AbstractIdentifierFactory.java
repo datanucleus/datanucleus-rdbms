@@ -117,16 +117,16 @@ public abstract class AbstractIdentifierFactory implements IdentifierFactory
         int userIdentifierCase = CASE_UPPER;
         if (props.containsKey(IdentifierFactory.PROPERTY_REQUIRED_CASE))
         {
-            String requiredCase = (String)props.get(IdentifierFactory.PROPERTY_REQUIRED_CASE);
-            if (requiredCase.equalsIgnoreCase("UPPERCASE"))
+            String requiredCase = ((String)props.get(IdentifierFactory.PROPERTY_REQUIRED_CASE)).toLowerCase();
+            if (requiredCase.equals("uppercase"))
             {
                 userIdentifierCase = CASE_UPPER;
             }
-            else if (requiredCase.equalsIgnoreCase("lowercase"))
+            else if (requiredCase.equals("lowercase"))
             {
                 userIdentifierCase = CASE_LOWER;
             }
-            else if (requiredCase.equalsIgnoreCase("MixedCase"))
+            else if (requiredCase.equals("mixedcase"))
             {
                 userIdentifierCase = CASE_PRESERVE;
             }

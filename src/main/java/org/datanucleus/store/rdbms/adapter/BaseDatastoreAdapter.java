@@ -175,7 +175,7 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
     protected Map<Integer, String> unsupportedJdbcTypesById = new HashMap<>();
 
     /** The set of reserved keywords for this datastore. */
-    protected final HashSet<String> reservedKeywords = new HashSet<>();
+    protected final Set<String> reservedKeywords = new HashSet<>();
 
     /** The product name of the underlying datastore. */
     protected String datastoreProductName;
@@ -962,13 +962,12 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
     }
 
     /**
-     * Iterator for the reserved words constructed from the method
-     * DataBaseMetaData.getSQLKeywords + standard SQL reserved words
-     * @return an Iterator with a set of reserved words
+     * Accessor for the reserved words constructed from the method DataBaseMetaData.getSQLKeywords + standard SQL reserved words
+     * @return Set of reserved words
      */
-    public Iterator iteratorReservedWords()
+    public Set<String> getReservedWords()
     {
-        return reservedKeywords.iterator();
+        return reservedKeywords;
     }
 
     public RDBMSColumnInfo newRDBMSColumnInfo(ResultSet rs)
@@ -2059,10 +2058,7 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
                 boolean defaultForJavaType = false;
                 if (defaultJava != null)
                 {
-                    if (defaultJava.equalsIgnoreCase("true"))
-                    {
-                        defaultForJavaType = Boolean.TRUE.booleanValue();
-                    }
+                    defaultForJavaType = Boolean.valueOf(defaultJava);
                 }
 
                 Class mappingType = null;

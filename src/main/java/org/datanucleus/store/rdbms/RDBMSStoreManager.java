@@ -2517,7 +2517,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
 
         super.printInformation(category, ps);
 
-        if (category.equalsIgnoreCase("DATASTORE"))
+        if (category.equals("DATASTORE"))
         {
             ps.println(dba.toString());
             ps.println();
@@ -2577,15 +2577,13 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
             // Print out the keywords info
             ps.println("Database Keywords");
 
-            Iterator reservedWordsIter = dba.iteratorReservedWords();
-            while (reservedWordsIter.hasNext())
+            for (String word : dba.getReservedWords())
             {
-                Object words = reservedWordsIter.next();
-                ps.println(words);
+                ps.println(word);
             }
             ps.println("");
         }
-        else if (category.equalsIgnoreCase("SCHEMA"))
+        else if (category.equals("SCHEMA"))
         {
             ps.println(dba.toString());
             ps.println();
@@ -3531,13 +3529,13 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                 if (!columnsInitialised)
                 {
                     // Allow initialisation of the column information TODO Arguably we should always do this
-                    String initInfo = getStringProperty(RDBMSPropertyNames.PROPERTY_RDBMS_INIT_COLUMN_INFO);
-                    if (initInfo.equalsIgnoreCase("PK"))
+                    String initInfo = getStringProperty(RDBMSPropertyNames.PROPERTY_RDBMS_INIT_COLUMN_INFO).toUpperCase();
+                    if (initInfo.equals("PK"))
                     {
                         // Initialise the PK columns only
                         t.initializeColumnInfoForPrimaryKeyColumns(getCurrentConnection());
                     }
-                    else if (initInfo.equalsIgnoreCase("ALL"))
+                    else if (initInfo.equals("ALL"))
                     {
                         // Initialise all columns
                         t.initializeColumnInfoFromDatastore(getCurrentConnection());
@@ -3806,10 +3804,12 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
     public void createSchemaForClasses(Set<String> classNames, Properties props)
     {
         String ddlFilename = props != null ? props.getProperty("ddlFilename") : null;
+
         String completeDdlProp = props != null ? props.getProperty("completeDdl") : null;
-        boolean completeDdl = completeDdlProp != null && completeDdlProp.equalsIgnoreCase("true");
+        boolean completeDdl = Boolean.valueOf(completeDdlProp);
+
         String autoStartProp = props != null ? props.getProperty("autoStartTable") : null;
-        boolean autoStart = autoStartProp != null && autoStartProp.equalsIgnoreCase("true");
+        boolean autoStart = Boolean.valueOf(autoStartProp);
 
         if (classNames != null && !classNames.isEmpty())
         {

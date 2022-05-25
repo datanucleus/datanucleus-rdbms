@@ -194,15 +194,16 @@ public class CollectionContainsMethod implements SQLMethod
                 String extensionValue = (String) stmt.getQueryGenerator().getValueForExtension(extensionName);
                 if (extensionValue != null)
                 {
-                    if (extensionValue.equalsIgnoreCase("SUBQUERY"))
+                    extensionValue = extensionValue.toUpperCase();
+                    if (extensionValue.equals("SUBQUERY"))
                     {
                         useSubquery = true;
                     }
-                    else if (extensionValue.equalsIgnoreCase("INNERJOIN"))
+                    else if (extensionValue.equals("INNERJOIN"))
                     {
                         useSubquery = false;
                     }
-                    else if (extensionValue.equalsIgnoreCase("LEFTOUTERJOIN"))
+                    else if (extensionValue.equals("LEFTOUTERJOIN"))
                     {
                         joinType = JoinType.LEFT_OUTER_JOIN;
                     }

@@ -96,19 +96,20 @@ public final class ScrollableQueryResult<E> extends AbstractRDBMSQueryResult<E> 
         String ext = (String)query.getExtension(Query.EXTENSION_RESULT_CACHE_TYPE);
         if (ext != null)
         {
-            if (ext.equalsIgnoreCase("soft"))
+            ext = ext.toLowerCase();
+            if (ext.equals("soft"))
             {
                 resultsObjsByIndex = new ConcurrentReferenceHashMap<>(1, ReferenceType.STRONG, ReferenceType.SOFT);
             }
-            else if (ext.equalsIgnoreCase("weak"))
+            else if (ext.equals("weak"))
             {
                 resultsObjsByIndex = new ConcurrentReferenceHashMap<>(1, ReferenceType.STRONG, ReferenceType.WEAK);
             }
-            else if (ext.equalsIgnoreCase("strong"))
+            else if (ext.equals("strong"))
             {
                 resultsObjsByIndex = new HashMap<>();
             }
-            else if (ext.equalsIgnoreCase("none"))
+            else if (ext.equals("none"))
             {
                 resultsObjsByIndex = null;
             }

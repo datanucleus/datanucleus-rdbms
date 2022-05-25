@@ -370,7 +370,7 @@ public class DB2Adapter extends BaseDatastoreAdapter
     @Override
     public boolean isStatementTimeout(SQLException sqle)
     {
-        if (sqle.getSQLState() != null && sqle.getSQLState().equalsIgnoreCase("57014") && (sqle.getErrorCode() == -952 || sqle.getErrorCode() == -905))
+        if (sqle.getSQLState() != null && sqle.getSQLState().equals("57014") && (sqle.getErrorCode() == -952 || sqle.getErrorCode() == -905))
         {
             return true;
         }

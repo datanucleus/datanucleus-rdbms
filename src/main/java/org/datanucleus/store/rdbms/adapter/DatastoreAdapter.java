@@ -23,8 +23,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.Properties;
+import java.util.Set;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.metadata.JdbcType;
@@ -905,11 +905,10 @@ public interface DatastoreAdapter
     boolean sequenceExists(Connection conn, String catalogName, String schemaName, String seqName);
 
     /**
-     * Iterator for the reserved words constructed from the method
-     * DataBaseMetaData.getSQLKeywords + standard SQL reserved words
-     * @return an Iterator with a set of reserved words
+     * Accessor for the reserved words constructed from the method DataBaseMetaData.getSQLKeywords + standard SQL reserved words
+     * @return Set of reserved words
      */
-    Iterator iteratorReservedWords();
+    Set<String> getReservedWords();
 
     /**
      * Accessor for a statement that will return the statement to use to get the datastore date.

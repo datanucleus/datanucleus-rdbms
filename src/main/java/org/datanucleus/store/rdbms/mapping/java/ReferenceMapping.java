@@ -89,12 +89,12 @@ public abstract class ReferenceMapping extends MultiPersistableMapping implement
     {
         if (mmd.hasExtension("mapping-strategy"))
         {
-            String strategy = mmd.getValueForExtension("mapping-strategy");
-            if (strategy.equalsIgnoreCase("identity"))
+            String strategy = mmd.getValueForExtension("mapping-strategy").toLowerCase();
+            if (strategy.equals("identity"))
             {
                 mappingStrategy = ID_MAPPING;
             }
-            else if (strategy.equalsIgnoreCase("xcalia"))
+            else if (strategy.equals("xcalia"))
             {
                 mappingStrategy = XCALIA_MAPPING;
             }

@@ -185,7 +185,7 @@ public final class SQLQuery extends Query
             type = QueryType.valueOf(queryTypeExt);
         }
 
-        if (ec.getApiAdapter().getName().equalsIgnoreCase("JDO"))
+        if (ec.getApiAdapter().getName().equals("JDO"))
         {
             // Check for strict SQL where the API restricts the usage
             if (!getBooleanExtensionProperty(EXTENSION_SQL_ALLOW_ALL, false))

@@ -41,10 +41,10 @@ public class RDBMSPropertyValidator implements PropertyValidator
         {
             if (value instanceof String)
             {
-                String strVal = (String)value;
-                if (strVal.equalsIgnoreCase("forward") ||
-                    strVal.equalsIgnoreCase("reverse") ||
-                    strVal.equalsIgnoreCase("unknown"))
+                String strVal = ((String)value).toLowerCase();
+                if (strVal.equals("forward") ||
+                    strVal.equals("reverse") ||
+                    strVal.equals("unknown"))
                 {
                     return true;
                 }
@@ -54,10 +54,10 @@ public class RDBMSPropertyValidator implements PropertyValidator
         {
             if (value instanceof String)
             {
-                String strVal = (String)value;
-                if (strVal.equalsIgnoreCase(RDBMSQueryUtils.QUERY_RESULTSET_TYPE_FORWARD_ONLY) ||
-                    strVal.equalsIgnoreCase(RDBMSQueryUtils.QUERY_RESULTSET_TYPE_SCROLL_SENSITIVE) ||
-                    strVal.equalsIgnoreCase(RDBMSQueryUtils.QUERY_RESULTSET_TYPE_SCROLL_INSENSITIVE))
+                String strVal = ((String)value).toLowerCase();
+                if (strVal.equals(RDBMSQueryUtils.QUERY_RESULTSET_TYPE_FORWARD_ONLY) ||
+                    strVal.equals(RDBMSQueryUtils.QUERY_RESULTSET_TYPE_SCROLL_SENSITIVE) ||
+                    strVal.equals(RDBMSQueryUtils.QUERY_RESULTSET_TYPE_SCROLL_INSENSITIVE))
                 {
                     return true;
                 }
@@ -67,9 +67,9 @@ public class RDBMSPropertyValidator implements PropertyValidator
         {
             if (value instanceof String)
             {
-                String strVal = (String)value;
-                if (strVal.equalsIgnoreCase(RDBMSQueryUtils.QUERY_RESULTSET_CONCURRENCY_READONLY) ||
-                    strVal.equalsIgnoreCase(RDBMSQueryUtils.QUERY_RESULTSET_CONCURRENCY_UPDATEABLE))
+                String strVal = ((String)value).toLowerCase();
+                if (strVal.equals(RDBMSQueryUtils.QUERY_RESULTSET_CONCURRENCY_READONLY) ||
+                    strVal.equals(RDBMSQueryUtils.QUERY_RESULTSET_CONCURRENCY_UPDATEABLE))
                 {
                     return true;
                 }
@@ -79,9 +79,9 @@ public class RDBMSPropertyValidator implements PropertyValidator
         {
             if (value instanceof String)
             {
-                String strVal = (String)value;
-                if (strVal.equalsIgnoreCase("exists") ||
-                    strVal.equalsIgnoreCase("none"))
+                String strVal = ((String)value).toLowerCase();
+                if (strVal.equals("exists") ||
+                    strVal.equals("none"))
                 {
                     return true;
                 }
@@ -91,9 +91,9 @@ public class RDBMSPropertyValidator implements PropertyValidator
         {
             if (value instanceof String)
             {
-                String strVal = (String)value;
-                if (strVal.equalsIgnoreCase("DataNucleus") ||
-                    strVal.equalsIgnoreCase("JDO2"))
+                String strVal = ((String)value).toLowerCase();
+                if (strVal.equals("datanucleus") ||
+                    strVal.equals("jdo2"))
                 {
                     return true;
                 }
@@ -103,9 +103,9 @@ public class RDBMSPropertyValidator implements PropertyValidator
         {
             if (value instanceof String)
             {
-                String strVal = (String)value;
-                if (strVal.equalsIgnoreCase("EXCEPTION") ||
-                    strVal.equalsIgnoreCase("TRUNCATE"))
+                String strVal = ((String)value).toLowerCase();
+                if (strVal.equals("exception") ||
+                    strVal.equals("truncate"))
                 {
                     return true;
                 }
@@ -115,10 +115,10 @@ public class RDBMSPropertyValidator implements PropertyValidator
         {
             if (value instanceof String)
             {
-                String strVal = (String)value;
-                if (strVal.equalsIgnoreCase("ALL") ||
-                    strVal.equalsIgnoreCase("PK") ||
-                    strVal.equalsIgnoreCase("NONE"))
+                String strVal = ((String)value).toLowerCase();
+                if (strVal.equals("all") ||
+                    strVal.equals("pk") ||
+                    strVal.equals("none"))
                 {
                     return true;
                 }
@@ -128,10 +128,10 @@ public class RDBMSPropertyValidator implements PropertyValidator
         {
             if (value instanceof String)
             {
-                String strVal = (String)value;
-                if (strVal.equalsIgnoreCase("JDBC") ||
-                    strVal.equalsIgnoreCase("PARAMS_INLINE") ||
-                    strVal.equalsIgnoreCase("PARAMS_IN_BRACKETS"))
+                String strVal = ((String)value).toUpperCase();
+                if (strVal.equals("JDBC") ||
+                    strVal.equals("PARAMS_INLINE") ||
+                    strVal.equals("PARAMS_IN_BRACKETS"))
                 {
                     return true;
                 }
