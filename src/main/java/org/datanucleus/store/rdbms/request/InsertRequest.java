@@ -324,27 +324,41 @@ public class InsertRequest extends Request
                     if (insertFieldNumbers.length > 0)
                     {
                         AbstractClassMetaData cmd = sm.getClassMetaData();
-
-                        if (createTimestampStmtMapping != null)
+                        for (int i=0;i<insertFieldNumbers.length;i++)
                         {
-                            // Set create timestamp to time for the start of this transaction
-                            int createTimestampMemberPos = cmd.getCreateTimestampMemberPosition();
-                            AbstractMemberMetaData mmd = cmd.getMetaDataForManagedMemberAtAbsolutePosition(createTimestampMemberPos);
-                            if (mmd.getType().isAssignableFrom(java.time.Instant.class))
+                            if (insertFieldNumbers[i] == cmd.getCreateTimestampMemberPosition())
                             {
-                                sm.replaceField(createTimestampMemberPos, ec.getTransaction().getIsActive() ? 
-                                        java.time.Instant.ofEpochMilli(ec.getTransaction().getBeginTime()) : java.time.Instant.now());
+                                // Member "create-timestamp"
+                                AbstractMemberMetaData mmd = cmd.getMetaDataForManagedMemberAtAbsolutePosition(insertFieldNumbers[i]);
+                                if (mmd.isCreateTimestamp())
+                                {
+                                    if (mmd.getType().isAssignableFrom(java.time.Instant.class))
+                                    {
+                                        sm.replaceField(insertFieldNumbers[i], ec.getTransaction().getIsActive() ? 
+                                                java.time.Instant.ofEpochMilli(ec.getTransaction().getBeginTime()) : java.time.Instant.now());
+                                    }
+                                    else
+                                    {
+                                        sm.replaceField(insertFieldNumbers[i], ec.getTransaction().getIsActive() ? 
+                                                new Timestamp(ec.getTransaction().getBeginTime()) : new Timestamp(System.currentTimeMillis()));
+                                    }
+                                }
                             }
-                            else
+                            else if (insertFieldNumbers[i] == cmd.getCreateUserMemberPosition())
                             {
-                                sm.replaceField(createTimestampMemberPos, ec.getTransaction().getIsActive() ? 
-                                        new Timestamp(ec.getTransaction().getBeginTime()) : new Timestamp(System.currentTimeMillis()));
+                                // Member "create-user"
+                                sm.replaceField(cmd.getCreateUserMemberPosition(), ec.getCurrentUser());
                             }
-                        }
-                        if (createUserStmtMapping != null)
-                        {
-                            // Set create user to current user
-                            sm.replaceField(cmd.getCreateUserMemberPosition(), ec.getCurrentUser());
+                            else if (insertFieldNumbers[i] == cmd.getUpdateTimestampMemberPosition())
+                            {
+                                // Member "update-timestamp"
+                                sm.replaceField(insertFieldNumbers[i], null);
+                            }
+                            else if (insertFieldNumbers[i] == cmd.getUpdateUserMemberPosition())
+                            {
+                                // Member "update-user"
+                                sm.replaceField(insertFieldNumbers[i], null);
+                            }
                         }
 
                         int numberOfFieldsToProvide = 0;
@@ -409,22 +423,26 @@ public class InsertRequest extends Request
 
                     if (createUserStmtMapping != null)
                     {
+                        // Set SURROGATE create-user
                         table.getSurrogateMapping(SurrogateColumnType.CREATE_USER, false).setObject(ec, ps, createUserStmtMapping.getParameterPositionsForOccurrence(0), 
                             ec.getCurrentUser());
                     }
                     if (createTimestampStmtMapping != null)
                     {
+                        // Set SURROGATE create-timestamp
                         table.getSurrogateMapping(SurrogateColumnType.CREATE_TIMESTAMP, false).setObject(ec, ps, createTimestampStmtMapping.getParameterPositionsForOccurrence(0), 
                             new Timestamp(ec.getTransaction().getIsActive() ? ec.getTransaction().getBeginTime() : System.currentTimeMillis()));
                     }
 
                     if (updateUserStmtMapping != null)
                     {
+                        // Set SURROGATE update-user
                         // TODO Do we need to specify this on INSERT? can they be nullable?
                         table.getSurrogateMapping(SurrogateColumnType.UPDATE_USER, false).setObject(ec, ps, updateUserStmtMapping.getParameterPositionsForOccurrence(0), "");
                     }
                     if (updateTimestampStmtMapping != null)
                     {
+                        // Set SURROGATE update-timestamp
                         // TODO Do we need to specify this on INSERT? can they be nullable?
                         table.getSurrogateMapping(SurrogateColumnType.UPDATE_TIMESTAMP, false).setObject(ec, ps, updateTimestampStmtMapping.getParameterPositionsForOccurrence(0), null);
                     }
@@ -758,12 +776,16 @@ public class InsertRequest extends Request
         /** StatementExpressionIndex for multi-tenancy. **/
         private StatementMappingIndex multitenancyStatementMapping;
 
-        /** StatementExpressionIndex for soft-delete. **/
+        /** StatementExpressionIndex for SURROGATE soft-delete. **/
         private StatementMappingIndex softDeleteStatementMapping;
 
+        /** StatementExpressionIndex for SURROGATE create-user. **/
         private StatementMappingIndex createUserStatementMapping;
+        /** StatementExpressionIndex for SURROGATE create-timestamp. **/
         private StatementMappingIndex createTimestampStatementMapping;
+        /** StatementExpressionIndex for SURROGATE update-user. **/
         private StatementMappingIndex updateUserStatementMapping;
+        /** StatementExpressionIndex for SURROGATE update-timestamp. **/
         private StatementMappingIndex updateTimestampStatementMapping;
 
         private StatementMappingIndex[] externalFKStmtExprIndex;
@@ -970,7 +992,7 @@ public class InsertRequest extends Request
         }
 
         /**
-         * Consumes a mapping not associated to a field.
+         * Consumes a (surrogate) mapping (i.e not associated to a field).
          * @param m The mapping.
          * @param mappingType the Mapping type
          */
