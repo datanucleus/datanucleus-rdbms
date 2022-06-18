@@ -71,13 +71,14 @@ public class LocateRequest extends Request
     /**
      * Constructor, taking the table. Uses the structure of the datastore table to build a basic query.
      * @param table The Class Table representing the datastore table to retrieve
+     * @param cmd Metadata for the class we are locating an instance of
+     * @param clr ClassLoader resolver
      */
-    public LocateRequest(DatastoreClass table)
+    public LocateRequest(DatastoreClass table, AbstractClassMetaData cmd, ClassLoaderResolver clr)
     {
         super(table);
 
         RDBMSStoreManager storeMgr = table.getStoreManager();
-        ClassLoaderResolver clr = storeMgr.getNucleusContext().getClassLoaderResolver(null);
         SelectStatement sqlStatement = new SelectStatement(storeMgr, table, null, null);
         mappingDefinition = new StatementClassMapping();
         SQLExpressionFactory exprFactory = storeMgr.getSQLExpressionFactory();
@@ -85,8 +86,6 @@ public class LocateRequest extends Request
         sqlStatement.select(exprFactory.newLiteral(sqlStatement, m, 1), null);
 
         // Add WHERE clause restricting to the identity of an object
-        AbstractClassMetaData cmd = storeMgr.getMetaDataManager().getMetaDataForClass(table.getType(), clr);
-
         int inputParamNum = 1;
         if (table.getIdentityType() == IdentityType.DATASTORE)
         {

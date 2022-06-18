@@ -587,14 +587,16 @@ public class RDBMSPersistenceHandler extends AbstractPersistenceHandler
             smsByTable.put(table, smList);
         }
 
+        // Submit a LocateBulkRequest for each table required, with each request returning however many are in that table
         for (Map.Entry<DatastoreClass, List<DNStateManager>> entry : smsByTable.entrySet())
         {
             DatastoreClass table = entry.getKey();
             List<DNStateManager> tableSMs = entry.getValue();
+            AbstractClassMetaData cmd = tableSMs.get(0).getClassMetaData();
 
             // TODO This just uses the base table. Could change to use the most-derived table
             // which would permit us to join to supertables and load more fields during this process
-            LocateBulkRequest req = new LocateBulkRequest(table);
+            LocateBulkRequest req = new LocateBulkRequest(table, cmd, clr);
             req.execute(tableSMs.toArray(new DNStateManager[tableSMs.size()]));
         }
     }
@@ -610,23 +612,24 @@ public class RDBMSPersistenceHandler extends AbstractPersistenceHandler
     {
         ClassLoaderResolver clr = sm.getExecutionContext().getClassLoaderResolver();
         DatastoreClass table = getDatastoreClass(sm.getObject().getClass().getName(), clr);
-        getLocateRequest(table, sm.getObject().getClass().getName()).execute(sm);
+        getLocateRequest(table, sm.getClassMetaData(), clr).execute(sm);
     }
 
     /**
      * Returns a request object that will locate a row from the given table.
      * The store manager will cache the request object for re-use by subsequent requests to the same table.
      * @param table The table from which to locate.
-     * @param className the class name of the object of the request
+     * @param cmd Metadata for the class being located
+     * @param clr ClassLoader resolver
      * @return A locate request object.
      */
-    private Request getLocateRequest(DatastoreClass table, String className)
+    private Request getLocateRequest(DatastoreClass table, AbstractClassMetaData cmd, ClassLoaderResolver clr)
     {
-        RequestIdentifier reqID = new RequestIdentifier(table, null, RequestType.LOCATE, className);
+        RequestIdentifier reqID = new RequestIdentifier(table, null, RequestType.LOCATE, cmd.getFullClassName());
         Request req = requestsByID.get(reqID);
         if (req == null)
         {
-            req = new LocateRequest(table);
+            req = new LocateRequest(table, cmd, clr);
             requestsByID.put(reqID, req);
         }
         return req;
