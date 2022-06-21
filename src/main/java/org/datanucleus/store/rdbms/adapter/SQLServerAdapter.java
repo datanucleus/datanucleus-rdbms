@@ -113,8 +113,11 @@ public class SQLServerAdapter extends BaseDatastoreAdapter
         reservedKeywords.addAll(StringUtils.convertCommaSeparatedStringToSet(MSSQL_RESERVED_WORDS));
 
         supportedOptions.add(IDENTITY_COLUMNS);
+
+        // Locking supported on SQLServer via "WITH (UPDLOCK, ROWLOCK)" in JOIN and after FROM. See SelectStatement, SequenceTable
         supportedOptions.add(LOCK_ROW_USING_OPTION_AFTER_FROM);
         supportedOptions.add(LOCK_ROW_USING_OPTION_WITHIN_JOIN);
+
         supportedOptions.add(STORED_PROCEDURES);
         supportedOptions.add(ORDERBY_NULLS_USING_CASE_NULL);
 
