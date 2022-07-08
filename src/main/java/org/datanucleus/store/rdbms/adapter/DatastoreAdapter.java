@@ -406,6 +406,8 @@ public interface DatastoreAdapter
      */
     public static final String RAW_PREFIX_LIKE_STATEMENTS = "RawPrefixLikeStatements";
 
+    public static final String INCLUDE_TABLE_INDEX_STATISTICS = "IncludeTableIndexStatistics";
+
     /**
      * Initialise the datastore adapter.
      * @param handler SchemaHandler that we initialise the types for

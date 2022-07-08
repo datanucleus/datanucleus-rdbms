@@ -1081,15 +1081,18 @@ public abstract class TableImpl extends AbstractTable
             Iterator indexIter = tableIndexInfo.getChildren().iterator();
             while (indexIter.hasNext())
             {
-                // No idea of why this was being used, so commented out (H2 v2 fails if enabled)
-//                short idxType = ((Short)indexInfo.getProperty("type")).shortValue();
-//                if (idxType == DatabaseMetaData.tableIndexStatistic)
-//                {
-//                    // Ignore
-//                    continue;
-//                }
+                IndexInfo indexInfo = (IndexInfo)indexIter.next();
 
-                IndexInfo indexInfo = (IndexInfo)indexIter.next();    
+                if (!dba.supportsOption(DatastoreAdapter.INCLUDE_TABLE_INDEX_STATISTICS))
+                {
+                    short idxType = ((Short)indexInfo.getProperty("type")).shortValue();
+                    if (idxType == DatabaseMetaData.tableIndexStatistic)
+                    {
+                        // Ignore
+                        continue;
+                    }
+                }
+ 
                 String indexName = (String)indexInfo.getProperty("index_name");
                 DatastoreIdentifier indexIdentifier = idFactory.newIdentifier(IdentifierType.CANDIDATE_KEY, indexName);
                 Index idx = indicesByName.get(indexIdentifier);

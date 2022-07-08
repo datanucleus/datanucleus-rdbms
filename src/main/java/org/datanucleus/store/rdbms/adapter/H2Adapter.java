@@ -80,6 +80,9 @@ public class H2Adapter extends BaseDatastoreAdapter
             }
         }
 
+        // H2 v2, at least, requires this
+        supportedOptions.add(INCLUDE_TABLE_INDEX_STATISTICS);
+
         supportedOptions.add(PRIMARYKEY_IN_CREATE_STATEMENTS);
         supportedOptions.add(LOCK_ROW_USING_SELECT_FOR_UPDATE);
         supportedOptions.add(IDENTITY_COLUMNS);
