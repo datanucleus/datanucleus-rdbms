@@ -104,13 +104,13 @@ public abstract class AbstractListStore<E> extends AbstractCollectionStore<E> im
     }
 
     @Override
-    public boolean addAll(DNStateManager ownerSM, Collection<E> elements, int size)
+    public boolean addAll(DNStateManager ownerSM, Collection<? extends E> elements, int size)
     {
         return internalAdd(ownerSM, 0, true, elements, size);
     }
 
     @Override
-    public boolean addAll(DNStateManager ownerSM, Collection<E> elements, int index, int size)
+    public boolean addAll(DNStateManager ownerSM, Collection<? extends E> elements, int index, int size)
     {
         return internalAdd(ownerSM, index, false, elements, size);
     }
@@ -124,7 +124,7 @@ public abstract class AbstractListStore<E> extends AbstractCollectionStore<E> im
      * @param size Current size of List (if known). -1 if not known
      * @return Whether it was successful
      */
-    protected abstract boolean internalAdd(DNStateManager ownerSM, int startAt, boolean atEnd, Collection<E> elements, int size);
+    protected abstract boolean internalAdd(DNStateManager ownerSM, int startAt, boolean atEnd, Collection<? extends E> elements, int size);
 
     @Override
     public E get(DNStateManager ownerSM, int index)

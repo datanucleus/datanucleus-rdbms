@@ -562,7 +562,7 @@ public class FKSetStore<E> extends AbstractSetStore<E>
     }
  
     @Override
-    public boolean addAll(DNStateManager ownerSM, Collection<E> elements, int size)
+    public boolean addAll(DNStateManager ownerSM, Collection<? extends E> elements, int size)
     {
         if (elements == null || elements.size() == 0)
         {

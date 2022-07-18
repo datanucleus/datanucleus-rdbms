@@ -296,7 +296,7 @@ public class JoinSetStore<E> extends AbstractSetStore<E>
     }
 
     @Override
-    public boolean addAll(DNStateManager sm, Collection<E> elements, int size)
+    public boolean addAll(DNStateManager sm, Collection<? extends E> elements, int size)
     {
         if (elements == null || elements.size() == 0)
         {
@@ -308,7 +308,7 @@ public class JoinSetStore<E> extends AbstractSetStore<E>
 
         // Validate all elements for writing
         ExecutionContext ec = sm.getExecutionContext();
-        Iterator<E> iter = elements.iterator();
+        Iterator<? extends E> iter = elements.iterator();
         while (iter.hasNext())
         {
             Object element = iter.next();

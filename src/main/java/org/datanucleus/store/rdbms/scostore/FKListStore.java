@@ -519,7 +519,7 @@ public class FKListStore<E> extends AbstractListStore<E>
      * @param size Current size of list (if known). -1 if not known
      * @return Whether it was successful
      */
-    protected boolean internalAdd(DNStateManager ownerSM, int startAt, boolean atEnd, Collection<E> c, int size)
+    protected boolean internalAdd(DNStateManager ownerSM, int startAt, boolean atEnd, Collection<? extends E> c, int size)
     {
         if (c == null || c.size() == 0)
         {
