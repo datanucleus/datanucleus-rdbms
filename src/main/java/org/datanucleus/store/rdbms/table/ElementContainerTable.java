@@ -351,7 +351,7 @@ public abstract class ElementContainerTable extends JoinTable
             autoMode = true;
         }
 
-        List<ForeignKey> foreignKeys = new ArrayList();
+        List<ForeignKey> foreignKeys = new ArrayList<>();
         try
         {
             // FK from join table to owner table
@@ -387,7 +387,7 @@ public abstract class ElementContainerTable extends JoinTable
                     if (ClassUtils.isReferenceType(embFmd.getType()) && embFieldMapping instanceof ReferenceMapping)
                     {
                         // Field is a reference type, so add a FK to the table of the PC for each PC implementation
-                        Collection fks = TableUtils.getForeignKeysForReferenceField(embFieldMapping, embFmd, autoMode, storeMgr, clr);
+                        Collection<ForeignKey> fks = TableUtils.getForeignKeysForReferenceField(embFieldMapping, embFmd, autoMode, storeMgr, clr);
                         foreignKeys.addAll(fks);
                     }
                     else if (storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForClass(embFmd.getType(), clr) != null &&
@@ -459,7 +459,7 @@ public abstract class ElementContainerTable extends JoinTable
     {
         assertIsInitialized();
 
-        Set<Index> indices = new HashSet();
+        Set<Index> indices = new HashSet<>();
 
         // Index for FK back to owner
         if (mmd.getIndexMetaData() != null)

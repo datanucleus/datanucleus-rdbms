@@ -46,6 +46,8 @@ import org.datanucleus.store.rdbms.schema.SQLTypeInfo;
 import org.datanucleus.store.rdbms.sql.SQLTable;
 import org.datanucleus.store.rdbms.sql.SQLText;
 import org.datanucleus.store.rdbms.sql.SelectStatement;
+import org.datanucleus.store.rdbms.sql.method.SQLMethod;
+import org.datanucleus.store.rdbms.sql.operation.SQLOperation;
 import org.datanucleus.store.rdbms.table.Column;
 import org.datanucleus.store.rdbms.table.Table;
 import org.datanucleus.store.schema.StoreSchemaHandler;
@@ -662,7 +664,7 @@ public class SQLServerAdapter extends BaseDatastoreAdapter
      * @see org.datanucleus.store.rdbms.adapter.BaseDatastoreAdapter#getSQLOperationClass(java.lang.String)
      */
     @Override
-    public Class getSQLOperationClass(String operationName)
+    public Class<? extends SQLOperation> getSQLOperationClass(String operationName)
     {
         if ("concat".equals(operationName)) return org.datanucleus.store.rdbms.sql.operation.Concat2Operation.class;
 
@@ -673,7 +675,7 @@ public class SQLServerAdapter extends BaseDatastoreAdapter
      * @see org.datanucleus.store.rdbms.adapter.BaseDatastoreAdapter#getSQLMethodClass(java.lang.String, java.lang.String)
      */
     @Override
-    public Class getSQLMethodClass(String className, String methodName, ClassLoaderResolver clr)
+    public Class<? extends SQLMethod> getSQLMethodClass(String className, String methodName, ClassLoaderResolver clr)
     {
         if (className == null)
         {

@@ -162,7 +162,7 @@ public class RDBMSPersistenceHandler extends AbstractPersistenceHandler
         getInsertRequest(table, sm.getClassMetaData(), clr).execute(sm);
 
         // Process any secondary tables
-        Collection<SecondaryDatastoreClass> secondaryTables = table.getSecondaryDatastoreClasses();
+        Collection<? extends SecondaryDatastoreClass> secondaryTables = table.getSecondaryDatastoreClasses();
         if (secondaryTables != null)
         {
             for (SecondaryDatastoreClass secTable : secondaryTables)
@@ -447,7 +447,7 @@ public class RDBMSPersistenceHandler extends AbstractPersistenceHandler
         getUpdateRequest(table, mmds, sm.getClassMetaData(), clr).execute(sm);
 
         // Update any secondary tables
-        Collection<SecondaryDatastoreClass> secondaryTables = table.getSecondaryDatastoreClasses();
+        Collection<? extends SecondaryDatastoreClass> secondaryTables = table.getSecondaryDatastoreClasses();
         if (secondaryTables != null)
         {
             for (SecondaryDatastoreClass secTable : secondaryTables)
@@ -520,7 +520,7 @@ public class RDBMSPersistenceHandler extends AbstractPersistenceHandler
         }
 
         // Delete any secondary tables
-        Collection<SecondaryDatastoreClass> secondaryTables = table.getSecondaryDatastoreClasses();
+        Collection<? extends SecondaryDatastoreClass> secondaryTables = table.getSecondaryDatastoreClasses();
         if (secondaryTables != null)
         {
             for (SecondaryDatastoreClass secTable : secondaryTables)

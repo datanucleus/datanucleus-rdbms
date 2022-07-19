@@ -32,9 +32,7 @@ import org.datanucleus.store.rdbms.sql.expression.StringExpression;
  */
 public class StringTrim3Method implements SQLMethod
 {
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.rdbms.sql.method.SQLMethod#getExpression(org.datanucleus.store.rdbms.sql.expression.SQLExpression, java.util.List)
-     */
+    @Override
     public SQLExpression getExpression(SQLStatement stmt, SQLExpression expr, List<SQLExpression> args)
     {
         if (args != null && args.size() > 1)
@@ -49,7 +47,7 @@ public class StringTrim3Method implements SQLMethod
             trimCharExpr = args.get(0);
         }
 
-        List trimArgs = new ArrayList();
+        List<SQLExpression> trimArgs = new ArrayList<>();
         if (trimCharExpr == null)
         {
             trimArgs.add(expr);

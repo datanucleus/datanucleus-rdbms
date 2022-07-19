@@ -318,7 +318,7 @@ public final class ScrollableQueryResult<E> extends AbstractRDBMSQueryResult<E> 
     {
         if (resultIdsByPosition != null)
         {
-            List ids = new ArrayList();
+            List<Object> ids = new ArrayList<>();
             Iterator<Integer> resultIdPositionIter = resultIdsByPosition.keySet().iterator();
             while (resultIdPositionIter.hasNext())
             {
@@ -576,7 +576,7 @@ public final class ScrollableQueryResult<E> extends AbstractRDBMSQueryResult<E> 
         return toArrayInternal(null);
     }
 
-    public Object[] toArray(Object[] a)
+    public <T> T[] toArray(T[] a)
     {
         if (a == null)
         {
@@ -587,10 +587,10 @@ public final class ScrollableQueryResult<E> extends AbstractRDBMSQueryResult<E> 
         return toArrayInternal(a);
     }
 
-    private Object[] toArrayInternal(Object[] a)
+    private <T> T[] toArrayInternal(T[] a)
     {
         Object[] result = a;
-        ArrayList resultList = null;
+        List<T> resultList = null;
 
         int size = -1;
         try
@@ -613,7 +613,7 @@ public final class ScrollableQueryResult<E> extends AbstractRDBMSQueryResult<E> 
             {
                 // if the size is known and exceeds the array length, we use a list instead of populating the array directly
                 result = null;
-                resultList = new ArrayList(size);
+                resultList = new ArrayList<>(size);
             }
         }
 
@@ -641,10 +641,10 @@ public final class ScrollableQueryResult<E> extends AbstractRDBMSQueryResult<E> 
                         capacity = result.length;
                     }
 
-                    resultList = new ArrayList(capacity);
+                    resultList = new ArrayList<>(capacity);
                     for (int i = 0; i < result.length; i++)
                     {
-                        resultList.add(result[i]);
+                        resultList.add((T)result[i]);
                     }
                     result = null;
                     break;
@@ -663,7 +663,7 @@ public final class ScrollableQueryResult<E> extends AbstractRDBMSQueryResult<E> 
         {
             if (resultList == null)
             {
-                resultList = new ArrayList();
+                resultList = new ArrayList<>();
             }
 
             if (iterator == null)
@@ -674,13 +674,13 @@ public final class ScrollableQueryResult<E> extends AbstractRDBMSQueryResult<E> 
 
             while (iterator.hasNext())
             {
-                resultList.add(iterator.next());
+                resultList.add((T) iterator.next());
             }
 
             result = (a == null) ? resultList.toArray() : resultList.toArray(a);
         }
 
-        return result;
+        return (T[]) result;
     }
 
     /**
@@ -692,7 +692,7 @@ public final class ScrollableQueryResult<E> extends AbstractRDBMSQueryResult<E> 
     protected Object writeReplace() throws ObjectStreamException
     {
         disconnect();
-        List results = new java.util.ArrayList();
+        List<E> results = new java.util.ArrayList<>();
         for (int i=0;i<resultsObjsByIndex.size();i++)
         {
             results.add(resultsObjsByIndex.get(i));

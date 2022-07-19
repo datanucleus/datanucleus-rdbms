@@ -44,7 +44,7 @@ public class TemporalYearMethod2 extends TemporalBaseMethod
         RDBMSStoreManager storeMgr = stmt.getRDBMSManager();
         JavaTypeMapping mapping = storeMgr.getMappingManager().getMapping(String.class);
 
-        ArrayList funcArgs = new ArrayList();
+        List<SQLExpression> funcArgs = new ArrayList<>();
         funcArgs.add(invokedExpr);
         SQLExpressionFactory exprFactory = stmt.getSQLExpressionFactory();
         funcArgs.add(exprFactory.newLiteral(stmt, mapping, "YYYY"));

@@ -50,7 +50,8 @@ public class TemporalQuarterMethod4 extends TemporalBaseMethod
         SQLExpressionFactory exprFactory = stmt.getSQLExpressionFactory();
         SQLExpression qq = exprFactory.newLiteral(stmt, mapping, "qq");
         ((StringLiteral)qq).generateStatementWithoutQuotes();
-        ArrayList funcArgs = new ArrayList();
+
+        List<SQLExpression> funcArgs = new ArrayList<>();
         funcArgs.add(qq);
 
         // CAST {invokedExpr} AS DATETIME

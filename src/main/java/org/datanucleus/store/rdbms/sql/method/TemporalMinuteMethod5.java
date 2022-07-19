@@ -44,7 +44,8 @@ public class TemporalMinuteMethod5 extends TemporalBaseMethod
         JavaTypeMapping mapping = storeMgr.getMappingManager().getMapping(String.class);
         SQLExpressionFactory exprFactory = stmt.getSQLExpressionFactory();
         SQLExpression day = exprFactory.newLiteral(stmt, mapping, "%M");
-        ArrayList funcArgs = new ArrayList();
+
+        List<SQLExpression> funcArgs = new ArrayList<>();
         funcArgs.add(day);
         funcArgs.add(invokedExpr);
         return new NumericExpression(stmt, stmt.getSQLExpressionFactory().getMappingForType(int.class, true), "strftime", funcArgs);

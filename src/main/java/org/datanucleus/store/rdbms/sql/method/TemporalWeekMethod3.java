@@ -47,7 +47,7 @@ public class TemporalWeekMethod3 extends TemporalBaseMethod
         SQLExpressionFactory exprFactory = stmt.getSQLExpressionFactory();
         SQLExpression day = exprFactory.newLiteral(stmt, mapping, "week");
 
-        ArrayList funcArgs = new ArrayList();
+        List<SQLExpression> funcArgs = new ArrayList<>();
         funcArgs.add(day);
         funcArgs.add(invokedExpr);
         NumericExpression secondExpr = new NumericExpression(stmt, stmt.getSQLExpressionFactory().getMappingForType(int.class, true), "date_part", funcArgs);

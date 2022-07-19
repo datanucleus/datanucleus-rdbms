@@ -639,7 +639,7 @@ public class MapTable extends JoinTable
      * @return The expected foreign keys.
      */
     @Override
-    public List getExpectedForeignKeys(ClassLoaderResolver clr)
+    public List<ForeignKey> getExpectedForeignKeys(ClassLoaderResolver clr)
     {
         assertIsInitialized();
 
@@ -649,7 +649,7 @@ public class MapTable extends JoinTable
             autoMode = true;
         }
 
-        ArrayList foreignKeys = new ArrayList();
+        List<ForeignKey> foreignKeys = new ArrayList<>();
         try
         {
             // FK from join table to owner table
@@ -684,8 +684,7 @@ public class MapTable extends JoinTable
                             embFieldMapping instanceof ReferenceMapping)
                         {
                             // Field is a reference type, so add a FK to the table of the PC for each PC implementation
-                            Collection fks = TableUtils.getForeignKeysForReferenceField(embFieldMapping, embFmd, 
-                                autoMode, storeMgr, clr);
+                            Collection<ForeignKey> fks = TableUtils.getForeignKeysForReferenceField(embFieldMapping, embFmd, autoMode, storeMgr, clr);
                             foreignKeys.addAll(fks);
                         }
                         else if (storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForClass(embFmd.getType(), clr) != null &&
@@ -737,7 +736,7 @@ public class MapTable extends JoinTable
                         if (ClassUtils.isReferenceType(embFmd.getType()) && embFieldMapping instanceof ReferenceMapping)
                         {
                             // Field is a reference type, so add a FK to the table of the PC for each PC implementation
-                            Collection fks = TableUtils.getForeignKeysForReferenceField(embFieldMapping, embFmd, autoMode, storeMgr, clr);
+                            Collection<ForeignKey> fks = TableUtils.getForeignKeysForReferenceField(embFieldMapping, embFmd, autoMode, storeMgr, clr);
                             foreignKeys.addAll(fks);
                         }
                         else if (storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForClass(embFmd.getType(), clr) != null &&
@@ -788,9 +787,9 @@ public class MapTable extends JoinTable
      * @return The indices
      */
     @Override
-    protected Set getExpectedIndices(ClassLoaderResolver clr)
+    protected Set<Index> getExpectedIndices(ClassLoaderResolver clr)
     {
-        Set indices = new HashSet();
+        Set<Index> indices = new HashSet<>();
 
         // Index for FK back to owner
         if (mmd.getIndexMetaData() != null)
@@ -917,10 +916,10 @@ public class MapTable extends JoinTable
      * @return The indices
      */
     @Override
-    protected List getExpectedCandidateKeys()
+    protected List<CandidateKey> getExpectedCandidateKeys()
     {
         // The indices required by foreign keys (BaseTable)
-        List candidateKeys = super.getExpectedCandidateKeys();
+        List<CandidateKey> candidateKeys = super.getExpectedCandidateKeys();
 
         if (keyMapping instanceof EmbeddedKeyPCMapping)
         {

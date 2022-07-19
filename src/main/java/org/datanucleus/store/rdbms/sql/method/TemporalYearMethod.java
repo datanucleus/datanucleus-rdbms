@@ -37,7 +37,7 @@ public class TemporalYearMethod extends TemporalBaseMethod
     {
         SQLExpression invokedExpr = getInvokedExpression(expr, args, "YEAR");
 
-        ArrayList funcArgs = new ArrayList();
+        List<SQLExpression> funcArgs = new ArrayList<>();
         funcArgs.add(invokedExpr);
         return new NumericExpression(stmt, stmt.getSQLExpressionFactory().getMappingForType(int.class, true), "YEAR", funcArgs);
     }

@@ -58,10 +58,11 @@ public class StatementParameterMapping
         {
             return null;
         }
-        Iterator iter = mappings.entrySet().iterator();
+
+        Iterator<Map.Entry<String, StatementMappingIndex>> iter = mappings.entrySet().iterator();
         while (iter.hasNext())
         {
-            Map.Entry<String, StatementMappingIndex> entry = (Map.Entry)iter.next();
+            Map.Entry<String, StatementMappingIndex> entry = iter.next();
             StatementMappingIndex idx = entry.getValue();
             for (int i=0;i<idx.getNumberOfParameterOccurrences();i++)
             {

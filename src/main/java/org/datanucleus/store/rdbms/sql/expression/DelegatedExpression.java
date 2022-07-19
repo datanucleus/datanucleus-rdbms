@@ -136,10 +136,9 @@ public abstract class DelegatedExpression extends SQLExpression
         return delegate.sub(expr);
     }
 
-    public SQLExpression invoke(String methodName, List args)
+    public SQLExpression invoke(String methodName, List<SQLExpression> args)
     {
-        return stmt.getRDBMSManager().getSQLExpressionFactory().invokeMethod(stmt, 
-            mapping.getJavaType().getName(), methodName, this, args);
+        return stmt.getRDBMSManager().getSQLExpressionFactory().invokeMethod(stmt, mapping.getJavaType().getName(), methodName, this, args);
     }
 
     /* (non-Javadoc)

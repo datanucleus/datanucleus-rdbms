@@ -39,6 +39,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
@@ -140,7 +141,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
     private final ClassMetaData cmd;
 
     /** MetaData for all classes being managed here. */
-    private final Collection<AbstractClassMetaData> managedClassMetaData = new HashSet();
+    private final Collection<AbstractClassMetaData> managedClassMetaData = new HashSet<>();
 
     /** Callbacks that have been applied keyed by the managed class. */
     private final Map<String, Collection<AbstractMemberMetaData>> callbacksAppliedForManagedClass = new HashMap<>();
@@ -175,7 +176,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
     /** DDL statement for creating the table, if using user defined table schema. */
     private String createStatementDDL;
 
-    Map<AbstractMemberMetaData, CandidateKey> candidateKeysByMapField = new HashMap();
+    Map<AbstractMemberMetaData, CandidateKey> candidateKeysByMapField = new HashMap<>();
 
     /** Set of unmapped "Column" objects that have no associated field (and hence ColumnMapping). */
     Set<Column> unmappedColumns = null;
@@ -672,7 +673,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                             // Add the field to the appropriate secondary table
                             if (secondaryTables == null)
                             {
-                                secondaryTables = new HashMap();
+                                secondaryTables = new HashMap<>();
                             }
                             SecondaryTable secTable = secondaryTables.get(mmd.getTable());
                             if (secTable == null)
@@ -1032,7 +1033,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
 
                 if (unmappedColumns == null)
                 {
-                    unmappedColumns = new HashSet();
+                    unmappedColumns = new HashSet<>();
                 }
 
                 if (NucleusLogger.DATASTORE_SCHEMA.isDebugEnabled())
@@ -1414,13 +1415,13 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                 break;
             }
 
-            Collection processedCallbacks = callbacksAppliedForManagedClass.get(managedCmd.getFullClassName());
+            Collection<AbstractMemberMetaData> processedCallbacks = callbacksAppliedForManagedClass.get(managedCmd.getFullClassName());
             Collection<AbstractMemberMetaData> c = storeMgr.getSchemaCallbacks().get(managedCmd.getFullClassName());
             if (c != null)
             {
                 if (processedCallbacks == null)
                 {
-                    processedCallbacks = new HashSet();
+                    processedCallbacks = new HashSet<>();
                     callbacksAppliedForManagedClass.put(managedCmd.getFullClassName(), processedCallbacks);
                 }
                 for (Iterator<AbstractMemberMetaData> it = c.iterator(); it.hasNext();)
@@ -1859,18 +1860,12 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
         return false;
     }
 
-    /**
-     * Accessor for any secondary tables for this table.
-     * @return Secondary tables (if any)
-     */
-    public Collection getSecondaryDatastoreClasses()
+    @Override
+    public Collection<? extends SecondaryDatastoreClass> getSecondaryDatastoreClasses()
     {
         return (secondaryTables != null ? secondaryTables.values() : null);
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.rdbms.table.Table#getSurrogateMapping(org.datanucleus.store.schema.table.SurrogateColumnType, boolean)
-     */
     @Override
     public JavaTypeMapping getSurrogateMapping(SurrogateColumnType colType, boolean allowSuperclasses)
     {
@@ -2028,7 +2023,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
             autoMode = true;
         }
 
-        Set<Index> indices = new HashSet();
+        Set<Index> indices = new HashSet<>();
 
         // Add on any user-required indices for the fields/properties
         Set memberNumbersSet = memberMappingsMap.keySet();
@@ -2445,7 +2440,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                 if (ClassUtils.isReferenceType(mmd.getType()) && memberMapping instanceof ReferenceMapping)
                 {
                     // Field is a reference type, so add a FK to the table of the PC for each PC implementation
-                    Collection fks = TableUtils.getForeignKeysForReferenceField(memberMapping, mmd, autoMode, storeMgr, clr);
+                    Collection<ForeignKey> fks = TableUtils.getForeignKeysForReferenceField(memberMapping, mmd, autoMode, storeMgr, clr);
                     foreignKeys.addAll(fks);
                 }
                 else if (storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForClass(mmd.getType(), clr) != null &&
@@ -2508,11 +2503,11 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
             }
         }
 
-        Map externalFks = getExternalFkMappings();
+        Map<AbstractMemberMetaData, JavaTypeMapping> externalFks = getExternalFkMappings();
         if (!externalFks.isEmpty())
         {
             // 1-N FK relationships - FK to id column(s) of owner table where this is the element table and we have a FK
-            Collection externalFkKeys = externalFks.entrySet();
+            Set<Entry<AbstractMemberMetaData, JavaTypeMapping>> externalFkKeys = externalFks.entrySet();
             Iterator<Map.Entry<AbstractMemberMetaData, JavaTypeMapping>> externalFkKeysIter = externalFkKeys.iterator();
             while (externalFkKeysIter.hasNext())
             {
@@ -2553,7 +2548,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
      * @param clr ClassLoader resolver
      * @param embeddedMapping The embedded PC mapping
      */
-    private void addExpectedForeignKeysForEmbeddedPCField(List foreignKeys, boolean autoMode, ClassLoaderResolver clr, EmbeddedPCMapping embeddedMapping)
+    private void addExpectedForeignKeysForEmbeddedPCField(List<ForeignKey> foreignKeys, boolean autoMode, ClassLoaderResolver clr, EmbeddedPCMapping embeddedMapping)
     {
         for (int i=0;i<embeddedMapping.getNumberOfJavaTypeMappings();i++)
         {
@@ -2569,7 +2564,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                 if (ClassUtils.isReferenceType(embFmd.getType()) && embFieldMapping instanceof ReferenceMapping)
                 {
                     // Field is a reference type, so add a FK to the table of the PC for each PC implementation
-                    Collection fks = TableUtils.getForeignKeysForReferenceField(embFieldMapping, embFmd, autoMode, storeMgr, clr);
+                    Collection<ForeignKey> fks = TableUtils.getForeignKeysForReferenceField(embFieldMapping, embFmd, autoMode, storeMgr, clr);
                     foreignKeys.addAll(fks);
                 }
                 else if (storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForClass(embFmd.getType(), clr) != null &&
@@ -3046,7 +3041,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                             CandidateKey ck = new CandidateKey(this, null);
 
                             // This HashSet is to avoid duplicate adding of columns.
-                            HashSet addedColumns = new HashSet();
+                            Set<Column> addedColumns = new HashSet<>();
 
                             // Add columns for the owner field
                             int countOwnerFields = ownerMapping.getNumberOfColumnMappings();
@@ -3212,7 +3207,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
     {
         if (externalOrderMappings == null)
         {       
-            externalOrderMappings = new HashMap();
+            externalOrderMappings = new HashMap<>();
         }
         return externalOrderMappings;
     }
@@ -3230,7 +3225,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
     {
         if (externalFkMappings == null)
         {       
-            externalFkMappings = new HashMap();
+            externalFkMappings = new HashMap<>();
         }
         return externalFkMappings;
     }
@@ -3319,7 +3314,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
     {
         if (externalFkDiscriminatorMappings == null)
         {
-            externalFkDiscriminatorMappings = new HashMap();
+            externalFkDiscriminatorMappings = new HashMap<>();
         }
         return externalFkDiscriminatorMappings;
     }
@@ -3717,7 +3712,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
      * @throws SQLException Thrown when an error occurs in validation
      */
     @Override
-    public boolean validateConstraints(Connection conn, boolean autoCreate, Collection autoCreateErrors, ClassLoaderResolver clr)
+    public boolean validateConstraints(Connection conn, boolean autoCreate, Collection<Throwable> autoCreateErrors, ClassLoaderResolver clr)
     throws SQLException
     {
         boolean modified = false;
@@ -3729,11 +3724,11 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
         // Validate our secondary tables since we manage them
         if (secondaryTables != null)
         {
-            Collection secTables = secondaryTables.values();
-            Iterator iter = secTables.iterator();
+            Collection<SecondaryTable> secTables = secondaryTables.values();
+            Iterator<SecondaryTable> iter = secTables.iterator();
             while (iter.hasNext())
             {
-                SecondaryTable secTable = (SecondaryTable)iter.next();
+                SecondaryTable secTable = iter.next();
                 if (secTable.validateConstraints(conn, autoCreate, autoCreateErrors, clr))
                 {
                     modified = true;

@@ -286,11 +286,8 @@ public class SecondaryTable extends AbstractClassTable implements SecondaryDatas
         return false;
     }
 
-    /**
-     * Accessor for any secondary tables for this table.
-     * @return Secondary tables (if any)
-     */
-    public Collection getSecondaryDatastoreClasses()
+    @Override
+    public Collection<? extends SecondaryDatastoreClass> getSecondaryDatastoreClasses()
     {
         return null;
     }

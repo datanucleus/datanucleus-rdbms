@@ -156,7 +156,7 @@ public abstract class AbstractRDBMSQueryResult<E> extends AbstractQueryResult<E>
                 {
                     String elementType = mmd.hasCollection() ? 
                             backingStore.getOwnerMemberMetaData().getCollection().getElementType() : backingStore.getOwnerMemberMetaData().getArray().getElementType();
-                    ResultObjectFactory<E> scoROF = new PersistentClassROF(ec, rs, fp,
+                    ResultObjectFactory<E> scoROF = new PersistentClassROF<>(ec, rs, fp,
                         elemIterStmt.getElementClassMapping(), backingStore.getElementClassMetaData(), ec.getClassLoaderResolver().classForName(elementType));
                     scoROF.setIgnoreCache(query.getIgnoreCache());
                     while (rs.next())
@@ -231,12 +231,12 @@ public abstract class AbstractRDBMSQueryResult<E> extends AbstractQueryResult<E>
 
         if (mmd.hasCollection())
         {
-            Collection coll = (Collection) fieldValuesForOwner.get(mmd.getAbsoluteFieldNumber());
+            Collection<Object> coll = (Collection<Object>) fieldValuesForOwner.get(mmd.getAbsoluteFieldNumber());
             if (coll == null)
             {
                 try
                 {
-                    Class instanceType = SCOUtils.getContainerInstanceType(mmd.getType(), mmd.getOrderMetaData() != null);
+                    Class<?> instanceType = SCOUtils.getContainerInstanceType(mmd.getType(), mmd.getOrderMetaData() != null);
                     coll = (Collection<Object>) instanceType.getDeclaredConstructor().newInstance();
                     fieldValuesForOwner.put(mmd.getAbsoluteFieldNumber(), coll);
                 }

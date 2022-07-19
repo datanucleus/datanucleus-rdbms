@@ -39,7 +39,7 @@ public class TemporalMonthJavaMethod extends TemporalBaseMethod
     {
         SQLExpression invokedExpr = getInvokedExpression(expr, args, "MONTH_JAVA");
 
-        ArrayList funcArgs = new ArrayList();
+        List<SQLExpression> funcArgs = new ArrayList<>();
         funcArgs.add(invokedExpr);
         NumericExpression monthExpr = new NumericExpression(stmt, stmt.getSQLExpressionFactory().getMappingForType(int.class, true), "MONTH", funcArgs);
 

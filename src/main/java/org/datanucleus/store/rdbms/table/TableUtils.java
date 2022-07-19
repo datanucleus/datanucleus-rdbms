@@ -55,11 +55,8 @@ public class TableUtils
      * @param clr ClassLoader resolver
      * @return The foreign key(s) created
      */
-    public static Collection getForeignKeysForReferenceField(JavaTypeMapping fieldMapping, 
-                                                             AbstractMemberMetaData mmd,
-                                                             boolean autoMode,
-                                                             RDBMSStoreManager storeMgr,
-                                                             ClassLoaderResolver clr)
+    public static Collection<ForeignKey> getForeignKeysForReferenceField(JavaTypeMapping fieldMapping, AbstractMemberMetaData mmd, boolean autoMode,
+            RDBMSStoreManager storeMgr, ClassLoaderResolver clr)
     {
         final ReferenceMapping refMapping = (ReferenceMapping)fieldMapping;
         JavaTypeMapping[] refJavaTypeMappings = refMapping.getJavaTypeMapping();

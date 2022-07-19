@@ -48,7 +48,7 @@ public class StringStartsWith3Method implements SQLMethod
         }
 
         // {stringExpr}.indexOf(strExpr1 [,numExpr2])
-        ArrayList funcArgs = new ArrayList();
+        List<SQLExpression> funcArgs = new ArrayList<>();
         SQLExpression substrExpr = args.get(0);
         if (!(substrExpr instanceof StringExpression) &&
                 !(substrExpr instanceof CharacterExpression) &&

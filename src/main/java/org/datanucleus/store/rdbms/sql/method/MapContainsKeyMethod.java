@@ -605,7 +605,7 @@ public class MapContainsKeyMethod implements SQLMethod
         return new BooleanSubqueryExpression(stmt, "EXISTS", subStmt);
     }
 
-    protected boolean keyTypeCompatible(Class keyType, Class mapKeyType)
+    protected boolean keyTypeCompatible(Class<?> keyType, Class<?> mapKeyType)
     {
         if (!keyType.isPrimitive() && mapKeyType.isPrimitive() && !mapKeyType.isAssignableFrom(keyType) && !keyType.isAssignableFrom(mapKeyType))
         {

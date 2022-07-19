@@ -2668,10 +2668,8 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
         }
     }
 
-    /**
-     * Accessor for the supported options in string form
-     */
-    public Collection getSupportedOptions()
+    @Override
+    public Collection<String> getSupportedOptions()
     {
         Set<String> set = new HashSet<>();
         set.add(StoreManager.OPTION_APPLICATION_ID);
@@ -2942,11 +2940,11 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
         private final boolean checkExistTablesOrViews;
 
         /** tracks the SchemaData currrently being added - used to rollback the AutoStart added classes **/
-        private Set<RDBMSStoreData> schemaDataAdded = new HashSet();
+        private Set<RDBMSStoreData> schemaDataAdded = new HashSet<>();
 
         private final String[] classNames;
 
-        private List<Table> tablesRecentlyInitialized = new ArrayList();
+        private List<Table> tablesRecentlyInitialized = new ArrayList<>();
 
         /**
          * Constructs a new class adder transaction that will add the given classes to the RDBMSManager.
@@ -3009,7 +3007,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
 
                     try
                     {
-                        List autoCreateErrors = new ArrayList();
+                        List<Throwable> autoCreateErrors = new ArrayList<>();
 
                         // Add SchemaData entries and tables/views for the requested classes - not yet initialized
                         addClassTables(classNames, clr);
@@ -3041,10 +3039,10 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                             if (!autoCreateErrors.isEmpty())
                             {
                                 // Verify the list of errors, log the errors and raise NucleusDataStoreException when fail on error is enabled.
-                                Iterator errorsIter = autoCreateErrors.iterator();
+                                Iterator<Throwable> errorsIter = autoCreateErrors.iterator();
                                 while (errorsIter.hasNext())
                                 {
-                                    Throwable exc = (Throwable)errorsIter.next();
+                                    Throwable exc = errorsIter.next();
                                     if (rdbmsMgr.getSchemaHandler().isAutoCreateWarnOnError())
                                     {
                                         NucleusLogger.DATASTORE.warn(Localiser.msg("050044", exc));
@@ -3056,7 +3054,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                                 }
                                 if (!rdbmsMgr.getSchemaHandler().isAutoCreateWarnOnError())
                                 {
-                                    throw new NucleusDataStoreException(Localiser.msg("050043"), (Throwable[])autoCreateErrors.toArray(new Throwable[autoCreateErrors.size()]));
+                                    throw new NucleusDataStoreException(Localiser.msg("050043"), autoCreateErrors.toArray(new Throwable[autoCreateErrors.size()]));
                                 }
                             }
                         }

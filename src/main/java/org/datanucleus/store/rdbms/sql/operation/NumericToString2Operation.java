@@ -33,9 +33,7 @@ import org.datanucleus.store.rdbms.sql.expression.StringLiteral;
  */
 public class NumericToString2Operation implements SQLOperation
 {
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.rdbms.sql.operation.SQLOperation#getExpression(org.datanucleus.store.rdbms.sql.expression.SQLExpression, org.datanucleus.store.rdbms.sql.expression.SQLExpression)
-     */
+    @Override
     public SQLExpression getExpression(SQLExpression expr, SQLExpression expr2)
     {
         SQLExpressionFactory exprFactory = expr.getSQLStatement().getSQLExpressionFactory();
@@ -50,9 +48,9 @@ public class NumericToString2Operation implements SQLOperation
             return new StringLiteral(expr.getSQLStatement(), m, ((SQLLiteral)expr).getValue().toString(), null);
         }
 
-        List args = new ArrayList();
+        List<SQLExpression> args = new ArrayList<>();
         args.add(expr);
-        List types = new ArrayList();
+        List<String> types = new ArrayList<>();
         types.add("CHAR(4000)");
         return new StringExpression(expr.getSQLStatement(), m, "CAST", args, types);
     }

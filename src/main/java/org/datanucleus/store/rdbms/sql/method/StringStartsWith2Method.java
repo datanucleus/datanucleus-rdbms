@@ -51,7 +51,7 @@ public class StringStartsWith2Method implements SQLMethod
         // {stringExpr}.indexOf(strExpr1 [,numExpr2])
         SQLExpression one = ExpressionUtils.getLiteralForOne(stmt);
 
-        ArrayList funcArgs = new ArrayList();
+        List<SQLExpression> funcArgs = new ArrayList<>();
         SQLExpression substrExpr = args.get(0);
         if (!(substrExpr instanceof StringExpression) && !(substrExpr instanceof CharacterExpression) && !(substrExpr instanceof ParameterLiteral))
         {

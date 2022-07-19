@@ -65,7 +65,7 @@ public class StringSubstring4Method implements SQLMethod
             SQLExpression lengthExpression = new NumericExpression(stmt, stmt.getSQLExpressionFactory().getMappingForType(int.class), "LEN", lengthFuncArgs);
             lengthExpression = lengthExpression.sub(startExpr);
 
-            ArrayList funcArgs = new ArrayList();
+            List<SQLExpression> funcArgs = new ArrayList<>();
             funcArgs.add(expr);
             funcArgs.add(startExpr.add(one));
             funcArgs.add(lengthExpression);

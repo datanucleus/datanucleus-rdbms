@@ -18,6 +18,7 @@ Contributors:
 package org.datanucleus.store.rdbms.sql.operation;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.datanucleus.store.rdbms.sql.expression.NumericExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
@@ -28,12 +29,10 @@ import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
  */
 public class Mod2Operation implements SQLOperation
 {
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.rdbms.sql.operation.SQLOperation#getExpression(org.datanucleus.store.rdbms.sql.expression.SQLExpression, org.datanucleus.store.rdbms.sql.expression.SQLExpression)
-     */
+    @Override
     public SQLExpression getExpression(SQLExpression expr, SQLExpression expr2)
     {
-        ArrayList args = new ArrayList();
+        List<SQLExpression> args = new ArrayList<>();
         args.add(expr);
         args.add(expr2);
         return new NumericExpression(expr.getSQLStatement(), expr.getSQLStatement().getSQLExpressionFactory().getMappingForType(int.class), "MOD", args);

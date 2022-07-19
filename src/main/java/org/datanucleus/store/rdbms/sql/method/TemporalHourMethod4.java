@@ -50,7 +50,8 @@ public class TemporalHourMethod4 extends TemporalBaseMethod
         SQLExpressionFactory exprFactory = stmt.getSQLExpressionFactory();
         SQLExpression hh = exprFactory.newLiteral(stmt, mapping, "hh");
         ((StringLiteral)hh).generateStatementWithoutQuotes();
-        ArrayList funcArgs = new ArrayList();
+
+        List<SQLExpression> funcArgs = new ArrayList<>();
         funcArgs.add(hh);
 
         // CAST {invokedExpr} AS DATETIME

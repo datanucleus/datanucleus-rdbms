@@ -45,7 +45,7 @@ public class TemporalSecondMethod6 extends TemporalBaseMethod
         SQLExpressionFactory exprFactory = stmt.getSQLExpressionFactory();
         SQLExpression sec = exprFactory.newLiteral(stmt, mapping, "%S");
 
-        ArrayList funcArgs = new ArrayList();
+        List<SQLExpression> funcArgs = new ArrayList<>();
         funcArgs.add(sec);
         funcArgs.add(invokedExpr);
         return new NumericExpression(stmt, stmt.getSQLExpressionFactory().getMappingForType(int.class), "strftime", funcArgs);

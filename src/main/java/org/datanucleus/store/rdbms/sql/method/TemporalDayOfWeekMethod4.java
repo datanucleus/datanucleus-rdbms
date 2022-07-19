@@ -44,7 +44,8 @@ public class TemporalDayOfWeekMethod4 extends TemporalBaseMethod
 
         RDBMSStoreManager storeMgr = stmt.getRDBMSManager();
         JavaTypeMapping mapping = storeMgr.getMappingManager().getMapping(String.class);
-        ArrayList funcArgs = new ArrayList();
+
+        List<SQLExpression> funcArgs = new ArrayList<>();
         SQLExpressionFactory exprFactory = stmt.getSQLExpressionFactory();
         funcArgs.add(exprFactory.newLiteral(stmt, mapping, "dw"));
         funcArgs.add(invokedExpr);

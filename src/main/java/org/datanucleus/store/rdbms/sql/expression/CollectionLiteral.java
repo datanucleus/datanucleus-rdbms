@@ -128,12 +128,12 @@ public class CollectionLiteral extends CollectionExpression implements SQLLitera
         }
     }
 
-    public SQLExpression invoke(String methodName, List args)
+    public SQLExpression invoke(String methodName, List<SQLExpression> args)
     {
         if (methodName.equals("get") && args.size() == 1 && value instanceof List)
         {
             // List.get
-            SQLExpression argExpr = (SQLExpression)args.get(0);
+            SQLExpression argExpr = args.get(0);
             if (argExpr instanceof SQLLiteral)
             {
                 // List.get(SQLLiteral)

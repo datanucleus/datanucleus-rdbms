@@ -38,9 +38,7 @@ import org.datanucleus.store.rdbms.sql.expression.TemporalExpression;
  */
 public class TemporalWeekMethod4 extends TemporalBaseMethod
 {
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.rdbms.sql.method.SQLMethod#getExpression(org.datanucleus.store.rdbms.sql.expression.SQLExpression, java.util.List)
-     */
+    @Override
     public SQLExpression getExpression(SQLStatement stmt, SQLExpression expr, List<SQLExpression> args)
     {
         SQLExpression invokedExpr = getInvokedExpression(expr, args, "WEEK");
@@ -50,11 +48,12 @@ public class TemporalWeekMethod4 extends TemporalBaseMethod
         SQLExpressionFactory exprFactory = stmt.getSQLExpressionFactory();
         SQLExpression wk = exprFactory.newLiteral(stmt, mapping, "wk");
         ((StringLiteral)wk).generateStatementWithoutQuotes();
-        ArrayList funcArgs = new ArrayList();
+
+        List<SQLExpression> funcArgs = new ArrayList<>();
         funcArgs.add(wk);
 
         // CAST {invokedExpr} AS DATETIME
-        List castArgs = new ArrayList<>();
+        List<SQLExpression> castArgs = new ArrayList<>();
         castArgs.add(invokedExpr);
 
         funcArgs.add(new TemporalExpression(stmt, stmt.getSQLExpressionFactory().getMappingForType(Date.class), "CAST", castArgs, asList("DATETIME")));

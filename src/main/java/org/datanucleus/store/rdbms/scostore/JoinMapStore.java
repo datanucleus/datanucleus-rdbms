@@ -219,7 +219,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
         }
 
         // Extract the current map entries to compare with (single SQL call)
-        Map currentMap = new HashMap<>(); // TODO If this is large then we should avoid pulling all in, so just pull in the keys that are being put here
+        Map<Object, Object> currentMap = new HashMap<>(); // TODO If this is large then we should avoid pulling all in, so just pull in the keys that are being put here
         SetStore<Map.Entry<K, V>> entrySet = this.entrySetStore();
         Iterator<Map.Entry<K,V>> entrySetIter = entrySet.iterator(sm);
         while (entrySetIter.hasNext())
@@ -537,11 +537,11 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
     @Override
     public void clear(DNStateManager ownerSM)
     {
-        Collection dependentElements = null;
+        Collection<Object> dependentElements = null;
         if (ownerMemberMetaData.getMap().isDependentKey() || ownerMemberMetaData.getMap().isDependentValue())
         {
             // Retain the PC dependent keys/values that need deleting after clearing
-            dependentElements = new HashSet();
+            dependentElements = new HashSet<>();
             ApiAdapter api = ownerSM.getExecutionContext().getApiAdapter();
             Iterator iter = entrySetStore().iterator(ownerSM);
             while (iter.hasNext())
@@ -569,31 +569,31 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
     }
 
     @Override
-    public synchronized SetStore keySetStore()
+    public synchronized SetStore<K> keySetStore()
     {
         if (keySetStore == null)
         {
-            keySetStore = new MapKeySetStore(mapTable, this, clr);
+            keySetStore = new MapKeySetStore<K>(mapTable, this, clr);
         }
         return keySetStore;
     }
 
     @Override
-    public synchronized CollectionStore valueCollectionStore()
+    public synchronized CollectionStore<V> valueCollectionStore()
     {
         if (valueSetStore == null)
         {
-            valueSetStore = new MapValueCollectionStore(mapTable, this, clr);
+            valueSetStore = new MapValueCollectionStore<V>(mapTable, this, clr);
         }
         return valueSetStore;
     }
 
     @Override
-    public synchronized SetStore entrySetStore()
+    public synchronized SetStore<Map.Entry<K, V>> entrySetStore()
     {
         if (entrySetStore == null)
         {
-            entrySetStore =  new MapEntrySetStore(mapTable, this, clr);
+            entrySetStore =  new MapEntrySetStore<>(mapTable, this, clr);
         }
         return entrySetStore;
     }
@@ -850,7 +850,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
                         else
                         {
                             // Value = PC
-                            ResultObjectFactory rof = new PersistentClassROF(ec, rs, ec.getFetchPlan(), getMappingDef, valueCmd, clr.classForName(valueType));
+                            ResultObjectFactory rof = new PersistentClassROF<>(ec, rs, ec.getFetchPlan(), getMappingDef, valueCmd, clr.classForName(valueType));
                             value = rof.getObject();
                         }
 

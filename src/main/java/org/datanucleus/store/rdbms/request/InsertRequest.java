@@ -735,21 +735,21 @@ public class InsertRequest extends Request
     private class InsertMappingConsumer implements MappingConsumer
     {
         /** Numbers of all fields to be inserted. */
-        List insertFields = new ArrayList();
+        List<Integer> insertFields = new ArrayList<>();
 
         /** Numbers of all PK fields. */
-        List pkFields = new ArrayList();
+        List<Integer> pkFields = new ArrayList<>();
 
         /** Numbers of all reachable fields (with no datastore column). */
-        List reachableFields = new ArrayList();
+        List<Integer> reachableFields = new ArrayList<>();
 
         /** Numbers of all relations fields (bidir that may already be attached when persisting). */
-        List relationFields = new ArrayList();
+        List<Integer> relationFields = new ArrayList<>();
 
         StringBuilder columnNames = new StringBuilder();
         StringBuilder columnValues = new StringBuilder();
 
-        Map assignedColumns = new HashMap();
+        Map<String, Integer> assignedColumns = new HashMap<>();
 
         /** Mappings that require post-set processing. */
         List<JavaTypeMapping> postSetMappings;
@@ -913,7 +913,7 @@ public class InsertRequest extends Request
                         boolean columnExists = assignedColumns.containsKey(columnId.toString());
                         if (columnExists)
                         {
-                            parametersIndex[j] = ((Integer)assignedColumns.get(c.getIdentifier().toString())).intValue();
+                            parametersIndex[j] = assignedColumns.get(c.getIdentifier().toString()).intValue();
                         }
 
                         // Either we are a field in a secondary table.
@@ -951,7 +951,7 @@ public class InsertRequest extends Request
 
                                 if (columnExists)
                                 {
-                                    parametersIndex[j] = ((Integer)assignedColumns.get(c.getIdentifier().toString())).intValue();
+                                    parametersIndex[j] = assignedColumns.get(c.getIdentifier().toString()).intValue();
                                 }
                                 else
                                 {
@@ -1307,7 +1307,7 @@ public class InsertRequest extends Request
             int[] fieldNumbers = new int[insertFields.size()];
             for (int i = 0; i < insertFields.size(); ++i)
             {
-                fieldNumbers[i] = ((Integer) insertFields.get(i)).intValue();
+                fieldNumbers[i] = insertFields.get(i).intValue();
             }
             return fieldNumbers;
         }
@@ -1321,7 +1321,7 @@ public class InsertRequest extends Request
             int[] fieldNumbers = new int[pkFields.size()];
             for (int i = 0; i < pkFields.size(); i++)
             {
-                fieldNumbers[i] = ((Integer) pkFields.get(i)).intValue();
+                fieldNumbers[i] = pkFields.get(i).intValue();
             }
             return fieldNumbers;
         }
@@ -1335,7 +1335,7 @@ public class InsertRequest extends Request
             int[] fieldNumbers = new int[reachableFields.size()];
             for (int i = 0; i < reachableFields.size(); ++i)
             {
-                fieldNumbers[i] = ((Integer) reachableFields.get(i)).intValue();
+                fieldNumbers[i] = reachableFields.get(i).intValue();
             }
             return fieldNumbers;
         }
@@ -1349,7 +1349,7 @@ public class InsertRequest extends Request
             int[] fieldNumbers = new int[relationFields.size()];
             for (int i = 0; i < relationFields.size(); ++i)
             {
-                fieldNumbers[i] = ((Integer) relationFields.get(i)).intValue();
+                fieldNumbers[i] = relationFields.get(i).intValue();
             }
             return fieldNumbers;
         }

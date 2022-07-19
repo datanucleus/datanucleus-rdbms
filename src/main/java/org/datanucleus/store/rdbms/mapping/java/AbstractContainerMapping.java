@@ -183,7 +183,7 @@ public abstract class AbstractContainerMapping extends SingleFieldMapping
         ApiAdapter api = ec.getApiAdapter();
         if (value != null)
         {
-            Collection smsColl = null;
+            Collection<DNStateManager> smsColl = null;
             if (value instanceof java.util.Collection)
             {
                 Iterator elementsIter = ((java.util.Collection)value).iterator();
@@ -197,7 +197,7 @@ public abstract class AbstractContainerMapping extends SingleFieldMapping
                         {
                             if (smsColl == null)
                             {
-                                smsColl = new HashSet();
+                                smsColl = new HashSet<>();
                             }
                             smsColl.add(sm);
                         }
@@ -219,7 +219,7 @@ public abstract class AbstractContainerMapping extends SingleFieldMapping
                         {
                             if (smsColl == null)
                             {
-                                smsColl = new HashSet();
+                                smsColl = new HashSet<>();
                             }
                             smsColl.add(sm);
                         }
@@ -231,7 +231,7 @@ public abstract class AbstractContainerMapping extends SingleFieldMapping
                         {
                             if (smsColl == null)
                             {
-                                smsColl = new HashSet();
+                                smsColl = new HashSet<>();
                             }
                             smsColl.add(sm);
                         }
@@ -240,7 +240,7 @@ public abstract class AbstractContainerMapping extends SingleFieldMapping
             }
             if (smsColl != null)
             {
-                sms = (DNStateManager[])smsColl.toArray(new DNStateManager[smsColl.size()]);
+                sms = smsColl.toArray(new DNStateManager[smsColl.size()]);
             }
         }
 
@@ -429,7 +429,7 @@ public abstract class AbstractContainerMapping extends SingleFieldMapping
      */
     protected SCO replaceFieldWithWrapper(DNStateManager sm, Object value)
     {
-        Class type = mmd.getType();
+        Class<?> type = mmd.getType();
         if (value != null)
         {
             type = value.getClass();

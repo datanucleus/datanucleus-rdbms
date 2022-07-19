@@ -43,13 +43,14 @@ public class TemporalMonthMethod2 extends TemporalBaseMethod
 
         RDBMSStoreManager storeMgr = stmt.getRDBMSManager();
         JavaTypeMapping mapping2 = storeMgr.getMappingManager().getMapping(String.class);
-        ArrayList funcArgs = new ArrayList();
+
+        List<SQLExpression> funcArgs = new ArrayList<>();
         funcArgs.add(invokedExpr);
         SQLExpressionFactory exprFactory = stmt.getSQLExpressionFactory();
         funcArgs.add(exprFactory.newLiteral(stmt, mapping2, "MM"));
         StringExpression charExpr = new StringExpression(stmt, stmt.getSQLExpressionFactory().getMappingForType(int.class, true), "TO_CHAR", funcArgs);
 
-        ArrayList funcArgs2 = new ArrayList();
+        List<SQLExpression> funcArgs2 = new ArrayList<>();
         funcArgs2.add(charExpr);
         NumericExpression numExpr = new NumericExpression(stmt, stmt.getSQLExpressionFactory().getMappingForType(int.class, true), "TO_NUMBER", funcArgs2);
         numExpr.encloseInParentheses();

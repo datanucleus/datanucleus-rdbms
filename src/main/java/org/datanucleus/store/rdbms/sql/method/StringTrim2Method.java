@@ -33,9 +33,7 @@ import org.datanucleus.util.NucleusLogger;
  */
 public class StringTrim2Method implements SQLMethod
 {
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.rdbms.sql.method.SQLMethod#getExpression(org.datanucleus.store.rdbms.sql.expression.SQLExpression, java.util.List)
-     */
+    @Override
     public SQLExpression getExpression(SQLStatement stmt, SQLExpression expr, List<SQLExpression> args)
     {
         if (args != null && args.size() > 1)
@@ -53,7 +51,7 @@ public class StringTrim2Method implements SQLMethod
             return new StringLiteral(stmt, expr.getJavaTypeMapping(), val.trim(), null);
         }
 
-        ArrayList rtrimArgs = new ArrayList();
+        List<SQLExpression> rtrimArgs = new ArrayList<>();
         rtrimArgs.add(expr);
         StringExpression strExpr = new StringExpression(stmt, stmt.getSQLExpressionFactory().getMappingForType(String.class), "RTRIM", rtrimArgs);
 

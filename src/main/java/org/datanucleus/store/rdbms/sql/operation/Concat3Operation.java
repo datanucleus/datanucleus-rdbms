@@ -34,9 +34,7 @@ import org.datanucleus.store.rdbms.sql.expression.StringExpression;
  */
 public class Concat3Operation implements SQLOperation
 {
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.rdbms.sql.operation.SQLOperation#getExpression(org.datanucleus.store.rdbms.sql.expression.SQLExpression, org.datanucleus.store.rdbms.sql.expression.SQLExpression)
-     */
+    @Override
     public SQLExpression getExpression(SQLExpression expr, SQLExpression expr2)
     {
         /*
@@ -62,14 +60,14 @@ public class Concat3Operation implements SQLOperation
          */
         JavaTypeMapping m = expr.getSQLStatement().getSQLExpressionFactory().getMappingForType(String.class, false);
 
-        List types = new ArrayList();
+        List<String> types = new ArrayList<>();
         types.add("VARCHAR(4000)");
 
-        List argsOp1 = new ArrayList();
+        List<SQLExpression> argsOp1 = new ArrayList<>();
         argsOp1.add(expr);
         SQLExpression firstExpr = new StringExpression(expr.getSQLStatement(), m, "CAST", argsOp1, types).encloseInParentheses();
 
-        List argsOp2 = new ArrayList();
+        List<SQLExpression> argsOp2 = new ArrayList<>();
         argsOp2.add(expr2);
         SQLExpression secondExpr = new StringExpression(expr.getSQLStatement(), m, "CAST", argsOp2, types).encloseInParentheses();
 
@@ -80,7 +78,7 @@ public class Concat3Operation implements SQLOperation
         sql.append("||");
         sql.append(secondExpr);
 
-        List args = new ArrayList();
+        List<SQLExpression> args = new ArrayList<>();
         args.add(concatExpr);
 
         return new StringExpression(expr.getSQLStatement(), m, "CAST", args, types);

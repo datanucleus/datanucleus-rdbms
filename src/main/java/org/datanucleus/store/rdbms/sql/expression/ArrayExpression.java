@@ -64,10 +64,10 @@ public class ArrayExpression extends SQLExpression
         return elementExpressions;
     }
 
-    public SQLExpression invoke(String methodName, List args)
+    @Override
+    public SQLExpression invoke(String methodName, List<SQLExpression> args)
     {
-        return stmt.getRDBMSManager().getSQLExpressionFactory().invokeMethod(stmt, "ARRAY",
-            methodName, this, args);
+        return stmt.getRDBMSManager().getSQLExpressionFactory().invokeMethod(stmt, "ARRAY", methodName, this, args);
     }
 
     public BooleanExpression eq(SQLExpression expr)

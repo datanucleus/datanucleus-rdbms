@@ -37,7 +37,7 @@ public class TemporalWeekMethod2 extends TemporalBaseMethod
     {
         SQLExpression invokedExpr = getInvokedExpression(expr, args, "WEEK");
 
-        ArrayList funcArgs = new ArrayList();
+        List<SQLExpression> funcArgs = new ArrayList<>();
         funcArgs.add(invokedExpr);
         return new NumericExpression(stmt, stmt.getSQLExpressionFactory().getMappingForType(int.class, true), "WEEK", funcArgs);
     }

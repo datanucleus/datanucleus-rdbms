@@ -30,22 +30,20 @@ import org.datanucleus.store.rdbms.sql.expression.SQLExpressionFactory;
  */
 public class Mod3Operation implements SQLOperation
 {
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.rdbms.sql.operation.SQLOperation#getExpression(org.datanucleus.store.rdbms.sql.expression.SQLExpression, org.datanucleus.store.rdbms.sql.expression.SQLExpression)
-     */
+    @Override
     public SQLExpression getExpression(SQLExpression expr, SQLExpression expr2)
     {
-        List  args = new ArrayList();
+        List<SQLExpression> args = new ArrayList<>();
 
-        List types = new ArrayList();
+        List<String> types = new ArrayList<>();
         types.add("BIGINT");
 
         SQLExpressionFactory exprFactory = expr.getSQLStatement().getSQLExpressionFactory();
-        List argsOp1 = new ArrayList();
+        List<SQLExpression> argsOp1 = new ArrayList<>();
         argsOp1.add(expr);
         args.add(new NumericExpression(expr.getSQLStatement(), exprFactory.getMappingForType(int.class), "CAST", argsOp1, types));
 
-        List argsOp2 = new ArrayList();
+        List<SQLExpression> argsOp2 = new ArrayList<>();
         argsOp2.add(expr2);
         args.add(new NumericExpression(expr.getSQLStatement(), exprFactory.getMappingForType(int.class), "CAST", argsOp2, types));
 

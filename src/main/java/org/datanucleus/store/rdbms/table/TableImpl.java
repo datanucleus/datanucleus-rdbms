@@ -189,10 +189,10 @@ public abstract class TableImpl extends AbstractTable
      * @return Whether it validates
      * @throws SQLException Thrown if an error occurs in the validation process
      */
-    public boolean validateColumns(Connection conn, boolean validateColumnStructure, boolean autoCreate, Collection autoCreateErrors)
+    public boolean validateColumns(Connection conn, boolean validateColumnStructure, boolean autoCreate, Collection<Throwable> autoCreateErrors)
     throws SQLException
     {
-        Map<DatastoreIdentifier, Column> unvalidated = new HashMap(columnsByIdentifier);
+        Map<DatastoreIdentifier, Column> unvalidated = new HashMap<>(columnsByIdentifier);
         List<StoreSchemaData> tableColInfo = storeMgr.getColumnInfoForTable(this, conn);
         Iterator i = tableColInfo.iterator();
         while (i.hasNext())
@@ -296,7 +296,7 @@ public abstract class TableImpl extends AbstractTable
     public void initializeColumnInfoFromDatastore(Connection conn)
     throws SQLException
     {
-        Map<DatastoreIdentifier, Column> columns = new HashMap(columnsByIdentifier);
+        Map<DatastoreIdentifier, Column> columns = new HashMap<>(columnsByIdentifier);
         Iterator i = storeMgr.getColumnInfoForTable(this, conn).iterator();
         while (i.hasNext())
         {
@@ -350,7 +350,7 @@ public abstract class TableImpl extends AbstractTable
      * @return Whether the database was modified
      * @throws SQLException Thrown when an error occurs in the JDBC calls
      */
-    public boolean validateConstraints(Connection conn, boolean autoCreate, Collection autoCreateErrors, ClassLoaderResolver clr)
+    public boolean validateConstraints(Connection conn, boolean autoCreate, Collection<Throwable> autoCreateErrors, ClassLoaderResolver clr)
     throws SQLException
     {
         assertIsInitialized();
@@ -381,7 +381,7 @@ public abstract class TableImpl extends AbstractTable
      * @return Whether the database was modified
      * @throws SQLException Thrown when an error occurs in the JDBC calls
      */
-    public boolean createConstraints(Connection conn, Collection autoCreateErrors, ClassLoaderResolver clr)
+    public boolean createConstraints(Connection conn, Collection<Throwable> autoCreateErrors, ClassLoaderResolver clr)
     throws SQLException
     {
         assertIsInitialized();
@@ -415,7 +415,7 @@ public abstract class TableImpl extends AbstractTable
      * @return Whether the database was modified
      * @throws SQLException Thrown when an error occurs in the JDBC calls
      */
-    private boolean validateForeignKeys(Connection conn, boolean autoCreate, Collection autoCreateErrors, ClassLoaderResolver clr)
+    private boolean validateForeignKeys(Connection conn, boolean autoCreate, Collection<Throwable> autoCreateErrors, ClassLoaderResolver clr)
     throws SQLException
     {
         boolean dbWasModified = false;
@@ -425,7 +425,7 @@ public abstract class TableImpl extends AbstractTable
         int numActualFKs = 0;
         if (storeMgr.getCompleteDDL())
         {
-            actualForeignKeysByName = new HashMap();
+            actualForeignKeysByName = new HashMap<>();
         }
         else
         {
@@ -473,7 +473,7 @@ public abstract class TableImpl extends AbstractTable
      * @return Whether the database was modified
      * @throws SQLException Thrown when an error occurs in the JDBC calls
      */
-    private boolean createForeignKeys(Connection conn, Collection autoCreateErrors, ClassLoaderResolver clr, Map actualForeignKeysByName)
+    private boolean createForeignKeys(Connection conn, Collection<Throwable> autoCreateErrors, ClassLoaderResolver clr, Map actualForeignKeysByName)
     throws SQLException
     {
         // Auto Create any missing foreign keys
@@ -515,7 +515,7 @@ public abstract class TableImpl extends AbstractTable
      * @return Whether the database was changed
      * @throws SQLException Thrown when an error occurs in the JDBC calls
      */
-    private boolean validateIndices(Connection conn, boolean autoCreate, Collection autoCreateErrors, ClassLoaderResolver clr)
+    private boolean validateIndices(Connection conn, boolean autoCreate, Collection<Throwable> autoCreateErrors, ClassLoaderResolver clr)
     throws SQLException
     {
         boolean dbWasModified = false;
@@ -579,7 +579,7 @@ public abstract class TableImpl extends AbstractTable
      * @return Whether the database was changed
      * @throws SQLException Thrown when an error occurs in the JDBC calls
      */
-    private boolean createIndices(Connection conn, Collection autoCreateErrors, ClassLoaderResolver clr, Map actualIndicesByName)
+    private boolean createIndices(Connection conn, Collection<Throwable> autoCreateErrors, ClassLoaderResolver clr, Map actualIndicesByName)
     throws SQLException
     {
         // Auto Create any missing indices
@@ -623,7 +623,7 @@ public abstract class TableImpl extends AbstractTable
      * @return Whether the database was modified
      * @throws SQLException Thrown when an error occurs in the JDBC calls
      */
-    private boolean validateCandidateKeys(Connection conn, boolean autoCreate, Collection autoCreateErrors)
+    private boolean validateCandidateKeys(Connection conn, boolean autoCreate, Collection<Throwable> autoCreateErrors)
     throws SQLException
     {
         boolean dbWasModified = false;
@@ -683,7 +683,7 @@ public abstract class TableImpl extends AbstractTable
      * @return Whether the database was modified
      * @throws SQLException Thrown when an error occurs in the JDBC calls
      */
-    private boolean createCandidateKeys(Connection conn, Collection autoCreateErrors, Map actualCandidateKeysByName)
+    private boolean createCandidateKeys(Connection conn, Collection<Throwable> autoCreateErrors, Map<DatastoreIdentifier, CandidateKey> actualCandidateKeysByName)
     throws SQLException
     {
         Map<String, String> stmtsByCKName = getSQLAddCandidateKeyStatements(actualCandidateKeysByName);
@@ -1241,12 +1241,12 @@ public abstract class TableImpl extends AbstractTable
     }
 
     /**
-     * Get SQL statements to add expected Candidate Keys that are not yet on the
-     * table. If the returned Map is empty, the current Candidate Key setup is correct.
+     * Get SQL statements to add expected Candidate Keys that are not yet on the table.
+     * If the returned Map is empty, the current Candidate Key setup is correct.
      * @param actualCandidateKeysByName Actual Map of candidate keys
      * @return a Map with the SQL statements
      */
-    protected Map<String, String> getSQLAddCandidateKeyStatements(Map actualCandidateKeysByName)
+    protected Map<String, String> getSQLAddCandidateKeyStatements(Map<DatastoreIdentifier, CandidateKey> actualCandidateKeysByName)
     {
         assertIsInitialized();
 

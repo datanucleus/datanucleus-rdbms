@@ -49,7 +49,7 @@ public class TemporalExpression extends SQLExpression
      * @param functionName Name of function
      * @param args SQLExpression list
      */
-    public TemporalExpression(SQLStatement stmt, JavaTypeMapping mapping, String functionName, List args)
+    public TemporalExpression(SQLStatement stmt, JavaTypeMapping mapping, String functionName, List<SQLExpression> args)
     {
         super(stmt, mapping, functionName, args, null);
     }
@@ -62,7 +62,7 @@ public class TemporalExpression extends SQLExpression
      * @param args SQLExpression list
      * @param types Optional String/SQLExpression list of types for the args
      */
-    public TemporalExpression(SQLStatement stmt, JavaTypeMapping mapping, String functionName, List args, List types)
+    public TemporalExpression(SQLStatement stmt, JavaTypeMapping mapping, String functionName, List<SQLExpression> args, List<Object> types)
     {
         super(stmt, mapping, functionName, args, types);
     }
@@ -217,7 +217,8 @@ public class TemporalExpression extends SQLExpression
         return super.sub(expr);
     }
 
-    public SQLExpression invoke(String methodName, List args)
+    @Override
+    public SQLExpression invoke(String methodName, List<SQLExpression> args)
     {
         return stmt.getRDBMSManager().getSQLExpressionFactory().invokeMethod(stmt, Date.class.getName(), methodName, this, args);
     }

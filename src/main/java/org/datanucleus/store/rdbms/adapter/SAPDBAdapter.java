@@ -35,6 +35,7 @@ import org.datanucleus.store.rdbms.key.CandidateKey;
 import org.datanucleus.store.rdbms.key.ForeignKey;
 import org.datanucleus.store.rdbms.key.Index;
 import org.datanucleus.store.rdbms.key.PrimaryKey;
+import org.datanucleus.store.rdbms.sql.method.SQLMethod;
 import org.datanucleus.util.Localiser;
 
 /**
@@ -169,7 +170,7 @@ public class SAPDBAdapter extends BaseDatastoreAdapter
      * @see org.datanucleus.store.rdbms.adapter.BaseDatastoreAdapter#getSQLMethodClass(java.lang.String, java.lang.String)
      */
     @Override
-    public Class getSQLMethodClass(String className, String methodName, ClassLoaderResolver clr)
+    public Class<? extends SQLMethod> getSQLMethodClass(String className, String methodName, ClassLoaderResolver clr)
     {
         if (className != null)
         {

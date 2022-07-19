@@ -93,7 +93,7 @@ public class ObjectExpression extends SQLExpression
      * @param functionName Name of function
      * @param args SQLExpression list
      */
-    public ObjectExpression(SQLStatement stmt, JavaTypeMapping mapping, String functionName, List args)
+    public ObjectExpression(SQLStatement stmt, JavaTypeMapping mapping, String functionName, List<SQLExpression> args)
     {
         super(stmt, mapping, functionName, args, null);
     }
@@ -106,7 +106,7 @@ public class ObjectExpression extends SQLExpression
      * @param args SQLExpression list
      * @param types Optional String/SQLExpression list of types for the args
      */
-    public ObjectExpression(SQLStatement stmt, JavaTypeMapping mapping, String functionName, List args, List types)
+    public ObjectExpression(SQLStatement stmt, JavaTypeMapping mapping, String functionName, List<SQLExpression> args, List<Object> types)
     {
         super(stmt, mapping, functionName, args, types);
     }
@@ -483,7 +483,7 @@ public class ObjectExpression extends SQLExpression
 
         // Extract cast type
         String castClassName = (String)((StringLiteral)expr).getValue();
-        Class type = null;
+        Class<?> type = null;
         try
         {
             type = stmt.getQueryGenerator().resolveClass(castClassName);
@@ -499,7 +499,7 @@ public class ObjectExpression extends SQLExpression
 
         // Extract type of this object and check obvious conditions
         SQLExpressionFactory exprFactory = stmt.getSQLExpressionFactory();
-        Class memberType = clr.classForName(mapping.getType());
+        Class<?> memberType = clr.classForName(mapping.getType());
         if (!memberType.isAssignableFrom(type) && !type.isAssignableFrom(memberType))
         {
             // object type and cast type are totally incompatible, so just return false
@@ -531,7 +531,7 @@ public class ObjectExpression extends SQLExpression
             JavaTypeMapping[] implMappings = refMapping.getJavaTypeMapping();
             for (int i=0;i<implMappings.length;i++)
             {
-                Class implType = clr.classForName(implMappings[i].getType());
+                Class<?> implType = clr.classForName(implMappings[i].getType());
                 if (type.isAssignableFrom(implType))
                 {
                     DatastoreClass castTable = storeMgr.getDatastoreClass(type.getName(), clr);
@@ -662,7 +662,7 @@ public class ObjectExpression extends SQLExpression
             throw new NucleusUserException("Do not currently support `instanceof` with class expression of type " + classExpr);
         }
 
-        Class type = null;
+        Class<?> type = null;
         try
         {
             type = stmt.getQueryGenerator().resolveClass(instanceofClassName);
@@ -678,7 +678,7 @@ public class ObjectExpression extends SQLExpression
 
         // Extract type of member and check obvious conditions
         SQLExpressionFactory exprFactory = stmt.getSQLExpressionFactory();
-        Class memberType = clr.classForName(mapping.getType());
+        Class<?> memberType = clr.classForName(mapping.getType());
         if (!memberType.isAssignableFrom(type) && !type.isAssignableFrom(memberType))
         {
             // Member type and instanceof type are totally incompatible, so just return false
@@ -864,7 +864,7 @@ public class ObjectExpression extends SQLExpression
                     if (selectStmt.getNumberOfUnions() == 0)
                     {
                         // No UNIONs so just check the main statement and return according to whether it is allowed
-                        Class mainCandidateCls = clr.classForName(stmt.getCandidateClassName());
+                        Class<?> mainCandidateCls = clr.classForName(stmt.getCandidateClassName());
                         if (type.isAssignableFrom(mainCandidateCls) == not)
                         {
                             SQLExpression returnExpr = exprFactory.newLiteral(stmt, m, true).eq(exprFactory.newLiteral(stmt, m, false));
@@ -881,7 +881,7 @@ public class ObjectExpression extends SQLExpression
                     // Note that this is only really valid is wanting "a instanceof SUB1".
                     // It fails when we want to do "a instanceof SUB1 || a instanceof SUB2"
                     // TODO What if this "OP_IS" is in the SELECT clause??? Need to update QueryToSQLMapper.compileResult
-                    Class mainCandidateCls = clr.classForName(stmt.getCandidateClassName());
+                    Class<?> mainCandidateCls = clr.classForName(stmt.getCandidateClassName());
                     if (type.isAssignableFrom(mainCandidateCls) == not)
                     {
                         SQLExpression unionClauseExpr = exprFactory.newLiteral(stmt, m, true).eq(exprFactory.newLiteral(stmt, m, false));
@@ -890,7 +890,7 @@ public class ObjectExpression extends SQLExpression
                     List<SelectStatement> unionStmts = selectStmt.getUnions();
                     for (SelectStatement unionStmt : unionStmts)
                     {
-                        Class unionCandidateCls = clr.classForName(unionStmt.getCandidateClassName());
+                        Class<?> unionCandidateCls = clr.classForName(unionStmt.getCandidateClassName());
                         if (type.isAssignableFrom(unionCandidateCls) == not)
                         {
                             SQLExpression unionClauseExpr = exprFactory.newLiteral(unionStmt, m, true).eq(exprFactory.newLiteral(unionStmt, m, false));
@@ -923,7 +923,8 @@ public class ObjectExpression extends SQLExpression
         }
     }
 
-    public SQLExpression invoke(String methodName, List args)
+    @Override
+    public SQLExpression invoke(String methodName, List<SQLExpression> args)
     {
         return stmt.getRDBMSManager().getSQLExpressionFactory().invokeMethod(stmt, Object.class.getName(), methodName, this, args);
     }

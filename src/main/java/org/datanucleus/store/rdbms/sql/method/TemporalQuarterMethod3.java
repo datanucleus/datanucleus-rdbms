@@ -42,7 +42,8 @@ public class TemporalQuarterMethod3 extends TemporalBaseMethod
 
         RDBMSStoreManager storeMgr = stmt.getRDBMSManager();
         JavaTypeMapping mapping2 = storeMgr.getMappingManager().getMapping(String.class);
-        ArrayList funcArgs = new ArrayList();
+
+        List<SQLExpression> funcArgs = new ArrayList<>();
         SQLExpressionFactory exprFactory = stmt.getSQLExpressionFactory();
         funcArgs.add(exprFactory.newLiteral(stmt, mapping2, "quarter"));
         funcArgs.add(invokedExpr);

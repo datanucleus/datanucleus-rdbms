@@ -213,7 +213,7 @@ public class ResultSetGetter extends AbstractFieldManager
         return value;
     }
 
-    private Object processSubObjectFields(JavaTypeMapping mapping, Class fieldType, StatementClassMapping relationMappings)
+    private Object processSubObjectFields(JavaTypeMapping mapping, Class<?> fieldType, StatementClassMapping relationMappings)
     {
         ClassLoaderResolver clr = ec.getClassLoaderResolver();
         AbstractClassMetaData relatedCmd = ec.getMetaDataManager().getMetaDataForClass(fieldType, clr);
@@ -232,7 +232,7 @@ public class ResultSetGetter extends AbstractFieldManager
             }
         }
 
-        ResultObjectFactory relationROF = new PersistentClassROF(ec, rs, ec.getFetchPlan(), relationMappings, relatedCmd, fieldType);
+        ResultObjectFactory relationROF = new PersistentClassROF<>(ec, rs, ec.getFetchPlan(), relationMappings, relatedCmd, fieldType);
         return relationROF.getObject();
     }
 }

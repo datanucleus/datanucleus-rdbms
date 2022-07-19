@@ -379,13 +379,13 @@ public class LocateBulkRequest extends BulkRequest
         {
             String msg = Localiser.msg("052220", sms[0].getObjectAsPrintable(), statement, sqle.getMessage());
             NucleusLogger.DATASTORE_RETRIEVE.warn(msg);
-            List exceptions = new ArrayList();
+            List<Throwable> exceptions = new ArrayList<>();
             exceptions.add(sqle);
             while ((sqle = sqle.getNextException()) != null)
             {
                 exceptions.add(sqle);
             }
-            throw new NucleusDataStoreException(msg, (Throwable[])exceptions.toArray(new Throwable[exceptions.size()]));
+            throw new NucleusDataStoreException(msg, exceptions.toArray(new Throwable[exceptions.size()]));
         }
     }
 

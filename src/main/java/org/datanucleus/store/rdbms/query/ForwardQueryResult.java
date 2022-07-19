@@ -56,12 +56,12 @@ public final class ForwardQueryResult<E> extends AbstractRDBMSQueryResult<E> imp
     protected boolean moreResultSetRows;
 
     /** The Result Objects. */
-    protected List<E> resultObjs = new ArrayList();
+    protected List<E> resultObjs = new ArrayList<>();
 
-    protected List resultIds = null;
+    protected List<Object> resultIds = null;
 
     /** The candidate list restriction (optional). */
-    private Collection candidates;
+    private Collection<Object> candidates;
 
     /**
      * Constructor of the result from a Query.
@@ -71,18 +71,18 @@ public final class ForwardQueryResult<E> extends AbstractRDBMSQueryResult<E> imp
      * @param fp FetchPlan
      * @param candidates Candidate elements
      */
-    public ForwardQueryResult(Query query, ResultObjectFactory<E> rof, ResultSet rs, FetchPlan fp, Collection candidates)
+    public ForwardQueryResult(Query query, ResultObjectFactory<E> rof, ResultSet rs, FetchPlan fp, Collection<Object> candidates)
     {
         super(query, rof, rs, fp);
 
         if (query.useResultsCaching())
         {
-            resultIds = new ArrayList();
+            resultIds = new ArrayList<>();
         }
 
         if (candidates != null)
         {
-            this.candidates = new ArrayList(candidates);
+            this.candidates = new ArrayList<>(candidates);
         }
     }
 
@@ -539,7 +539,7 @@ public final class ForwardQueryResult<E> extends AbstractRDBMSQueryResult<E> imp
      * @param a The array to copy into. 
      * @return The array.
      */
-    public synchronized Object[] toArray(Object[] a)
+    public synchronized <T> T[] toArray(T[] a)
     {
         assertIsOpen();
         advanceToEndOfResultSet();
@@ -556,6 +556,6 @@ public final class ForwardQueryResult<E> extends AbstractRDBMSQueryResult<E> imp
     protected Object writeReplace() throws ObjectStreamException
     {
         disconnect();
-        return new java.util.ArrayList(resultObjs);
+        return new java.util.ArrayList<>(resultObjs);
     }
 }

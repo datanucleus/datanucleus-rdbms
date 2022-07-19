@@ -240,8 +240,7 @@ public class JDOQLQuery extends AbstractJDOQLQuery
 
     /**
      * Method to compile the JDOQL query.
-     * Uses the superclass to compile the generic query populating the "compilation", and then generates
-     * the datastore-specific "datastoreCompilation".
+     * Uses the superclass to compile the generic query populating the "compilation", and then generates the datastore-specific "datastoreCompilation".
      * @param parameterValues Map of param values keyed by param name (if available at compile time)
      */
     protected synchronized void compileInternal(Map parameterValues)
@@ -601,7 +600,7 @@ public class JDOQLQuery extends AbstractJDOQLQuery
             }
             else if (inMemory)
             {
-                return new JDOQLInMemoryEvaluator(this, new ArrayList(candidateCollection), compilation, parameters, clr).execute(true, true, true, true, true);
+                return new JDOQLInMemoryEvaluator(this, new ArrayList<>(candidateCollection), compilation, parameters, clr).execute(true, true, true, true, true);
             }
         }
         else if (type == QueryType.SELECT)
@@ -610,7 +609,7 @@ public class JDOQLQuery extends AbstractJDOQLQuery
             List<Object> cachedResults = getQueryManager().getQueryResult(this, parameters);
             if (cachedResults != null)
             {
-                return new CandidateIdsQueryResult(this, cachedResults);
+                return new CandidateIdsQueryResult<>(this, cachedResults);
             }
         }
 
@@ -655,7 +654,7 @@ public class JDOQLQuery extends AbstractJDOQLQuery
                         if (inMemory)
                         {
                             // IN-MEMORY EVALUATION
-                            ResultObjectFactory rof = new PersistentClassROF(ec, rs, getFetchPlan(), datastoreCompilation.getResultDefinitionForClass(), acmd, candidateClass);
+                            ResultObjectFactory rof = new PersistentClassROF<>(ec, rs, getFetchPlan(), datastoreCompilation.getResultDefinitionForClass(), acmd, candidateClass);
                             rof.setIgnoreCache(ignoreCache);
 
                             // Just instantiate the candidates for later in-memory processing
@@ -686,7 +685,7 @@ public class JDOQLQuery extends AbstractJDOQLQuery
                             else
                             {
                                 // Each result row is a candidate object
-                                rof = new PersistentClassROF(ec, rs, getFetchPlan(), datastoreCompilation.getResultDefinitionForClass(), acmd, candidateClass);
+                                rof = new PersistentClassROF<>(ec, rs, getFetchPlan(), datastoreCompilation.getResultDefinitionForClass(), acmd, candidateClass);
                                 if (getBooleanExtensionProperty(EXTENSION_UPDATE_ALL_CANDIDATE_FIELDS, false))
                                 {
                                     rof.setUpdateAllFields(true);

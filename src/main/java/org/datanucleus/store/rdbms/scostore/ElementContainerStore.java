@@ -305,7 +305,7 @@ public abstract class ElementContainerStore extends BaseContainerStore
      */
     public void clear(DNStateManager ownerSM)
     {
-        Collection dependentElements = null;
+        Collection<Object> dependentElements = null;
         CollectionMetaData collmd = ownerMemberMetaData.getCollection();
         boolean dependent = collmd.isDependentElement();
         if (ownerMemberMetaData.isCascadeRemoveOrphans())
@@ -315,7 +315,7 @@ public abstract class ElementContainerStore extends BaseContainerStore
         if (dependent && !collmd.isEmbeddedElement() && !collmd.isSerializedElement())
         {
             // Retain the dependent elements that need deleting after clearing
-            dependentElements = new HashSet();
+            dependentElements = new HashSet<>();
             Iterator iter = iterator(ownerSM);
             while (iter.hasNext())
             {
@@ -897,10 +897,10 @@ public abstract class ElementContainerStore extends BaseContainerStore
         }
         if (elemInfo == null)
         {
-            Class elementCls = element.getClass();
+            Class<?> elementCls = element.getClass();
             for (int i=0;i<elementInfo.length;i++)
             {
-                Class elemInfoCls = clr.classForName(elementInfo[i].getClassName());
+                Class<?> elemInfoCls = clr.classForName(elementInfo[i].getClassName());
                 if (elemInfoCls.isAssignableFrom(elementCls))
                 {
                     elemInfo = elementInfo[i];

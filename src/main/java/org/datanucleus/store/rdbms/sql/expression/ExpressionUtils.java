@@ -20,6 +20,7 @@ package org.datanucleus.store.rdbms.sql.expression;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ExecutionContext;
@@ -76,7 +77,7 @@ public class ExpressionUtils
             return (NumericExpression)factory.newLiteral(expr.getSQLStatement(), storeMgr.getMappingManager().getMapping(value.getClass()), value);
         }
 
-        ArrayList args = new ArrayList();
+        List<SQLExpression> args = new ArrayList<>();
         args.add(expr);
         return new NumericExpression(expr.getSQLStatement(), expr.getJavaTypeMapping(), dba.getNumericConversionFunction(), args);
     }

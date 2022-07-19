@@ -183,7 +183,7 @@ abstract class Key
 
     // ------------------------------- Static Utilities -----------------------------
 
-    protected static void setListMinimumSize(List list, int size)
+    protected static void setListMinimumSize(List<?> list, int size)
     {
         while (list.size() < size)
         {

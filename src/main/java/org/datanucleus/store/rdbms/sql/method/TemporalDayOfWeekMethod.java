@@ -37,7 +37,7 @@ public class TemporalDayOfWeekMethod extends TemporalBaseMethod
     {
         SQLExpression invokedExpr = getInvokedExpression(expr, args, "DAY_OF_WEEK");
 
-        ArrayList funcArgs = new ArrayList();
+        List<SQLExpression> funcArgs = new ArrayList<>();
         funcArgs.add(invokedExpr);
         return new NumericExpression(stmt, stmt.getSQLExpressionFactory().getMappingForType(int.class), "DAY_OF_WEEK", funcArgs);
     }

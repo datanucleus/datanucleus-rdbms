@@ -44,7 +44,7 @@ public class UUIDMapping extends SingleFieldMapping
     public void initialize(RDBMSStoreManager storeMgr, String type)
     {
         // We don't have access to any field info yet, so have no idea whether we need a TypeConverter, so just create one
-        Class fieldType = storeMgr.getNucleusContext().getClassLoaderResolver(null).classForName(type);
+        Class fieldType = storeMgr.getNucleusContext().getClassLoaderResolver(null).classForName(type); // TODO This has to be UUID
         converter = storeMgr.getNucleusContext().getTypeManager().getDefaultTypeConverterForType(fieldType);
         if (converter == null)
         {

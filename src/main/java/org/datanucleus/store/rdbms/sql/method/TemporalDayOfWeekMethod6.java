@@ -40,7 +40,7 @@ public class TemporalDayOfWeekMethod6 extends TemporalBaseMethod
         SQLExpression invokedExpr = getInvokedExpression(expr, args, "WEEKDAY");
 
         expr.toSQLText().prepend("WEEKDAY FROM ");
-        ArrayList funcArgs = new ArrayList();
+        List<SQLExpression> funcArgs = new ArrayList<>();
         funcArgs.add(invokedExpr);
 
         // Add one to the SQL (origin=0) to be compatible with Java Calendar day of week (origin=1)

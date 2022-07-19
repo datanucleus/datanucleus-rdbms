@@ -49,10 +49,10 @@ public class CollectionExpression extends SQLExpression
         super(stmt, table, mapping);
     }
 
-    public SQLExpression invoke(String methodName, List args)
+    @Override
+    public SQLExpression invoke(String methodName, List<SQLExpression> args)
     {
-        return stmt.getRDBMSManager().getSQLExpressionFactory().invokeMethod(stmt, Collection.class.getName(), 
-            methodName, this, args);
+        return stmt.getRDBMSManager().getSQLExpressionFactory().invokeMethod(stmt, Collection.class.getName(), methodName, this, args);
     }
 
     /**

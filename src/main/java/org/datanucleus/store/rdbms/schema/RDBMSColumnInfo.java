@@ -264,7 +264,7 @@ public class RDBMSColumnInfo implements ListStoreSchemaData
         return null;
     }
 
-    public List getChildren()
+    public List<StoreSchemaData> getChildren()
     {
         // A column has no child components
         return null;

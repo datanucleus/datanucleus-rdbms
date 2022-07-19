@@ -33,11 +33,8 @@ public class OptionalExpression extends SingleCollectionExpression
         super(stmt, table, mapping);
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.rdbms.sql.expression.DelegatedExpression#invoke(java.lang.String, java.util.List)
-     */
     @Override
-    public SQLExpression invoke(String methodName, List args)
+    public SQLExpression invoke(String methodName, List<SQLExpression> args)
     {
         return stmt.getRDBMSManager().getSQLExpressionFactory().invokeMethod(stmt, java.util.Optional.class.getName(), methodName, this, args);
     }

@@ -32,17 +32,15 @@ import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
  */
 public class TemporalSecondMethod5 extends TemporalBaseMethod
 {
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.rdbms.sql.method.SQLMethod#getExpression(org.datanucleus.store.rdbms.sql.expression.SQLExpression, java.util.List)
-     */
+    @Override
     public SQLExpression getExpression(SQLStatement stmt, SQLExpression expr, List<SQLExpression> args)
     {
         SQLExpression invokedExpr = getInvokedExpression(expr, args, "SECOND");
 
-        List secondArgs = new ArrayList();
+        List<SQLExpression> secondArgs = new ArrayList<>();
         secondArgs.add(invokedExpr);
         NumericExpression secondExpr = new NumericExpression(stmt, stmt.getSQLExpressionFactory().getMappingForType(int.class, true), "SECOND", secondArgs);
-        List castArgs = new ArrayList();
+        List<SQLExpression> castArgs = new ArrayList<>();
         castArgs.add(secondExpr);
         return new NumericExpression(stmt, stmt.getSQLExpressionFactory().getMappingForType(Integer.class, true), "CAST", castArgs, asList("INTEGER"));
     }

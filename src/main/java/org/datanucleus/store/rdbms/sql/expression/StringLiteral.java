@@ -56,13 +56,12 @@ public class StringLiteral extends StringExpression implements SQLLiteral
         }
         else
         {
-            Class type = value.getClass();
+            Class<?> type = value.getClass();
             if (mapping != null)
             {
                 type = mapping.getJavaType();
             }
-            TypeConverter converter = 
-                stmt.getRDBMSManager().getNucleusContext().getTypeManager().getTypeConverterForType(type, String.class);
+            TypeConverter converter = stmt.getRDBMSManager().getNucleusContext().getTypeManager().getTypeConverterForType(type, String.class);
             if (converter != null)
             {
                 // Use converter

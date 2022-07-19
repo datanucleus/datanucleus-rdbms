@@ -68,7 +68,7 @@ public class StringIndexOf5Method implements SQLMethod
                     "StringExpression/CharacterExpression/ParameterLiteral"));
         }
 
-        ArrayList funcArgs = new ArrayList();
+        List<SQLExpression> funcArgs = new ArrayList<>();
         if (args.size() == 1)
         {
             // strExpr.indexOf(str1)

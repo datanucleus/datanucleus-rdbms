@@ -74,6 +74,8 @@ import org.datanucleus.store.rdbms.sql.SQLTable;
 import org.datanucleus.store.rdbms.sql.SQLText;
 import org.datanucleus.store.rdbms.sql.SelectStatement;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
+import org.datanucleus.store.rdbms.sql.method.SQLMethod;
+import org.datanucleus.store.rdbms.sql.operation.SQLOperation;
 import org.datanucleus.store.rdbms.table.Column;
 import org.datanucleus.store.rdbms.table.Table;
 import org.datanucleus.store.rdbms.table.TableImpl;
@@ -1773,11 +1775,8 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
         return true;
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.rdbms.adapter.DatastoreAdapter#getSQLOperationClass(java.lang.String)
-     */
     @Override
-    public Class getSQLOperationClass(String operationName)
+    public Class<? extends SQLOperation> getSQLOperationClass(String operationName)
     {
         if ("numericToString".equals(operationName))
         {
@@ -1788,7 +1787,7 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
     }
 
     @Override
-    public Class getSQLMethodClass(String className, String methodName, ClassLoaderResolver clr)
+    public Class<? extends SQLMethod> getSQLMethodClass(String className, String methodName, ClassLoaderResolver clr)
     {
         if (className == null)
         {
@@ -2061,7 +2060,7 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
                     defaultForJavaType = Boolean.valueOf(defaultJava);
                 }
 
-                Class mappingType = null;
+                Class<? extends ColumnMapping> mappingType = null;
                 if (!StringUtils.isWhitespace(columnMappingClassName))
                 {
                     try
@@ -2073,8 +2072,8 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
                         NucleusLogger.DATASTORE.error(Localiser.msg("041013", columnMappingClassName));
                     }
 
-                    Set includes = new HashSet();
-                    Set excludes = new HashSet();
+                    Set<String> includes = new HashSet<>();
+                    Set<String> excludes = new HashSet<>();
                     for (ConfigurationElement childElem : elem.getChildren())
                     {
                         if (childElem.getName().equals("includes"))
@@ -2214,7 +2213,7 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
             if (sqlType != null)
             {
                 // "sql-type" was specified
-                Class cls = typeMappings.columnMappingBySqlType.get(sqlType.toUpperCase());
+                Class<? extends ColumnMapping> cls = typeMappings.columnMappingBySqlType.get(sqlType.toUpperCase());
                 if (cls != null)
                 {
                     return cls;
@@ -2235,7 +2234,7 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
             if (jdbcType != null)
             {
                 // "jdbc-type" was specified
-                Class cls = typeMappings.columnMappingByJdbcType.get(jdbcType.toUpperCase());
+                Class<? extends ColumnMapping> cls = typeMappings.columnMappingByJdbcType.get(jdbcType.toUpperCase());
                 if (cls != null)
                 {
                     return cls;
