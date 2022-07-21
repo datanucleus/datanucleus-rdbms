@@ -49,9 +49,7 @@ import org.datanucleus.util.Localiser;
  */
 public class StringIndexOf5Method implements SQLMethod
 {
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.rdbms.sql.method.SQLMethod#getExpression(org.datanucleus.store.rdbms.sql.expression.SQLExpression, java.util.List)
-     */
+    @Override
     public SQLExpression getExpression(SQLStatement stmt, SQLExpression expr, List<SQLExpression> args)
     {
         if (args == null || args.size() == 0 || args.size() > 2)
@@ -68,12 +66,13 @@ public class StringIndexOf5Method implements SQLMethod
                     "StringExpression/CharacterExpression/ParameterLiteral"));
         }
 
-        List<SQLExpression> funcArgs = new ArrayList<>();
         if (args.size() == 1)
         {
             // strExpr.indexOf(str1)
+            List<SQLExpression> funcArgs = new ArrayList<>();
             funcArgs.add(expr);
             funcArgs.add(substrExpr);
+
             SQLExpression oneExpr = ExpressionUtils.getLiteralForOne(stmt);
             NumericExpression locateExpr = new NumericExpression(stmt, stmt.getSQLExpressionFactory().getMappingForType(int.class, true), "STRPOS", funcArgs);
             return new NumericExpression(locateExpr, Expression.OP_SUB, oneExpr);
@@ -88,21 +87,19 @@ public class StringIndexOf5Method implements SQLMethod
 
         // Find the substring starting at this position
         SQLExpressionFactory exprFactory = stmt.getSQLExpressionFactory();
-        ArrayList substrArgs = new ArrayList(1);
-        substrArgs.add(fromExpr);
+        List<SQLExpression> substrArgs = List.of(fromExpr);
         SQLExpression strExpr = exprFactory.invokeMethod(stmt, "java.lang.String", "substring", expr, substrArgs);
 
+        List<SQLExpression> funcArgs = new ArrayList<>();
         funcArgs.add(strExpr);
         funcArgs.add(substrExpr);
         NumericExpression locateExpr = new NumericExpression(stmt, stmt.getSQLExpressionFactory().getMappingForType(int.class, true), "STRPOS", funcArgs);
 
         SQLExpression[] whenExprs = new SQLExpression[1];
-        NumericExpression zeroExpr = new IntegerLiteral(stmt, exprFactory.getMappingForType(Integer.class, false), Integer.valueOf(0), null);
-        whenExprs[0] = locateExpr.gt(zeroExpr);
+        whenExprs[0] = locateExpr.gt(new IntegerLiteral(stmt, exprFactory.getMappingForType(Integer.class, false), Integer.valueOf(0), null));
 
         SQLExpression[] actionExprs = new SQLExpression[1];
-        SQLExpression oneExpr = ExpressionUtils.getLiteralForOne(stmt);
-        NumericExpression posExpr1 = new NumericExpression(locateExpr, Expression.OP_SUB, oneExpr);
+        NumericExpression posExpr1 = new NumericExpression(locateExpr, Expression.OP_SUB, ExpressionUtils.getLiteralForOne(stmt));
         actionExprs[0] = new NumericExpression(posExpr1, Expression.OP_ADD, fromExpr);
 
         SQLExpression elseExpr = new IntegerLiteral(stmt, exprFactory.getMappingForType(Integer.class, false), Integer.valueOf(-1), null);

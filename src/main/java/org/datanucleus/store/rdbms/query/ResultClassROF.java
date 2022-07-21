@@ -62,7 +62,7 @@ import org.datanucleus.util.StringUtils;
 public class ResultClassROF extends AbstractROF
 {
     /** The result class that we should create for each row of results. */
-    private final Class resultClass;
+    private final Class<?> resultClass;
 
     /** The index of fields position to mapping type. */
     private final StatementMappingIndex[] stmtMappings;
@@ -231,9 +231,9 @@ public class ResultClassROF extends AbstractROF
                 else if (stmtMap instanceof StatementClassMapping)
                 {
                     StatementClassMapping classMap = (StatementClassMapping)stmtMap;
-                    Class cls = ec.getClassLoaderResolver().classForName(classMap.getClassName());
+                    Class<?> cls = ec.getClassLoaderResolver().classForName(classMap.getClassName());
                     AbstractClassMetaData acmd = ec.getMetaDataManager().getMetaDataForClass(cls, ec.getClassLoaderResolver());
-                    PersistentClassROF rof = new PersistentClassROF(ec, rs, fp, classMap, acmd, cls);
+                    PersistentClassROF rof = new PersistentClassROF<>(ec, rs, fp, classMap, acmd, cls);
                     rof.setIgnoreCache(ignoreCache);
                     resultFieldValues[i] = rof.getObject();
 
@@ -733,7 +733,7 @@ public class ResultClassROF extends AbstractROF
     }
 
     /** Map<Class, ResultSetGetter> ResultSetGetters by result classes */
-    private static Map<Class, ResultSetGetter> resultSetGetters = new HashMap(15);
+    private static Map<Class, ResultSetGetter> resultSetGetters = new HashMap<>(15);
     static
     {
         // any type specific getter from ResultSet that we can guess from the desired result class

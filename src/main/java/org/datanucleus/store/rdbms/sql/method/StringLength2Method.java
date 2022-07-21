@@ -41,9 +41,7 @@ import org.datanucleus.util.Localiser;
  */
 public class StringLength2Method implements SQLMethod
 {
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.rdbms.sql.method.SQLMethod#getExpression(org.datanucleus.store.rdbms.sql.expression.SQLExpression, java.util.List)
-     */
+    @Override
     public SQLExpression getExpression(SQLStatement stmt, SQLExpression expr, List<SQLExpression> args)
     {
         DatastoreAdapter dba = stmt.getDatastoreAdapter();
@@ -83,7 +81,7 @@ public class StringLength2Method implements SQLMethod
         }
         else if (expr instanceof StringExpression || expr instanceof ParameterLiteral)
         {
-            ArrayList funcArgs = new ArrayList();
+            List<SQLExpression> funcArgs = new ArrayList<>();
             funcArgs.add(expr);
             return new NumericExpression(stmt, stmt.getSQLExpressionFactory().getMappingForType(int.class), "STRLEN", funcArgs);
         }

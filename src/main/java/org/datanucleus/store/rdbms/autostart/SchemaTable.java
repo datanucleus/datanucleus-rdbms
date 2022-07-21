@@ -157,7 +157,7 @@ public class SchemaTable extends TableImpl
      * @return The HashSet of class names (StoreData)
      * @throws SQLException Thrown when an error occurs in the process.
      */
-    public Set getAllClasses(ManagedConnection conn)
+    public Set<StoreData> getAllClasses(ManagedConnection conn)
     throws SQLException
     {
         Set<StoreData> schema_data = new HashSet<>();

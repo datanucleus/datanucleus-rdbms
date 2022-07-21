@@ -94,17 +94,13 @@ public class StringSubqueryExpression extends StringExpression implements Subque
         return eqExpr;
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.rdbms.sql.expression.SQLExpression#invoke(java.lang.String, java.util.List)
-     */
-    public SQLExpression invoke(String methodName, List args)
+    @Override
+    public SQLExpression invoke(String methodName, List<SQLExpression> args)
     {
         if (methodName.equals("contains"))
         {
-            SQLExpression sqlExpr = (SQLExpression) args.get(0);
-            return new BooleanExpression(sqlExpr, Expression.OP_IN, this);
+            return new BooleanExpression(args.get(0), Expression.OP_IN, this);
         }
-
         return super.invoke(methodName, args);
     }
 }

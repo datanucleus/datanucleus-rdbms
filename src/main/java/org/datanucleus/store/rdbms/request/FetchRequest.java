@@ -560,13 +560,13 @@ public class FetchRequest extends Request
             {
                 String msg = Localiser.msg("052219", IdentityUtils.getPersistableIdentityForId(sm.getInternalObjectId()), statement, sqle.getMessage());
                 NucleusLogger.DATASTORE_RETRIEVE.warn(msg);
-                List exceptions = new ArrayList();
+                List<Throwable> exceptions = new ArrayList<>();
                 exceptions.add(sqle);
                 while ((sqle = sqle.getNextException()) != null)
                 {
                     exceptions.add(sqle);
                 }
-                throw new NucleusDataStoreException(msg, (Throwable[])exceptions.toArray(new Throwable[exceptions.size()]));
+                throw new NucleusDataStoreException(msg, exceptions.toArray(new Throwable[exceptions.size()]));
             }
         }
 
@@ -596,7 +596,8 @@ public class FetchRequest extends Request
      * @return Number of members being selected in the statement
      */
     protected int processMembersOfClass(SelectStatement sqlStatement, FetchPlanForClass fpClass, AbstractMemberMetaData[] mmds, AbstractMemberMetaData[] mmdsToStore, 
-            DatastoreClass table, SQLTable sqlTbl, StatementClassMapping mappingDef, Collection fetchCallbacks, ClassLoaderResolver clr, List<Integer> memberNumbersToStore)
+            DatastoreClass table, SQLTable sqlTbl, StatementClassMapping mappingDef, Collection<MappingCallbacks> fetchCallbacks, ClassLoaderResolver clr, 
+            List<Integer> memberNumbersToStore)
     {
         int number = 0;
         if (mmds != null)
@@ -650,8 +651,8 @@ public class FetchRequest extends Request
      * @param memberNumbersToStore List of member numbers that are approved to be stored (any fetched ones will be added if recursionDepth=0)
      * @return Whether this member is selected in the statement
      */
-    boolean processMemberToFetch(AbstractMemberMetaData mmd, FetchPlanForClass fpClass, ClassLoaderResolver clr, Collection fetchCallbacks, SelectStatement sqlStmt, 
-            SQLTable sqlTbl, StatementClassMapping mappingDef, List<Integer> memberNumbersToStore)
+    boolean processMemberToFetch(AbstractMemberMetaData mmd, FetchPlanForClass fpClass, ClassLoaderResolver clr, Collection<MappingCallbacks> fetchCallbacks,
+            SelectStatement sqlStmt, SQLTable sqlTbl, StatementClassMapping mappingDef, List<Integer> memberNumbersToStore)
     {
         boolean selected = false;
         JavaTypeMapping mapping = table.getMemberMapping(mmd);
@@ -731,7 +732,7 @@ public class FetchRequest extends Request
             if (mapping instanceof MappingCallbacks)
             {
                 // TODO Need to add that this mapping is for base object or base.field1, etc
-                fetchCallbacks.add(mapping);
+                fetchCallbacks.add((MappingCallbacks) mapping);
             }
         }
         return selected;
@@ -749,8 +750,8 @@ public class FetchRequest extends Request
      * @param memberNumbersToStore List of member numbers that are approved to be stored
      * @return Whether this member is selected in the statement
      */
-    boolean processMemberToStore(AbstractMemberMetaData mmd, FetchPlanForClass fpClass, ClassLoaderResolver clr, Collection fetchCallbacks, SelectStatement sqlStmt, 
-            SQLTable sqlTbl, StatementClassMapping mappingDef, List<Integer> memberNumbersToStore)
+    boolean processMemberToStore(AbstractMemberMetaData mmd, FetchPlanForClass fpClass, ClassLoaderResolver clr, Collection<MappingCallbacks> fetchCallbacks,
+            SelectStatement sqlStmt, SQLTable sqlTbl, StatementClassMapping mappingDef, List<Integer> memberNumbersToStore)
     {
         boolean selected = false;
         JavaTypeMapping mapping = table.getMemberMapping(mmd);
@@ -779,7 +780,7 @@ public class FetchRequest extends Request
             if (mapping instanceof MappingCallbacks)
             {
                 // TODO Need to add that this mapping is for base object or base.field1, etc
-                fetchCallbacks.add(mapping);
+                fetchCallbacks.add((MappingCallbacks) mapping);
             }
         }
         return selected;

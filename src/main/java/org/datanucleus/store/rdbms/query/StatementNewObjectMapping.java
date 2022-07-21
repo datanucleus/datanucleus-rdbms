@@ -38,7 +38,7 @@ public class StatementNewObjectMapping
         this.cls = cls;
     }
 
-    public Class getObjectClass()
+    public Class<?> getObjectClass()
     {
         return cls;
     }

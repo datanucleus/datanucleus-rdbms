@@ -215,8 +215,8 @@ public abstract class AbstractListStore<E> extends AbstractCollectionStore<E> im
     @Override
     public java.util.List<E> subList(DNStateManager sm, int startIdx, int endIdx)
     {
-        ListIterator iter = listIterator(sm, startIdx, endIdx);
-        java.util.List list = new ArrayList();
+        ListIterator<E> iter = listIterator(sm, startIdx, endIdx);
+        java.util.List<E> list = new ArrayList<>();
         while (iter.hasNext())
         {
             list.add(iter.next());
@@ -278,7 +278,7 @@ public abstract class AbstractListStore<E> extends AbstractCollectionStore<E> im
                         }
                     }
 
-                    List<Integer> indexes = new ArrayList();
+                    List<Integer> indexes = new ArrayList<>();
                     ResultSet rs = sqlControl.executeStatementQuery(ec, mconn, stmt, ps);
                     try
                     {

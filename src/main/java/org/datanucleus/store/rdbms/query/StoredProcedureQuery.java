@@ -117,7 +117,7 @@ public class StoredProcedureQuery extends AbstractStoredProcedureQuery
      */
     protected Object executeQuery(final Map parameters)
     {
-        this.inputParameters = new HashMap();
+        this.inputParameters = new HashMap<>();
         if (implicitParameters != null)
         {
             inputParameters.putAll(implicitParameters);
@@ -573,7 +573,7 @@ public class StoredProcedureQuery extends AbstractStoredProcedureQuery
 
                             if (outputParamValues == null)
                             {
-                                outputParamValues = new HashMap();
+                                outputParamValues = new HashMap<>();
                             }
                             if (param.getName() != null)
                             {

@@ -76,6 +76,8 @@ public class JoinListStore<E> extends AbstractListStore<E>
 {
     private String setStmt;
 
+    private Class<E> elementCls;
+
     /**
      * Constructor for a join list store for RDBMS.
      * @param mmd Metadata for the member that has the list with join table
@@ -108,13 +110,13 @@ public class JoinListStore<E> extends AbstractListStore<E>
             throw new NucleusUserException(Localiser.msg("056044", ownerMemberMetaData.getFullFieldName(), joinTable.toString()));
         }
 
+        elementCls = clr.classForName(elementType);
         if (elementsAreSerialised)
         {
             elementInfo = null;
         }
         else
         {
-            Class elementCls = clr.classForName(elementType);
             if (ClassUtils.isReferenceType(elementCls))
             {
                 // Collection of reference types (interfaces/Objects)
@@ -298,18 +300,18 @@ public class JoinListStore<E> extends AbstractListStore<E>
     }
 
     @Override
-    public E set(DNStateManager ownerSM, int index, Object element, boolean allowDependentField)
+    public E set(DNStateManager ownerSM, int index, E element, boolean allowDependentField)
     {
         ExecutionContext ec = ownerSM.getExecutionContext();
         validateElementForWriting(ec, element, null);
 
         // Find the original element at this position
         E oldElement  = null;
-        List fieldVal = (List) ownerSM.provideField(ownerMemberMetaData.getAbsoluteFieldNumber());
+        List<E> fieldVal = (List) ownerSM.provideField(ownerMemberMetaData.getAbsoluteFieldNumber());
         if (fieldVal != null && fieldVal instanceof BackedSCO && ((BackedSCO)fieldVal).isLoaded())
         {
             // Already loaded in the wrapper
-            oldElement = (E) fieldVal.get(index);
+            oldElement = fieldVal.get(index);
         }
         else
         {
@@ -320,7 +322,7 @@ public class JoinListStore<E> extends AbstractListStore<E>
         if (storeMgr.getBooleanObjectProperty(RDBMSPropertyNames.PROPERTY_RDBMS_DYNAMIC_SCHEMA_UPDATES).booleanValue())
         {
             DynamicSchemaFieldManager dynamicSchemaFM = new DynamicSchemaFieldManager(storeMgr, ownerSM);
-            Collection coll = new ArrayList();
+            Collection<E> coll = new ArrayList<>();
             coll.add(element);
             dynamicSchemaFM.storeObjectField(getOwnerMemberMetaData().getAbsoluteFieldNumber(), coll);
             if (dynamicSchemaFM.hasPerformedSchemaUpdates())
@@ -393,7 +395,7 @@ public class JoinListStore<E> extends AbstractListStore<E>
     }
 
     @Override
-    public void update(DNStateManager ownerSM, Collection coll)
+    public void update(DNStateManager ownerSM, Collection<? extends E> coll)
     {
         if (coll == null || coll.isEmpty())
         {
@@ -410,11 +412,11 @@ public class JoinListStore<E> extends AbstractListStore<E>
         }
 
         // Find existing elements, and remove any that are no longer present
-        Collection existing = new ArrayList();
-        Iterator elemIter = iterator(ownerSM);
+        Collection<E> existing = new ArrayList<>();
+        Iterator<E> elemIter = iterator(ownerSM);
         while (elemIter.hasNext())
         {
-            Object elem = elemIter.next();
+            E elem = elemIter.next();
             if (!coll.contains(elem))
             {
                 remove(ownerSM, elem, -1, true);
@@ -482,8 +484,8 @@ public class JoinListStore<E> extends AbstractListStore<E>
             // Indexed List, so retrieve the index of the element and remove the object
             // Get the indices of the elements to remove in reverse order (highest first)
             // This is done because the element could be duplicated in the list.
-            Collection elements = new ArrayList();
-            elements.add(element);
+            Collection<E> elements = new ArrayList<>();
+            elements.add((E) element);
             int[] indices = getIndicesOf(ownerSM, elements);
             if (indices == null)
             {
@@ -771,17 +773,17 @@ public class JoinListStore<E> extends AbstractListStore<E>
                         if (elementsAreEmbedded || elementsAreSerialised)
                         {
                             // No ResultObjectFactory needed - handled by SetStoreIterator
-                            return new ListStoreIterator(ownerSM, rs, null, this);
+                            return new ListStoreIterator<E>(ownerSM, rs, null, this);
                         }
                         else if (elementMapping instanceof ReferenceMapping)
                         {
                             // No ResultObjectFactory needed - handled by SetStoreIterator
-                            return new ListStoreIterator(ownerSM, rs, null, this);
+                            return new ListStoreIterator<E>(ownerSM, rs, null, this);
                         }
                         else
                         {
-                            ResultObjectFactory rof = new PersistentClassROF(ec, rs, ec.getFetchPlan(), resultMapping, elementCmd, clr.classForName(elementType));
-                            return new ListStoreIterator(ownerSM, rs, rof, this);
+                            ResultObjectFactory<E> rof = new PersistentClassROF<E>(ec, rs, ec.getFetchPlan(), resultMapping, elementCmd, elementCls);
+                            return new ListStoreIterator<E>(ownerSM, rs, rof, this);
                         }
                     }
                     finally

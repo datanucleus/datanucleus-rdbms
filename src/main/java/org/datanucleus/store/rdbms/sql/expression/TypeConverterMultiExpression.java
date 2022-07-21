@@ -33,7 +33,8 @@ public class TypeConverterMultiExpression extends ObjectExpression
         super(stmt, table, mapping);
     }
 
-    public SQLExpression invoke(String methodName, List args)
+    @Override
+    public SQLExpression invoke(String methodName, List<SQLExpression> args)
     {
         return stmt.getRDBMSManager().getSQLExpressionFactory().invokeMethod(stmt, mapping.getJavaType().getName(), methodName, this, args);
     }

@@ -659,7 +659,7 @@ public class JDOQLQuery extends AbstractJDOQLQuery
 
                             // Just instantiate the candidates for later in-memory processing
                             // TODO Use a queryResult rather than an ArrayList so we load when required
-                            List candidates = new ArrayList();
+                            List<Object> candidates = new ArrayList<>();
                             while (rs.next())
                             {
                                 candidates.add(rof.getObject());
@@ -1454,7 +1454,7 @@ public class JDOQLQuery extends AbstractJDOQLQuery
 
     /**
      * Set multiple extensions, or use null to clear extensions.
-     * Intercepts any settong of in-memory evaluation, so we can throw away any datastore compilation.
+     * Intercepts any setting of in-memory evaluation, so we can throw away any datastore compilation.
      * @param extensions Query extensions
      */
     public void setExtensions(Map extensions)
