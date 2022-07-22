@@ -28,7 +28,7 @@ import org.datanucleus.store.rdbms.sql.SQLStatement;
  */
 public class AggregateStringExpression extends StringExpression implements AggregateExpression
 {
-    public AggregateStringExpression(SQLStatement stmt, JavaTypeMapping mapping, String functionName, List args)
+    public AggregateStringExpression(SQLStatement stmt, JavaTypeMapping mapping, String functionName, List<SQLExpression> args)
     {
         super(stmt, mapping, functionName, args);
     }

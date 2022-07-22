@@ -28,7 +28,7 @@ import org.datanucleus.store.rdbms.sql.SQLStatement;
  */
 public class AggregateNumericExpression extends NumericExpression implements AggregateExpression
 {
-    public AggregateNumericExpression(SQLStatement stmt, JavaTypeMapping mapping, String functionName, List args)
+    public AggregateNumericExpression(SQLStatement stmt, JavaTypeMapping mapping, String functionName, List<SQLExpression> args)
     {
         super(stmt, mapping, functionName, args);
     }

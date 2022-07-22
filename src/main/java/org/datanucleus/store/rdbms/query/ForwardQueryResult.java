@@ -75,7 +75,7 @@ public final class ForwardQueryResult<E> extends AbstractRDBMSQueryResult<E> imp
     {
         super(query, rof, rs, fp);
 
-        if (query.useResultsCaching())
+        if (query.useResultsCaching() && rof instanceof PersistentClassROF) // Only cache result ids when performing a candidate query
         {
             resultIds = new ArrayList<>();
         }
@@ -269,6 +269,7 @@ public final class ForwardQueryResult<E> extends AbstractRDBMSQueryResult<E> imp
         if (resultIds != null)
         {
             resultIds.clear();
+            resultIds = null;
         }
 
         super.close();

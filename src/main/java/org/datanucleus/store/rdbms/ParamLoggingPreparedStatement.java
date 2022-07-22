@@ -1067,7 +1067,8 @@ class ParamLoggingPreparedStatement implements PreparedStatement
             throw new SQLException("PreparedStatement of type [" + getClass().getName() +
                    "] can only be unwrapped as [java.sql.PreparedStatement], not as [" + iface.getName() + "]");
         }
-        return (T) this;
+
+        return ps.unwrap(iface);
     }
 
     public void closeOnCompletion() throws SQLException

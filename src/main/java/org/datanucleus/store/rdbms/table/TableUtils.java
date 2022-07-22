@@ -60,7 +60,7 @@ public class TableUtils
     {
         final ReferenceMapping refMapping = (ReferenceMapping)fieldMapping;
         JavaTypeMapping[] refJavaTypeMappings = refMapping.getJavaTypeMapping();
-        List fks = new ArrayList();
+        List<ForeignKey> fks = new ArrayList<>();
         for (int i=0;i<refJavaTypeMappings.length;i++)
         {
             // If the implementation is of a PC class, look to add a FK to the PC class table

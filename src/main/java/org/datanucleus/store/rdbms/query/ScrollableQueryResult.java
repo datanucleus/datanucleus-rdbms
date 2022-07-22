@@ -87,7 +87,7 @@ public final class ScrollableQueryResult<E> extends AbstractRDBMSQueryResult<E> 
             throw new NucleusException("Unsupported Feature: Candidate Collection is only allowed using ForwardQueryResult").setFatal();
         }
 
-        if (query.useResultsCaching())
+        if (query.useResultsCaching() && rof instanceof PersistentClassROF) // Only cache result ids when performing a candidate query
         {
             resultIdsByPosition = new HashMap<>();
         }

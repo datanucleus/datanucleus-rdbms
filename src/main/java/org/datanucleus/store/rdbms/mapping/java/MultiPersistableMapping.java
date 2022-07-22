@@ -65,7 +65,7 @@ public abstract class MultiPersistableMapping extends MultiMapping
         // Find the appropriate mapping
         for (int i=0; i<javaTypeMappings.length; i++)
         {
-            Class cls = clr.classForName(javaTypeMappings[i].getType());
+            Class<?> cls = clr.classForName(javaTypeMappings[i].getType());
             if (cls.isAssignableFrom(value.getClass()))
             {
                 return i;
@@ -76,7 +76,7 @@ public abstract class MultiPersistableMapping extends MultiMapping
         // e.g If we have interface "Base" with impl "BaseImpl", and sub-interface "Sub1" with impl "Sub1Impl"
         // So if the mapping is of type BaseImpl and the value is Sub1Impl then they don't come up as "assignable"
         // but they are
-        Class mappingJavaType = null;
+        Class<?> mappingJavaType = null;
         MetaDataManager mmgr = storeMgr.getNucleusContext().getMetaDataManager();
         boolean isPersistentInterface = mmgr.isPersistentInterface(getType());
         if (isPersistentInterface)

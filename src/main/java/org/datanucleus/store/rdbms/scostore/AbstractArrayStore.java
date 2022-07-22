@@ -63,11 +63,11 @@ public abstract class AbstractArrayStore<E> extends ElementContainerStore implem
     public List<E> getArray(DNStateManager sm)
     {
         Iterator<E> iter = iterator(sm);
-        List elements = new ArrayList();
+        List<E> elements = new ArrayList<>();
         while (iter.hasNext())
         {
-            Object obj = iter.next();
-            elements.add(obj);
+            E elem = iter.next();
+            elements.add(elem);
         }
 
         return elements;
@@ -80,15 +80,15 @@ public abstract class AbstractArrayStore<E> extends ElementContainerStore implem
      */
     public void clear(DNStateManager sm)
     {
-        Collection dependentElements = null;
+        Collection<E> dependentElements = null;
         if (ownerMemberMetaData.getArray().isDependentElement())
         {
             // Retain the dependent elements that need deleting after clearing
-            dependentElements = new HashSet();
-            Iterator iter = iterator(sm);
+            dependentElements = new HashSet<>();
+            Iterator<E> iter = iterator(sm);
             while (iter.hasNext())
             {
-                Object elem = iter.next();
+                E elem = iter.next();
                 if (sm.getExecutionContext().getApiAdapter().isPersistable(elem))
                 {
                     dependentElements.add(elem);
@@ -126,7 +126,7 @@ public abstract class AbstractArrayStore<E> extends ElementContainerStore implem
         }
 
         boolean modified = false;
-        List exceptions = new ArrayList();
+        List<Throwable> exceptions = new ArrayList<>();
         boolean batched = allowsBatching() && length > 1;
 
         ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
@@ -170,11 +170,10 @@ public abstract class AbstractArrayStore<E> extends ElementContainerStore implem
 
         if (!exceptions.isEmpty())
         {
-            // Throw all exceptions received as the cause of a NucleusDataStoreException so the user can see which
-            // record(s) didn't persist
-            String msg = Localiser.msg("056009", ((Exception) exceptions.get(0)).getMessage());
+            // Throw all exceptions received as the cause of a NucleusDataStoreException so the user can see which record(s) didn't persist
+            String msg = Localiser.msg("056009", exceptions.get(0).getMessage());
             NucleusLogger.DATASTORE.error(msg);
-            throw new NucleusDataStoreException(msg, (Throwable[]) exceptions.toArray(new Throwable[exceptions.size()]), sm.getObject());
+            throw new NucleusDataStoreException(msg, exceptions.toArray(new Throwable[exceptions.size()]), sm.getObject());
         }
 
         return modified;

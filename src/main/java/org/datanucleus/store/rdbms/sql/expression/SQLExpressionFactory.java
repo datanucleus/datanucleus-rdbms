@@ -574,7 +574,7 @@ public class SQLExpressionFactory
                 boolean unsupported = true;
                 if (!StringUtils.isWhitespace(className))
                 {
-                    Class cls = clr.classForName(className);
+                    Class<?> cls = clr.classForName(className);
 
                     // Try datastore-dependent
                     for (MethodKey methodKey : pluginSqlMethodsKeysSupported)

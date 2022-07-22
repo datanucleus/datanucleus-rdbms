@@ -21,6 +21,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.exceptions.NucleusDataStoreException;
@@ -38,26 +39,26 @@ import org.datanucleus.store.rdbms.table.Table;
 /**
  * ArrayStore iterator for RDBMS datastores.
  */
-public class ArrayStoreIterator implements Iterator
+public class ArrayStoreIterator<E> implements Iterator<E>
 {
     private final ExecutionContext ec;
 
     /** Underlying iterator that we wrap. */
-    private final Iterator delegate;
+    private final Iterator<E> delegate;
 
-    private Object lastElement = null;
+    private E lastElement = null;
 
-    ArrayStoreIterator(DNStateManager sm, ResultSet rs, ResultObjectFactory rof, ElementContainerStore backingStore)
+    ArrayStoreIterator(DNStateManager sm, ResultSet rs, ResultObjectFactory<E> rof, ElementContainerStore backingStore)
     {
         this.ec = sm.getExecutionContext();
 
-        ArrayList results = new ArrayList();
+        List<E> results = new ArrayList<>();
         if (rs != null)
         {
             JavaTypeMapping elementMapping = backingStore.getElementMapping();
             while (next(rs))
             {
-                Object nextElement;
+                E nextElement;
                 if (backingStore.isElementsAreEmbedded() || backingStore.isElementsAreSerialised())
                 {
                     int param[] = new int[elementMapping.getNumberOfColumnMappings()];
@@ -74,12 +75,12 @@ public class ArrayStoreIterator implements Iterator
                         {
                             ownerFieldNumber = getOwnerFieldMetaData(backingStore.getContainerTable()).getAbsoluteFieldNumber();
                         }
-                        nextElement = elementMapping.getObject(ec, rs, param, sm, ownerFieldNumber);
+                        nextElement = (E)elementMapping.getObject(ec, rs, param, sm, ownerFieldNumber);
                     }
                     else
                     {
                         // Element = Non-PC
-                        nextElement = elementMapping.getObject(ec, rs, param);
+                        nextElement = (E)elementMapping.getObject(ec, rs, param);
                     }
                 }
                 else if (elementMapping instanceof ReferenceMapping)
@@ -90,7 +91,7 @@ public class ArrayStoreIterator implements Iterator
                     {
                         param[i] = i + 1;
                     }
-                    nextElement = elementMapping.getObject(ec, rs, param);
+                    nextElement = (E) elementMapping.getObject(ec, rs, param);
                 }
                 else if (rof != null)
                 {
@@ -113,7 +114,7 @@ public class ArrayStoreIterator implements Iterator
         return delegate.hasNext();
     }
 
-    public Object next()
+    public E next()
     {
         lastElement = delegate.next();
 

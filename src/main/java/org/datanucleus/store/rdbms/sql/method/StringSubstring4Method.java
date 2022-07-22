@@ -60,7 +60,7 @@ public class StringSubstring4Method implements SQLMethod
 
             SQLExpression one = ExpressionUtils.getLiteralForOne(stmt);
 
-            ArrayList lengthFuncArgs = new ArrayList();
+            List<SQLExpression> lengthFuncArgs = new ArrayList<>();
             lengthFuncArgs.add(expr);
             SQLExpression lengthExpression = new NumericExpression(stmt, stmt.getSQLExpressionFactory().getMappingForType(int.class), "LEN", lengthFuncArgs);
             lengthExpression = lengthExpression.sub(startExpr);
@@ -88,7 +88,7 @@ public class StringSubstring4Method implements SQLMethod
 
             SQLExpression one = ExpressionUtils.getLiteralForOne(stmt);
 
-            ArrayList funcArgs = new ArrayList();
+            List<SQLExpression> funcArgs = new ArrayList<>();
             funcArgs.add(expr);
             funcArgs.add(startExpr.add(one));
             funcArgs.add(endExpr.sub(startExpr));

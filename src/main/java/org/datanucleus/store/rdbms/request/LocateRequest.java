@@ -299,13 +299,13 @@ public class LocateRequest extends Request
             {
                 String msg = Localiser.msg("052220", IdentityUtils.getPersistableIdentityForId(sm.getInternalObjectId()), statement, sqle.getMessage());
                 NucleusLogger.DATASTORE_RETRIEVE.warn(msg);
-                List exceptions = new ArrayList();
+                List<Throwable> exceptions = new ArrayList<>();
                 exceptions.add(sqle);
                 while ((sqle = sqle.getNextException()) != null)
                 {
                     exceptions.add(sqle);
                 }
-                throw new NucleusDataStoreException(msg, (Throwable[])exceptions.toArray(new Throwable[exceptions.size()]));
+                throw new NucleusDataStoreException(msg, exceptions.toArray(new Throwable[exceptions.size()]));
             }
         }
     }

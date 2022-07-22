@@ -31,6 +31,7 @@ public abstract class AbstractROF<T> implements ResultObjectFactory<T>
 
     protected ResultSet rs;
 
+    /** Whether to ignore the cache when locating objects from an identity. */
     protected boolean ignoreCache = false;
 
     protected boolean updateAllFields = false;
