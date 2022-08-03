@@ -17,7 +17,6 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.store.rdbms.sql.method;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
@@ -25,7 +24,6 @@ import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.expression.NumericExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
-import org.datanucleus.store.rdbms.sql.expression.SQLExpressionFactory;
 
 /**
  * Method for evaluating SECOND({dateExpr}) using SQLite.
@@ -42,12 +40,9 @@ public class TemporalSecondMethod6 extends TemporalBaseMethod
 
         RDBMSStoreManager storeMgr = stmt.getRDBMSManager();
         JavaTypeMapping mapping = storeMgr.getMappingManager().getMapping(String.class);
-        SQLExpressionFactory exprFactory = stmt.getSQLExpressionFactory();
-        SQLExpression sec = exprFactory.newLiteral(stmt, mapping, "%S");
+        SQLExpression sec = stmt.getSQLExpressionFactory().newLiteral(stmt, mapping, "%S");
 
-        List<SQLExpression> funcArgs = new ArrayList<>();
-        funcArgs.add(sec);
-        funcArgs.add(invokedExpr);
+        List<SQLExpression> funcArgs = List.of(sec, invokedExpr);
         return new NumericExpression(stmt, stmt.getSQLExpressionFactory().getMappingForType(int.class), "strftime", funcArgs);
     }
 }

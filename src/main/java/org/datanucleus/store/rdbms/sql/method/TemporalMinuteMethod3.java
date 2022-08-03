@@ -17,7 +17,6 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.store.rdbms.sql.method;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
@@ -43,9 +42,7 @@ public class TemporalMinuteMethod3 extends TemporalBaseMethod
         SQLExpressionFactory exprFactory = stmt.getSQLExpressionFactory();
         SQLExpression day = exprFactory.newLiteral(stmt, mapping, "minute");
 
-        List<SQLExpression> funcArgs = new ArrayList<>();
-        funcArgs.add(day);
-        funcArgs.add(invokedExpr);
+        List<SQLExpression> funcArgs = List.of(day, invokedExpr);
         return new NumericExpression(stmt, stmt.getSQLExpressionFactory().getMappingForType(int.class, true), "date_part", funcArgs);
     }
 }

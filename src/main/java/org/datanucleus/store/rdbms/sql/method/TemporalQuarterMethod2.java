@@ -17,7 +17,6 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.store.rdbms.sql.method;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
@@ -46,11 +45,8 @@ public class TemporalQuarterMethod2 extends TemporalBaseMethod
         SQLExpressionFactory exprFactory = stmt.getSQLExpressionFactory();
         SQLExpression mi = exprFactory.newLiteral(stmt, mapping, "Q");
 
-        List<SQLExpression> funcArgs = new ArrayList<>();
-        funcArgs.add(invokedExpr);
-        funcArgs.add(mi);
-        List<SQLExpression> funcArgs2 = new ArrayList<>();
-        funcArgs2.add(new StringExpression(stmt, mapping, "TO_CHAR", funcArgs));
+        List<SQLExpression> funcArgs = List.of(invokedExpr, mi);
+        List<SQLExpression> funcArgs2 = List.of(new StringExpression(stmt, mapping, "TO_CHAR", funcArgs));
         return new NumericExpression(stmt, stmt.getSQLExpressionFactory().getMappingForType(int.class, true), "TO_NUMBER", funcArgs2);
     }
 }

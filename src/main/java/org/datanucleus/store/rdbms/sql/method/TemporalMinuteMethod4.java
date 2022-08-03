@@ -19,7 +19,6 @@ package org.datanucleus.store.rdbms.sql.method;
 
 import static java.util.Arrays.asList;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -49,14 +48,10 @@ public class TemporalMinuteMethod4 extends TemporalBaseMethod
         SQLExpression mi = exprFactory.newLiteral(stmt, mapping, "mi");
         ((StringLiteral)mi).generateStatementWithoutQuotes();
 
-        List<SQLExpression> funcArgs = new ArrayList<>();
-        funcArgs.add(mi);
-
         // CAST {invokedExpr} AS DATETIME
-        List<SQLExpression> castArgs = new ArrayList<>();
-        castArgs.add(invokedExpr);
+        List<SQLExpression> castArgs = List.of(invokedExpr);
 
-        funcArgs.add(new TemporalExpression(stmt, stmt.getSQLExpressionFactory().getMappingForType(Date.class, true), "CAST", castArgs, asList("DATETIME")));
-        return new NumericExpression(stmt, stmt.getSQLExpressionFactory().getMappingForType(int.class, true), "DATEPART", funcArgs);
+        List<SQLExpression> funcArgs = List.of(mi, new TemporalExpression(stmt, exprFactory.getMappingForType(Date.class, true), "CAST", castArgs, asList("DATETIME")));
+        return new NumericExpression(stmt, exprFactory.getMappingForType(int.class, true), "DATEPART", funcArgs);
     }
 }

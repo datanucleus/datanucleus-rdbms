@@ -17,7 +17,6 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.store.rdbms.sql.method;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.datanucleus.exceptions.NucleusException;
@@ -48,11 +47,8 @@ public class StringStartsWith3Method implements SQLMethod
         }
 
         // {stringExpr}.indexOf(strExpr1 [,numExpr2])
-        List<SQLExpression> funcArgs = new ArrayList<>();
         SQLExpression substrExpr = args.get(0);
-        if (!(substrExpr instanceof StringExpression) &&
-                !(substrExpr instanceof CharacterExpression) &&
-                !(substrExpr instanceof ParameterLiteral))
+        if (!(substrExpr instanceof StringExpression) && !(substrExpr instanceof CharacterExpression) && !(substrExpr instanceof ParameterLiteral))
         {
             throw new NucleusException(Localiser.msg("060003", "startsWith", "StringExpression", 0, "StringExpression/CharacterExpression/Parameter"));
         }
@@ -61,13 +57,11 @@ public class StringStartsWith3Method implements SQLMethod
         if (args.size() > 1)
         {
             SQLExpression numExpr = args.get(1);
-            funcArgs.add(substrExpr);
-            funcArgs.add(expr);
+            List<SQLExpression> funcArgs = List.of(substrExpr, expr);
             return new BooleanExpression(new StringExpression(stmt, stmt.getSQLExpressionFactory().getMappingForType(int.class), "LOCATE", funcArgs), Expression.OP_EQ, one.add(numExpr));
         }
 
-        funcArgs.add(substrExpr);
-        funcArgs.add(expr);
+        List<SQLExpression> funcArgs = List.of(substrExpr, expr);
         return new BooleanExpression(new StringExpression(stmt, stmt.getSQLExpressionFactory().getMappingForType(int.class), "LOCATE", funcArgs), Expression.OP_EQ, one);
     }
 }

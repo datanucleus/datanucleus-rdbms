@@ -17,7 +17,6 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.store.rdbms.sql.method;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.datanucleus.exceptions.NucleusException;
@@ -51,12 +50,10 @@ public class StringTrim2Method implements SQLMethod
             return new StringLiteral(stmt, expr.getJavaTypeMapping(), val.trim(), null);
         }
 
-        List<SQLExpression> rtrimArgs = new ArrayList<>();
-        rtrimArgs.add(expr);
+        List<SQLExpression> rtrimArgs = List.of(expr);
         StringExpression strExpr = new StringExpression(stmt, stmt.getSQLExpressionFactory().getMappingForType(String.class), "RTRIM", rtrimArgs);
 
-        List<SQLExpression> ltrimArgs = new ArrayList<>();
-        ltrimArgs.add(strExpr);
+        List<SQLExpression> ltrimArgs = List.of(strExpr);
         return new StringExpression(stmt, stmt.getSQLExpressionFactory().getMappingForType(String.class), "LTRIM", ltrimArgs);
     }
 }

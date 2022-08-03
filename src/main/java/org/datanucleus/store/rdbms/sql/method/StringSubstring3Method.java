@@ -17,7 +17,6 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.store.rdbms.sql.method;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.datanucleus.exceptions.NucleusException;
@@ -59,9 +58,7 @@ public class StringSubstring3Method implements SQLMethod
 
             SQLExpression one = ExpressionUtils.getLiteralForOne(stmt);
 
-            List<SQLExpression> funcArgs = new ArrayList<>();
-            funcArgs.add(expr);
-            funcArgs.add(startExpr.add(one));
+            List<SQLExpression> funcArgs = List.of(expr, startExpr.add(one));
             return new StringExpression(stmt, stmt.getSQLExpressionFactory().getMappingForType(String.class), "SUBSTR", funcArgs);
         }
         else
@@ -80,10 +77,7 @@ public class StringSubstring3Method implements SQLMethod
 
             SQLExpression one = ExpressionUtils.getLiteralForOne(stmt);
 
-            List<SQLExpression> funcArgs = new ArrayList<>();
-            funcArgs.add(expr);
-            funcArgs.add(startExpr.add(one));
-            funcArgs.add(endExpr.sub(startExpr));
+            List<SQLExpression> funcArgs = List.of(expr, startExpr.add(one), endExpr.sub(startExpr));
             return new StringExpression(stmt, stmt.getSQLExpressionFactory().getMappingForType(String.class), "SUBSTR", funcArgs);
         }
     }

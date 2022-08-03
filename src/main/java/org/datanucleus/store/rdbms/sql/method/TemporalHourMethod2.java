@@ -17,7 +17,6 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.store.rdbms.sql.method;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
@@ -25,7 +24,6 @@ import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.expression.NumericExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
-import org.datanucleus.store.rdbms.sql.expression.SQLExpressionFactory;
 import org.datanucleus.store.rdbms.sql.expression.StringExpression;
 
 /**
@@ -44,12 +42,8 @@ public class TemporalHourMethod2 extends TemporalBaseMethod
         RDBMSStoreManager storeMgr = stmt.getRDBMSManager();
         JavaTypeMapping mapping = storeMgr.getMappingManager().getMapping(String.class);
 
-        List<SQLExpression> funcArgs = new ArrayList<>();
-        funcArgs.add(invokedExpr);
-        SQLExpressionFactory exprFactory = stmt.getSQLExpressionFactory();
-        funcArgs.add(exprFactory.newLiteral(stmt, mapping, "HH24"));
-        ArrayList funcArgs2 = new ArrayList();
-        funcArgs2.add(new StringExpression(stmt, mapping, "TO_CHAR", funcArgs));
+        List<SQLExpression> funcArgs = List.of(invokedExpr, stmt.getSQLExpressionFactory().newLiteral(stmt, mapping, "HH24"));
+        List<SQLExpression> funcArgs2 = List.of(new StringExpression(stmt, mapping, "TO_CHAR", funcArgs));
         return new NumericExpression(stmt, stmt.getSQLExpressionFactory().getMappingForType(int.class), "TO_NUMBER", funcArgs2);
     }
 }

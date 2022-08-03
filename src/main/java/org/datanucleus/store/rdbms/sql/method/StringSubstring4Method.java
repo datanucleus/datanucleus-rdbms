@@ -17,7 +17,6 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.store.rdbms.sql.method;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.datanucleus.exceptions.NucleusException;
@@ -60,15 +59,11 @@ public class StringSubstring4Method implements SQLMethod
 
             SQLExpression one = ExpressionUtils.getLiteralForOne(stmt);
 
-            List<SQLExpression> lengthFuncArgs = new ArrayList<>();
-            lengthFuncArgs.add(expr);
+            List<SQLExpression> lengthFuncArgs = List.of(expr);
             SQLExpression lengthExpression = new NumericExpression(stmt, stmt.getSQLExpressionFactory().getMappingForType(int.class), "LEN", lengthFuncArgs);
             lengthExpression = lengthExpression.sub(startExpr);
 
-            List<SQLExpression> funcArgs = new ArrayList<>();
-            funcArgs.add(expr);
-            funcArgs.add(startExpr.add(one));
-            funcArgs.add(lengthExpression);
+            List<SQLExpression> funcArgs = List.of(expr, startExpr.add(one), lengthExpression);
             StringExpression exp = new StringExpression(stmt, stmt.getSQLExpressionFactory().getMappingForType(String.class), "SUBSTRING", funcArgs);
             return exp;
         }
@@ -88,10 +83,7 @@ public class StringSubstring4Method implements SQLMethod
 
             SQLExpression one = ExpressionUtils.getLiteralForOne(stmt);
 
-            List<SQLExpression> funcArgs = new ArrayList<>();
-            funcArgs.add(expr);
-            funcArgs.add(startExpr.add(one));
-            funcArgs.add(endExpr.sub(startExpr));
+            List<SQLExpression> funcArgs = List.of(expr, startExpr.add(one), endExpr.sub(startExpr));
             return new StringExpression(stmt, stmt.getSQLExpressionFactory().getMappingForType(String.class), "SUBSTRING", funcArgs);
         }
     }

@@ -17,7 +17,6 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.store.rdbms.sql.method;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
@@ -27,7 +26,6 @@ import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.expression.ExpressionUtils;
 import org.datanucleus.store.rdbms.sql.expression.NumericExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
-import org.datanucleus.store.rdbms.sql.expression.SQLExpressionFactory;
 
 /**
  * Method for evaluating DAY_OF_WEEK({dateExpr}) using SQLite.
@@ -45,10 +43,7 @@ public class TemporalDayOfWeekMethod5 extends TemporalBaseMethod
         RDBMSStoreManager storeMgr = stmt.getRDBMSManager();
         JavaTypeMapping mapping = storeMgr.getMappingManager().getMapping(String.class);
 
-        List<SQLExpression> funcArgs = new ArrayList<>();
-        SQLExpressionFactory exprFactory = stmt.getSQLExpressionFactory();
-        funcArgs.add(exprFactory.newLiteral(stmt, mapping, "%w"));
-        funcArgs.add(invokedExpr);
+        List<SQLExpression> funcArgs = List.of(stmt.getSQLExpressionFactory().newLiteral(stmt, mapping, "%w"), invokedExpr);
 
         // Add one to the SQL (origin=0) to be compatible with Java Calendar day of week (origin=1)
         SQLExpression one = ExpressionUtils.getLiteralForOne(stmt);

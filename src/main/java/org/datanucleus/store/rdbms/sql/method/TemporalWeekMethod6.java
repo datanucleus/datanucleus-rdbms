@@ -47,6 +47,7 @@ public class TemporalWeekMethod6 extends TemporalBaseMethod
         List<SQLExpression> funcArgs = new ArrayList<>();
         funcArgs.add(invokedExpr);
         funcArgs.add(mi);
+
         List<SQLExpression> funcArgs2 = new ArrayList<>();
         funcArgs2.add(new StringExpression(stmt, mapping, "TO_CHAR", funcArgs));
         return new NumericExpression(stmt, stmt.getSQLExpressionFactory().getMappingForType(int.class, true), "TO_NUMBER", funcArgs2);

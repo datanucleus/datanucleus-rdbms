@@ -17,7 +17,6 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.store.rdbms.sql.method;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
@@ -25,7 +24,6 @@ import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.expression.NumericExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
-import org.datanucleus.store.rdbms.sql.expression.SQLExpressionFactory;
 import org.datanucleus.store.rdbms.sql.expression.StringExpression;
 
 /**
@@ -44,14 +42,10 @@ public class TemporalMonthMethod2 extends TemporalBaseMethod
         RDBMSStoreManager storeMgr = stmt.getRDBMSManager();
         JavaTypeMapping mapping2 = storeMgr.getMappingManager().getMapping(String.class);
 
-        List<SQLExpression> funcArgs = new ArrayList<>();
-        funcArgs.add(invokedExpr);
-        SQLExpressionFactory exprFactory = stmt.getSQLExpressionFactory();
-        funcArgs.add(exprFactory.newLiteral(stmt, mapping2, "MM"));
+        List<SQLExpression> funcArgs = List.of(invokedExpr, stmt.getSQLExpressionFactory().newLiteral(stmt, mapping2, "MM"));
         StringExpression charExpr = new StringExpression(stmt, stmt.getSQLExpressionFactory().getMappingForType(int.class, true), "TO_CHAR", funcArgs);
 
-        List<SQLExpression> funcArgs2 = new ArrayList<>();
-        funcArgs2.add(charExpr);
+        List<SQLExpression> funcArgs2 = List.of(charExpr);
         NumericExpression numExpr = new NumericExpression(stmt, stmt.getSQLExpressionFactory().getMappingForType(int.class, true), "TO_NUMBER", funcArgs2);
         numExpr.encloseInParentheses();
 

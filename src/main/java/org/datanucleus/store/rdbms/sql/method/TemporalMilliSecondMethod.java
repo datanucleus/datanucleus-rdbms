@@ -16,7 +16,6 @@
  **********************************************************************/
 package org.datanucleus.store.rdbms.sql.method;
 
-import java.util.ArrayList;
 import java.util.List;
 import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.expression.NumericExpression;
@@ -35,8 +34,7 @@ public class TemporalMilliSecondMethod extends TemporalBaseMethod
 
         invokedExpr.toSQLText().prepend("MILLISECOND FROM ");
 
-        List<SQLExpression> funcArgs = new ArrayList<>();
-        funcArgs.add(invokedExpr);
+        List<SQLExpression> funcArgs = List.of(invokedExpr);
         return new NumericExpression(stmt, stmt.getSQLExpressionFactory().getMappingForType(int.class, true), "EXTRACT", funcArgs);
     }
 }

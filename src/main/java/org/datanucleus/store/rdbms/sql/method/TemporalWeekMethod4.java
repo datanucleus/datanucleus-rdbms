@@ -49,13 +49,11 @@ public class TemporalWeekMethod4 extends TemporalBaseMethod
         SQLExpression wk = exprFactory.newLiteral(stmt, mapping, "wk");
         ((StringLiteral)wk).generateStatementWithoutQuotes();
 
+        // CAST {invokedExpr} AS DATETIME
+        List<SQLExpression> castArgs = List.of(invokedExpr);
+
         List<SQLExpression> funcArgs = new ArrayList<>();
         funcArgs.add(wk);
-
-        // CAST {invokedExpr} AS DATETIME
-        List<SQLExpression> castArgs = new ArrayList<>();
-        castArgs.add(invokedExpr);
-
         funcArgs.add(new TemporalExpression(stmt, stmt.getSQLExpressionFactory().getMappingForType(Date.class), "CAST", castArgs, asList("DATETIME")));
         return new NumericExpression(stmt, stmt.getSQLExpressionFactory().getMappingForType(int.class), "DATEPART", funcArgs);
     }
