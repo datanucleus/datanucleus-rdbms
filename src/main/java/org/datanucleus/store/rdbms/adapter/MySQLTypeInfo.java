@@ -74,6 +74,7 @@ public class MySQLTypeInfo extends SQLTypeInfo
             typeName.equalsIgnoreCase("BLOB") ||
             typeName.equalsIgnoreCase("MEDIUMBLOB") ||
             typeName.equalsIgnoreCase("LONGBLOB") ||
+            typeName.equalsIgnoreCase("TINYTEXT") ||
             typeName.equalsIgnoreCase("MEDIUMTEXT") ||
             typeName.equalsIgnoreCase("LONGTEXT") ||
             typeName.equalsIgnoreCase("TEXT"))
