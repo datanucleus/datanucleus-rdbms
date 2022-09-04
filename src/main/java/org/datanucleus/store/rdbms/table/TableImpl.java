@@ -1028,13 +1028,15 @@ public abstract class TableImpl extends AbstractTable
                 boolean isUnique = !((Boolean)indexInfo.getProperty("non_unique")).booleanValue();
                 if (isUnique)
                 {
-                    // No idea of why this was being used, so commented out (H2 v2 fails if enabled)
-//                    short idxType = ((Short)indexInfo.getProperty("type")).shortValue();
-//                    if (idxType == DatabaseMetaData.tableIndexStatistic)
-//                    {
-//                        // Ignore
-//                        continue;
-//                    }
+                    if (!dba.supportsOption(DatastoreAdapter.INCLUDE_TABLE_INDEX_STATISTICS))
+                    {
+                        short idxType = ((Short)indexInfo.getProperty("type")).shortValue();
+                        if (idxType == DatabaseMetaData.tableIndexStatistic)
+                        {
+                            // Ignore
+                            continue;
+                        }
+                    }
 
                     // Only utilise unique indexes    
                     String keyName = (String)indexInfo.getProperty("index_name");
