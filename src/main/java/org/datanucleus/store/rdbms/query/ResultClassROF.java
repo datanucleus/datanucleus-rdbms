@@ -519,8 +519,8 @@ public class ResultClassROF extends AbstractROF
                                         try
                                         {
                                             Object convValue = TypeConversionHelper.convertTo(value, args[0]);
-                                            methods[i].invoke(obj, new Object[]{convValue});
-                                            resultClassMemberSetters[i] = new ResultClassSetMethodSetter(setMethod, args[0]);
+                                            methods[j].invoke(obj, new Object[]{convValue});
+                                            resultClassMemberSetters[i] = new ResultClassSetMethodSetter(methods[j], args[0]);
                                             if (NucleusLogger.QUERY.isDebugEnabled())
                                             {
                                                 NucleusLogger.QUERY.debug(Localiser.msg("021221", resultClass.getName(), fieldName));
