@@ -179,6 +179,10 @@ public class SQLServerAdapter extends BaseDatastoreAdapter
         addSQLTypeForJDBCType(handler, mconn, (short)Types.DOUBLE, sqlType, true);
 
         sqlType = new org.datanucleus.store.rdbms.adapter.SQLServerTypeInfo(
+                "float", (short)Types.FLOAT, 53, null, null, null, 1, false, (short)2, false, false, false, null, (short)0, (short)0, 2);
+        addSQLTypeForJDBCType(handler, mconn, (short)Types.FLOAT, sqlType, true);
+
+        sqlType = new org.datanucleus.store.rdbms.adapter.SQLServerTypeInfo(
             "IMAGE", (short)Types.LONGVARBINARY, 2147483647, null, null, null, 1, false, (short)1, false, false, false, "LONGVARBINARY", (short)0, (short)0, 0);
         addSQLTypeForJDBCType(handler, mconn, (short)Types.LONGVARBINARY, sqlType, true);
 
