@@ -885,7 +885,7 @@ public class ResultClassROF extends AbstractROF
         {
             // Field is of the precise type
             Object fieldValue = value;
-            if (field.getType().isAssignableFrom(value.getClass()))
+            if (value != null && field.getType().isAssignableFrom(value.getClass()))
             {
                 Object convertedValue = TypeConversionHelper.convertTo(value, field.getType());
                 if (convertedValue != value)
