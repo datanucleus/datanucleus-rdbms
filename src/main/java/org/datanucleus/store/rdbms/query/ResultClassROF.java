@@ -492,11 +492,12 @@ public class ResultClassROF extends AbstractROF
                             Method setMethod = ClassUtils.getMethodWithArgument(resultClass, setMethodName, argType);
                             if (setMethod != null && Modifier.isPublic(setMethod.getModifiers()))
                             {
-                                // Where a set method with the exact argument type exists use it
+                                // Where a set method with the exact argument type exists use it. Set argType as it might
+                                // be used for conversion, in case we don't now the value type at this stage for null values.
                                 try
                                 {
                                     setMethod.invoke(obj, new Object[]{value});
-                                    resultClassMemberSetters[i] = new ResultClassSetMethodSetter(setMethod, null);
+                                    resultClassMemberSetters[i] = new ResultClassSetMethodSetter(setMethod, argType);
                                     if (NucleusLogger.QUERY.isDebugEnabled())
                                     {
                                         NucleusLogger.QUERY.debug(Localiser.msg("021220", resultClass.getName(), fieldName));
