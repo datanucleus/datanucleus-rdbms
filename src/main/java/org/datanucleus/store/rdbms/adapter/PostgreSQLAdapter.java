@@ -43,6 +43,8 @@ import org.datanucleus.store.connection.ManagedConnection;
 import org.datanucleus.store.rdbms.identifier.IdentifierFactory;
 import org.datanucleus.store.rdbms.key.Index;
 import org.datanucleus.store.rdbms.key.PrimaryKey;
+import org.datanucleus.store.rdbms.mapping.column.BigIntColumnMapping;
+import org.datanucleus.store.rdbms.mapping.column.ColumnMapping;
 import org.datanucleus.store.rdbms.schema.ForeignKeyInfo;
 import org.datanucleus.store.rdbms.schema.RDBMSColumnInfo;
 import org.datanucleus.store.rdbms.schema.SQLTypeInfo;
@@ -490,12 +492,23 @@ public class PostgreSQLAdapter extends BaseDatastoreAdapter
     }
 
     /**
-     * Accessor for the auto-increment keyword for generating DDLs (CREATE TABLEs...).
-     * @param storeMgr The Store Manager
-     * @return The keyword for a column using auto-increment
+     * Accessor for the identity (auto-increment) keyword for generating DDLs (CREATE TABLEs...).
+     * Provides the {@link ColumnMapping} as context for data stores that have different identity
+     * keywords based on the mapped Java / JDBC type.
+     * @param storeMgr The Store manager
+     * @param columnMapping The column mapping
+     * @return The keyword for a column using auto-increment/identity
      */
-    public String getIdentityKeyword(StoreManager storeMgr)
+    @Override
+    public String getIdentityKeyword(StoreManager storeMgr, ColumnMapping columnMapping)
     {
+        // PostgreSQL differentiates between SERIAL (integer) and BIGSERIAL (bigint).
+        // https://www.postgresql.org/docs/14/datatype-numeric.html
+        if (columnMapping instanceof BigIntColumnMapping)
+        {
+            return "BIGSERIAL";
+        }
+
         return "SERIAL";
     }
 

@@ -569,6 +569,20 @@ public interface DatastoreAdapter
     String getIdentityKeyword(StoreManager storeMgr);
 
     /**
+     * Accessor for the identity (auto-increment) keyword for generating DDLs (CREATE TABLEs...).
+     * Provides the {@link ColumnMapping} as context for data stores that have different identity
+     * keywords based on the mapped Java / JDBC type.
+     * Defaults to {@link #getIdentityKeyword(StoreManager)} for backward-compatibility.
+     * @param storeMgr The Store manager
+     * @param columnMapping The column mapping
+     * @return The keyword for a column using auto-increment/identity
+     */
+    default String getIdentityKeyword(StoreManager storeMgr, ColumnMapping columnMapping)
+    {
+        return getIdentityKeyword(storeMgr);
+    }
+
+    /**
      * Method to return the maximum length of a datastore identifier of the specified type.
      * If no limit exists then returns -1
      * @param identifierType Type of identifier
