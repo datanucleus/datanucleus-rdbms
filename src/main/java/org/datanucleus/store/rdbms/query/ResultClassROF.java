@@ -884,14 +884,17 @@ public class ResultClassROF extends AbstractROF
 
         public boolean set(Object obj, String fieldName, Object value)
         {
-            // Field is of the precise type
             Object fieldValue = value;
-            if (value != null && field.getType().isAssignableFrom(value.getClass()))
+            if (value != null)
             {
-                Object convertedValue = TypeConversionHelper.convertTo(value, field.getType());
-                if (convertedValue != value)
+                if (field.getType() != value.getClass())
                 {
-                    fieldValue = convertedValue;
+                	// Field is not of precise type so try to convert it
+                    Object convertedValue = TypeConversionHelper.convertTo(value, field.getType());
+                    if (convertedValue != value)
+                    {
+                        fieldValue = convertedValue;
+                    }
                 }
             }
 
@@ -902,6 +905,8 @@ public class ResultClassROF extends AbstractROF
             }
             catch (Exception e)
             {
+            	// Maybe we need to update TypeConversionHelper with further conversions
+                NucleusLogger.DATASTORE_RETRIEVE.warn("Unable to convert query value of type " + value.getClass().getName() + " to field of type " + field.getType().getName());
             }
 
             return false;
