@@ -265,7 +265,22 @@ public class ResultClassROF extends AbstractROF
                 resultFieldValues = new Object[resultFieldNames != null ? resultFieldNames.length : 0];
                 for (int i=0; i<resultFieldValues.length; i++)
                 {
-                    resultFieldValues[i] = getResultObject(rs, i+1);
+                    // Try to get the class of the result object field for the column
+                    Class resultFieldClass = resultFieldTypes != null ? resultFieldTypes[i] : null;
+                    if(resultFieldClass == null)
+                    {
+                        final Field field = resultClassFieldsByName.get(resultFieldNames[i]);
+                        if(field != null)
+                        {
+                            resultFieldClass = field.getType();
+                            if (resultFieldClass.isPrimitive())
+                            {
+                                resultFieldClass = ClassUtils.getWrapperTypeForPrimitiveType(resultFieldClass);
+                            }
+                        }
+                    }
+                    resultFieldValues[i] = getResultObject(rs, i+1, resultFieldClass);
+
                 }
             }
             catch (SQLException sqe)
@@ -848,10 +863,11 @@ public class ResultClassROF extends AbstractROF
      * Convenience method to read the value of a column out of the ResultSet.
      * @param rs ResultSet
      * @param columnNumber Number of the column (starting at 1)
+     * @param resultFieldClass Class of the field for the column in the result object, if available
      * @return Value for the column for this row.
      * @throws SQLException Thrown if an error occurs on reading
      */
-    private Object getResultObject(final ResultSet rs, int columnNumber) throws SQLException
+    private Object getResultObject(final ResultSet rs, int columnNumber, Class resultFieldClass) throws SQLException
     {
         // use getter on ResultSet specific to our desired resultClass
         ResultSetGetter getter = resultSetGetters.get(resultClass);
@@ -860,7 +876,14 @@ public class ResultClassROF extends AbstractROF
             // User has specified a result type for this column so use the specific getter
             return getter.getValue(rs, columnNumber);
         }
-
+        if(resultFieldClass != null) {
+            // use getter on ResultSet specific to our desired result field class
+            ResultSetGetter fieldGetter = resultSetGetters.get(resultFieldClass);
+            if (fieldGetter != null)
+            {
+                return fieldGetter.getValue(rs, columnNumber);
+            }
+        }
         // User has specified Object/Object[] so just retrieve generically
         return rs.getObject(columnNumber);
     }
