@@ -846,6 +846,7 @@ public class ResultClassROF extends AbstractROF
 
     /**
      * Convenience method to read the value of a column out of the ResultSet.
+     * Uses "rs.getBoolean", "rs.getInt", etc, otherwise "rs.getObject".
      * @param rs ResultSet
      * @param columnNumber Number of the column (starting at 1)
      * @return Value for the column for this row.
@@ -853,7 +854,7 @@ public class ResultClassROF extends AbstractROF
      */
     private Object getResultObject(final ResultSet rs, int columnNumber) throws SQLException
     {
-        // use getter on ResultSet specific to our desired resultClass
+        // Where the result class is a basic type
         ResultSetGetter getter = resultSetGetters.get(resultClass);
         if (getter != null)
         {
@@ -861,7 +862,8 @@ public class ResultClassROF extends AbstractROF
             return getter.getValue(rs, columnNumber);
         }
 
-        // User has specified Object/Object[] so just retrieve generically
+        // User has specified resultClass as Object/Object[] or user-type so just retrieve generically
+        // TODO We could pass in the "type" that we expect the column to be (whether field, or constructor arg etc), and then use getXXX here
         return rs.getObject(columnNumber);
     }
 
@@ -885,16 +887,17 @@ public class ResultClassROF extends AbstractROF
         public boolean set(Object obj, String fieldName, Object value)
         {
             Object fieldValue = value;
-            if (value != null)
+            if (value != null && !field.getType().isAssignableFrom(value.getClass()))
             {
-                if (field.getType() != value.getClass())
+                // Field is not of assignable type so try to convert it
+                Object convertedValue = TypeConversionHelper.convertTo(value, field.getType());
+                if (convertedValue != value)
                 {
-                	// Field is not of precise type so try to convert it
-                    Object convertedValue = TypeConversionHelper.convertTo(value, field.getType());
-                    if (convertedValue != value)
-                    {
-                        fieldValue = convertedValue;
-                    }
+                    fieldValue = convertedValue;
+                }
+                else
+                {
+                    // TODO Flag the error here
                 }
             }
 
