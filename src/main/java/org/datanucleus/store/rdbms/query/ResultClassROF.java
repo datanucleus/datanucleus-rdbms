@@ -441,45 +441,8 @@ public class ResultClassROF extends AbstractROF
                         Field f = ClassUtils.getFieldForClass(resultClass, declaredFieldName);
                         if (f != null && Modifier.isPublic(f.getModifiers()))
                         {
-                            try
-                            {
-                                f.set(obj, value);
-                                resultClassMemberSetters[i] = new ResultClassFieldSetter(f);
-                                if (NucleusLogger.QUERY.isDebugEnabled())
-                                {
-                                    NucleusLogger.QUERY.debug(Localiser.msg("021218", resultClass.getName(), fieldName));
-                                }
-                            }
-                            catch (Exception e)
-                            {
-                                // Unable to set directly, so try converting the value to the type of the field
-                                Object convertedValue = TypeConversionHelper.convertTo(value, f.getType());
-                                if (convertedValue != value)
-                                {
-                                    // Value has been converted so try setting the field now
-                                    try
-                                    {
-                                        f.set(obj, convertedValue);
-                                        resultClassMemberSetters[i] = new ResultClassFieldSetter(f);
-                                        if (NucleusLogger.QUERY.isDebugEnabled())
-                                        {
-                                            NucleusLogger.QUERY.debug(Localiser.msg("021219", resultClass.getName(), fieldName));
-                                        }
-                                    }
-                                    catch (Exception e2)
-                                    {
-                                        // Do nothing since unable to convert it
-                                    }
-                                }
-                            }
-
-                            if (resultClassMemberSetters[i] == null)
-                            {
-                                if (NucleusLogger.QUERY.isDebugEnabled())
-                                {
-                                    NucleusLogger.QUERY.debug(Localiser.msg("021209", obj.getClass().getName(), declaredFieldName));
-                                }
-                            }
+                            resultClassMemberSetters[i] = new ResultClassFieldSetter(f);
+                            resultClassMemberSetters[i].set(obj, declaredFieldName, value);
                         }
 
                         if (resultClassMemberSetters[i] == null)
@@ -496,12 +459,8 @@ public class ResultClassROF extends AbstractROF
                                 // be used for conversion, in case we don't now the value type at this stage for null values.
                                 try
                                 {
-                                    setMethod.invoke(obj, new Object[]{value});
                                     resultClassMemberSetters[i] = new ResultClassSetMethodSetter(setMethod, argType);
-                                    if (NucleusLogger.QUERY.isDebugEnabled())
-                                    {
-                                        NucleusLogger.QUERY.debug(Localiser.msg("021220", resultClass.getName(), fieldName));
-                                    }
+                                    resultClassMemberSetters[i].set(obj, fieldName, value);
                                 }
                                 catch (Exception e)
                                 {
@@ -510,7 +469,7 @@ public class ResultClassROF extends AbstractROF
                             }
                             else if (setMethod == null)
                             {
-                                // Find a method with the right name and a single argument and try conversion of the supplied value
+                                // Find a method with the right name and a single argument
                                 Method[] methods = resultClass.getDeclaredMethods();
                                 for (int j=0;j<methods.length;j++)
                                 {
@@ -519,13 +478,8 @@ public class ResultClassROF extends AbstractROF
                                     {
                                         try
                                         {
-                                            Object convValue = TypeConversionHelper.convertTo(value, args[0]);
-                                            methods[j].invoke(obj, new Object[]{convValue});
                                             resultClassMemberSetters[i] = new ResultClassSetMethodSetter(methods[j], args[0]);
-                                            if (NucleusLogger.QUERY.isDebugEnabled())
-                                            {
-                                                NucleusLogger.QUERY.debug(Localiser.msg("021221", resultClass.getName(), fieldName));
-                                            }
+                                            resultClassMemberSetters[i].set(obj, fieldName, value);
                                             break;
                                         }
                                         catch (Exception e)
@@ -552,12 +506,8 @@ public class ResultClassROF extends AbstractROF
                             {
                                 try
                                 {
-                                    putMethod.invoke(obj, new Object[]{fieldName, value});
                                     resultClassMemberSetters[i] = new ResultClassPutMethodSetter(putMethod);
-                                    if (NucleusLogger.QUERY.isDebugEnabled())
-                                    {
-                                        NucleusLogger.QUERY.debug(Localiser.msg("021222", resultClass.getName(), fieldName));
-                                    }
+                                    resultClassMemberSetters[i].set(obj, fieldName, value);
                                 }
                                 catch (Exception e)
                                 {
@@ -904,6 +854,17 @@ public class ResultClassROF extends AbstractROF
             try
             {
                 field.set(obj, fieldValue);
+                if (NucleusLogger.QUERY.isDebugEnabled())
+                {
+                    if (fieldValue != value)
+                    {
+                        NucleusLogger.QUERY.debug(Localiser.msg("021219", resultClass.getName(), fieldName));
+                    }
+                    else
+                    {
+                        NucleusLogger.QUERY.debug(Localiser.msg("021218", resultClass.getName(), fieldName));
+                    }
+                }
                 return true;
             }
             catch (Exception e)
@@ -938,6 +899,10 @@ public class ResultClassROF extends AbstractROF
                 try
                 {
                     setterMethod.invoke(obj, new Object[]{value});
+                    if (NucleusLogger.QUERY.isDebugEnabled())
+                    {
+                        NucleusLogger.QUERY.debug(Localiser.msg("021220", resultClass.getName(), fieldName));
+                    }
                     return true;
                 }
                 catch (Exception e)
@@ -951,6 +916,10 @@ public class ResultClassROF extends AbstractROF
                 {
                     Object convValue = TypeConversionHelper.convertTo(value, argType);
                     setterMethod.invoke(obj, new Object[]{convValue});
+                    if (NucleusLogger.QUERY.isDebugEnabled())
+                    {
+                        NucleusLogger.QUERY.debug(Localiser.msg("021221", resultClass.getName(), fieldName));
+                    }
                     return true;
                 }
                 catch (Exception e)
@@ -981,6 +950,10 @@ public class ResultClassROF extends AbstractROF
             try
             {
                 putMethod.invoke(obj, new Object[]{fieldName, value});
+                if (NucleusLogger.QUERY.isDebugEnabled())
+                {
+                    NucleusLogger.QUERY.debug(Localiser.msg("021222", resultClass.getName(), fieldName));
+                }
                 return true;
             }
             catch (Exception e)
