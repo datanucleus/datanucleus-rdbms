@@ -129,6 +129,7 @@ import org.datanucleus.util.NucleusLogger;
 import org.datanucleus.util.StringUtils;
 
 import java.lang.reflect.Constructor;
+import java.util.AbstractMap;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -142,6 +143,7 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.stream.Collectors;
 
 /**
  * Class which maps a compiled (generic) query to an SQL query for RDBMS datastores.
@@ -327,7 +329,13 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
         {
             this.options.addAll(options);
         }
-        this.extensionsByName = extensions;
+        // Ensures that the entries are in lowercase for compatibility with older version of datanucleus
+        this.extensionsByName = extensions.entrySet().stream()
+                .map(entry -> new AbstractMap.SimpleEntry<>(entry.getKey().toLowerCase(), entry.getValue()))
+                .collect(Collectors.toMap(
+                    Map.Entry::getKey,
+                    Map.Entry::getValue
+                ));
 
         this.stmt.setQueryGenerator(this);
 
@@ -920,9 +928,9 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
             }
 
             int maxFetchDepth = fetchPlan.getMaxFetchDepth();
-            if (extensionsByName != null && extensionsByName.containsKey(PropertyNames.PROPERTY_MAX_FETCH_DEPTH))
+            if (extensionsByName != null && extensionsByName.containsKey(PropertyNames.PROPERTY_MAX_FETCH_DEPTH.toLowerCase()))
             {
-                maxFetchDepth = (Integer)extensionsByName.get(PropertyNames.PROPERTY_MAX_FETCH_DEPTH);
+                maxFetchDepth = (Integer)extensionsByName.get(PropertyNames.PROPERTY_MAX_FETCH_DEPTH.toLowerCase());
             }
             if (maxFetchDepth < 0)
             {
@@ -5129,12 +5137,12 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
 
     public boolean hasExtension(String key)
     {
-        return (extensionsByName == null ? false : extensionsByName.containsKey(key));
+        return (extensionsByName == null ? false : extensionsByName.containsKey(key.toLowerCase()));
     }
 
     public Object getValueForExtension(String key)
     {
-        return (extensionsByName == null ? null : extensionsByName.get(key));
+        return (extensionsByName == null ? null : extensionsByName.get(key.toLowerCase()));
     }
 
     /**
