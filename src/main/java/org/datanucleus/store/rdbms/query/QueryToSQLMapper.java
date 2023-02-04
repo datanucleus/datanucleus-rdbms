@@ -5154,7 +5154,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
             return null;
         }
 
-        String extensionName = "datanucleus.query.jdoql." + alias + ".join";
+        String extensionName = "datanucleus.query.jdoql." + alias.toLowerCase() + ".join";
         JoinType joinType = null;
         if (hasExtension(extensionName))
         {
