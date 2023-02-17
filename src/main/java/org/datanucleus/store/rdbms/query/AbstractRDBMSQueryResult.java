@@ -24,6 +24,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 
 import org.datanucleus.ExecutionContext;
@@ -60,7 +61,10 @@ public abstract class AbstractRDBMSQueryResult<E> extends AbstractQueryResult<E>
 
     protected FetchPlan fp;
 
-    /** Map of field values, keyed by the "id" of the object. The value is a "Map&lt;fieldNumber, fieldValue&gt;". */
+    /** The members (of the candidate, if any) that are bulk loaded. */
+    protected Collection<AbstractMemberMetaData> bulkLoadedMmds;
+
+    /** Map of bulk-load (candidate) field values, keyed by the "id" of the candidate object. The value is a "Map&lt;fieldNumber, fieldValue&gt;". */
     protected Map<Object, Map<Integer, Object>> bulkLoadedValueByMemberNumber;
 
     /** Default to closing the statement when closing the resultSet, but allow override. */
@@ -96,6 +100,11 @@ public abstract class AbstractRDBMSQueryResult<E> extends AbstractQueryResult<E>
         {
             bulkLoadedValueByMemberNumber = new HashMap<>();
         }
+        if (bulkLoadedMmds == null)
+        {
+            bulkLoadedMmds = new HashSet<>();
+        }
+        bulkLoadedMmds.add(iterStmt.getBackingStore().getOwnerMemberMetaData());
 
         try
         {

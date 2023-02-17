@@ -26,6 +26,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
@@ -34,12 +35,15 @@ import java.util.NoSuchElementException;
 
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.FetchPlan;
+import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.exceptions.NucleusUserException;
+import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.query.AbstractQueryResultIterator;
 import org.datanucleus.store.query.Query;
 import org.datanucleus.store.rdbms.JDBCUtils;
+import org.datanucleus.store.types.SCOUtils;
 import org.datanucleus.util.ConcurrentReferenceHashMap;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
@@ -240,17 +244,39 @@ public final class ScrollableQueryResult<E> extends AbstractRDBMSQueryResult<E> 
             {
                 ExecutionContext ec = query.getExecutionContext();
                 Map<Integer, Object> memberValues = bulkLoadedValueByMemberNumber.get(api.getIdForObject(obj));
+                DNStateManager sm = ec.findStateManager(obj);
+                Collection<AbstractMemberMetaData> bulkMmds = new HashSet<>(bulkLoadedMmds);
+
                 if (memberValues != null)
                 {
-                    DNStateManager sm = ec.findStateManager(obj);
                     Iterator<Map.Entry<Integer, Object>> memberValIter = memberValues.entrySet().iterator();
                     while (memberValIter.hasNext())
                     {
                         Map.Entry<Integer, Object> memberValueEntry = memberValIter.next();
                         sm.replaceField(memberValueEntry.getKey(), memberValueEntry.getValue());
+                        bulkMmds.remove(sm.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(memberValueEntry.getKey()));
                     }
-                    sm.replaceAllLoadedSCOFieldsWithWrappers();
                 }
+                if (!bulkMmds.isEmpty())
+                {
+                    for (AbstractMemberMetaData bulkMmd : bulkMmds)
+                    {
+                        if (bulkMmd.hasCollection())
+                        {
+                            try
+                            {
+                                Class<?> instanceType = SCOUtils.getContainerInstanceType(bulkMmd.getType(), bulkMmd.getOrderMetaData() != null);
+                                Collection coll = (Collection<Object>) instanceType.getDeclaredConstructor().newInstance();
+                                sm.replaceField(bulkMmd.getAbsoluteFieldNumber(), coll);
+                            }
+                            catch (Exception e)
+                            {
+                                throw new NucleusDataStoreException(e.getMessage(), e);
+                            }
+                        }
+                    }
+                }
+                sm.replaceAllLoadedSCOFieldsWithWrappers();
             }
 
             if (resultsObjsByIndex != null)
