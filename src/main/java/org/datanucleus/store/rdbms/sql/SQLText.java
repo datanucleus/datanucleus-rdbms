@@ -328,9 +328,10 @@ public class SQLText
 
     /**
      * Accessor for the SQL of the statement.
+     * Synchronized so that we don't have a race condition on creation of the SQL.
      * @return The SQL text
      */
-    public String toSQL()
+    public synchronized String toSQL()
     {
         if (sql != null)
         {
@@ -338,12 +339,19 @@ public class SQLText
             return sql;
         }
 
+        calculateSQL();
+        return sql;
+    }
+
+    private void calculateSQL()
+    {
         StringBuilder sql = new StringBuilder();
         if (encloseInParentheses)
         {
             sql.append("(");
         }
-        for (int i = 0; i < appended.size(); i++)
+        int numAppended = appended.size();
+        for (int i = 0; i < numAppended; i++)
         {
             Object item = appended.get(i);
             if (item instanceof SQLExpression)
@@ -410,8 +418,6 @@ public class SQLText
         }
         sql.append((postpend == null ? "" : postpend));
         this.sql = sql.toString();
-
-        return this.sql;
     }
 
     /**
