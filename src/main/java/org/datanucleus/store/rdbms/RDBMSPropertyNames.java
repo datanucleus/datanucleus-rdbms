@@ -87,6 +87,7 @@ public class RDBMSPropertyNames
     public static final String PROPERTY_CONNECTION_POOL_READ_ONLY = "datanucleus.connectionPool.readOnly".toLowerCase();
     public static final String PROPERTY_CONNECTION_POOL_TRANSACTION_ISOLATION = "datanucleus.connectionPool.transactionIsolation".toLowerCase();
     public static final String PROPERTY_CONNECTION_POOL_CATALOG = "datanucleus.connectionPool.catalog".toLowerCase();
+    public static final String PROPERTY_CONNECTION_POOL_INIT_SQL = "datanucleus.connectionPool.connectionInitSQL";
 
     // Oracle specific
     public static final String PROPERTY_RDBMS_ORACLE_NLS_SORT_ORDER = "datanucleus.rdbms.oracle.nlsSortOrder".toLowerCase();
