@@ -808,7 +808,7 @@ public final class SQLQuery extends Query
     public Object executeWithArray(Object[] parameters)
     {
         // Convert the input array into a Map with Integer keys 1, 2, etc
-        Map parameterMap = new HashMap();
+        Map<Object, Object> parameterMap = new HashMap<>();
         if (parameters != null)
         {
             for (int i = 0; i < parameters.length; ++i)
@@ -818,7 +818,7 @@ public final class SQLQuery extends Query
         }
 
         // Prepare for execution
-        Map executionMap = prepareForExecution(parameterMap);
+        Map<Object, Object> executionMap = prepareForExecution(parameterMap);
 
         // Execute using superclass method
         return super.executeQuery(executionMap);
@@ -849,7 +849,7 @@ public final class SQLQuery extends Query
      * @param executeParameters The input parameters map
      * @return Map of parameters for execution
      */
-    protected Map prepareForExecution(Map executeParameters)
+    protected Map<Object, Object> prepareForExecution(Map executeParameters)
     {
         Map params = new HashMap();
         if (implicitParameters != null)
@@ -870,7 +870,7 @@ public final class SQLQuery extends Query
 
         // Build up list of expected parameters (in the order the query needs them)
         // Allow for positional parameters ('?'), numbered parameters ("?1") or named parameters (":myParam")
-        Collection expectedParams = new ArrayList();
+        Collection<Object> expectedParams = new ArrayList<>();
         boolean complete = false;
         int charPos = 0;
         char[] statement = compiledSQL.toCharArray();
@@ -997,7 +997,7 @@ public final class SQLQuery extends Query
         }
 
         // Build a Map of params with keys 1, 2, 3, etc representing the position in the runtime JDBC SQL
-        Map executeMap = new HashMap();
+        Map<Object, Object> executeMap = new HashMap<>();
 
         // Cycle through the expected params
         paramPos = 1;

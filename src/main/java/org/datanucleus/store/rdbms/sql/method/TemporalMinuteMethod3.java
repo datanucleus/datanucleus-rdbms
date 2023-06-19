@@ -17,7 +17,6 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.store.rdbms.sql.method;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
@@ -33,9 +32,7 @@ import org.datanucleus.store.rdbms.sql.expression.SQLExpressionFactory;
  */
 public class TemporalMinuteMethod3 extends TemporalBaseMethod
 {
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.rdbms.sql.method.SQLMethod#getExpression(org.datanucleus.store.rdbms.sql.expression.SQLExpression, java.util.List)
-     */
+    @Override
     public SQLExpression getExpression(SQLStatement stmt, SQLExpression expr, List<SQLExpression> args)
     {
         SQLExpression invokedExpr = getInvokedExpression(expr, args, "MINUTE");
@@ -45,9 +42,7 @@ public class TemporalMinuteMethod3 extends TemporalBaseMethod
         SQLExpressionFactory exprFactory = stmt.getSQLExpressionFactory();
         SQLExpression day = exprFactory.newLiteral(stmt, mapping, "minute");
 
-        ArrayList funcArgs = new ArrayList();
-        funcArgs.add(day);
-        funcArgs.add(invokedExpr);
+        List<SQLExpression> funcArgs = List.of(day, invokedExpr);
         return new NumericExpression(stmt, stmt.getSQLExpressionFactory().getMappingForType(int.class, true), "date_part", funcArgs);
     }
 }

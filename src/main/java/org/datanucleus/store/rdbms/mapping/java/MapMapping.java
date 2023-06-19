@@ -63,7 +63,7 @@ public class MapMapping extends AbstractContainerMapping implements MappingCallb
     public void postInsert(DNStateManager ownerSM)
     {
         ExecutionContext ec = ownerSM.getExecutionContext();
-        java.util.Map value = (java.util.Map) ownerSM.provideField(getAbsoluteFieldNumber());
+        java.util.Map<Object, Object> value = (java.util.Map<Object, Object>) ownerSM.provideField(getAbsoluteFieldNumber());
         if (containerIsStoredInSingleColumn())
         {
             // Do nothing when serialised since we are handled in the main request
@@ -72,7 +72,7 @@ public class MapMapping extends AbstractContainerMapping implements MappingCallb
                 if (mmd.getMap().keyIsPersistent() || mmd.getMap().valueIsPersistent())
                 {
                     // Make sure all persistable keys/values have StateManagers
-                    Set<Map.Entry> entries = value.entrySet();
+                    Set<Map.Entry<Object, Object>> entries = value.entrySet();
                     for (Map.Entry entry : entries)
                     {
                         if (mmd.getMap().keyIsPersistent() && entry.getKey() != null)
@@ -137,7 +137,7 @@ public class MapMapping extends AbstractContainerMapping implements MappingCallb
             }
 
             ApiAdapter api = ec.getApiAdapter();
-            Set<Map.Entry> entries = value.entrySet();
+            Set<Map.Entry<Object, Object>> entries = value.entrySet();
             for (Map.Entry entry : entries)
             {
                 if (api.isPersistable(entry.getKey()))

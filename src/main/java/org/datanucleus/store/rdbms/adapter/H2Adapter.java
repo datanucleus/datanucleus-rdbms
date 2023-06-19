@@ -39,6 +39,8 @@ import org.datanucleus.store.rdbms.identifier.IdentifierType;
 import org.datanucleus.store.rdbms.key.Index;
 import org.datanucleus.store.rdbms.key.PrimaryKey;
 import org.datanucleus.store.rdbms.schema.SQLTypeInfo;
+import org.datanucleus.store.rdbms.sql.method.SQLMethod;
+import org.datanucleus.store.rdbms.sql.operation.SQLOperation;
 import org.datanucleus.store.rdbms.table.Column;
 import org.datanucleus.store.rdbms.table.Table;
 import org.datanucleus.store.schema.StoreSchemaHandler;
@@ -79,6 +81,9 @@ public class H2Adapter extends BaseDatastoreAdapter
                 NucleusLogger.DATASTORE_SCHEMA.warn("Exception when trying to get default schema name for datastore", e);
             }
         }
+
+        // H2 v2, at least, requires this
+        supportedOptions.add(INCLUDE_TABLE_INDEX_STATISTICS);
 
         supportedOptions.add(PRIMARYKEY_IN_CREATE_STATEMENTS);
         supportedOptions.add(LOCK_ROW_USING_SELECT_FOR_UPDATE);
@@ -403,7 +408,7 @@ public class H2Adapter extends BaseDatastoreAdapter
      * @see org.datanucleus.store.rdbms.adapter.BaseDatastoreAdapter#getSQLOperationClass(java.lang.String)
      */
     @Override
-    public Class getSQLOperationClass(String operationName)
+    public Class<? extends SQLOperation> getSQLOperationClass(String operationName)
     {
         if ("mod".equals(operationName)) return org.datanucleus.store.rdbms.sql.operation.Mod2Operation.class;
 
@@ -414,7 +419,7 @@ public class H2Adapter extends BaseDatastoreAdapter
      * @see org.datanucleus.store.rdbms.adapter.BaseDatastoreAdapter#getSQLMethodClass(java.lang.String, java.lang.String)
      */
     @Override
-    public Class getSQLMethodClass(String className, String methodName, ClassLoaderResolver clr)
+    public Class<? extends SQLMethod> getSQLMethodClass(String className, String methodName, ClassLoaderResolver clr)
     {
         if (className == null)
         {

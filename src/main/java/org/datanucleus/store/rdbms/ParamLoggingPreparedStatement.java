@@ -60,7 +60,7 @@ class ParamLoggingPreparedStatement implements PreparedStatement
     private SubStatement currentStatement = null;
 
     /** List of sub-statements (to cater for batched statements). Null if normal PreparedStatement. */
-    private List subStatements = null;
+    private List<SubStatement> subStatements = null;
 
     private boolean paramAngleBrackets = true;
 
@@ -69,7 +69,7 @@ class ParamLoggingPreparedStatement implements PreparedStatement
     /** Inner class representing a sub-part of the PreparedStatement (to allow for batched statements). */
     static class SubStatement
     {
-        public final Map parameters = new HashMap();
+        public final Map<Integer, Object> parameters = new HashMap<>();
         public final String statementText;
         
         public SubStatement(String statementText)
@@ -228,7 +228,7 @@ class ParamLoggingPreparedStatement implements PreparedStatement
         newSubStmt.parameters.putAll(currentStatement.parameters);
         if (subStatements == null)
         {
-            subStatements = new ArrayList();
+            subStatements = new ArrayList<>();
         }
         subStatements.add(newSubStmt);
         ps.addBatch();
@@ -245,7 +245,7 @@ class ParamLoggingPreparedStatement implements PreparedStatement
         if (subStatements == null)
         {
             // New SubStatement, using the specified SQL
-            subStatements = new ArrayList();
+            subStatements = new ArrayList<>();
         }
         subStatements.add(newSubStmt);
         ps.addBatch(sql);
@@ -1060,14 +1060,15 @@ class ParamLoggingPreparedStatement implements PreparedStatement
         return PreparedStatement.class.equals(iface);
     }
 
-    public Object unwrap(Class iface) throws SQLException
+    public <T> T unwrap(Class<T> iface) throws SQLException
     {
         if (!PreparedStatement.class.equals(iface))
         {
             throw new SQLException("PreparedStatement of type [" + getClass().getName() +
                    "] can only be unwrapped as [java.sql.PreparedStatement], not as [" + iface.getName() + "]");
         }
-        return this;
+
+        return ps.unwrap(iface);
     }
 
     public void closeOnCompletion() throws SQLException

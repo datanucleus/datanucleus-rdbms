@@ -333,10 +333,9 @@ public class BooleanExpression extends SQLExpression
         return new BooleanExpression(this, (not ? Expression.OP_NOTIN : Expression.OP_IN), expr);
     }
 
-    public SQLExpression invoke(String methodName, List args)
+    public SQLExpression invoke(String methodName, List<SQLExpression> args)
     {
-        return stmt.getRDBMSManager().getSQLExpressionFactory().invokeMethod(stmt, Boolean.class.getName(), 
-            methodName, this, args);
+        return stmt.getRDBMSManager().getSQLExpressionFactory().invokeMethod(stmt, Boolean.class.getName(), methodName, this, args);
     }
 
     public BooleanExpression neg()

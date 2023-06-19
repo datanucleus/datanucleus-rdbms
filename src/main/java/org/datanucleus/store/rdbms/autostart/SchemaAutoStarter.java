@@ -138,13 +138,13 @@ public class SchemaAutoStarter extends AbstractAutoStartMechanism
      * @return Collection of classes supported (StoreData). Collection of StoreData elements
      * @throws DatastoreInitialisationException if an error occurs in datastore communication
      */
-    public Collection getAllClassData()
+    public Collection<StoreData> getAllClassData()
     throws DatastoreInitialisationException
     {
         try
         {
             assertIsOpen();
-            Collection data=null;
+            Collection<StoreData> data = null;
             try
             {
                 data = schemaTable.getAllClasses(mconn);

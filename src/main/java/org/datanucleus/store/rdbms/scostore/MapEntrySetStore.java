@@ -23,6 +23,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -623,7 +624,7 @@ class MapEntrySetStore<K, V> extends BaseContainerStore implements SetStore<Map.
             this.setStore = setStore;
 
             ExecutionContext ec = sm.getExecutionContext();
-            ArrayList results = new ArrayList();
+            List<EntryImpl> results = new ArrayList<>();
             while (next(rs))
             {
                 Object key = null;

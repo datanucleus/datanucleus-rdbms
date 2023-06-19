@@ -45,14 +45,9 @@ public class SingleCollectionExpression extends DelegatedExpression
         }
     }
 
-    /**
-     * Allow the methods to be invoked directly in the wrapped type.
-     */
     @Override
-    public SQLExpression invoke(String methodName, List args)
+    public SQLExpression invoke(String methodName, List<SQLExpression> args)
     {
-        return stmt.getRDBMSManager()
-                   .getSQLExpressionFactory()
-                   .invokeMethod(stmt,  mapping.getJavaType().getName(), methodName, this.getDelegate(), args);
+        return stmt.getRDBMSManager().getSQLExpressionFactory().invokeMethod(stmt,  mapping.getJavaType().getName(), methodName, this.getDelegate(), args);
     }
 }

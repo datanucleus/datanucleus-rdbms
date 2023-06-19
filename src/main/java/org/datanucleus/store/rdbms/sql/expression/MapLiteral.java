@@ -127,12 +127,12 @@ public class MapLiteral extends MapExpression implements SQLLiteral
             return keyExpressions;
         }
 
-        public SQLExpression invoke(String methodName, List args)
+        public SQLExpression invoke(String methodName, List<SQLExpression> args)
         {
             if (methodName.equals("get") && args.size() == 1)
             {
                 // Map.get(expr)
-                SQLExpression argExpr = (SQLExpression)args.get(0);
+                SQLExpression argExpr = args.get(0);
                 if (argExpr instanceof SQLLiteral)
                 {
                     Object val = value.get(((SQLLiteral)argExpr).getValue());
@@ -180,7 +180,7 @@ public class MapLiteral extends MapExpression implements SQLLiteral
             {
                 RDBMSStoreManager storeMgr = stmt.getRDBMSManager();
                 st.append("(");
-                keyExpressions = new ArrayList();
+                keyExpressions = new ArrayList<>();
 
                 boolean hadPrev = false;
                 Set keys = value.keySet();
@@ -272,7 +272,7 @@ public class MapLiteral extends MapExpression implements SQLLiteral
             if (!isEmpty)
             {
                 RDBMSStoreManager storeMgr = stmt.getRDBMSManager();
-                valueExpressions = new ArrayList();
+                valueExpressions = new ArrayList<>();
                 st.append("(");
 
                 boolean hadPrev = false;

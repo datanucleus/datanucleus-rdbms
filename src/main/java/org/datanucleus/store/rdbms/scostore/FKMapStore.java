@@ -21,6 +21,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.NoSuchElementException;
 
 import org.datanucleus.ClassLoaderResolver;
@@ -896,21 +897,21 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
     }
 
     @Override
-    public synchronized SetStore keySetStore()
+    public synchronized SetStore<K> keySetStore()
     {
-        return new MapKeySetStore(mapTable, this, clr);
+        return new MapKeySetStore<>(mapTable, this, clr);
     }
 
     @Override
-    public synchronized CollectionStore valueCollectionStore()
+    public synchronized CollectionStore<V> valueCollectionStore()
     {
-        return new MapValueCollectionStore(mapTable, this, clr);
+        return new MapValueCollectionStore<>(mapTable, this, clr);
     }
 
     @Override
-    public synchronized SetStore entrySetStore()
+    public synchronized SetStore<Map.Entry<K, V>> entrySetStore()
     {
-        return new MapEntrySetStore(mapTable, this, clr);
+        return new MapEntrySetStore<>(mapTable, this, clr);
     }
 
     /**
@@ -1158,7 +1159,7 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
                         else
                         {
                             // Value = PC
-                            value = new PersistentClassROF(ec, rs, ec.getFetchPlan(), getMappingDef, valueCmd, clr.classForName(valueType)).getObject();
+                            value = new PersistentClassROF<>(ec, rs, ec.getFetchPlan(), getMappingDef, valueCmd, clr.classForName(valueType)).getObject();
                         }
 
                         JDBCUtils.logWarnings(rs);

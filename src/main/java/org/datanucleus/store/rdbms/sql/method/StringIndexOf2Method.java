@@ -56,7 +56,7 @@ public class StringIndexOf2Method implements SQLMethod
 
         SQLExpression one = ExpressionUtils.getLiteralForOne(stmt);
 
-        ArrayList funcArgs = new ArrayList();
+        List<SQLExpression> funcArgs = new ArrayList<>();
         funcArgs.add(expr);
         funcArgs.add(substrExpr);
         if (args.size() == 2)

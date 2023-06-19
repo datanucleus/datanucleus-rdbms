@@ -17,7 +17,6 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.store.rdbms.sql.method;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
@@ -25,7 +24,6 @@ import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.expression.NumericExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
-import org.datanucleus.store.rdbms.sql.expression.SQLExpressionFactory;
 
 /**
  * Method for evaluating HOUR({dateExpr}) using SQLite.
@@ -42,10 +40,8 @@ public class TemporalHourMethod5 extends TemporalBaseMethod
 
         RDBMSStoreManager storeMgr = stmt.getRDBMSManager();
         JavaTypeMapping mapping = storeMgr.getMappingManager().getMapping(String.class);
-        ArrayList funcArgs = new ArrayList();
-        SQLExpressionFactory exprFactory = stmt.getSQLExpressionFactory();
-        funcArgs.add(exprFactory.newLiteral(stmt, mapping, "%H"));
-        funcArgs.add(invokedExpr);
+
+        List<SQLExpression> funcArgs = List.of(stmt.getSQLExpressionFactory().newLiteral(stmt, mapping, "%H"), invokedExpr);
         return new NumericExpression(stmt, stmt.getSQLExpressionFactory().getMappingForType(int.class), "strftime", funcArgs);
     }
 }

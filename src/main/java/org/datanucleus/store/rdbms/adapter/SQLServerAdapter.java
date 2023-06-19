@@ -46,6 +46,8 @@ import org.datanucleus.store.rdbms.schema.SQLTypeInfo;
 import org.datanucleus.store.rdbms.sql.SQLTable;
 import org.datanucleus.store.rdbms.sql.SQLText;
 import org.datanucleus.store.rdbms.sql.SelectStatement;
+import org.datanucleus.store.rdbms.sql.method.SQLMethod;
+import org.datanucleus.store.rdbms.sql.operation.SQLOperation;
 import org.datanucleus.store.rdbms.table.Column;
 import org.datanucleus.store.rdbms.table.Table;
 import org.datanucleus.store.schema.StoreSchemaHandler;
@@ -113,8 +115,11 @@ public class SQLServerAdapter extends BaseDatastoreAdapter
         reservedKeywords.addAll(StringUtils.convertCommaSeparatedStringToSet(MSSQL_RESERVED_WORDS));
 
         supportedOptions.add(IDENTITY_COLUMNS);
+
+        // Locking supported on SQLServer via "WITH (UPDLOCK, ROWLOCK)" in JOIN and after FROM. See SelectStatement, SequenceTable
         supportedOptions.add(LOCK_ROW_USING_OPTION_AFTER_FROM);
         supportedOptions.add(LOCK_ROW_USING_OPTION_WITHIN_JOIN);
+
         supportedOptions.add(STORED_PROCEDURES);
         supportedOptions.add(ORDERBY_NULLS_USING_CASE_NULL);
         supportedOptions.add(LOCK_WITH_SELECT_FOR_UPDATE);
@@ -174,6 +179,10 @@ public class SQLServerAdapter extends BaseDatastoreAdapter
         sqlType = new org.datanucleus.store.rdbms.adapter.SQLServerTypeInfo(
             "float", (short)Types.DOUBLE, 53, null, null, null, 1, false, (short)2, false, false, false, null, (short)0, (short)0, 2);
         addSQLTypeForJDBCType(handler, mconn, (short)Types.DOUBLE, sqlType, true);
+
+        sqlType = new org.datanucleus.store.rdbms.adapter.SQLServerTypeInfo(
+                "float", (short)Types.FLOAT, 53, null, null, null, 1, false, (short)2, false, false, false, null, (short)0, (short)0, 2);
+        addSQLTypeForJDBCType(handler, mconn, (short)Types.FLOAT, sqlType, true);
 
         sqlType = new org.datanucleus.store.rdbms.adapter.SQLServerTypeInfo(
             "IMAGE", (short)Types.LONGVARBINARY, 2147483647, null, null, null, 1, false, (short)1, false, false, false, "LONGVARBINARY", (short)0, (short)0, 0);
@@ -661,7 +670,7 @@ public class SQLServerAdapter extends BaseDatastoreAdapter
      * @see org.datanucleus.store.rdbms.adapter.BaseDatastoreAdapter#getSQLOperationClass(java.lang.String)
      */
     @Override
-    public Class getSQLOperationClass(String operationName)
+    public Class<? extends SQLOperation> getSQLOperationClass(String operationName)
     {
         if ("concat".equals(operationName)) return org.datanucleus.store.rdbms.sql.operation.Concat2Operation.class;
 
@@ -672,7 +681,7 @@ public class SQLServerAdapter extends BaseDatastoreAdapter
      * @see org.datanucleus.store.rdbms.adapter.BaseDatastoreAdapter#getSQLMethodClass(java.lang.String, java.lang.String)
      */
     @Override
-    public Class getSQLMethodClass(String className, String methodName, ClassLoaderResolver clr)
+    public Class<? extends SQLMethod> getSQLMethodClass(String className, String methodName, ClassLoaderResolver clr)
     {
         if (className == null)
         {

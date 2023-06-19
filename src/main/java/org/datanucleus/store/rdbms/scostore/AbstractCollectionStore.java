@@ -63,7 +63,7 @@ public abstract class AbstractCollectionStore<E> extends ElementContainerStore i
     }
 
     @Override
-    public void update(DNStateManager sm, Collection coll)
+    public void update(DNStateManager sm, Collection<? extends E> coll)
     {
         // Crude update - remove existing and add new!
         clear(sm);

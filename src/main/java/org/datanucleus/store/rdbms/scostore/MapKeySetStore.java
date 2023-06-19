@@ -204,15 +204,14 @@ class MapKeySetStore<K> extends AbstractSetStore<K>
                     ResultSet rs = sqlControl.executeStatementQuery(ec, mconn, stmt, ps);
                     try
                     {
-                        ResultObjectFactory rof = null;
                         if (elementsAreEmbedded || elementsAreSerialised)
                         {
                             // No ResultObjectFactory needed - handled by SetStoreIterator
-                            return new CollectionStoreIterator(ownerSM, rs, null, this);
+                            return new CollectionStoreIterator<K>(ownerSM, rs, null, this);
                         }
 
-                        rof = new PersistentClassROF(ec, rs, ec.getFetchPlan(), iteratorMappingDef, elementCmd, clr.classForName(elementType));
-                        return new CollectionStoreIterator(ownerSM, rs, rof, this);
+                        ResultObjectFactory<K> rof = new PersistentClassROF<K>(ec, rs, ec.getFetchPlan(), iteratorMappingDef, elementCmd, clr.classForName(elementType));
+                        return new CollectionStoreIterator<K>(ownerSM, rs, rof, this);
                     }
                     finally
                     {

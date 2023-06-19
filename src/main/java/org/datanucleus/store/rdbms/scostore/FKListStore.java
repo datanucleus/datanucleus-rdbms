@@ -270,7 +270,7 @@ public class FKListStore<E> extends AbstractListStore<E>
     }
 
     @Override
-    public E set(DNStateManager ownerSM, int index, Object element, boolean allowDependentField)
+    public E set(DNStateManager ownerSM, int index, E element, boolean allowDependentField)
     {
         validateElementForWriting(ownerSM, element, -1); // Last argument means don't set the position on any INSERT
 
@@ -475,7 +475,7 @@ public class FKListStore<E> extends AbstractListStore<E>
     }
 
     @Override
-    public void update(DNStateManager ownerSM, Collection coll)
+    public void update(DNStateManager ownerSM, Collection<? extends E> coll)
     {
         if (coll == null || coll.isEmpty())
         {
@@ -484,11 +484,11 @@ public class FKListStore<E> extends AbstractListStore<E>
         }
 
         // Find existing elements, and remove any that are no longer present
-        Collection existing = new ArrayList();
-        Iterator elemIter = iterator(ownerSM);
+        Collection<E> existing = new ArrayList<>();
+        Iterator<E> elemIter = iterator(ownerSM);
         while (elemIter.hasNext())
         {
-            Object elem = elemIter.next();
+            E elem = elemIter.next();
             if (!coll.contains(elem))
             {
                 remove(ownerSM, elem, -1, true);
@@ -519,7 +519,7 @@ public class FKListStore<E> extends AbstractListStore<E>
      * @param size Current size of list (if known). -1 if not known
      * @return Whether it was successful
      */
-    protected boolean internalAdd(DNStateManager ownerSM, int startAt, boolean atEnd, Collection<E> c, int size)
+    protected boolean internalAdd(DNStateManager ownerSM, int startAt, boolean atEnd, Collection<? extends E> c, int size)
     {
         if (c == null || c.size() == 0)
         {
@@ -1220,14 +1220,14 @@ public class FKListStore<E> extends AbstractListStore<E>
                     ResultSet rs = sqlControl.executeStatementQuery(ec, mconn, stmt, ps);
                     try
                     {
-                        ResultObjectFactory rof = null;
+                        ResultObjectFactory<E> rof = null;
                         if (elementsAreEmbedded || elementsAreSerialised)
                         {
                             throw new NucleusException("Cannot have FK set with non-persistent objects");
                         }
 
-                        rof = new PersistentClassROF(ec, rs, ec.getFetchPlan(), resultMapping, elementCmd, clr.classForName(elementType));
-                        return new ListStoreIterator(ownerSM, rs, rof, this);
+                        rof = new PersistentClassROF<>(ec, rs, ec.getFetchPlan(), resultMapping, elementCmd, clr.classForName(elementType));
+                        return new ListStoreIterator<E>(ownerSM, rs, rof, this);
                     }
                     finally
                     {

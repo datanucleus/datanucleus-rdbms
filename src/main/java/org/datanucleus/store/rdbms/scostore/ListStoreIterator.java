@@ -20,6 +20,7 @@ package org.datanucleus.store.rdbms.scostore;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.ListIterator;
 
 import org.datanucleus.ExecutionContext;
@@ -57,7 +58,7 @@ public class ListStoreIterator<E> implements ListIterator<E>
         this.abstractListStore = als;
 
         ExecutionContext ec = sm.getExecutionContext();
-        ArrayList results = new ArrayList();
+        List<E> results = new ArrayList<>();
         if (resultSet != null)
         {
             Table containerTable = als.getContainerTable();
@@ -109,7 +110,7 @@ public class ListStoreIterator<E> implements ListIterator<E>
                     nextElement = rof.getObject();
                 }
 
-                results.add(nextElement);
+                results.add((E) nextElement);
             }
         }
         delegate = results.listIterator();

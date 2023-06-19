@@ -91,7 +91,7 @@ public interface DatastoreClass extends Table
      * Accessor for any secondary tables for this table.
      * @return Collection of secondary tables (if any)
      */
-    public Collection<SecondaryDatastoreClass> getSecondaryDatastoreClasses();
+    public Collection<? extends SecondaryDatastoreClass> getSecondaryDatastoreClasses();
 
     /**
      * Accessor for whether this table manages the specified class

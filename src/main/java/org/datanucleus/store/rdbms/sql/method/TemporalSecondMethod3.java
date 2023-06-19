@@ -19,7 +19,6 @@ package org.datanucleus.store.rdbms.sql.method;
 
 import static java.util.Arrays.asList;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
@@ -35,9 +34,7 @@ import org.datanucleus.store.rdbms.sql.expression.SQLExpressionFactory;
  */
 public class TemporalSecondMethod3 extends TemporalBaseMethod
 {
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.rdbms.sql.method.SQLMethod#getExpression(org.datanucleus.store.rdbms.sql.expression.SQLExpression, java.util.List)
-     */
+    @Override
     public SQLExpression getExpression(SQLStatement stmt, SQLExpression expr, List<SQLExpression> args)
     {
         SQLExpression invokedExpr = getInvokedExpression(expr, args, "SECOND");
@@ -47,12 +44,10 @@ public class TemporalSecondMethod3 extends TemporalBaseMethod
         SQLExpressionFactory exprFactory = stmt.getSQLExpressionFactory();
         SQLExpression day = exprFactory.newLiteral(stmt, mapping, "second");
 
-        List<SQLExpression> funcArgs = new ArrayList<>();
-        funcArgs.add(day);
-        funcArgs.add(invokedExpr);
+        List<SQLExpression> funcArgs = List.of(day, invokedExpr);
+
         NumericExpression secondExpr = new NumericExpression(stmt, stmt.getSQLExpressionFactory().getMappingForType(int.class, true), "date_part", funcArgs);
-        List<SQLExpression> castArgs = new ArrayList<>();
-        castArgs.add(secondExpr);
+        List<SQLExpression> castArgs = List.of(secondExpr);
         return new NumericExpression(stmt, stmt.getSQLExpressionFactory().getMappingForType(Integer.class, true), "CAST", castArgs, asList("INTEGER"));
     }
 }

@@ -17,11 +17,17 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.store.rdbms.mapping.column;
 
-import java.sql.Types;
-
+import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.table.Column;
+import org.datanucleus.util.Localiser;
+
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.SQLXML;
+import java.sql.Types;
 
 /**
  * Mapping of an SQLXML column.
@@ -36,5 +42,43 @@ public class SqlXmlColumnMapping extends LongVarcharColumnMapping
     public int getJDBCType()
     {
         return Types.SQLXML;
+    }
+
+    public void setString(PreparedStatement ps, int param, String value)
+    {
+        try
+        {
+            if (value == null)
+            {
+                ps.setNull(param, getJDBCType());
+            }
+            else
+            {
+                SQLXML sqlxml = ps.getConnection().createSQLXML();
+                sqlxml.setString(value);
+                ps.setSQLXML(param, sqlxml);
+            }
+        }
+        catch (SQLException e)
+        {
+            throw new NucleusDataStoreException(Localiser.msg("055001","String","" + value), e);
+        }
+    }
+
+    public String getString(ResultSet rs, int param)
+    {
+        String value;
+
+        try
+        {
+            SQLXML sqlxml = rs.getSQLXML(param);
+            value = sqlxml.getString();
+        }
+        catch (SQLException e)
+        {
+            throw new NucleusDataStoreException(Localiser.msg("055002","String", "" + param, column, e.getMessage()), e);
+        }
+
+        return value;
     }
 }

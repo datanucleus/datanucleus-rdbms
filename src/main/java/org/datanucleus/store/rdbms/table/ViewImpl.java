@@ -89,7 +89,7 @@ public abstract class ViewImpl extends AbstractTable
         }
 
         // Validate the column(s)
-        Map<DatastoreIdentifier, Column> unvalidated = new HashMap(columnsByIdentifier);
+        Map<DatastoreIdentifier, Column> unvalidated = new HashMap<>(columnsByIdentifier);
         Iterator i = storeMgr.getColumnInfoForTable(this, conn).iterator();
         while (i.hasNext())
         {

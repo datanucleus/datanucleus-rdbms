@@ -342,7 +342,7 @@ public abstract class EmbeddedMapping extends SingleFieldMapping
 
         if (javaTypeMappings == null)
         {
-            javaTypeMappings = new ArrayList();
+            javaTypeMappings = new ArrayList<>();
         }
         javaTypeMappings.add(mapping);
     }

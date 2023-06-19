@@ -55,15 +55,12 @@ public class TableUtils
      * @param clr ClassLoader resolver
      * @return The foreign key(s) created
      */
-    public static Collection getForeignKeysForReferenceField(JavaTypeMapping fieldMapping, 
-                                                             AbstractMemberMetaData mmd,
-                                                             boolean autoMode,
-                                                             RDBMSStoreManager storeMgr,
-                                                             ClassLoaderResolver clr)
+    public static Collection<ForeignKey> getForeignKeysForReferenceField(JavaTypeMapping fieldMapping, AbstractMemberMetaData mmd, boolean autoMode,
+            RDBMSStoreManager storeMgr, ClassLoaderResolver clr)
     {
         final ReferenceMapping refMapping = (ReferenceMapping)fieldMapping;
         JavaTypeMapping[] refJavaTypeMappings = refMapping.getJavaTypeMapping();
-        List fks = new ArrayList();
+        List<ForeignKey> fks = new ArrayList<>();
         for (int i=0;i<refJavaTypeMappings.length;i++)
         {
             // If the implementation is of a PC class, look to add a FK to the PC class table

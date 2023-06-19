@@ -122,14 +122,14 @@ public abstract class ReferenceMapping extends MultiPersistableMapping implement
      * @param type The implementation type we want the submapping for
      * @return The javaTypeMapping for this implementation
      */
-    public JavaTypeMapping getJavaTypeMappingForType(Class type)
+    public JavaTypeMapping getJavaTypeMappingForType(Class<?> type)
     {
         if (mappingStrategy == PER_IMPLEMENTATION_MAPPING)
         {
             for (int i=0;i<javaTypeMappings.length;i++)
             {
                 JavaTypeMapping m = javaTypeMappings[i];
-                Class implType = storeMgr.getNucleusContext().getClassLoaderResolver(type.getClassLoader()).classForName(m.getType());
+                Class<?> implType = storeMgr.getNucleusContext().getClassLoaderResolver(type.getClassLoader()).classForName(m.getType());
                 if (type.isAssignableFrom(implType))
                 {
                     return m;
@@ -365,10 +365,10 @@ public abstract class ReferenceMapping extends MultiPersistableMapping implement
         // We only add columns for the implementation that is the root of a particular inheritance tree
         // e.g if we have A implements I1, and B extends A then they both are valid implementations
         // but we only want to create column(s) for A.
-        Collection implClasses = new ArrayList();
+        Collection<Class> implClasses = new ArrayList<>();
         for (int i=0;i<implTypes.length;i++)
         {
-            Class type = clr.classForName(implTypes[i]);
+            Class<?> type = clr.classForName(implTypes[i]);
             if (type == null)
             {
                 throw new NucleusUserException(Localiser.msg("020189", mmd.getTypeName(), implTypes[i]));
@@ -380,10 +380,10 @@ public abstract class ReferenceMapping extends MultiPersistableMapping implement
 
             Iterator iter = implClasses.iterator();
             boolean toBeAdded = true;
-            Class clsToSwap = null;
+            Class<?> clsToSwap = null;
             while (iter.hasNext())
             {
-                Class cls = (Class)iter.next();
+                Class<?> cls = (Class)iter.next();
                 if (cls == type)
                 {
                     // Implementation already present

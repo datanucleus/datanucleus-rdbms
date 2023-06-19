@@ -40,7 +40,7 @@ public class StringMatchesDerbyMethod extends StringMatchesMethod
     protected BooleanExpression getExpressionForStringExpressionInput(SQLStatement stmt, SQLExpression expr, SQLExpression argExpr, SQLExpression escapeExpr)
     {
         // Use Derby "NUCLEUS_MATCHES" function
-        List funcArgs = new ArrayList();
+        List<SQLExpression> funcArgs = new ArrayList<>();
         funcArgs.add(expr);
         funcArgs.add(argExpr);
         SQLExpressionFactory exprFactory = stmt.getSQLExpressionFactory();

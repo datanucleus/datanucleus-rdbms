@@ -38,9 +38,7 @@ import org.datanucleus.store.rdbms.sql.expression.SQLLiteral;
  */
 public class RoundMethod implements SQLMethod
 {
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.rdbms.sql.method.SQLMethod#getExpression(org.datanucleus.store.rdbms.sql.expression.SQLExpression, java.util.List)
-     */
+    @Override
     public SQLExpression getExpression(SQLStatement stmt, SQLExpression ignore, List<SQLExpression> args)
     {
         if (args == null || args.size() == 0)

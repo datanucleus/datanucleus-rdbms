@@ -53,7 +53,7 @@ public abstract class SimpleStringMethod implements SQLMethod
         {
             // We have {stringExpr}.method(...)
             // TODO Cater for input args
-            ArrayList functionArgs = new ArrayList();
+            List<SQLExpression> functionArgs = new ArrayList<>();
             functionArgs.add(expr);
             return new StringExpression(stmt, stmt.getSQLExpressionFactory().getMappingForType(String.class, true), getFunctionName(), functionArgs);
         }

@@ -67,11 +67,8 @@ public class TypeConverterExpression extends DelegatedExpression
         }
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.rdbms.sql.expression.DelegatedExpression#invoke(java.lang.String, java.util.List)
-     */
     @Override
-    public SQLExpression invoke(String methodName, List args)
+    public SQLExpression invoke(String methodName, List<SQLExpression> args)
     {
         String typeName = mapping.getJavaType().getName();
 

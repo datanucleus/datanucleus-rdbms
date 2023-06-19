@@ -71,9 +71,11 @@ public class MySQLTypeInfo extends SQLTypeInfo
     private void fixAllowsPrecisionSpec()
     {
         if (typeName.equalsIgnoreCase("LONG VARCHAR") ||
-            typeName.equalsIgnoreCase("BLOB") ||
+            typeName.equalsIgnoreCase("TINYBLOB") ||
             typeName.equalsIgnoreCase("MEDIUMBLOB") ||
             typeName.equalsIgnoreCase("LONGBLOB") ||
+            typeName.equalsIgnoreCase("BLOB") ||
+            typeName.equalsIgnoreCase("TINYTEXT") ||
             typeName.equalsIgnoreCase("MEDIUMTEXT") ||
             typeName.equalsIgnoreCase("LONGTEXT") ||
             typeName.equalsIgnoreCase("TEXT"))

@@ -32,7 +32,7 @@ import org.datanucleus.store.rdbms.sql.SQLStatementParameter;
  */
 public class RDBMSQueryCompilation
 {
-    List<StatementCompilation> statementCompilations = new ArrayList(1);
+    List<StatementCompilation> statementCompilations = new ArrayList<>(1);
 
     /** Input parameter definitions, in the order used in the SQL. */
     List<SQLStatementParameter> inputParameters;

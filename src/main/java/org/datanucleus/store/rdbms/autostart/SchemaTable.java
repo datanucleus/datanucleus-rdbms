@@ -28,6 +28,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashSet;
+import java.util.Set;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.exceptions.NucleusException;
@@ -156,10 +157,10 @@ public class SchemaTable extends TableImpl
      * @return The HashSet of class names (StoreData)
      * @throws SQLException Thrown when an error occurs in the process.
      */
-    public HashSet getAllClasses(ManagedConnection conn)
+    public Set<StoreData> getAllClasses(ManagedConnection conn)
     throws SQLException
     {
-        HashSet schema_data = new HashSet();
+        Set<StoreData> schema_data = new HashSet<>();
 
         if (storeMgr.getDdlWriter() != null && !tableExists((Connection) conn.getConnection()))
         {

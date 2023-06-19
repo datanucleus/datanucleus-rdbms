@@ -2668,10 +2668,8 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
         }
     }
 
-    /**
-     * Accessor for the supported options in string form
-     */
-    public Collection getSupportedOptions()
+    @Override
+    public Collection<String> getSupportedOptions()
     {
         Set<String> set = new HashSet<>();
         set.add(StoreManager.OPTION_APPLICATION_ID);
@@ -2942,11 +2940,11 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
         private final boolean checkExistTablesOrViews;
 
         /** tracks the SchemaData currrently being added - used to rollback the AutoStart added classes **/
-        private Set<RDBMSStoreData> schemaDataAdded = new HashSet();
+        private Set<RDBMSStoreData> schemaDataAdded = new HashSet<>();
 
         private final String[] classNames;
 
-        private List<Table> tablesRecentlyInitialized = new ArrayList();
+        private List<Table> tablesRecentlyInitialized = new ArrayList<>();
 
         /**
          * Constructs a new class adder transaction that will add the given classes to the RDBMSManager.
@@ -3003,13 +3001,13 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                     storeDataMgr.begin();
                     boolean completed = false;
 
-                    List tablesCreated = null;
-                    List tableConstraintsCreated = null;
-                    List viewsCreated = null;
+                    List<Table> tablesCreated = null;
+                    List<Table> tableConstraintsCreated = null;
+                    List<Table> viewsCreated = null;
 
                     try
                     {
-                        List autoCreateErrors = new ArrayList();
+                        List<Throwable> autoCreateErrors = new ArrayList<>();
 
                         // Add SchemaData entries and tables/views for the requested classes - not yet initialized
                         addClassTables(classNames, clr);
@@ -3023,28 +3021,25 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                             if (toValidate[0] != null && toValidate[0].size() > 0)
                             {
                                 // Validate the tables
-                                List[] result = performTablesValidation(toValidate[0], clr);
+                                List<Table>[] result = performTablesValidation(toValidate[0], clr, autoCreateErrors);
                                 tablesCreated = result[0];
                                 tableConstraintsCreated = result[1];
-                                autoCreateErrors = result[2];
                             }
 
                             if (toValidate[1] != null && toValidate[1].size() > 0)
                             {
                                 // Validate the views
-                                List[] result = performViewsValidation(toValidate[1]);
-                                viewsCreated = result[0];
-                                autoCreateErrors.addAll(result[1]);
+                                viewsCreated = performViewsValidation(toValidate[1], autoCreateErrors);
                             }
 
                             // Process all errors from the above
                             if (!autoCreateErrors.isEmpty())
                             {
                                 // Verify the list of errors, log the errors and raise NucleusDataStoreException when fail on error is enabled.
-                                Iterator errorsIter = autoCreateErrors.iterator();
+                                Iterator<Throwable> errorsIter = autoCreateErrors.iterator();
                                 while (errorsIter.hasNext())
                                 {
-                                    Throwable exc = (Throwable)errorsIter.next();
+                                    Throwable exc = errorsIter.next();
                                     if (rdbmsMgr.getSchemaHandler().isAutoCreateWarnOnError())
                                     {
                                         NucleusLogger.DATASTORE.warn(Localiser.msg("050044", exc));
@@ -3056,7 +3051,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                                 }
                                 if (!rdbmsMgr.getSchemaHandler().isAutoCreateWarnOnError())
                                 {
-                                    throw new NucleusDataStoreException(Localiser.msg("050043"), (Throwable[])autoCreateErrors.toArray(new Throwable[autoCreateErrors.size()]));
+                                    throw new NucleusDataStoreException(Localiser.msg("050043"), autoCreateErrors.toArray(new Throwable[autoCreateErrors.size()]));
                                 }
                             }
                         }
@@ -3086,7 +3081,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                         if (!completed)
                         {
                             storeDataMgr.rollback();
-                            rollbackSchemaCreation(viewsCreated,tableConstraintsCreated,tablesCreated);
+                            rollbackSchemaCreation(viewsCreated, tableConstraintsCreated, tablesCreated);
                         }
                         else
                         {
@@ -3142,7 +3137,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
 
                     // For data where the table wasn't defined, make a second pass.
                     // This is necessary where a subclass uses "superclass-table" and the superclass' table hadn't been defined at the point of adding this class
-                    Iterator<RDBMSStoreData> addedIter = new HashSet(this.schemaDataAdded).iterator();
+                    Iterator<RDBMSStoreData> addedIter = new HashSet<>(this.schemaDataAdded).iterator();
                     while (addedIter.hasNext())
                     {
                         RDBMSStoreData data = addedIter.next();
@@ -3369,8 +3364,8 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
          */
         private List<Table>[] initializeClassTables(String[] classNames, ClassLoaderResolver clr)
         {
-            List<Table> tablesToValidate = new ArrayList();
-            List<Table> viewsToValidate = new ArrayList();
+            List<Table> tablesToValidate = new ArrayList<>();
+            List<Table> viewsToValidate = new ArrayList<>();
 
             tablesRecentlyInitialized.clear();
             int numTablesInitializedInit = 0;
@@ -3441,15 +3436,14 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
          * Validate tables.
          * @param tablesToValidate list of TableImpl to validate
          * @param clr the ClassLoaderResolver
-         * @return an array of List where index == 0 has a list of the tables created, index == 1 has a list of the contraints created, index == 2 has a list of the auto creation errors 
+         * @return an array of List where index == 0 has a list of the tables created, index == 1 has a list of the contraints created
          * @throws SQLException When an error occurs in validation
          */
-        private List[] performTablesValidation(List<Table> tablesToValidate, ClassLoaderResolver clr) 
+        private List[] performTablesValidation(List<Table> tablesToValidate, ClassLoaderResolver clr, List<Throwable> autoCreateErrors) 
         throws SQLException
         {
-            List autoCreateErrors = new ArrayList();
-            List<Table> tableConstraintsCreated = new ArrayList();
-            List<Table> tablesCreated = new ArrayList();
+            List<Table> tableConstraintsCreated = new ArrayList<>();
+            List<Table> tablesCreated = new ArrayList<>();
 
             if (ddlWriter != null) // TODO Why is this only done with the DDL option enabled?
             {
@@ -3603,7 +3597,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                     }
                 }
             }
-            return new List[] { tablesCreated, tableConstraintsCreated, autoCreateErrors };
+            return new List[] { tablesCreated, tableConstraintsCreated};
         }
 
         /**
@@ -3629,17 +3623,16 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
         /**
          * Validate the supplied views.
          * @param viewsToValidate list of ViewImpl to validate
-         * @return an array of List where index == 0 has a list of the views created, index == 1 has a list of the auto creation errors 
+         * @return list of the views created
          * @throws SQLException
          */
-        private List[] performViewsValidation(List<Table> viewsToValidate) throws SQLException
+        private List<Table> performViewsValidation(List<Table> viewsToValidate, List<Throwable> autoCreateErrors) throws SQLException
         {
             // View existence and validation.
             // a). Check for existence of the view
             // b). If autocreate, create the view if necessary
             // c). If validate, validate the view
-            List<Table> viewsCreated = new ArrayList();
-            List autoCreateErrors = new ArrayList();
+            List<Table> viewsCreated = new ArrayList<>();
             Iterator i = viewsToValidate.iterator();
             while (i.hasNext())
             {
@@ -3659,7 +3652,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                 // Discard any cached column info used to validate the view
                 invalidateColumnInfoForTable(v);
             }
-            return new List[] { viewsCreated, autoCreateErrors };
+            return viewsCreated;
         }
 
         /**
@@ -3861,7 +3854,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                     {
                         this.ddlWriter = ddlFileWriter;
                         this.completeDDL = completeDdl;
-                        this.writtenDdlStatements = new HashSet();
+                        this.writtenDdlStatements = new HashSet<>();
                     }
 
                     // Tables/constraints DDL
@@ -3937,8 +3930,8 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
         // Check for datastore-based value-generator usage
         if (classNames != null && classNames.size() > 0)
         {
-            Set<String> seqTablesGenerated = new HashSet();
-            Set<String> sequencesGenerated = new HashSet();
+            Set<String> seqTablesGenerated = new HashSet<>();
+            Set<String> sequencesGenerated = new HashSet<>();
             for (String className : classNames)
             {
                 AbstractClassMetaData cmd = getMetaDataManager().getMetaDataForClass(className, clr);
@@ -4190,7 +4183,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                     {
                         this.ddlWriter = ddlFileWriter;
                         this.completeDDL = completeDdl;
-                        this.writtenDdlStatements = new HashSet();
+                        this.writtenDdlStatements = new HashSet<>();
                     }
 
                     // Generate the tables/constraints for these classes (so we know the tables to delete)

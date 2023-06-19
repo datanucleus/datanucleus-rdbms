@@ -17,7 +17,6 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.store.rdbms.sql.method;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
@@ -25,7 +24,6 @@ import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.expression.NumericExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
-import org.datanucleus.store.rdbms.sql.expression.SQLExpressionFactory;
 
 /**
  * Method for evaluating MONTH({dateExpr}) using SQLite.
@@ -41,11 +39,9 @@ public class TemporalMonthMethod4 extends TemporalBaseMethod
         SQLExpression invokedExpr = getInvokedExpression(expr, args, "MONTH");
 
         RDBMSStoreManager storeMgr = stmt.getRDBMSManager();
-        JavaTypeMapping mapping2 = storeMgr.getMappingManager().getMapping(String.class);
-        ArrayList funcArgs = new ArrayList();
-        SQLExpressionFactory exprFactory = stmt.getSQLExpressionFactory();
-        funcArgs.add(exprFactory.newLiteral(stmt, mapping2, "%m"));
-        funcArgs.add(invokedExpr);
+        JavaTypeMapping mapping = storeMgr.getMappingManager().getMapping(String.class);
+
+        List<SQLExpression> funcArgs = List.of(stmt.getSQLExpressionFactory().newLiteral(stmt, mapping, "%m"), invokedExpr);
         NumericExpression numExpr = new NumericExpression(stmt, stmt.getSQLExpressionFactory().getMappingForType(int.class, true), "strftime", funcArgs);
         numExpr.encloseInParentheses();
         return numExpr;

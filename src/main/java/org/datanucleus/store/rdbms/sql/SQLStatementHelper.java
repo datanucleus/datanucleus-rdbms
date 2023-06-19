@@ -612,8 +612,7 @@ public class SQLStatementHelper
      * The source class is defined by the supplied meta-data, and the SQLTable that we are selecting from.
      * The supplied statement and mapping definition are updated during this method.
      * @param stmt The statement
-     * @param mappingDefinition Mapping definition for result columns (populated with column positions
-     *                          of any selected mappings if provided as input)
+     * @param mappingDefinition Mapping definition for result columns (populated with column positions of any selected mappings if provided as input)
      * @param fetchPlan FetchPlan in use
      * @param sourceSqlTbl SQLTable for the source class that we select from
      * @param sourceCmd Meta-data for the source class
@@ -636,7 +635,7 @@ public class SQLStatementHelper
             fieldNumbers = sourceCmd.getDFGMemberPositions();
         }
 
-        ClassLoaderResolver clr = stmt.getRDBMSManager().getNucleusContext().getClassLoaderResolver(null);
+        ClassLoaderResolver clr = stmt.getClassLoaderResolver();
         for (int fieldNumber : fieldNumbers)
         {
             AbstractMemberMetaData mmd = sourceCmd.getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);

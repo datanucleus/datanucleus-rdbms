@@ -81,7 +81,7 @@ public final class PersistentClassROF<T> extends AbstractROF<T>
     protected int[] mappedFieldNumbers;
 
     /** Resolved classes for metadata / discriminator keyed by class names. */
-    private Map resolvedClasses = new ConcurrentReferenceHashMap<>(1, ReferenceType.STRONG, ReferenceType.SOFT);
+    private Map<String, Class> resolvedClasses = new ConcurrentReferenceHashMap<>(1, ReferenceType.STRONG, ReferenceType.SOFT);
 
     /**
      * Constructor.
@@ -179,7 +179,7 @@ public final class PersistentClassROF<T> extends AbstractROF<T>
         Class pcClassForObject = persistentClass;
         if (className != null)
         {
-            Class cls = (Class) resolvedClasses.get(className);
+            Class cls = resolvedClasses.get(className);
             if (cls != null)
             {
                 pcClassForObject = cls;
@@ -515,7 +515,7 @@ public final class PersistentClassROF<T> extends AbstractROF<T>
      * @param surrogateVersion The version when the object has a surrogate version field
      * @return The persistable object for this id
      */
-    private T findObjectWithIdAndLoadFields(final Object id, final int[] membersToLoad, final int[] membersToStore, Class pcClass, final AbstractClassMetaData cmd, 
+    private T findObjectWithIdAndLoadFields(final Object id, final int[] membersToLoad, final int[] membersToStore, Class<?> pcClass, final AbstractClassMetaData cmd, 
             final Object surrogateVersion)
     {
         return (T) ec.findObject(id, new FieldValues()

@@ -70,6 +70,8 @@ public class LocateBulkRequest extends BulkRequest
 {
     AbstractClassMetaData cmd = null;
 
+    ClassLoaderResolver clr = null;
+
     /** Definition of input mappings in the SQL statement. */
     private StatementClassMapping[] mappingDefinitions;
 
@@ -79,18 +81,20 @@ public class LocateBulkRequest extends BulkRequest
     /**
      * Constructor, taking the table. Uses the structure of the datastore table to build a basic query.
      * @param table The Class Table representing the datastore table to retrieve
+     * @param cmd Metadata for the class whose objects we are locating
+     * @param clr ClassLoader resolver
      */
-    public LocateBulkRequest(DatastoreClass table)
+    public LocateBulkRequest(DatastoreClass table, AbstractClassMetaData cmd, ClassLoaderResolver clr)
     {
         super(table);
+        this.cmd = cmd;
+        this.clr = clr;
     }
 
     protected String getStatement(DatastoreClass table, DNStateManager[] sms, boolean lock)
     {
         RDBMSStoreManager storeMgr = table.getStoreManager();
-        ClassLoaderResolver clr = storeMgr.getNucleusContext().getClassLoaderResolver(null);
         SQLExpressionFactory exprFactory = storeMgr.getSQLExpressionFactory();
-        cmd = storeMgr.getMetaDataManager().getMetaDataForClass(table.getType(), clr);
         ExecutionContext ec = sms[0].getExecutionContext();
 
         SelectStatement sqlStatement = new SelectStatement(storeMgr, table, null, null);
@@ -375,13 +379,13 @@ public class LocateBulkRequest extends BulkRequest
         {
             String msg = Localiser.msg("052220", sms[0].getObjectAsPrintable(), statement, sqle.getMessage());
             NucleusLogger.DATASTORE_RETRIEVE.warn(msg);
-            List exceptions = new ArrayList();
+            List<Throwable> exceptions = new ArrayList<>();
             exceptions.add(sqle);
             while ((sqle = sqle.getNextException()) != null)
             {
                 exceptions.add(sqle);
             }
-            throw new NucleusDataStoreException(msg, (Throwable[])exceptions.toArray(new Throwable[exceptions.size()]));
+            throw new NucleusDataStoreException(msg, exceptions.toArray(new Throwable[exceptions.size()]));
         }
     }
 

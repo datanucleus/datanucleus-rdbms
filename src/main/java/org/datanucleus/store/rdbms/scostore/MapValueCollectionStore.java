@@ -158,7 +158,7 @@ class MapValueCollectionStore<V> extends AbstractCollectionStore<V>
         throw new UnsupportedOperationException("Cannot add to a map through its values collection");
     }
 
-    public boolean addAll(DNStateManager sm, Collection<V> values, int size)
+    public boolean addAll(DNStateManager sm, Collection<? extends V> values, int size)
     {
         throw new UnsupportedOperationException("Cannot add to a map through its values collection");
     }

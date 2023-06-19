@@ -28,7 +28,7 @@ import org.datanucleus.store.rdbms.sql.SQLStatement;
  */
 public class AggregateTemporalExpression extends TemporalExpression implements AggregateExpression
 {
-    public AggregateTemporalExpression(SQLStatement stmt, JavaTypeMapping mapping, String functionName, List args)
+    public AggregateTemporalExpression(SQLStatement stmt, JavaTypeMapping mapping, String functionName, List<SQLExpression> args)
     {
         super(stmt, mapping, functionName, args);
     }

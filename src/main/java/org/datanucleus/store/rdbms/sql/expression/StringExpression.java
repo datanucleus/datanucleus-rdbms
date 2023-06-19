@@ -497,7 +497,8 @@ public class StringExpression extends SQLExpression
         return new BooleanExpression(this, not ? Expression.OP_NOTIN : Expression.OP_IN, expr);
     }
 
-    public SQLExpression invoke(String methodName, List args)
+    @Override
+    public SQLExpression invoke(String methodName, List<SQLExpression> args)
     {
         return stmt.getRDBMSManager().getSQLExpressionFactory().invokeMethod(stmt, String.class.getName(), methodName, this, args);
     }

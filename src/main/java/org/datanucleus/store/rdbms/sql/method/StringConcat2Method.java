@@ -37,9 +37,7 @@ import org.datanucleus.util.Localiser;
  */
 public class StringConcat2Method implements SQLMethod
 {
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.rdbms.sql.method.SQLMethod#getExpression(org.datanucleus.store.rdbms.sql.expression.SQLExpression, java.util.List)
-     */
+    @Override
     public SQLExpression getExpression(SQLStatement stmt, SQLExpression expr, List<SQLExpression> args)
     {
         if (args == null || args.size() != 1)
@@ -52,8 +50,8 @@ public class StringConcat2Method implements SQLMethod
         {
             throw new NucleusException(Localiser.msg("060003", "concat", "StringExpression", 0, "StringExpression/CharacterExpression/Parameter"));
         }
-        
-        ArrayList funcArgs = new ArrayList();
+
+        List<SQLExpression> funcArgs = new ArrayList<>();
         funcArgs.add(expr);
         funcArgs.add(otherExpr);
         return new StringExpression(stmt, stmt.getSQLExpressionFactory().getMappingForType(String.class), "CONCAT", funcArgs);

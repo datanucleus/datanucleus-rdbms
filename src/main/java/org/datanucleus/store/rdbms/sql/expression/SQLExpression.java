@@ -203,7 +203,7 @@ public abstract class SQLExpression
      * @param args SQLExpression list
      * @param types List of String/SQLExpression for the types of arguments
      */
-    protected SQLExpression(SQLStatement stmt, JavaTypeMapping mapping, String functionName, List<SQLExpression> args, List types)
+    protected SQLExpression(SQLStatement stmt, JavaTypeMapping mapping, String functionName, List<SQLExpression> args, List<Object> types)
     {
         if (types != null && args != null && args.size() != types.size())
         {
@@ -622,7 +622,7 @@ public abstract class SQLExpression
      * @param args Args to this method (if any)
      * @return the converted value
      */
-    public SQLExpression invoke(String methodName, List args)
+    public SQLExpression invoke(String methodName, List<SQLExpression> args)
     {
         throw new IllegalExpressionOperationException("." + methodName, this);
     }

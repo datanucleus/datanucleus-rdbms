@@ -1,0 +1,780 @@
+StoreManager : "rdbms" using the URL "jdbc:sqlserver://localhost:1433;databaseName=dtrack;sendStringParametersAsUnicode=false;trustServerCertificate=true" - datastore-mode=read-write
+================ DatabaseAdapter ==================
+Adapter : org.datanucleus.store.rdbms.adapter.SQLServerAdapter
+Datastore : name="Microsoft SQL Server" version="14.00.3456" (major=14, minor=0, revision=3456)
+Driver : name="Microsoft JDBC Driver 11.2 for SQL Server" version="11.2.1.0" (major=11, minor=2)
+===================================================
+
+Database TypeInfo
+JDBC Type=null sqlTypes=UNIQUEIDENTIFIER (default=UNIQUEIDENTIFIER)
+    SQLTypeInfo : [DATANUCLEUS]
+      type : name = UNIQUEIDENTIFIER, jdbcId = 1, localName = UNIQUEIDENTIFIER, createParams = 
+      precision = 36, allowsSpec = false, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = false, searchable = 2, unsigned = false, autoIncrement = false
+
+JDBC Type=null sqlTypes=datetimeoffset (default=datetimeoffset)
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = datetimeoffset, jdbcId = -155, localName = datetimeoffset, createParams = scale
+      precision = 34, allowsSpec = true, numPrecRadix = 0
+      scale : min = 0, max = 7, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = false, searchable = 3, unsigned = false, autoIncrement = false
+
+JDBC Type=NCHAR sqlTypes=nchar (default=nchar)
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = nchar, jdbcId = -15, localName = nchar, createParams = length
+      precision = 4000, allowsSpec = true, numPrecRadix = 0
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = N', suffix = '
+      nullable = 1, caseSensitive = false, searchable = 3, unsigned = false, autoIncrement = false
+
+JDBC Type=null sqlTypes=xml,ntext (default=xml)
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = xml, jdbcId = -16, localName = xml, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 0
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = N', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 0, unsigned = false, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = ntext, jdbcId = -16, localName = ntext, createParams = null
+      precision = 1073741823, allowsSpec = true, numPrecRadix = 0
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = N', suffix = '
+      nullable = 1, caseSensitive = false, searchable = 1, unsigned = false, autoIncrement = false
+
+JDBC Type=CLOB sqlTypes=TEXT (default=TEXT)
+    SQLTypeInfo : [DATANUCLEUS]
+      type : name = TEXT, jdbcId = 2005, localName = TEXT, createParams = null
+      precision = 2147483647, allowsSpec = true, numPrecRadix = 0
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = null, suffix = null
+      nullable = 1, caseSensitive = true, searchable = 1, unsigned = false, autoIncrement = false
+
+JDBC Type=BLOB sqlTypes=IMAGE (default=IMAGE)
+    SQLTypeInfo : [DATANUCLEUS]
+      type : name = IMAGE, jdbcId = 2004, localName = BLOB, createParams = null
+      precision = 2147483647, allowsSpec = true, numPrecRadix = 0
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = null, suffix = null
+      nullable = 1, caseSensitive = false, searchable = 1, unsigned = false, autoIncrement = false
+
+JDBC Type=DATE sqlTypes=date,DATE (default=date)
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = date, jdbcId = 91, localName = date, createParams = null
+      precision = 10, allowsSpec = true, numPrecRadix = 0
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = false, searchable = 3, unsigned = false, autoIncrement = false
+
+    SQLTypeInfo : [DATANUCLEUS]
+      type : name = DATE, jdbcId = 91, localName = DATE, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 0
+      scale : min = 0, max = 0, fixedPrec = true
+      literals : prefix = null, suffix = null
+      nullable = 1, caseSensitive = false, searchable = 1, unsigned = true, autoIncrement = false
+
+JDBC Type=TIME sqlTypes=TIME,time (default=time)
+    SQLTypeInfo : [DATANUCLEUS]
+      type : name = TIME, jdbcId = 92, localName = TIME, createParams = null
+      precision = 0, allowsSpec = true, numPrecRadix = 0
+      scale : min = 0, max = 0, fixedPrec = true
+      literals : prefix = null, suffix = null
+      nullable = 1, caseSensitive = false, searchable = 1, unsigned = true, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = time, jdbcId = 92, localName = time, createParams = scale
+      precision = 16, allowsSpec = true, numPrecRadix = 0
+      scale : min = 0, max = 7, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = false, searchable = 3, unsigned = false, autoIncrement = false
+
+JDBC Type=TIMESTAMP sqlTypes=datetime,smalldatetime,datetime2 (default=datetime2)
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = datetime, jdbcId = 93, localName = datetime, createParams = null
+      precision = 23, allowsSpec = true, numPrecRadix = 0
+      scale : min = 3, max = 3, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = false, searchable = 3, unsigned = false, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = smalldatetime, jdbcId = 93, localName = smalldatetime, createParams = null
+      precision = 16, allowsSpec = true, numPrecRadix = 0
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = false, searchable = 3, unsigned = false, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = datetime2, jdbcId = 93, localName = datetime2, createParams = scale
+      precision = 27, allowsSpec = true, numPrecRadix = 0
+      scale : min = 0, max = 7, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = false, searchable = 3, unsigned = false, autoIncrement = false
+
+JDBC Type=VARCHAR sqlTypes=varchar (default=varchar)
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = varchar, jdbcId = 12, localName = varchar, createParams = max length
+      precision = 8000, allowsSpec = true, numPrecRadix = 0
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = false, searchable = 3, unsigned = false, autoIncrement = false
+
+JDBC Type=LONGVARCHAR sqlTypes=text (default=text)
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = text, jdbcId = -1, localName = text, createParams = null
+      precision = 2147483647, allowsSpec = true, numPrecRadix = 0
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = false, searchable = 1, unsigned = false, autoIncrement = false
+
+JDBC Type=BINARY sqlTypes=binary,timestamp (default=binary)
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = binary, jdbcId = -2, localName = binary, createParams = length
+      precision = 8000, allowsSpec = true, numPrecRadix = 0
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = 0x, suffix = null
+      nullable = 1, caseSensitive = false, searchable = 2, unsigned = false, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = timestamp, jdbcId = -2, localName = timestamp, createParams = null
+      precision = 8, allowsSpec = true, numPrecRadix = 0
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = 0x, suffix = null
+      nullable = 0, caseSensitive = false, searchable = 2, unsigned = false, autoIncrement = false
+
+JDBC Type=VARBINARY sqlTypes=varbinary (default=varbinary)
+    SQLTypeInfo : [DATANUCLEUS]
+      type : name = varbinary, jdbcId = -3, localName = varbinary, createParams = (max)
+      precision = 8000, allowsSpec = true, numPrecRadix = 0
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = 0x, suffix = null
+      nullable = 1, caseSensitive = false, searchable = 2, unsigned = false, autoIncrement = false
+
+JDBC Type=LONGVARBINARY sqlTypes=image,IMAGE (default=image)
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = image, jdbcId = -4, localName = image, createParams = null
+      precision = 2147483647, allowsSpec = true, numPrecRadix = 0
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = 0x, suffix = null
+      nullable = 1, caseSensitive = false, searchable = 0, unsigned = false, autoIncrement = false
+
+    SQLTypeInfo : [DATANUCLEUS]
+      type : name = IMAGE, jdbcId = -4, localName = LONGVARBINARY, createParams = null
+      precision = 2147483647, allowsSpec = true, numPrecRadix = 0
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = null, suffix = null
+      nullable = 1, caseSensitive = false, searchable = 1, unsigned = false, autoIncrement = false
+
+JDBC Type=BIGINT sqlTypes=bigint identity,bigint (default=bigint)
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = bigint identity, jdbcId = -5, localName = bigint identity, createParams = null
+      precision = 19, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = null, suffix = null
+      nullable = 0, caseSensitive = false, searchable = 2, unsigned = false, autoIncrement = true
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = bigint, jdbcId = -5, localName = bigint, createParams = null
+      precision = 19, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = null, suffix = null
+      nullable = 1, caseSensitive = false, searchable = 2, unsigned = false, autoIncrement = false
+
+JDBC Type=null sqlTypes=sql_variant (default=sql_variant)
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = sql_variant, jdbcId = -150, localName = sql_variant, createParams = null
+      precision = 8000, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = null, suffix = null
+      nullable = 1, caseSensitive = false, searchable = 2, unsigned = false, autoIncrement = false
+
+JDBC Type=BIT sqlTypes=bit (default=bit)
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = bit, jdbcId = -7, localName = bit, createParams = null
+      precision = 1, allowsSpec = true, numPrecRadix = 0
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = null, suffix = null
+      nullable = 1, caseSensitive = false, searchable = 2, unsigned = false, autoIncrement = false
+
+JDBC Type=NVARCHAR sqlTypes=nvarchar,sysname (default=nvarchar)
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = nvarchar, jdbcId = -9, localName = nvarchar, createParams = max length
+      precision = 4000, allowsSpec = true, numPrecRadix = 0
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = N', suffix = '
+      nullable = 1, caseSensitive = false, searchable = 3, unsigned = false, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = sysname, jdbcId = -9, localName = sysname, createParams = null
+      precision = 128, allowsSpec = true, numPrecRadix = 0
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = N', suffix = '
+      nullable = 0, caseSensitive = false, searchable = 3, unsigned = false, autoIncrement = false
+
+JDBC Type=CHAR sqlTypes=char,uniqueidentifier (default=uniqueidentifier)
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = char, jdbcId = 1, localName = char, createParams = length
+      precision = 8000, allowsSpec = true, numPrecRadix = 0
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = false, searchable = 3, unsigned = false, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = uniqueidentifier, jdbcId = 1, localName = uniqueidentifier, createParams = null
+      precision = 36, allowsSpec = false, numPrecRadix = 0
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = false, searchable = 2, unsigned = false, autoIncrement = false
+
+JDBC Type=NUMERIC sqlTypes=numeric() identity,numeric (default=numeric)
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = numeric() identity, jdbcId = 2, localName = numeric() identity, createParams = precision
+      precision = 38, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = null, suffix = null
+      nullable = 0, caseSensitive = false, searchable = 2, unsigned = false, autoIncrement = true
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = numeric, jdbcId = 2, localName = numeric, createParams = precision,scale
+      precision = 38, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 38, fixedPrec = false
+      literals : prefix = null, suffix = null
+      nullable = 1, caseSensitive = false, searchable = 2, unsigned = false, autoIncrement = false
+
+JDBC Type=DECIMAL sqlTypes=money,smallmoney,decimal,decimal() identity (default=decimal)
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = money, jdbcId = 3, localName = money, createParams = null
+      precision = 19, allowsSpec = true, numPrecRadix = 10
+      scale : min = 4, max = 4, fixedPrec = true
+      literals : prefix = $, suffix = null
+      nullable = 1, caseSensitive = false, searchable = 2, unsigned = false, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = smallmoney, jdbcId = 3, localName = smallmoney, createParams = null
+      precision = 10, allowsSpec = true, numPrecRadix = 10
+      scale : min = 4, max = 4, fixedPrec = true
+      literals : prefix = $, suffix = null
+      nullable = 1, caseSensitive = false, searchable = 2, unsigned = false, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = decimal, jdbcId = 3, localName = decimal, createParams = precision,scale
+      precision = 38, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 38, fixedPrec = false
+      literals : prefix = null, suffix = null
+      nullable = 1, caseSensitive = false, searchable = 2, unsigned = false, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = decimal() identity, jdbcId = 3, localName = decimal() identity, createParams = precision
+      precision = 38, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = null, suffix = null
+      nullable = 0, caseSensitive = false, searchable = 2, unsigned = false, autoIncrement = true
+
+JDBC Type=INTEGER sqlTypes=int identity,int (default=int)
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = int identity, jdbcId = 4, localName = int identity, createParams = null
+      precision = 10, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = null, suffix = null
+      nullable = 0, caseSensitive = false, searchable = 2, unsigned = false, autoIncrement = true
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = int, jdbcId = 4, localName = int, createParams = null
+      precision = 10, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = null, suffix = null
+      nullable = 1, caseSensitive = false, searchable = 2, unsigned = false, autoIncrement = false
+
+JDBC Type=SMALLINT sqlTypes=smallint,smallint identity (default=smallint)
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = smallint, jdbcId = 5, localName = smallint, createParams = null
+      precision = 5, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = null, suffix = null
+      nullable = 1, caseSensitive = false, searchable = 2, unsigned = false, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = smallint identity, jdbcId = 5, localName = smallint identity, createParams = null
+      precision = 5, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = null, suffix = null
+      nullable = 0, caseSensitive = false, searchable = 2, unsigned = false, autoIncrement = true
+
+JDBC Type=REAL sqlTypes=real (default=real)
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = real, jdbcId = 7, localName = real, createParams = null
+      precision = 24, allowsSpec = true, numPrecRadix = 2
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = null, suffix = null
+      nullable = 1, caseSensitive = false, searchable = 2, unsigned = false, autoIncrement = false
+
+JDBC Type=DOUBLE sqlTypes=float (default=float)
+    SQLTypeInfo : [DATANUCLEUS]
+      type : name = float, jdbcId = 8, localName = null, createParams = null
+      precision = 53, allowsSpec = true, numPrecRadix = 2
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = null, suffix = null
+      nullable = 1, caseSensitive = false, searchable = 2, unsigned = false, autoIncrement = false
+
+
+Database Keywords
+PATH
+TRIM
+ROWGUIDCOL
+TRANSLATION
+MUMPS
+STATIC
+CATALOG
+YEAR
+MESSAGE_LENGTH
+DISCONNECT
+PARTITION
+LEFT
+SEARCH
+CURRENT_PATH
+SIZE
+CURRENT_DEFAULT_TRANSFORM_GROUP
+RESTRICT
+CUBE
+RELEASE
+WHERE
+SQLWARNING
+AS
+AT
+DATABASE
+TIMEZONE_MINUTE
+FREETEXTTABLE
+ALTER
+DOMAIN
+SET
+C
+MERGE
+CONSTRAINT
+PRECISION
+TEXTSIZE
+SPACE
+ROLE
+UPPER
+COLLATION_NAME
+BY
+CHARACTER
+OCTET_LENGTH
+INTERVAL
+COLLATION_SCHEMA
+CATALOG_NAME
+CLUSTERED
+CONNECTION
+CONTINUE
+PAD
+REF
+SETS
+ADA
+TRUNCATE
+CURSOR
+SYSTEM
+CONSTRAINT_SCHEMA
+ADD
+TRY_CONVERT
+TABLE_NAME
+SQLERROR
+DO
+INDEX
+FOUND
+HOLD
+EXTRACT
+VARYING
+OFFSETS
+FOR
+ITERATE
+PIVOT
+CURRENT
+USING
+EXEC
+RETURNED_SQLSTATE
+DEFERRABLE
+END
+CONNECTION_NAME
+RAISERROR
+PRESERVE
+UNDO
+LOAD
+BINARY
+STATE
+WITHIN
+NCHAR
+ABSOLUTE
+SOME
+SCHEMA
+OUTER
+FILTER
+GO
+BIT
+INTERSECT
+WITH
+INITIALLY
+OVER
+GRANT
+CURRENT_ROLE
+CLASS_ORIGIN
+ACTION
+START
+CHAR_LENGTH
+DEFAULT
+CHARACTER_LENGTH
+JOIN
+UNNEST
+BULK
+NULLIF
+SESSION_USER
+MULTISET
+ELSE
+IF
+BIT_LENGTH
+PARAMETER
+LANGUAGE
+NCLOB
+CHARACTER_SET_SCHEMA
+NATIONAL
+IN
+DISTINCT
+IS
+CURRENT_TRANSFORM_GROUP_FOR_TYPE
+SPECIFICTYPE
+TOP
+FORTRAN
+MAP
+READTEXT
+EXIT
+ASYMMETRIC
+DBCC
+OPENROWSET
+COLLATION
+GOTO
+MAX
+CASCADE
+TRANSACTION
+SYSTEM_USER
+OFF
+IDENTITYCOL
+USAGE
+CURSOR_NAME
+RIGHT
+UPDATE
+SAVE
+FILE
+DISTRIBUTED
+FILLFACTOR
+FETCH
+NUMERIC
+REVOKE
+USE
+RETURNS
+SQLEXCEPTION
+FIRST
+LINENO
+SELECT
+DYNAMIC
+CALLED
+ELEMENT
+DEPTH
+ALL
+CURRENT_USER
+NEW
+ARRAY
+ATOMIC
+COLUMN_NAME
+COLUMN
+DECIMAL
+VALUE
+SEMANTICSIMILARITYDETAILSTABLE
+SERIALIZABLE
+BACKUP
+COALESCE
+ALLOCATE
+CORRESPONDING
+TIMESTAMP
+HOLDLOCK
+MINUTE
+SCALE
+DESCRIBE
+MESSAGE_OCTET_LENGTH
+NULL
+RETURNED_LENGTH
+TRUE
+OBJECT
+PRIVILEGES
+SQL
+READ
+MODULE
+AND
+SQLCODE
+REAL
+ROW
+CURRENT_DATE
+MESSAGE_TEXT
+DISK
+DIAGNOSTICS
+RANGE
+NO
+FLOAT
+CURRENT_TIMESTAMP
+HOUR
+ROUTINE
+ANY
+PLI
+ROLLBACK
+MEMBER
+NATURAL
+EXTERNAL
+DUMP
+UNNAMED
+OF
+GROUPING
+READS
+ON
+OR
+EQUALS
+PRIMARY
+TRANSLATE
+SECOND
+UNKNOWN
+MATCH
+REFERENCES
+ROWS
+PRINT
+MONTH
+ELSEIF
+ROWCOUNT
+CREATE
+REVERT
+OLD
+TRIGGER
+BETWEEN
+AFTER
+CLOSE
+CONVERT
+POSITION
+DENY
+END-EXEC
+DEALLOCATE
+INNER
+EACH
+UPDATETEXT
+SETUSER
+PRIOR
+SUM
+BIGINT
+IDENTITY
+MIN
+ARE
+VARCHAR
+THEN
+CONDITION
+KEY
+ORDINALITY
+CALL
+WAITFOR
+INTO
+REPEAT
+EXCEPTION
+INDICATOR
+FREE
+RETURNED_OCTET_LENGTH
+ASC
+GROUP
+DELETE
+DATETIME_INTERVAL_PRECISION
+RESTORE
+TEMPORARY
+SIMILAR
+OPENDATASOURCE
+PROCEDURE
+STATISTICS
+COBOL
+UNDER
+NULLABLE
+COMMITTED
+OPEN
+REFERENCING
+PERCENT
+TO
+CONSTRUCTOR
+UNION
+BREADTH
+LOCATOR
+SCOPE
+LOOP
+IMMEDIATE
+VIEW
+DESC
+ASSERTION
+CONSTRAINTS
+FREETEXT
+CURRENT_TIME
+DEFERRED
+INTEGER
+NUMBER
+OUTPUT
+UNIQUE
+TRAILING
+FULL
+BOOLEAN
+NAME
+AVG
+NOT
+ROW_COUNT
+LAST
+LOWER
+SPECIFIC
+HAVING
+SQLSTATE
+RECONFIGURE
+SEMANTICSIMILARITYTABLE
+LOCALTIME
+COMMAND_FUNCTION
+GENERAL
+CONTAINS
+DROP
+RETURN
+FOREIGN
+TSEQUAL
+NEXT
+GLOBAL
+LEAVE
+RULE
+SERVER_NAME
+SHUTDOWN
+EXISTS
+PARTIAL
+TIME
+OPENXML
+ESCAPE
+ERRLVL
+FALSE
+SECTION
+NOCHECK
+DATETIME_INTERVAL_CODE
+SYMMETRIC
+PLAN
+TRAN
+LOCALTIMESTAMP
+TABLE
+WHEN
+BREAK
+LOCAL
+CONSTRAINT_CATALOG
+COLLATION_CATALOG
+NONE
+TYPE
+SEMANTICKEYPHRASETABLE
+CYCLE
+CAST
+DESCRIPTOR
+OPTION
+WHENEVER
+LEVEL
+LEADING
+FUNCTION
+MODIFIES
+ASENSITIVE
+CASE
+OUT
+OVERLAPS
+PREPARE
+GET
+CHECK
+PUBLIC
+WORK
+WITHOUT
+COUNT
+HANDLER
+TREAT
+UNPIVOT
+WRITETEXT
+NAMES
+IDENTITY_INSERT
+NONCLUSTERED
+LENGTH
+CHAR
+CONNECT
+BEGIN
+TABLESAMPLE
+WRITE
+ORDER
+ISOLATION
+REPLICATION
+RELATIVE
+LARGE
+VALUES
+DOUBLE
+CHARACTER_SET_NAME
+SIGNAL
+TIMEZONE_HOUR
+SUBMULTISET
+COLLATE
+COMPUTE
+UNCOMMITTED
+SESSION
+RESIGNAL
+WINDOW
+DUMMY
+EXECUTE
+MORE
+PROC
+REPEATABLE
+CHECKPOINT
+DAY
+KILL
+AUTHORIZATION
+BLOB
+INPUT
+SUBSTRING
+ZONE
+RECURSIVE
+ONLY
+FROM
+DEREF
+LATERAL
+SECURITYAUDIT
+INSENSITIVE
+BOTH
+WITHIN GROUP
+SENSITIVE
+SUBCLASS_ORIGIN
+CHARACTER_SET_CATALOG
+EXCEPT
+DATE
+SCHEMA_NAME
+ROLLUP
+LIKE
+SCROLL
+DATA
+METHOD
+INSERT
+INOUT
+BROWSE
+CONSTRAINT_NAME
+INT
+PASCAL
+OPENQUERY
+DEC
+CLOB
+CASCADED
+COMMIT
+DETERMINISTIC
+USER
+SAVEPOINT
+UNTIL
+DYNAMIC_FUNCTION
+CONTAINSTABLE
+CONDITION_NUMBER
+BEFORE
+DECLARE
+CROSS
+SMALLINT
+WHILE
+RESULT
+
+DataNucleus SchemaTool completed successfully

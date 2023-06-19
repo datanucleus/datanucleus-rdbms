@@ -1560,7 +1560,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                                 FetchGroupManager fetchGrpMgr = storeMgr.getNucleusContext().getFetchGroupManager();
                                 if (fetchGrpMgr.getFetchGroupsWithName(fgName) == null)
                                 {
-                                    FetchGroup grp = new FetchGroup(storeMgr.getNucleusContext(), fgName, clr.classForName(cmd.getFullClassName()));
+                                    FetchGroup<?> grp = new FetchGroup(storeMgr.getNucleusContext(), fgName, clr.classForName(cmd.getFullClassName()));
                                     grp.addMember(mmd.getName());
                                     fetchGrpMgr.addFetchGroup(grp);
                                 }
@@ -4304,7 +4304,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
         }
 
         // Process the arguments for invoking
-        List args = expr.getArguments();
+        List<Expression> args = expr.getArguments();
         List<SQLExpression> sqlExprArgs = null;
         if (args != null)
         {
@@ -4913,7 +4913,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
     protected Object processCreatorExpression(CreatorExpression expr)
     {
         String className = expr.getId();
-        Class cls = null;
+        Class<?> cls = null;
         try
         {
             cls = clr.classForName(className);
@@ -4975,7 +4975,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
             }
 
             // Check that this class has the required constructor
-            Constructor ctr = ClassUtils.getConstructorWithArguments(cls, ctrArgTypes, ctrArgTypeCheck);
+            Constructor<?> ctr = ClassUtils.getConstructorWithArguments(cls, ctrArgTypes, ctrArgTypeCheck);
             if (ctr == null)
             {
                 throw new NucleusUserException(Localiser.msg("021033", className, StringUtils.objectArrayToString(ctrArgTypes)));
@@ -5154,7 +5154,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
             return null;
         }
 
-        String extensionName = "datanucleus.query.jdoql." + alias + ".join";
+        String extensionName = "datanucleus.query.jdoql." + alias.toLowerCase() + ".join";
         JoinType joinType = null;
         if (hasExtension(extensionName))
         {

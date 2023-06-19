@@ -17,7 +17,6 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.store.rdbms.sql.method;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.datanucleus.exceptions.NucleusException;
@@ -51,7 +50,6 @@ public class StringStartsWith2Method implements SQLMethod
         // {stringExpr}.indexOf(strExpr1 [,numExpr2])
         SQLExpression one = ExpressionUtils.getLiteralForOne(stmt);
 
-        ArrayList funcArgs = new ArrayList();
         SQLExpression substrExpr = args.get(0);
         if (!(substrExpr instanceof StringExpression) && !(substrExpr instanceof CharacterExpression) && !(substrExpr instanceof ParameterLiteral))
         {
@@ -61,13 +59,11 @@ public class StringStartsWith2Method implements SQLMethod
         if (args.size() == 2)
         {
             NumericExpression numExpr = (NumericExpression) args.get(1);
-            funcArgs.add(substrExpr);
-            funcArgs.add(expr);
+            List<SQLExpression> funcArgs = List.of(substrExpr, expr);
             return new BooleanExpression(new StringExpression(stmt, stmt.getSQLExpressionFactory().getMappingForType(int.class), "CHARINDEX", funcArgs), Expression.OP_EQ, one.add(numExpr));
         }
 
-        funcArgs.add(substrExpr);
-        funcArgs.add(expr);
+        List<SQLExpression> funcArgs = List.of(substrExpr, expr);
         return new BooleanExpression(new StringExpression(stmt, stmt.getSQLExpressionFactory().getMappingForType(int.class), "CHARINDEX", funcArgs), Expression.OP_EQ, one);
     }
 }

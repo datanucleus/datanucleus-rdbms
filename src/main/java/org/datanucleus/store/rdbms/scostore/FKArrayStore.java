@@ -637,14 +637,14 @@ public class FKArrayStore<E> extends AbstractArrayStore<E>
                     ResultSet rs = sqlControl.executeStatementQuery(ec, mconn, stmt, ps);
                     try
                     {
-                        ResultObjectFactory rof = null;
+                        ResultObjectFactory<E> rof = null;
                         if (elementsAreEmbedded || elementsAreSerialised)
                         {
                             throw new NucleusException("Cannot have FK array with non-persistent objects");
                         }
 
-                        rof = new PersistentClassROF(ec, rs, ec.getFetchPlan(), iteratorMappingDef, elementCmd, clr.classForName(elementType));
-                        return new ArrayStoreIterator(ownerSM, rs, rof, this);
+                        rof = new PersistentClassROF<>(ec, rs, ec.getFetchPlan(), iteratorMappingDef, elementCmd, clr.classForName(elementType));
+                        return new ArrayStoreIterator<E>(ownerSM, rs, rof, this);
                     }
                     finally
                     {

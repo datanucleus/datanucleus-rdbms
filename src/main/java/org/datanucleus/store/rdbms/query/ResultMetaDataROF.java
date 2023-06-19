@@ -144,7 +144,7 @@ public class ResultMetaDataROF extends AbstractROF
      */
     public Object getObject()
     {
-        List returnObjects = new ArrayList();
+        List<Object> returnObjects = new ArrayList<>();
 
         // A). Process persistent types
         PersistentTypeMapping[] persistentTypes = queryResultMetaData.getPersistentTypeMappings();
@@ -240,7 +240,7 @@ public class ResultMetaDataROF extends AbstractROF
                     StatementMappingIndex stmtMapping = new StatementMappingIndex(dc.getMemberMapping(apmd));
 
                     resultFieldNumbers[j] = apmd.getAbsoluteFieldNumber();
-                    List indexes = new ArrayList();
+                    List<Integer> indexes = new ArrayList<>();
                     for (int k=0; k<mmds.length; k++)
                     {
                         if (mmds[k] == apmd)
@@ -252,7 +252,7 @@ public class ResultMetaDataROF extends AbstractROF
                     for( int k=0; k<indxs.length; k++)
                     {
                         //add +1 because result sets in JDBC starts with 1
-                        indxs[k] = ((Integer)indexes.get(k)).intValue()+1;
+                        indxs[k] = indexes.get(k).intValue()+1;
                     }
                     stmtMapping.setColumnPositions(indxs);
                     stmtMappings[resultFieldNumbers[j]] = stmtMapping;
@@ -363,7 +363,7 @@ public class ResultMetaDataROF extends AbstractROF
             for (int i=0;i<ctrTypeMappings.length;i++)
             {
                 String ctrClassName = ctrTypeMappings[i].getClassName();
-                Class ctrCls = ec.getClassLoaderResolver().classForName(ctrClassName);
+                Class<?> ctrCls = ec.getClassLoaderResolver().classForName(ctrClassName);
                 List<ConstructorTypeColumn> ctrColumns = ctrTypeMappings[i].getColumnsForConstructor();
                 Class[] ctrArgTypes = null;
                 Object[] ctrArgVals = null;

@@ -164,13 +164,13 @@ public class StreamableSpooler
 
     public class StreamableSpoolerGC extends Thread
     {
-        protected ReferenceQueue refQ;
+        protected ReferenceQueue<? super File> refQ;
 
-        protected Collection references = new HashSet();
+        protected Collection<WeakReference> references = new HashSet<>();
 
         public StreamableSpoolerGC()
         {
-            refQ = new ReferenceQueue();
+            refQ = new ReferenceQueue<>();
             setDaemon(true);
             start();
         }
@@ -224,7 +224,7 @@ public class StreamableSpooler
         }
     }
 
-    class FileWeakReference extends WeakReference
+    class FileWeakReference extends WeakReference<File>
     {
         protected String filename;
 
@@ -234,7 +234,7 @@ public class StreamableSpooler
             filename = f.getCanonicalPath();
         }
 
-        public FileWeakReference(File f, ReferenceQueue refQ) throws IOException
+        public FileWeakReference(File f, ReferenceQueue<? super File> refQ) throws IOException
         {
             super(f, refQ);
             filename = f.getCanonicalPath();

@@ -48,6 +48,8 @@ import org.datanucleus.store.rdbms.sql.SQLTable;
 import org.datanucleus.store.rdbms.sql.SQLText;
 import org.datanucleus.store.rdbms.sql.SelectStatement;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
+import org.datanucleus.store.rdbms.sql.method.SQLMethod;
+import org.datanucleus.store.rdbms.sql.operation.SQLOperation;
 import org.datanucleus.store.rdbms.table.Column;
 import org.datanucleus.store.rdbms.table.Table;
 import org.datanucleus.store.rdbms.table.TableImpl;
@@ -409,6 +411,8 @@ public interface DatastoreAdapter
      */
     public static final String RAW_PREFIX_LIKE_STATEMENTS = "RawPrefixLikeStatements";
 
+    public static final String INCLUDE_TABLE_INDEX_STATISTICS = "IncludeTableIndexStatistics";
+
     /**
      * Initialise the datastore adapter.
      * @param handler SchemaHandler that we initialise the types for
@@ -566,6 +570,20 @@ public interface DatastoreAdapter
      * @return The keyword for a column using auto-increment/identity
      */
     String getIdentityKeyword(StoreManager storeMgr);
+
+    /**
+     * Accessor for the identity (auto-increment) keyword for generating DDLs (CREATE TABLEs...).
+     * Provides the {@link ColumnMapping} as context for data stores that have different identity
+     * keywords based on the mapped Java / JDBC type.
+     * Defaults to {@link #getIdentityKeyword(StoreManager)} for backward-compatibility.
+     * @param storeMgr The Store manager
+     * @param columnMapping The column mapping
+     * @return The keyword for a column using auto-increment/identity
+     */
+    default String getIdentityKeyword(StoreManager storeMgr, ColumnMapping columnMapping)
+    {
+        return getIdentityKeyword(storeMgr);
+    }
 
     /**
      * Method to return the maximum length of a datastore identifier of the specified type.
@@ -1033,7 +1051,7 @@ public interface DatastoreAdapter
      * @param operationName operation name
      * @return SQLOperation class (or null if none available)
      */
-    Class getSQLOperationClass(String operationName);
+    Class<? extends SQLOperation> getSQLOperationClass(String operationName);
 
     /**
      * Accessor for the SQLMethod class for the query invocation of specified class + method name (if available for this datastore).
@@ -1042,7 +1060,7 @@ public interface DatastoreAdapter
      * @param clr ClassLoader resolver, in case <cite>className</cite> is a subclass of a supported type
      * @return The SQLMethod class (or null if not defined for this datastore).
      */
-    Class getSQLMethodClass(String className, String methodName, ClassLoaderResolver clr);
+    Class<? extends SQLMethod> getSQLMethodClass(String className, String methodName, ClassLoaderResolver clr);
 
     /**
      * Method to register a column mapping for a specified java type, and against particular JDBC/SQL type.

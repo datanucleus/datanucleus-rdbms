@@ -60,7 +60,8 @@ public class MapExpression extends SQLExpression
         return this.alias;
     }
 
-    public SQLExpression invoke(String methodName, List args)
+    @Override
+    public SQLExpression invoke(String methodName, List<SQLExpression> args)
     {
         return stmt.getRDBMSManager().getSQLExpressionFactory().invokeMethod(stmt, Map.class.getName(), methodName, this, args);
     }

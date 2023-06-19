@@ -340,7 +340,7 @@ public class FKSetStore<E> extends AbstractSetStore<E>
     }
 
     @Override
-    public void update(DNStateManager ownerSM, Collection coll)
+    public void update(DNStateManager ownerSM, Collection<? extends E> coll)
     {
         if (coll == null || coll.isEmpty())
         {
@@ -350,11 +350,11 @@ public class FKSetStore<E> extends AbstractSetStore<E>
 
         // Find existing elements, and remove any that are no longer present
         // TODO Create set of elements to remove and remove in one call, and add new ones in one call
-        Iterator elemIter = iterator(ownerSM);
-        Collection existing = new HashSet();
+        Iterator<E> elemIter = iterator(ownerSM);
+        Collection<E> existing = new HashSet<>();
         while (elemIter.hasNext())
         {
-            Object elem = elemIter.next();
+            E elem = elemIter.next();
             if (!coll.contains(elem))
             {
                 remove(ownerSM, elem, -1, true);
@@ -368,7 +368,7 @@ public class FKSetStore<E> extends AbstractSetStore<E>
         if (existing.size() != coll.size())
         {
             // Add any elements that aren't already present
-            Iterator<E> iter = coll.iterator();
+            Iterator<? extends E> iter = coll.iterator();
             while (iter.hasNext())
             {
                 E elem = iter.next();
@@ -423,7 +423,7 @@ public class FKSetStore<E> extends AbstractSetStore<E>
                 // Find which of these subclasses is appropriate for this element
                 for (int i=0;i<managingCmds.length;i++)
                 {
-                    Class tblCls = clr.classForName(managingCmds[i].getFullClassName());
+                    Class<?> tblCls = clr.classForName(managingCmds[i].getFullClassName());
                     if (tblCls.isAssignableFrom(element.getClass()))
                     {
                         elementTable = storeMgr.getDatastoreClass(managingCmds[i].getFullClassName(), clr);
@@ -562,7 +562,7 @@ public class FKSetStore<E> extends AbstractSetStore<E>
     }
  
     @Override
-    public boolean addAll(DNStateManager ownerSM, Collection<E> elements, int size)
+    public boolean addAll(DNStateManager ownerSM, Collection<? extends E> elements, int size)
     {
         if (elements == null || elements.size() == 0)
         {
@@ -1141,14 +1141,13 @@ public class FKSetStore<E> extends AbstractSetStore<E>
                     ResultSet rs = sqlControl.executeStatementQuery(ec, mconn, stmt, ps);
                     try
                     {
-                        ResultObjectFactory rof = null;
                         if (elementsAreEmbedded || elementsAreSerialised)
                         {
                             throw new NucleusException("Cannot have FK set with non-persistent objects");
                         }
-                        rof = new PersistentClassROF(ec, rs, ec.getFetchPlan(), iteratorMappingClass, elementCmd, clr.classForName(elementType));
 
-                        return new CollectionStoreIterator(ownerSM, rs, rof, this);
+                        ResultObjectFactory rof = new PersistentClassROF<>(ec, rs, ec.getFetchPlan(), iteratorMappingClass, elementCmd, clr.classForName(elementType));
+                        return new CollectionStoreIterator<E>(ownerSM, rs, rof, this);
                     }
                     finally
                     {

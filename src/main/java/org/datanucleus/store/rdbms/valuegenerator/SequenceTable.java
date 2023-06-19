@@ -37,6 +37,7 @@ import org.datanucleus.store.rdbms.table.Column;
 import org.datanucleus.store.rdbms.table.TableImpl;
 import org.datanucleus.store.valuegenerator.ValueGenerationException;
 import org.datanucleus.util.Localiser;
+import org.datanucleus.util.NucleusLogger;
 
 /**
  * Class defining a table for storing generated values for use with TableGenerator.
@@ -109,10 +110,11 @@ public class SequenceTable extends TableImpl
         {
             fetchStmt += " WITH " + dba.getSelectWithLockOption();
         }
+
         fetchStmt += " WHERE " + colSequenceName.getIdentifier() + "=?";
         if (dba.supportsOption(DatastoreAdapter.LOCK_ROW_USING_SELECT_FOR_UPDATE))
         {
-            fetchStmt = dba.generateLockWithSelectForUpdate(fetchStmt);
+            fetchStmt += " " + dba.getSelectForUpdateText();
         }
         if (dba.supportsOption(DatastoreAdapter.LOCK_WITH_SELECT_WITH_UPDLOCK))
         {
@@ -296,7 +298,7 @@ public class SequenceTable extends TableImpl
         }
         catch (SQLException e)
         {
-            e.printStackTrace();
+            NucleusLogger.DATASTORE.error("Exception adding sequence", e);
             throw e;
         }
         finally

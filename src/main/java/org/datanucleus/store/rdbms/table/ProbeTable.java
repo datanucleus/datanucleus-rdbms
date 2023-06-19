@@ -39,8 +39,7 @@ import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 
 /**
- * Utility class used for detecting database schema existence and provides
- * means of determining the schema name.
+ * Utility class used for detecting database schema existence and provides means of determining the schema name.
  */ 
 public class ProbeTable extends TableImpl
 {
@@ -64,7 +63,7 @@ public class ProbeTable extends TableImpl
 
 		JavaTypeMapping mapping = storeMgr.getMappingManager().getMapping(int.class);
 		Column column = addColumn(int.class.getName(), storeMgr.getIdentifierFactory().newColumnIdentifier("UNUSED"), mapping, null);
-		getStoreManager().getMappingManager().createColumnMapping(mapping, column, int.class.getName());
+		storeMgr.getMappingManager().createColumnMapping(mapping, column, int.class.getName());
 
         state = TABLE_STATE_INITIALIZED;
     }
@@ -93,8 +92,7 @@ public class ProbeTable extends TableImpl
         DatabaseMetaData dmd = conn.getMetaData();
 
         // Make sure the table name is in the correct case.
-        // This is required by RDBMS such as PostgreSQL which allow creation in one format yet
-        // actually store it in another.
+        // This is required by RDBMS such as PostgreSQL which allow creation in one format yet actually store it in another.
         String table_name = identifier.getName();
         if (storeMgr.getIdentifierFactory().getNamingCase() == NamingCase.LOWER_CASE ||
             storeMgr.getIdentifierFactory().getNamingCase() == NamingCase.LOWER_CASE_QUOTED)

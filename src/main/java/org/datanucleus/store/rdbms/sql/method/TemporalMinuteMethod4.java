@@ -19,7 +19,6 @@ package org.datanucleus.store.rdbms.sql.method;
 
 import static java.util.Arrays.asList;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -38,9 +37,7 @@ import org.datanucleus.store.rdbms.sql.expression.TemporalExpression;
  */
 public class TemporalMinuteMethod4 extends TemporalBaseMethod
 {
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.rdbms.sql.method.SQLMethod#getExpression(org.datanucleus.store.rdbms.sql.expression.SQLExpression, java.util.List)
-     */
+    @Override
     public SQLExpression getExpression(SQLStatement stmt, SQLExpression expr, List<SQLExpression> args)
     {
         SQLExpression invokedExpr = getInvokedExpression(expr, args, "MINUTE");
@@ -50,14 +47,11 @@ public class TemporalMinuteMethod4 extends TemporalBaseMethod
         SQLExpressionFactory exprFactory = stmt.getSQLExpressionFactory();
         SQLExpression mi = exprFactory.newLiteral(stmt, mapping, "mi");
         ((StringLiteral)mi).generateStatementWithoutQuotes();
-        ArrayList funcArgs = new ArrayList();
-        funcArgs.add(mi);
 
         // CAST {invokedExpr} AS DATETIME
-        List castArgs = new ArrayList<>();
-        castArgs.add(invokedExpr);
+        List<SQLExpression> castArgs = List.of(invokedExpr);
 
-        funcArgs.add(new TemporalExpression(stmt, stmt.getSQLExpressionFactory().getMappingForType(Date.class, true), "CAST", castArgs, asList("DATETIME")));
-        return new NumericExpression(stmt, stmt.getSQLExpressionFactory().getMappingForType(int.class, true), "DATEPART", funcArgs);
+        List<SQLExpression> funcArgs = List.of(mi, new TemporalExpression(stmt, exprFactory.getMappingForType(Date.class, true), "CAST", castArgs, asList("DATETIME")));
+        return new NumericExpression(stmt, exprFactory.getMappingForType(int.class, true), "DATEPART", funcArgs);
     }
 }

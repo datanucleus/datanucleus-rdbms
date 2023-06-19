@@ -35,16 +35,17 @@ import org.datanucleus.store.rdbms.sql.expression.StringExpression;
  */
 public class AvgWithCastFunction extends AvgFunction
 {
-    protected SQLExpression getAggregateExpression(SQLStatement stmt, List args, JavaTypeMapping m)
+    @Override
+    protected SQLExpression getAggregateExpression(SQLStatement stmt, List<SQLExpression> args, JavaTypeMapping m)
     {
-        Class argType = ((SQLExpression) args.get(0)).getJavaTypeMapping().getJavaType();
+        Class argType = args.get(0).getJavaTypeMapping().getJavaType();
 
         List<SQLExpression> checkedArgs = null;
 
         // Only add the CAST if the argument is a non-floating point
         if (!argType.equals(Double.class) && !argType.equals(Float.class))
         {
-            SQLExpression argExpr = (SQLExpression)args.get(0);
+            SQLExpression argExpr = args.get(0);
 
             // Check for an arg that is "AVG(DISTINCT argExpr)", remove DISTINCT, apply CAST, reapply DISTINCT
             boolean applyDistinct = false;

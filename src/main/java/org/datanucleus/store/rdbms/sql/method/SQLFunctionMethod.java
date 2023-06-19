@@ -37,17 +37,15 @@ import org.datanucleus.store.rdbms.sql.expression.StringLiteral;
  */
 public class SQLFunctionMethod implements SQLMethod
 {
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.rdbms.sql.method.SQLMethod#getExpression(org.datanucleus.store.rdbms.sql.expression.SQLExpression, java.util.List)
-     */
-    public SQLExpression getExpression(SQLStatement stmt, SQLExpression ignore, List args)
+    @Override
+    public SQLExpression getExpression(SQLStatement stmt, SQLExpression ignore, List<SQLExpression> args)
     {
         if (args == null || args.size() < 1)
         {
             throw new NucleusUserException("Cannot invoke SQL_function() without first argument defining the function");
         }
 
-        SQLExpression expr = (SQLExpression)args.get(0);
+        SQLExpression expr = args.get(0);
         if (!(expr instanceof StringLiteral))
         {
            throw new NucleusUserException("Cannot use SQL_function() without first argument defining the function");
@@ -64,7 +62,6 @@ public class SQLFunctionMethod implements SQLMethod
         JavaTypeMapping m = new SQLFunctionMapping();
         m.initialize(stmt.getRDBMSManager(), null);
 
-        ObjectExpression retExpr = new ObjectExpression(stmt, m, sql, funcArgs);
-        return retExpr;
+        return new ObjectExpression(stmt, m, sql, funcArgs);
     }
 }

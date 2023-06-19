@@ -43,10 +43,8 @@ public class AvgFunction extends SimpleNumericAggregateMethod
         return "AVG";
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.rdbms.sql.method.SQLMethod#getExpression(org.datanucleus.store.rdbms.sql.expression.SQLExpression, java.util.List)
-     */
-    public SQLExpression getExpression(SQLStatement stmt, SQLExpression expr, List args)
+    @Override
+    public SQLExpression getExpression(SQLStatement stmt, SQLExpression expr, List<SQLExpression> args)
     {
         if (expr != null)
         {
@@ -72,7 +70,7 @@ public class AvgFunction extends SimpleNumericAggregateMethod
 
         // Handle as Subquery "SELECT AVG(expr) FROM tbl"
         ClassLoaderResolver clr = stmt.getQueryGenerator().getClassLoaderResolver();
-        SQLExpression argExpr = (SQLExpression)args.get(0);
+        SQLExpression argExpr = args.get(0);
         SelectStatement subStmt = new SelectStatement(stmt, stmt.getRDBMSManager(), argExpr.getSQLTable().getTable(), argExpr.getSQLTable().getAlias(), null);
         subStmt.setClassLoaderResolver(clr);
 
@@ -86,7 +84,7 @@ public class AvgFunction extends SimpleNumericAggregateMethod
         return subqExpr;
     }
 
-    protected SQLExpression getAggregateExpression(SQLStatement stmt, List args, JavaTypeMapping m)
+    protected SQLExpression getAggregateExpression(SQLStatement stmt, List<SQLExpression> args, JavaTypeMapping m)
     {
         return new AggregateNumericExpression(stmt, m, getFunctionName(), args);
     }

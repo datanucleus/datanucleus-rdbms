@@ -104,13 +104,13 @@ public abstract class AbstractListStore<E> extends AbstractCollectionStore<E> im
     }
 
     @Override
-    public boolean addAll(DNStateManager ownerSM, Collection<E> elements, int size)
+    public boolean addAll(DNStateManager ownerSM, Collection<? extends E> elements, int size)
     {
         return internalAdd(ownerSM, 0, true, elements, size);
     }
 
     @Override
-    public boolean addAll(DNStateManager ownerSM, Collection<E> elements, int index, int size)
+    public boolean addAll(DNStateManager ownerSM, Collection<? extends E> elements, int index, int size)
     {
         return internalAdd(ownerSM, index, false, elements, size);
     }
@@ -124,7 +124,7 @@ public abstract class AbstractListStore<E> extends AbstractCollectionStore<E> im
      * @param size Current size of List (if known). -1 if not known
      * @return Whether it was successful
      */
-    protected abstract boolean internalAdd(DNStateManager ownerSM, int startAt, boolean atEnd, Collection<E> elements, int size);
+    protected abstract boolean internalAdd(DNStateManager ownerSM, int startAt, boolean atEnd, Collection<? extends E> elements, int size);
 
     @Override
     public E get(DNStateManager ownerSM, int index)
@@ -215,8 +215,8 @@ public abstract class AbstractListStore<E> extends AbstractCollectionStore<E> im
     @Override
     public java.util.List<E> subList(DNStateManager sm, int startIdx, int endIdx)
     {
-        ListIterator iter = listIterator(sm, startIdx, endIdx);
-        java.util.List list = new ArrayList();
+        ListIterator<E> iter = listIterator(sm, startIdx, endIdx);
+        java.util.List<E> list = new ArrayList<>();
         while (iter.hasNext())
         {
             list.add(iter.next());
@@ -278,7 +278,7 @@ public abstract class AbstractListStore<E> extends AbstractCollectionStore<E> im
                         }
                     }
 
-                    List<Integer> indexes = new ArrayList();
+                    List<Integer> indexes = new ArrayList<>();
                     ResultSet rs = sqlControl.executeStatementQuery(ec, mconn, stmt, ps);
                     try
                     {
@@ -473,7 +473,7 @@ public abstract class AbstractListStore<E> extends AbstractCollectionStore<E> im
                 }
 
                 // Execute the statement
-                return sqlControl.executeStatementUpdate(ec, conn, shiftStmt, ps, executeNow);
+                return sqlControl.executeStatementUpdate(ec, conn, shiftBulkStmt, ps, executeNow);
             }
             finally
             {

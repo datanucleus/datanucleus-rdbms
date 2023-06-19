@@ -17,15 +17,12 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.store.rdbms.sql.method;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
-import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.expression.NumericExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
-import org.datanucleus.store.rdbms.sql.expression.SQLExpressionFactory;
 
 /**
  * Method for evaluating YEAR({dateExpr}) using SQLite.
@@ -40,12 +37,9 @@ public class TemporalYearMethod4 extends TemporalBaseMethod
     {
         SQLExpression invokedExpr = getInvokedExpression(expr, args, "YEAR");
 
-        RDBMSStoreManager storeMgr = stmt.getRDBMSManager();
-        JavaTypeMapping mapping = storeMgr.getMappingManager().getMapping(String.class);
-        ArrayList funcArgs = new ArrayList();
-        SQLExpressionFactory exprFactory = stmt.getSQLExpressionFactory();
-        funcArgs.add(exprFactory.newLiteral(stmt, mapping, "%Y"));
-        funcArgs.add(invokedExpr);
+        JavaTypeMapping mapping = stmt.getRDBMSManager().getMappingManager().getMapping(String.class);
+
+        List<SQLExpression> funcArgs = List.of(stmt.getSQLExpressionFactory().newLiteral(stmt, mapping, "%Y"), invokedExpr);
         return new NumericExpression(stmt, stmt.getSQLExpressionFactory().getMappingForType(int.class, true), "strftime", funcArgs);
     }
 }

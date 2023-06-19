@@ -286,11 +286,11 @@ public class SQLExpressionFactory
         SQLTable exprSqlTbl = SQLStatementHelper.getSQLTableForMappingOfTable(stmt, sqlTbl, parentMapping == null ? mapping : parentMapping);
         Object[] args = new Object[] {stmt, exprSqlTbl, mapping};
 
-        Class expressionClass = expressionClassByMappingName.get(mapping.getClass().getName());
+        Class<? extends SQLExpression> expressionClass = expressionClassByMappingName.get(mapping.getClass().getName());
         if (expressionClass != null)
         {
             // Use built-in expression class
-            return (SQLExpression)ClassUtils.newInstance(expressionClass, EXPR_CREATION_ARG_TYPES, new Object[] {stmt, exprSqlTbl, mapping});
+            return ClassUtils.newInstance(expressionClass, EXPR_CREATION_ARG_TYPES, new Object[] {stmt, exprSqlTbl, mapping});
         }
 
         try
@@ -461,7 +461,7 @@ public class SQLExpressionFactory
      * @param args Any arguments to the method call
      * @return The result
      */
-    public SQLExpression invokeMethod(SQLStatement stmt, String className, String methodName, SQLExpression expr, List args)
+    public SQLExpression invokeMethod(SQLStatement stmt, String className, String methodName, SQLExpression expr, List<SQLExpression> args)
     {
         SQLMethod method = getMethod(className, methodName, args);
         if (method != null)
@@ -544,13 +544,13 @@ public class SQLExpressionFactory
         }
 
         // No existing instance, so check the built-in SQLMethods from DatastoreAdapter
-        Class sqlMethodCls = storeMgr.getDatastoreAdapter().getSQLMethodClass(className, methodName, clr);
+        Class<? extends SQLMethod> sqlMethodCls = storeMgr.getDatastoreAdapter().getSQLMethodClass(className, methodName, clr);
         if (sqlMethodCls != null)
         {
             // Built-in SQLMethod found, so instantiate it, cache it and return it
             try
             {
-                method = (SQLMethod) sqlMethodCls.getDeclaredConstructor().newInstance();
+                method = sqlMethodCls.getDeclaredConstructor().newInstance();
                 MethodKey key = getSQLMethodKey(datastoreId, className, methodName);
                 sqlMethodsByKey.put(key, method);
                 return method;
@@ -574,14 +574,14 @@ public class SQLExpressionFactory
                 boolean unsupported = true;
                 if (!StringUtils.isWhitespace(className))
                 {
-                    Class cls = clr.classForName(className);
+                    Class<?> cls = clr.classForName(className);
 
                     // Try datastore-dependent
                     for (MethodKey methodKey : pluginSqlMethodsKeysSupported)
                     {
                         if (methodKey.methodName.equals(methodName) && methodKey.datastoreName.equals(datastoreId))
                         {
-                            Class methodCls = null;
+                            Class<SQLMethod> methodCls = null;
                             try
                             {
                                 methodCls = clr.classForName(methodKey.clsName);
@@ -619,7 +619,7 @@ public class SQLExpressionFactory
                         {
                             if (methodKey.methodName.equals(methodName) && methodKey.datastoreName.equals("ALL"))
                             {
-                                Class methodCls = null;
+                                Class<SQLMethod> methodCls = null;
                                 try
                                 {
                                     methodCls = clr.classForName(methodKey.clsName);
@@ -721,13 +721,13 @@ public class SQLExpressionFactory
         }
 
         // Check for built-in SQLOperation class definition
-        Class sqlOpClass = dba.getSQLOperationClass(name);
+        Class<? extends SQLOperation> sqlOpClass = dba.getSQLOperationClass(name);
         if (sqlOpClass != null)
         {
             try
             {
                 // Instantiate it
-                operation = (SQLOperation) sqlOpClass.getDeclaredConstructor().newInstance();
+                operation = sqlOpClass.getDeclaredConstructor().newInstance();
                 sqlOperationsByName.put(name, operation);
                 return operation.getExpression(expr, expr2);
             }
