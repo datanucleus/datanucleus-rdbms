@@ -181,7 +181,8 @@ public class InsertRequest extends Request
         table.providePrimaryKeyMappings(consumer);
         table.provideSurrogateMapping(SurrogateColumnType.VERSION, consumer);
         boolean discriminatorColumnAlreadyMapped = cmd.getDiscriminatorColumnName()!=null && consumer.assignedColumns.containsKey(cmd.getDiscriminatorColumnName().toUpperCase());
-        if (!discriminatorColumnAlreadyMapped) {
+        if (!discriminatorColumnAlreadyMapped)
+        {
             table.provideSurrogateMapping(SurrogateColumnType.DISCRIMINATOR, consumer);
         }
         table.provideSurrogateMapping(SurrogateColumnType.MULTITENANCY, consumer);

@@ -1036,17 +1036,20 @@ public final class SQLQuery extends Query
      * An index of a column in a field mapping. Necessary to ensure that parameter
      * positions are bound to the correct fields in multi-column mappings.
      */
-    private static class FieldAndColumn {
+    private static class FieldAndColumn
+    {
         private final int fieldNumber;
         private final int columnIndex;
 
-        private FieldAndColumn(int fieldNumber, int columnIndex) {
+        private FieldAndColumn(int fieldNumber, int columnIndex)
+        {
             this.fieldNumber = fieldNumber;
             this.columnIndex = columnIndex;
         }
 
         @Override
-        public String toString() {
+        public String toString()
+        {
             return fieldNumber + ":" + columnIndex;
         }
     }
