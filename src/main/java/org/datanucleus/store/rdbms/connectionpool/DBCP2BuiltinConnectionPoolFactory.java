@@ -141,6 +141,23 @@ public class DBCP2BuiltinConnectionPoolFactory extends AbstractConnectionPoolFac
                 }
             }
 
+            if (storeMgr.hasProperty(RDBMSPropertyNames.PROPERTY_CONNECTION_POOL_MAX_LIFETIME))
+            {
+                // how long time a connection can be active before being retired (on next return)
+                int value = storeMgr.getIntProperty(RDBMSPropertyNames.PROPERTY_CONNECTION_POOL_MAX_LIFETIME);
+                if (value > 0)
+                {
+                    connectionPool.setTestOnReturn(true);
+                    poolableCF.setMaxConnLifetimeMillis(value);
+                }
+            }
+
+            if (storeMgr.hasProperty(RDBMSPropertyNames.PROPERTY_CONNECTION_POOL_AUTO_COMMIT))
+            {
+                boolean autoCommit = storeMgr.getBooleanProperty(RDBMSPropertyNames.PROPERTY_CONNECTION_POOL_AUTO_COMMIT);
+                poolableCF.setAutoCommitOnReturn(autoCommit);
+            }
+
             // Create the datasource
             ds = new org.datanucleus.store.rdbms.datasource.dbcp2.PoolingDataSource(connectionPool);
         }
