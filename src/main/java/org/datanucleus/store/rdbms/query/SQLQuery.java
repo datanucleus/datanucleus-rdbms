@@ -1033,6 +1033,28 @@ public final class SQLQuery extends Query
     }
 
     /**
+     * An index of a column in a field mapping. Necessary to ensure that parameter
+     * positions are bound to the correct fields in multi-column mappings.
+     */
+    private static class FieldAndColumn
+    {
+        private final int fieldNumber;
+        private final int columnIndex;
+
+        private FieldAndColumn(int fieldNumber, int columnIndex)
+        {
+            this.fieldNumber = fieldNumber;
+            this.columnIndex = columnIndex;
+        }
+
+        @Override
+        public String toString()
+        {
+            return fieldNumber + ":" + columnIndex;
+        }
+    }
+
+    /**
      * Method to generate a ResultObjectFactory for converting rows of the provided ResultSet into instances of the candidate class. 
      * Populates "stmtMappings".
      * @param rs The ResultSet
@@ -1049,7 +1071,7 @@ public final class SQLQuery extends Query
         // Create an index listing for ALL (fetchable) fields in the result class.
         final AbstractClassMetaData candidateCmd = ec.getMetaDataManager().getMetaDataForClass(candidateClass, clr);
         int fieldCount = candidateCmd.getNoOfManagedMembers() + candidateCmd.getNoOfInheritedManagedMembers();
-        Map columnFieldNumberMap = new HashMap(); // Map of field numbers keyed by the column name
+        Map<String, Collection<FieldAndColumn>> columnFieldNumberMap = new HashMap<>(); // Map of field numbers keyed by the column name
         stmtMappings = new StatementMappingIndex[fieldCount];
         DatastoreClass tbl = storeMgr.getDatastoreClass(candidateClass.getName(), clr);
         for (int fieldNumber = 0; fieldNumber < fieldCount; ++fieldNumber)
@@ -1080,14 +1102,20 @@ public final class SQLQuery extends Query
                         for (int colNum = 0;colNum<mmd.getColumnMetaData().length;colNum++)
                         {
                             columnName = mmd.getColumnMetaData()[colNum].getName();
-                            columnFieldNumberMap.put(columnName, Integer.valueOf(fieldNumber));
+                            if (columnName!=null)
+                            {
+                                columnFieldNumberMap.computeIfAbsent(columnName.toLowerCase(), k -> new ArrayList<>()).add(new FieldAndColumn(fieldNumber, colNum));
+                            }
                         }
                     }
                     else
                     {
                         columnName = storeMgr.getIdentifierFactory().newColumnIdentifier(
                             fieldName, ec.getNucleusContext().getTypeManager().isDefaultEmbeddedType(fieldType), FieldRole.ROLE_NONE, false).getName();
-                        columnFieldNumberMap.put(columnName, Integer.valueOf(fieldNumber));
+                        if (columnName!=null)
+                        {
+                            columnFieldNumberMap.computeIfAbsent(columnName.toLowerCase(), k -> new ArrayList<>()).add(new FieldAndColumn(fieldNumber, 0));
+                        }
                     }
                 }
                 else
@@ -1145,48 +1173,27 @@ public final class SQLQuery extends Query
         int[] versionIndex = null;
         int[] discrimIndex = null;
 
-        int[] matchedFieldNumbers = new int[colCount];
-        int fieldNumberPosition = 0;
+        List<Integer> matchedFieldNumbers = new ArrayList<>();
         for (int colNum=1; colNum<=colCount; ++colNum)
         {
             String colName = rsmd.getColumnName(colNum);
 
             // Find the field for this column
-            int fieldNumber = -1;
-            Integer fieldNum = (Integer)columnFieldNumberMap.get(colName);
-            if (fieldNum == null)
-            {
-                // Try column name in lowercase
-                fieldNum = (Integer)columnFieldNumberMap.get(colName.toLowerCase());
-                if (fieldNum == null)
-                {
-                    // Try column name in UPPERCASE
-                    fieldNum = (Integer)columnFieldNumberMap.get(colName.toUpperCase());
-                }
-            }
-
+            Collection<FieldAndColumn> fieldNum = columnFieldNumberMap.get(colName.toLowerCase());
             if (fieldNum != null)
             {
-                fieldNumber = fieldNum.intValue();
-            }
-            if (fieldNumber >= 0)
-            {
-                int[] exprIndices = null;
-                if (stmtMappings[fieldNumber].getColumnPositions() != null)
+                for (FieldAndColumn fieldAndColumnNumber : fieldNum)
                 {
-                    exprIndices = new int[stmtMappings[fieldNumber].getColumnPositions().length+1];
-                    for (int i=0;i<stmtMappings[fieldNumber].getColumnPositions().length;i++)
-                    {
-                        exprIndices[i] = stmtMappings[fieldNumber].getColumnPositions()[i];
-                    }
-                    exprIndices[exprIndices.length-1] = colNum;
+                    int fieldNumber = fieldAndColumnNumber.fieldNumber;
+                    int columnIndex = fieldAndColumnNumber.columnIndex;
+
+                    StatementMappingIndex smi = stmtMappings[fieldNumber];
+                    if (smi.getColumnPositions() == null)
+                        smi.setColumnPositions(new int[smi.getMapping().getNumberOfColumnMappings()]);
+
+                    smi.getColumnPositions()[columnIndex] = colNum;
+                    matchedFieldNumbers.add(fieldNumber);
                 }
-                else
-                {
-                    exprIndices = new int[] {colNum};
-                }
-                stmtMappings[fieldNumber].setColumnPositions(exprIndices);
-                matchedFieldNumbers[fieldNumberPosition++] = fieldNumber;
             }
 
             if (discrimColName != null && colName.equals(discrimColName))
@@ -1214,17 +1221,10 @@ public final class SQLQuery extends Query
             }
         }
 
-        // Set the field numbers found to match what we really have
-        int[] fieldNumbers = new int[fieldNumberPosition];
-        for (int i=0;i<fieldNumberPosition;i++)
-        {
-            fieldNumbers[i] = matchedFieldNumbers[i];
-        }
-
         StatementClassMapping mappingDefinition = new StatementClassMapping();
-        for (int i=0;i<fieldNumbers.length;i++)
+        for (Integer fieldNumber : matchedFieldNumbers)
         {
-            mappingDefinition.addMappingForMember(fieldNumbers[i], stmtMappings[fieldNumbers[i]]);
+            mappingDefinition.addMappingForMember(fieldNumber, stmtMappings[fieldNumber]);
         }
         if (datastoreIndex != null)
         {

@@ -180,7 +180,11 @@ public class InsertRequest extends Request
         table.provideNonPrimaryKeyMappings(consumer);
         table.providePrimaryKeyMappings(consumer);
         table.provideSurrogateMapping(SurrogateColumnType.VERSION, consumer);
-        table.provideSurrogateMapping(SurrogateColumnType.DISCRIMINATOR, consumer);
+        boolean discriminatorColumnAlreadyMapped = cmd.getDiscriminatorColumnName()!=null && consumer.assignedColumns.containsKey(cmd.getDiscriminatorColumnName().toUpperCase());
+        if (!discriminatorColumnAlreadyMapped)
+        {
+            table.provideSurrogateMapping(SurrogateColumnType.DISCRIMINATOR, consumer);
+        }
         table.provideSurrogateMapping(SurrogateColumnType.MULTITENANCY, consumer);
         table.provideSurrogateMapping(SurrogateColumnType.SOFTDELETE, consumer);
         table.provideSurrogateMapping(SurrogateColumnType.CREATE_USER, consumer);
@@ -448,7 +452,7 @@ public class InsertRequest extends Request
                     }
 
                     JavaTypeMapping discrimMapping = table.getSurrogateMapping(SurrogateColumnType.DISCRIMINATOR, false);
-                    if (discrimMapping != null)
+                    if (discrimMapping != null && discriminatorStmtMapping!=null)
                     {
                         // Discriminator mapping
                         Object discVal = sm.getClassMetaData().getDiscriminatorValue();
@@ -961,7 +965,7 @@ public class InsertRequest extends Request
 
                             if (!columnExists)
                             {
-                                assignedColumns.put(c.getIdentifier().toString(), Integer.valueOf(mmd.getAbsoluteFieldNumber()));
+                                assignedColumns.put(c.getIdentifier().toString(), parametersIndex[j]);
                             }
                         }
                         else

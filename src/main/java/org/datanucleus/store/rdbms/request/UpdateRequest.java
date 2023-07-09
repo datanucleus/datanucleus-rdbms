@@ -715,11 +715,14 @@ public class UpdateRequest extends Request
                             {
                                 updateFields.add(abs_field_num);
                             }
-                            parametersIndex[j] = paramIndex++;
+                            if (!columnExists)
+                            {
+                                parametersIndex[j] = paramIndex++;
+                            }
                         }
                         if (!columnExists)
                         {
-                            assignedColumns.put(columnId.toString(), Integer.valueOf(mmd.getAbsoluteFieldNumber()));
+                            assignedColumns.put(columnId.toString(), parametersIndex[j]);
                         }
                     }
                 }
