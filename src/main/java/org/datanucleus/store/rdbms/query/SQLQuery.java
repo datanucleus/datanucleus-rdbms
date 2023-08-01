@@ -694,7 +694,7 @@ public final class SQLQuery extends Query
 
                             final QueryResult qr1 = qr;
                             final ManagedConnection mconn1 = mconn;
-                            mconn.addListener(new ManagedConnectionResourceListener()
+                            final ManagedConnectionResourceListener listener = new ManagedConnectionResourceListener()
                             {
                                 public void transactionFlushed(){}
                                 public void transactionPreClose()
@@ -715,7 +715,9 @@ public final class SQLQuery extends Query
                                 {
                                     mconn1.removeListener(this);
                                 }
-                            });                            
+                            };
+                            mconn.addListener(listener);
+                            qr.addConnectionListener(listener);
                         }
                         finally
                         {
@@ -1190,6 +1192,15 @@ public final class SQLQuery extends Query
                     StatementMappingIndex smi = stmtMappings[fieldNumber];
                     if (smi.getColumnPositions() == null)
                         smi.setColumnPositions(new int[smi.getMapping().getNumberOfColumnMappings()]);
+
+                    // Help detect bad SQL referring ambiguous column name.
+                    int previousColNum = smi.getColumnPositions()[columnIndex];
+                    if (previousColNum != 0)
+                    {
+                        NucleusLogger.QUERY.warn("The column name '" + colName +
+                                "' is duplicated in select (at index " + previousColNum + " and " + colNum +
+                                ") -- fix this to avoid nasty surprises!");
+                    }
 
                     smi.getColumnPositions()[columnIndex] = colNum;
                     matchedFieldNumbers.add(fieldNumber);
