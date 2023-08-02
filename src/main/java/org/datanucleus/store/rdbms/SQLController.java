@@ -714,7 +714,7 @@ public class SQLController
     protected void setConnectionStatementState(final ManagedConnection conn, ConnectionStatementState state)
     {
         connectionStatements.put(conn, state);
-        conn.addListener(new ManagedConnectionResourceListener()
+        ManagedConnectionResourceListener listener = new ManagedConnectionResourceListener()
         {
             public void transactionFlushed()
             {
@@ -752,6 +752,7 @@ public class SQLController
             public void managedConnectionPreClose(){}
             public void managedConnectionPostClose(){}
             public void resourcePostClose(){}
-        });
+        };
+        conn.addListener(listener);
     }
 }
