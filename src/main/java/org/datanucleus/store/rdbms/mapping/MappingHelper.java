@@ -153,7 +153,7 @@ public class MappingHelper
         // Abstract class
         if (((ClassMetaData)cmd).isAbstract() && cmd.getObjectidClass() != null)
         {
-            return getObjectForAbstractClass(ec, mapping, rs, resultIndexes, cmd);
+            return getObjectIdentityForAbstractClass(ec, mapping, rs, resultIndexes, cmd);
         }
 
         int totalFieldCount = cmd.getNoOfManagedMembers() + cmd.getNoOfInheritedManagedMembers();
@@ -263,7 +263,7 @@ public class MappingHelper
      * @param cmd the AbstractClassMetaData
      * @return the id
      */
-    protected static Object getObjectForAbstractClass(ExecutionContext ec, JavaTypeMapping mapping, final ResultSet rs, int[] resultIndexes, AbstractClassMetaData cmd)
+    protected static Object getObjectIdentityForAbstractClass(ExecutionContext ec, JavaTypeMapping mapping, final ResultSet rs, int[] resultIndexes, AbstractClassMetaData cmd)
     {
         ClassLoaderResolver clr = ec.getClassLoaderResolver();
 
@@ -272,7 +272,21 @@ public class MappingHelper
         Object id = (cmd.usesSingleFieldIdentityClass()) ?
             createSingleFieldIdentity(ec, mapping, rs, resultIndexes, cmd, objectIdClass, clr.classForName(cmd.getFullClassName())) :
             createObjectIdentityUsingReflection(ec, mapping, rs, resultIndexes, cmd, objectIdClass);
+        return id;
+    }
 
+    /**
+     * Create an object instance and fill the fields using reflection
+     * @param ec ExecutionContext
+     * @param mapping Mapping in which this is returned
+     * @param rs the ResultSet
+     * @param resultIndexes indexes of the result set to use
+     * @param cmd the AbstractClassMetaData
+     * @return the id
+     */
+    protected static Object getObjectForAbstractClass(ExecutionContext ec, JavaTypeMapping mapping, final ResultSet rs, int[] resultIndexes, AbstractClassMetaData cmd)
+    {
+        Object id = getObjectIdentityForAbstractClass(ec, mapping, rs, resultIndexes, cmd);
         return ec.findObject(id, false, true, null);
     }
 
@@ -364,7 +378,8 @@ public class MappingHelper
         catch (Exception e)
         {
             AbstractMemberMetaData mmd = mapping.getMemberMetaData();
-            NucleusLogger.PERSISTENCE.error(Localiser.msg("041037", cmd.getObjectidClass(), mmd == null ? null : mmd.getName(), fieldValue, e));
+            Object mmdName = mmd == null ? null : mmd.getClassName(false) + "." + mmd.getName();
+            NucleusLogger.PERSISTENCE.error(Localiser.msg("041037", cmd.getObjectidClass(), mmdName, fieldValue, e));
             return null;
         }
     }
