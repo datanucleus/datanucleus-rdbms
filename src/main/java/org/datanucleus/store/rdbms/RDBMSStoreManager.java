@@ -264,8 +264,8 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
 
     private Map<String, Store> backingStoreByMemberName = new ConcurrentHashMap<>();
 
-	private static final ConcurrentFixedCache<String, NoTableManagedException> noTableManagedExceptionCache =
-			new ConcurrentFixedCache<>(NoTableManagedException::new);
+    private static final ConcurrentFixedCache<String, NoTableManagedException> noTableManagedExceptionCache =
+            new ConcurrentFixedCache<>(NoTableManagedException::new);
 
     /**
      * Constructs a new RDBMSManager. 
@@ -282,14 +282,14 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
     {
         super("rdbms", clr, ctx, props);
 
-		initRDBMSStoreManager(clr, ctx, props);
-	}
+        initRDBMSStoreManager(clr, ctx, props);
+    }
 
-	protected void initRDBMSStoreManager(ClassLoaderResolver clr, PersistenceNucleusContext ctx, Map<String, Object> props)
-	{
-		persistenceHandler = createPersistenceHandler();
-		flushProcess = createFlushProcess();
-		schemaHandler = createSchemaHandler();
+    protected void initRDBMSStoreManager(ClassLoaderResolver clr, PersistenceNucleusContext ctx, Map<String, Object> props)
+    {
+        persistenceHandler = createPersistenceHandler();
+        flushProcess = createFlushProcess();
+        schemaHandler = createSchemaHandler();
 
         // Retrieve the Database Adapter for this datastore
         try
@@ -398,20 +398,20 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
         }
     }
 
-	protected RDBMSSchemaHandler createSchemaHandler()
-	{
-		return new RDBMSSchemaHandler(this);
-	}
+    protected RDBMSSchemaHandler createSchemaHandler()
+    {
+        return new RDBMSSchemaHandler(this);
+    }
 
-	protected static FlushOrdered createFlushProcess()
-	{
-		return new FlushOrdered(); // TODO Change this to FlushReferential when we have it complete
-	}
+    protected static FlushOrdered createFlushProcess()
+    {
+        return new FlushOrdered(); // TODO Change this to FlushReferential when we have it complete
+    }
 
-	protected RDBMSPersistenceHandler createPersistenceHandler()
-	{
-		return new RDBMSPersistenceHandler(this);
-	}
+    protected RDBMSPersistenceHandler createPersistenceHandler()
+    {
+        return new RDBMSPersistenceHandler(this);
+    }
 
     /* (non-Javadoc)
      * @see org.datanucleus.store.StoreManager#getQueryCacheKey()
@@ -676,7 +676,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
         // Note : "subclass-table" inheritance strategies will return null from this method
         if (!classKnown && ct == null)
         {
-			throw noTableManagedExceptionCache.get(className);
+            throw noTableManagedExceptionCache.get(className);
         }
 
         return ct;
@@ -1956,40 +1956,40 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
         return rootCmd.getFullClassName();
     }
 
-	/**
-	 * Return a custom class-name-resolver.
-	 * Return null to leave class name resolving to normal configuration.
-	 * @param ec Execution context
-	 * @param persistentClass the candidate persistent class
-	 * @param resultMapping Mapping used for query
-	 * @return null if no custom class name resolver is in use for supplied candidate class,
-	 * otherwise return a custom class name resolver instance to use.
-	 */
-	public CustomClassNameResolver getCustomClassNameResolver(ExecutionContext ec, Class persistentClass,
-															  StatementClassMapping resultMapping)
-	{
-		return null;
-	}
+    /**
+     * Return a custom class-name-resolver.
+     * Return null to leave class name resolving to normal configuration.
+     * @param ec Execution context
+     * @param persistentClass the candidate persistent class
+     * @param resultMapping Mapping used for query
+     * @return null if no custom class name resolver is in use for supplied candidate class,
+     * otherwise return a custom class name resolver instance to use.
+     */
+    public CustomClassNameResolver getCustomClassNameResolver(ExecutionContext ec, Class persistentClass,
+                                                              StatementClassMapping resultMapping)
+    {
+        return null;
+    }
 
-	/**
-	 * Return custom boolean expression for fetching object of class name.
-	 * Return null to leave SQL generation to normal configuration.
-	 * @param stmt
-	 * @param className
-	 * @param dismd
-	 * @param discriminatorMapping
-	 * @param discrimSqlTbl
-	 * @param clr
-	 * @return
-	 */
-	public BooleanExpression getCustomExpressionForDiscriminatorForClass(SQLStatement stmt, String className,
-																		 DiscriminatorMetaData dismd,
-																		 JavaTypeMapping discriminatorMapping,
-																		 SQLTable discrimSqlTbl,
-																		 ClassLoaderResolver clr)
-	{
-		return null;
-	}
+    /**
+     * Return custom boolean expression for fetching object of class name.
+     * Return null to leave SQL generation to normal configuration.
+     * @param stmt
+     * @param className
+     * @param dismd
+     * @param discriminatorMapping
+     * @param discrimSqlTbl
+     * @param clr
+     * @return
+     */
+    public BooleanExpression getCustomExpressionForDiscriminatorForClass(SQLStatement stmt, String className,
+                                                                         DiscriminatorMetaData dismd,
+                                                                         JavaTypeMapping discriminatorMapping,
+                                                                         SQLTable discrimSqlTbl,
+                                                                         ClassLoaderResolver clr)
+    {
+        return null;
+    }
 
     /**
      * Method to return the value from the results for the mapping at the specified position.

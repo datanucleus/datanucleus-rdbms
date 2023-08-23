@@ -86,7 +86,7 @@ public final class PersistentClassROF<T> extends AbstractROF<T>
     /** Resolved classes for metadata / discriminator keyed by class names. */
     private Map<String, Class> resolvedClasses = new ConcurrentReferenceHashMap<>(1, ReferenceType.STRONG, ReferenceType.SOFT);
 
-	private final CustomClassNameResolver customClassNameResolver;
+    private final CustomClassNameResolver customClassNameResolver;
 
     /**
      * Constructor.
@@ -104,11 +104,11 @@ public final class PersistentClassROF<T> extends AbstractROF<T>
         this.resultMapping = resultMapping;
         this.rootCmd = acmd;
         this.persistentClass = persistentClass;
-	    final StoreManager storeManager = ec.getStoreManager();
-	    this.customClassNameResolver = storeManager instanceof RDBMSStoreManager ?
-			    ((RDBMSStoreManager) storeManager).getCustomClassNameResolver(ec, persistentClass, resultMapping)
-			    :
-			    null;
+        final StoreManager storeManager = ec.getStoreManager();
+        this.customClassNameResolver = storeManager instanceof RDBMSStoreManager ?
+                ((RDBMSStoreManager) storeManager).getCustomClassNameResolver(ec, persistentClass, resultMapping)
+                :
+                null;
     }
 
     /* (non-Javadoc)
@@ -133,22 +133,22 @@ public final class PersistentClassROF<T> extends AbstractROF<T>
 
         // Used for reporting details of a failed class lookup by discriminator
         boolean hasDiscrimValue = false;
-	    boolean foundClassByDiscrim = false;
+        boolean foundClassByDiscrim = false;
 
         StatementMappingIndex discrimMapIdx = resultMapping.getMappingForMemberPosition(SurrogateColumnType.DISCRIMINATOR.getFieldNumber());
 
-	    if (customClassNameResolver != null)
-		{
-			className = customClassNameResolver.getCustomClassName(rs);
-			if (className != null)
-			{
-				if (discrimMapIdx != null)
-				{
-					foundClassByDiscrim = true;
-				}
-				requiresInheritanceCheck = false;
-			}
-		}
+        if (customClassNameResolver != null)
+        {
+            className = customClassNameResolver.getCustomClassName(rs);
+            if (className != null)
+            {
+                if (discrimMapIdx != null)
+                {
+                    foundClassByDiscrim = true;
+                }
+                requiresInheritanceCheck = false;
+            }
+        }
 
         if (className == null && discrimMapIdx != null)
         {
@@ -168,7 +168,7 @@ public final class PersistentClassROF<T> extends AbstractROF<T>
                 className = ec.getMetaDataManager().getClassNameFromDiscriminatorValue(discrimValue, dismd);
                 if (className != null)
                 {
-                	foundClassByDiscrim = true;
+                    foundClassByDiscrim = true;
                 }
                 requiresInheritanceCheck = false;
             }
@@ -614,9 +614,11 @@ public final class PersistentClassROF<T> extends AbstractROF<T>
             {
                 resultSetGetter.setStateManager(sm);
 
-				// We re-set version in case it has been evicted
-	            if (surrogateVersion != null && !sm.isVersionLoaded())
-		            sm.setVersion(surrogateVersion);
+                // We re-set version in case it has been evicted
+                if (surrogateVersion != null && !sm.isVersionLoaded())
+                {
+                    sm.setVersion(surrogateVersion);
+                }
 
                 if (updateAllFields)
                 {
