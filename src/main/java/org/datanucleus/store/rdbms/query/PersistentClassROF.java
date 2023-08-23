@@ -49,11 +49,14 @@ import org.datanucleus.metadata.RelationType;
 import org.datanucleus.metadata.VersionMetaData;
 import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.FieldValues;
+import org.datanucleus.store.StoreManager;
+import org.datanucleus.store.rdbms.CustomClassNameResolver;
+import org.datanucleus.store.rdbms.RDBMSStoreManager;
+import org.datanucleus.store.rdbms.fieldmanager.ResultSetGetter;
 import org.datanucleus.store.rdbms.mapping.MappingHelper;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.mapping.java.PersistableMapping;
 import org.datanucleus.store.schema.table.SurrogateColumnType;
-import org.datanucleus.store.rdbms.fieldmanager.ResultSetGetter;
 import org.datanucleus.util.ConcurrentReferenceHashMap;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
@@ -83,6 +86,8 @@ public final class PersistentClassROF<T> extends AbstractROF<T>
     /** Resolved classes for metadata / discriminator keyed by class names. */
     private Map<String, Class> resolvedClasses = new ConcurrentReferenceHashMap<>(1, ReferenceType.STRONG, ReferenceType.SOFT);
 
+	private final CustomClassNameResolver customClassNameResolver;
+
     /**
      * Constructor.
      * @param ec ExecutionContext
@@ -99,6 +104,11 @@ public final class PersistentClassROF<T> extends AbstractROF<T>
         this.resultMapping = resultMapping;
         this.rootCmd = acmd;
         this.persistentClass = persistentClass;
+	    final StoreManager storeManager = ec.getStoreManager();
+	    this.customClassNameResolver = storeManager instanceof RDBMSStoreManager ?
+			    ((RDBMSStoreManager) storeManager).getCustomClassNameResolver(ec, persistentClass, resultMapping)
+			    :
+			    null;
     }
 
     /* (non-Javadoc)
@@ -126,7 +136,21 @@ public final class PersistentClassROF<T> extends AbstractROF<T>
 	    boolean foundClassByDiscrim = false;
 
         StatementMappingIndex discrimMapIdx = resultMapping.getMappingForMemberPosition(SurrogateColumnType.DISCRIMINATOR.getFieldNumber());
-        if (discrimMapIdx != null)
+
+	    if (customClassNameResolver != null)
+		{
+			className = customClassNameResolver.getCustomClassName(rs);
+			if (className != null)
+			{
+				if (discrimMapIdx != null)
+				{
+					foundClassByDiscrim = true;
+				}
+				requiresInheritanceCheck = false;
+			}
+		}
+
+        if (className == null && discrimMapIdx != null)
         {
             // Discriminator mapping registered so use that
             try
@@ -153,7 +177,7 @@ public final class PersistentClassROF<T> extends AbstractROF<T>
                 NucleusLogger.DATASTORE_RETRIEVE.debug("Exception obtaining value of discriminator : " + sqle.getMessage());
             }
         }
-        else if (resultMapping.getNucleusTypeColumnName() != null)
+        else if (className == null && resultMapping.getNucleusTypeColumnName() != null)
         {
             // Extract the object type using the NucleusType column (if available)
             try
@@ -589,6 +613,10 @@ public final class PersistentClassROF<T> extends AbstractROF<T>
             public void fetchNonLoadedFields(DNStateManager sm)
             {
                 resultSetGetter.setStateManager(sm);
+
+				// We re-set version in case it has been evicted
+	            if (surrogateVersion != null && !sm.isVersionLoaded())
+		            sm.setVersion(surrogateVersion);
 
                 if (updateAllFields)
                 {

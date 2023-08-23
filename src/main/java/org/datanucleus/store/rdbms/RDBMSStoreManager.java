@@ -89,6 +89,7 @@ import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.ClassMetaData;
 import org.datanucleus.metadata.ClassPersistenceModifier;
 import org.datanucleus.metadata.DatastoreIdentityMetaData;
+import org.datanucleus.metadata.DiscriminatorMetaData;
 import org.datanucleus.metadata.ValueGenerationStrategy;
 import org.datanucleus.metadata.IdentityType;
 import org.datanucleus.metadata.InheritanceMetaData;
@@ -130,6 +131,7 @@ import org.datanucleus.store.rdbms.mapping.java.PersistableMapping;
 import org.datanucleus.store.rdbms.query.JDOQLQuery;
 import org.datanucleus.store.rdbms.query.JPQLQuery;
 import org.datanucleus.store.rdbms.query.SQLQuery;
+import org.datanucleus.store.rdbms.query.StatementClassMapping;
 import org.datanucleus.store.rdbms.query.StoredProcedureQuery;
 import org.datanucleus.store.rdbms.schema.JDBCTypeInfo;
 import org.datanucleus.store.rdbms.schema.RDBMSColumnInfo;
@@ -147,6 +149,9 @@ import org.datanucleus.store.rdbms.scostore.JoinListStore;
 import org.datanucleus.store.rdbms.scostore.JoinMapStore;
 import org.datanucleus.store.rdbms.scostore.JoinPersistableRelationStore;
 import org.datanucleus.store.rdbms.scostore.JoinSetStore;
+import org.datanucleus.store.rdbms.sql.SQLStatement;
+import org.datanucleus.store.rdbms.sql.SQLTable;
+import org.datanucleus.store.rdbms.sql.expression.BooleanExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpressionFactory;
 import org.datanucleus.store.rdbms.table.ArrayTable;
 import org.datanucleus.store.rdbms.table.ClassTable;
@@ -259,6 +264,9 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
 
     private Map<String, Store> backingStoreByMemberName = new ConcurrentHashMap<>();
 
+	private static final ConcurrentFixedCache<String, NoTableManagedException> noTableManagedExceptionCache =
+			new ConcurrentFixedCache<>(NoTableManagedException::new);
+
     /**
      * Constructs a new RDBMSManager. 
      * On successful return the new RDBMSManager will have successfully connected to the database with the given
@@ -274,9 +282,14 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
     {
         super("rdbms", clr, ctx, props);
 
-        persistenceHandler = new RDBMSPersistenceHandler(this);
-        flushProcess = new FlushOrdered(); // TODO Change this to FlushReferential when we have it complete
-        schemaHandler = new RDBMSSchemaHandler(this);
+		initRDBMSStoreManager(clr, ctx, props);
+	}
+
+	protected void initRDBMSStoreManager(ClassLoaderResolver clr, PersistenceNucleusContext ctx, Map<String, Object> props)
+	{
+		persistenceHandler = createPersistenceHandler();
+		flushProcess = createFlushProcess();
+		schemaHandler = createSchemaHandler();
 
         // Retrieve the Database Adapter for this datastore
         try
@@ -384,6 +397,21 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
             throw new NucleusUserException(msg, e1).setFatal();
         }
     }
+
+	protected RDBMSSchemaHandler createSchemaHandler()
+	{
+		return new RDBMSSchemaHandler(this);
+	}
+
+	protected static FlushOrdered createFlushProcess()
+	{
+		return new FlushOrdered(); // TODO Change this to FlushReferential when we have it complete
+	}
+
+	protected RDBMSPersistenceHandler createPersistenceHandler()
+	{
+		return new RDBMSPersistenceHandler(this);
+	}
 
     /* (non-Javadoc)
      * @see org.datanucleus.store.StoreManager#getQueryCacheKey()
@@ -648,7 +676,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
         // Note : "subclass-table" inheritance strategies will return null from this method
         if (!classKnown && ct == null)
         {
-            throw new NoTableManagedException(className);
+			throw noTableManagedExceptionCache.get(className);
         }
 
         return ct;
@@ -1927,6 +1955,41 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
         }
         return rootCmd.getFullClassName();
     }
+
+	/**
+	 * Return a custom class-name-resolver.
+	 * Return null to leave class name resolving to normal configuration.
+	 * @param ec Execution context
+	 * @param persistentClass the candidate persistent class
+	 * @param resultMapping Mapping used for query
+	 * @return null if no custom class name resolver is in use for supplied candidate class,
+	 * otherwise return a custom class name resolver instance to use.
+	 */
+	public CustomClassNameResolver getCustomClassNameResolver(ExecutionContext ec, Class persistentClass,
+															  StatementClassMapping resultMapping)
+	{
+		return null;
+	}
+
+	/**
+	 * Return custom boolean expression for fetching object of class name.
+	 * Return null to leave SQL generation to normal configuration.
+	 * @param stmt
+	 * @param className
+	 * @param dismd
+	 * @param discriminatorMapping
+	 * @param discrimSqlTbl
+	 * @param clr
+	 * @return
+	 */
+	public BooleanExpression getCustomExpressionForDiscriminatorForClass(SQLStatement stmt, String className,
+																		 DiscriminatorMetaData dismd,
+																		 JavaTypeMapping discriminatorMapping,
+																		 SQLTable discrimSqlTbl,
+																		 ClassLoaderResolver clr)
+	{
+		return null;
+	}
 
     /**
      * Method to return the value from the results for the mapping at the specified position.

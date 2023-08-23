@@ -1245,6 +1245,12 @@ public class SQLStatementHelper
     public static BooleanExpression getExpressionForDiscriminatorForClass(SQLStatement stmt, String className, DiscriminatorMetaData dismd, JavaTypeMapping discriminatorMapping,
             SQLTable discrimSqlTbl, ClassLoaderResolver clr)
     {
+        final BooleanExpression customExpr = stmt.getRDBMSManager().getCustomExpressionForDiscriminatorForClass(stmt, className, dismd, discriminatorMapping, discrimSqlTbl, clr);
+        if (customExpr != null)
+        {
+            return customExpr;
+        }
+
         Object discriminatorValue = getDiscriminatorValueForClass(stmt.getRDBMSManager().getNucleusContext(), className, dismd, discriminatorMapping, clr);
 
         SQLExpression discrExpr = stmt.getSQLExpressionFactory().newExpression(stmt, discrimSqlTbl, discriminatorMapping);
