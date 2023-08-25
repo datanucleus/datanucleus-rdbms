@@ -1958,7 +1958,21 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
 
     /**
      * Return a custom class-name-resolver.
-     * Return null to leave class name resolving to normal configuration.
+     * Return null to leave class name resolving to normal JDO mechanisms.
+     * <p>
+     * Current implementation only allows for discriminating on one string column.
+     * <p>
+     * The custom class-name-resolver enables to discriminate persistent
+     * objects from the selected ResultSet - eg. by using more column values
+     * to make a decision on which class should be instantiated from this DB row.
+     * This calculation can be of any complexity using the DB row from ResultSet.
+     * <p>
+     * Implementing this method typically also requires you to implement a similar
+     * calculation in getCustomExpressionForDiscriminatorForClass method for generating
+     * SQL when fetching data from such a custom discriminated class.
+     *
+     * You might also want to implement getClassNameForObjectID.
+     *
      * @param ec Execution context
      * @param persistentClass the candidate persistent class
      * @param resultMapping Mapping used for query
@@ -1972,15 +1986,25 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
     }
 
     /**
-     * Return custom boolean expression for fetching object of class name.
-     * Return null to leave SQL generation to normal configuration.
-     * @param stmt
-     * @param className
-     * @param dismd
-     * @param discriminatorMapping
-     * @param discrimSqlTbl
-     * @param clr
-     * @return
+     * Return custom boolean expression for fetching object of class name when using JDO/SQL queries.
+     * Return null to leave SQL generation to normal JDO mechanisms.
+     * <p>
+     * This enables to generate SQL for fetching custom discriminated classes
+     * that might have been implemented in getCustomClassNameResolver method.
+     * <p>
+     * Implementing this method typically also requires you to implement a similar
+     * calculation in getCustomClassNameResolver method for calculating the correct
+     * persistent class to instantiate given a DB row from a ResultSet,
+     *
+     * @param stmt SQL statement being build
+     * @param className name of class being queried in JDO/SQL query
+     * @param dismd defined JDO discriminator meta data
+     * @param discriminatorMapping defined JDO discriminator mapping
+     * @param discrimSqlTbl table to query
+     * @param clr class loader resolver
+     * @return null, to use standard JDO discriminator mechanisms,
+     * otherwise return full new boolean expression to be used for finding objects
+     * using custom discriminator for class of className.
      */
     public BooleanExpression getCustomExpressionForDiscriminatorForClass(SQLStatement stmt, String className,
                                                                          DiscriminatorMetaData dismd,
