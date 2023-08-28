@@ -274,9 +274,9 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
     {
         super("rdbms", clr, ctx, props);
 
-        persistenceHandler = new RDBMSPersistenceHandler(this);
-        flushProcess = new FlushOrdered(); // TODO Change this to FlushReferential when we have it complete
-        schemaHandler = new RDBMSSchemaHandler(this);
+        persistenceHandler = createPersistenceHandler();
+        flushProcess = createFlushProcess();
+        schemaHandler = createSchemaHandler();
 
         // Retrieve the Database Adapter for this datastore
         try
@@ -383,6 +383,21 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
             NucleusLogger.DATASTORE_SCHEMA.error(msg, e1);
             throw new NucleusUserException(msg, e1).setFatal();
         }
+    }
+
+    protected RDBMSSchemaHandler createSchemaHandler()
+    {
+        return new RDBMSSchemaHandler(this);
+    }
+
+    protected static FlushOrdered createFlushProcess()
+    {
+        return new FlushOrdered(); // TODO Change this to FlushReferential when we have it complete
+    }
+
+    protected RDBMSPersistenceHandler createPersistenceHandler()
+    {
+        return new RDBMSPersistenceHandler(this);
     }
 
     /* (non-Javadoc)
