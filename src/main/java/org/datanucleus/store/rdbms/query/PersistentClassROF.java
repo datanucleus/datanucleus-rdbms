@@ -50,8 +50,9 @@ import org.datanucleus.metadata.VersionMetaData;
 import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.FieldValues;
 import org.datanucleus.store.StoreManager;
-import org.datanucleus.store.rdbms.CustomClassNameResolver;
+import org.datanucleus.store.rdbms.discriminatordefiner.CustomClassNameResolver;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
+import org.datanucleus.store.rdbms.discriminatordefiner.DiscriminatorDefiner;
 import org.datanucleus.store.rdbms.fieldmanager.ResultSetGetter;
 import org.datanucleus.store.rdbms.mapping.MappingHelper;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
@@ -105,10 +106,17 @@ public final class PersistentClassROF<T> extends AbstractROF<T>
         this.rootCmd = acmd;
         this.persistentClass = persistentClass;
         final StoreManager storeManager = ec.getStoreManager();
-        this.customClassNameResolver = storeManager instanceof RDBMSStoreManager ?
-                ((RDBMSStoreManager) storeManager).getCustomClassNameResolver(ec, persistentClass, resultMapping)
-                :
-                null;
+        if (acmd.getDiscriminatorMetaData() != null)
+        {
+            final DiscriminatorDefiner discriminatorDefiner = ((RDBMSStoreManager) storeManager).getDiscriminatorDefiner(acmd.getBaseAbstractClassMetaData(), ec.getClassLoaderResolver());
+            this.customClassNameResolver = discriminatorDefiner != null ?
+                    discriminatorDefiner.getCustomClassNameResolver(ec, resultMapping)
+                    :
+                    null;
+        }
+        else {
+            this.customClassNameResolver = null;
+        }
     }
 
     /* (non-Javadoc)
@@ -142,10 +150,7 @@ public final class PersistentClassROF<T> extends AbstractROF<T>
             className = customClassNameResolver.getCustomClassName(rs);
             if (className != null)
             {
-                if (discrimMapIdx != null)
-                {
-                    foundClassByDiscrim = true;
-                }
+                foundClassByDiscrim = true;
                 requiresInheritanceCheck = false;
             }
         }

@@ -1,4 +1,4 @@
-package org.datanucleus.store.rdbms;
+package org.datanucleus.store.rdbms.discriminatordefiner;
 
 import java.sql.ResultSet;
 

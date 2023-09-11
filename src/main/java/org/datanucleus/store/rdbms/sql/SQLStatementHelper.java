@@ -46,6 +46,7 @@ import org.datanucleus.metadata.JoinMetaData;
 import org.datanucleus.metadata.MetaDataManager;
 import org.datanucleus.metadata.RelationType;
 import org.datanucleus.store.connection.ManagedConnection;
+import org.datanucleus.store.rdbms.discriminatordefiner.DiscriminatorDefiner;
 import org.datanucleus.store.rdbms.mapping.MappingHelper;
 import org.datanucleus.store.rdbms.mapping.java.DiscriminatorMapping;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
@@ -1245,7 +1246,11 @@ public class SQLStatementHelper
     public static BooleanExpression getExpressionForDiscriminatorForClass(SQLStatement stmt, String className, DiscriminatorMetaData dismd, JavaTypeMapping discriminatorMapping,
             SQLTable discrimSqlTbl, ClassLoaderResolver clr)
     {
-        final BooleanExpression customExpr = stmt.getRDBMSManager().getCustomExpressionForDiscriminatorForClass(stmt, className, dismd, discriminatorMapping, discrimSqlTbl, clr);
+        DiscriminatorDefiner discriminatorDefiner = stmt.getRDBMSManager().getDiscriminatorDefiner(discriminatorMapping.getTable().getClassMetaData(), clr);
+        final BooleanExpression customExpr = discriminatorDefiner != null ?
+                discriminatorDefiner.getCustomExpressionForDiscriminatorForClass(stmt, className, dismd, discriminatorMapping, discrimSqlTbl, clr)
+                :
+                null;
         if (customExpr != null)
         {
             return customExpr;

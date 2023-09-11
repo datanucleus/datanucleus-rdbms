@@ -20,18 +20,25 @@ package org.datanucleus.store.rdbms;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.metadata.AbstractClassMetaData;
+import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.DiscriminatorMetaData;
 import org.datanucleus.metadata.InheritanceMetaData;
 import org.datanucleus.metadata.InheritanceStrategy;
 import org.datanucleus.store.connection.ManagedConnection;
+import org.datanucleus.store.rdbms.discriminatordefiner.CustomClassNameResolver;
+import org.datanucleus.store.rdbms.discriminatordefiner.DiscriminatorDefiner;
+import org.datanucleus.store.rdbms.mapping.column.ColumnMapping;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.mapping.java.PersistableIdMapping;
 import org.datanucleus.store.rdbms.mapping.java.PersistableMapping;
@@ -45,6 +52,7 @@ import org.datanucleus.store.rdbms.sql.SelectStatementGenerator;
 import org.datanucleus.store.rdbms.sql.UnionStatementGenerator;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpressionFactory;
+import org.datanucleus.store.rdbms.table.Column;
 import org.datanucleus.store.rdbms.table.DatastoreClass;
 import org.datanucleus.store.schema.table.SurrogateColumnType;
 import org.datanucleus.util.NucleusLogger;
@@ -93,6 +101,34 @@ public class RDBMSStoreHelper
         SQLExpression sqlFldVal = exprFactory.newLiteralParameter(sqlStmt, idParamMapping, id, "ID");
         sqlStmt.whereAnd(sqlFldExpr.eq(sqlFldVal), true);
 
+        // check if custom class name definer has been defined
+        final DiscriminatorDefiner discriminatorDefiner = storeMgr.getDiscriminatorDefiner(cmd, clr);
+        CustomClassNameResolver customClassNameResolver = null;
+        if (discriminatorDefiner != null)
+        {
+            customClassNameResolver = discriminatorDefiner.getCustomClassNameResolver(ec, null);
+            if (customClassNameResolver != null)
+            {
+                // custom discriminator definer also gets access to fields in default fetch group
+                Set<Column> alreadySelected = Arrays.stream(discrimMapping.getColumnMappings()).map(ColumnMapping::getColumn).collect(Collectors.toSet());
+                final int[] dfgMemberPositions = cmd.getDFGMemberPositions();
+                for (int dfgMemberPosition : dfgMemberPositions)
+                {
+                    final AbstractMemberMetaData mmd = cmd.getMetaDataForManagedMemberAtAbsolutePosition(dfgMemberPosition);
+                    final JavaTypeMapping memberMapping = primaryTable.getMemberMapping(mmd);
+                    for (ColumnMapping columnMapping : memberMapping.getColumnMappings())
+                    {
+                        final Column column = columnMapping.getColumn();
+                        // not add discriminator column again
+                        if (!alreadySelected.contains(column))
+                        {
+                            sqlStmt.select(discrimSqlTbl, column, null);
+                        }
+                    }
+                }
+            }
+        }
+
         // Perform the query
         try
         {
@@ -114,6 +150,16 @@ public class RDBMSStoreHelper
                     {
                         while (rs.next())
                         {
+                            // check custom discriminator definer first
+                            if (customClassNameResolver != null)
+                            {
+                                String customClassName = customClassNameResolver.getCustomClassName(rs);
+                                if (customClassName != null)
+                                {
+                                    return customClassName;
+                                }
+                            }
+                            // no custom discriminator defined - business as usual
                             DiscriminatorMetaData dismd = discrimMapping.getTable().getDiscriminatorMetaData();
                             return RDBMSQueryUtils.getClassNameFromDiscriminatorResultSetRow(discrimMapping, dismd, rs, ec);
                         }

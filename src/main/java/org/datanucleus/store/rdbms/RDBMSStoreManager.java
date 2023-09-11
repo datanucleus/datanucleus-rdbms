@@ -43,6 +43,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.io.Writer;
 import java.lang.reflect.Modifier;
+import java.lang.reflect.InvocationTargetException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -89,7 +90,6 @@ import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.ClassMetaData;
 import org.datanucleus.metadata.ClassPersistenceModifier;
 import org.datanucleus.metadata.DatastoreIdentityMetaData;
-import org.datanucleus.metadata.DiscriminatorMetaData;
 import org.datanucleus.metadata.ValueGenerationStrategy;
 import org.datanucleus.metadata.IdentityType;
 import org.datanucleus.metadata.InheritanceMetaData;
@@ -113,6 +113,7 @@ import org.datanucleus.store.rdbms.SQLController.StatementLoggingType;
 import org.datanucleus.store.rdbms.adapter.DatastoreAdapter;
 import org.datanucleus.store.rdbms.adapter.DatastoreAdapterFactory;
 import org.datanucleus.store.rdbms.autostart.SchemaAutoStarter;
+import org.datanucleus.store.rdbms.discriminatordefiner.DiscriminatorDefiner;
 import org.datanucleus.store.rdbms.exceptions.NoTableManagedException;
 import org.datanucleus.store.rdbms.exceptions.UnsupportedDataTypeException;
 import org.datanucleus.store.rdbms.identifier.DN2IdentifierFactory;
@@ -131,7 +132,6 @@ import org.datanucleus.store.rdbms.mapping.java.PersistableMapping;
 import org.datanucleus.store.rdbms.query.JDOQLQuery;
 import org.datanucleus.store.rdbms.query.JPQLQuery;
 import org.datanucleus.store.rdbms.query.SQLQuery;
-import org.datanucleus.store.rdbms.query.StatementClassMapping;
 import org.datanucleus.store.rdbms.query.StoredProcedureQuery;
 import org.datanucleus.store.rdbms.schema.JDBCTypeInfo;
 import org.datanucleus.store.rdbms.schema.RDBMSColumnInfo;
@@ -149,9 +149,6 @@ import org.datanucleus.store.rdbms.scostore.JoinListStore;
 import org.datanucleus.store.rdbms.scostore.JoinMapStore;
 import org.datanucleus.store.rdbms.scostore.JoinPersistableRelationStore;
 import org.datanucleus.store.rdbms.scostore.JoinSetStore;
-import org.datanucleus.store.rdbms.sql.SQLStatement;
-import org.datanucleus.store.rdbms.sql.SQLTable;
-import org.datanucleus.store.rdbms.sql.expression.BooleanExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpressionFactory;
 import org.datanucleus.store.rdbms.table.ArrayTable;
 import org.datanucleus.store.rdbms.table.ClassTable;
@@ -266,6 +263,8 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
 
     private static final ConcurrentFixedCache<String, NoTableManagedException> noTableManagedExceptionCache =
             new ConcurrentFixedCache<>(NoTableManagedException::new);
+
+    private static Map<String, DiscriminatorDefiner> discriminatorDefinerMap = new ConcurrentHashMap<>();
 
     /**
      * Constructs a new RDBMSManager. 
@@ -1798,7 +1797,6 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                 {
                     AbstractClassMetaData pkCmd = iter.next();
 
-                    AbstractClassMetaData cmdToSwap = null;
                     boolean toAdd = true;
 
                     Iterator<AbstractClassMetaData> rootCmdIterator = rootCmds.iterator();
@@ -1807,10 +1805,8 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                         AbstractClassMetaData rootCmd = rootCmdIterator.next();
                         if (rootCmd.isDescendantOf(pkCmd))
                         {
-                            // This cmd is a parent of an existing, so swap them
-                            cmdToSwap = rootCmd;
-                            toAdd = false;
-                            break;
+                            // This cmd is a parent of an existing, so swap them (remove existing and add this one)
+                            rootCmdIterator.remove();
                         }
                         else if (pkCmd.isDescendantOf(rootCmd))
                         {
@@ -1818,12 +1814,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                         }
                     }
 
-                    if (cmdToSwap != null)
-                    {
-                        rootCmds.remove(cmdToSwap);
-                        rootCmds.add(pkCmd);
-                    }
-                    else if (toAdd)
+                    if (toAdd)
                     {
                         rootCmds.add(pkCmd);
                     }
@@ -1956,62 +1947,25 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
         return rootCmd.getFullClassName();
     }
 
-    /**
-     * Return a custom class-name-resolver.
-     * Return null to leave class name resolving to normal JDO mechanisms.
-     * <p>
-     * Current implementation only allows for discriminating on one string column.
-     * <p>
-     * The custom class-name-resolver enables to discriminate persistent
-     * objects from the selected ResultSet - eg. by using more column values
-     * to make a decision on which class should be instantiated from this DB row.
-     * This calculation can be of any complexity using the DB row from ResultSet.
-     * <p>
-     * Implementing this method typically also requires you to implement a similar
-     * calculation in getCustomExpressionForDiscriminatorForClass method for generating
-     * SQL when fetching data from such a custom discriminated class.
-     *
-     * You might also want to implement getClassNameForObjectID.
-     *
-     * @param ec Execution context
-     * @param persistentClass the candidate persistent class
-     * @param resultMapping Mapping used for query
-     * @return null if no custom class name resolver is in use for supplied candidate class,
-     * otherwise return a custom class name resolver instance to use.
-     */
-    public CustomClassNameResolver getCustomClassNameResolver(ExecutionContext ec, Class persistentClass,
-                                                              StatementClassMapping resultMapping)
+    public DiscriminatorDefiner getDiscriminatorDefiner(AbstractClassMetaData cmd, ClassLoaderResolver clr)
     {
-        return null;
-    }
-
-    /**
-     * Return custom boolean expression for fetching object of class name when using JDO/SQL queries.
-     * Return null to leave SQL generation to normal JDO mechanisms.
-     * <p>
-     * This enables to generate SQL for fetching custom discriminated classes
-     * that might have been implemented in getCustomClassNameResolver method.
-     * <p>
-     * Implementing this method typically also requires you to implement a similar
-     * calculation in getCustomClassNameResolver method for calculating the correct
-     * persistent class to instantiate given a DB row from a ResultSet,
-     *
-     * @param stmt SQL statement being build
-     * @param className name of class being queried in JDO/SQL query
-     * @param dismd defined JDO discriminator meta data
-     * @param discriminatorMapping defined JDO discriminator mapping
-     * @param discrimSqlTbl table to query
-     * @param clr class loader resolver
-     * @return null, to use standard JDO discriminator mechanisms,
-     * otherwise return full new boolean expression to be used for finding objects
-     * using custom discriminator for class of className.
-     */
-    public BooleanExpression getCustomExpressionForDiscriminatorForClass(SQLStatement stmt, String className,
-                                                                         DiscriminatorMetaData dismd,
-                                                                         JavaTypeMapping discriminatorMapping,
-                                                                         SQLTable discrimSqlTbl,
-                                                                         ClassLoaderResolver clr)
-    {
+        final String discrDefinerClassName = cmd.getValueForExtension(DiscriminatorDefiner.METADATA_EXTENSION_DISCRIMINATOR_DEFINER);
+        if (discrDefinerClassName != null && !discrDefinerClassName.isEmpty())
+        {
+            return discriminatorDefinerMap.computeIfAbsent(discrDefinerClassName, className ->
+            {
+                final Class<DiscriminatorDefiner> discrDefinerClass = clr.classForName(discrDefinerClassName);
+                try
+                {
+                    return discrDefinerClass.getDeclaredConstructor().newInstance();
+                }
+                catch (InstantiationException | IllegalAccessException |
+                       InvocationTargetException | NoSuchMethodException e)
+                {
+                    throw new RuntimeException(e);
+                }
+            });
+        }
         return null;
     }
 
