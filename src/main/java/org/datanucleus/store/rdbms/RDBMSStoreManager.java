@@ -43,6 +43,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.io.Writer;
 import java.lang.reflect.Modifier;
+import java.lang.reflect.InvocationTargetException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -112,6 +113,7 @@ import org.datanucleus.store.rdbms.SQLController.StatementLoggingType;
 import org.datanucleus.store.rdbms.adapter.DatastoreAdapter;
 import org.datanucleus.store.rdbms.adapter.DatastoreAdapterFactory;
 import org.datanucleus.store.rdbms.autostart.SchemaAutoStarter;
+import org.datanucleus.store.rdbms.discriminatordefiner.DiscriminatorDefiner;
 import org.datanucleus.store.rdbms.exceptions.NoTableManagedException;
 import org.datanucleus.store.rdbms.exceptions.UnsupportedDataTypeException;
 import org.datanucleus.store.rdbms.identifier.DN2IdentifierFactory;
@@ -259,6 +261,11 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
 
     private Map<String, Store> backingStoreByMemberName = new ConcurrentHashMap<>();
 
+    private static final ConcurrentFixedCache<String, NoTableManagedException> noTableManagedExceptionCache =
+            new ConcurrentFixedCache<>(NoTableManagedException::new);
+
+    private static Map<String, DiscriminatorDefiner> discriminatorDefinerMap = new ConcurrentHashMap<>();
+
     /**
      * Constructs a new RDBMSManager. 
      * On successful return the new RDBMSManager will have successfully connected to the database with the given
@@ -274,6 +281,11 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
     {
         super("rdbms", clr, ctx, props);
 
+        initRDBMSStoreManager(clr, ctx, props);
+    }
+
+    protected void initRDBMSStoreManager(ClassLoaderResolver clr, PersistenceNucleusContext ctx, Map<String, Object> props)
+    {
         persistenceHandler = createPersistenceHandler();
         flushProcess = createFlushProcess();
         schemaHandler = createSchemaHandler();
@@ -663,7 +675,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
         // Note : "subclass-table" inheritance strategies will return null from this method
         if (!classKnown && ct == null)
         {
-            throw new NoTableManagedException(className);
+            throw noTableManagedExceptionCache.get(className);
         }
 
         return ct;
@@ -1785,7 +1797,6 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                 {
                     AbstractClassMetaData pkCmd = iter.next();
 
-                    AbstractClassMetaData cmdToSwap = null;
                     boolean toAdd = true;
 
                     Iterator<AbstractClassMetaData> rootCmdIterator = rootCmds.iterator();
@@ -1794,10 +1805,8 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                         AbstractClassMetaData rootCmd = rootCmdIterator.next();
                         if (rootCmd.isDescendantOf(pkCmd))
                         {
-                            // This cmd is a parent of an existing, so swap them
-                            cmdToSwap = rootCmd;
-                            toAdd = false;
-                            break;
+                            // This cmd is a parent of an existing, so swap them (remove existing and add this one)
+                            rootCmdIterator.remove();
                         }
                         else if (pkCmd.isDescendantOf(rootCmd))
                         {
@@ -1805,12 +1814,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                         }
                     }
 
-                    if (cmdToSwap != null)
-                    {
-                        rootCmds.remove(cmdToSwap);
-                        rootCmds.add(pkCmd);
-                    }
-                    else if (toAdd)
+                    if (toAdd)
                     {
                         rootCmds.add(pkCmd);
                     }
@@ -1941,6 +1945,28 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                     rootCmd.getFullClassName() + " : unable to determine if actually of a subclass");
         }
         return rootCmd.getFullClassName();
+    }
+
+    public DiscriminatorDefiner getDiscriminatorDefiner(AbstractClassMetaData cmd, ClassLoaderResolver clr)
+    {
+        final String discrDefinerClassName = cmd.getValueForExtension(DiscriminatorDefiner.METADATA_EXTENSION_DISCRIMINATOR_DEFINER);
+        if (discrDefinerClassName != null && !discrDefinerClassName.isEmpty())
+        {
+            return discriminatorDefinerMap.computeIfAbsent(discrDefinerClassName, className ->
+            {
+                final Class<DiscriminatorDefiner> discrDefinerClass = clr.classForName(discrDefinerClassName);
+                try
+                {
+                    return discrDefinerClass.getDeclaredConstructor().newInstance();
+                }
+                catch (InstantiationException | IllegalAccessException |
+                       InvocationTargetException | NoSuchMethodException e)
+                {
+                    throw new RuntimeException(e);
+                }
+            });
+        }
+        return null;
     }
 
     /**
