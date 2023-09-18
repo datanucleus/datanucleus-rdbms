@@ -54,6 +54,7 @@ import org.datanucleus.store.rdbms.mapping.java.SqlTimestampMapping;
 import org.datanucleus.store.rdbms.mapping.java.StringMapping;
 import org.datanucleus.store.query.expression.Expression;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
+import org.datanucleus.store.rdbms.discriminator.DiscriminatorUtils;
 import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.SQLStatementHelper;
 import org.datanucleus.store.rdbms.sql.SQLTable;
@@ -786,7 +787,7 @@ public class ObjectExpression extends SQLExpression
                 BooleanExpression discExpr = null;
                 if (!Modifier.isAbstract(type.getModifiers()))
                 {
-                    discExpr = SQLStatementHelper.getExpressionForDiscriminatorForClass(stmt, type.getName(), dismd, discMapping, discSqlTbl, clr);
+                    discExpr = DiscriminatorUtils.getExpressionForDiscriminatorForClass(stmt, type.getName(), dismd, discMapping, discSqlTbl, clr);
                 }
 
                 Iterator<String> subclassIter = storeMgr.getSubClassesForClass(type.getName(), true, clr).iterator();
@@ -799,7 +800,7 @@ public class ObjectExpression extends SQLExpression
                     {
                         continue;
                     }
-                    BooleanExpression discExprSub = SQLStatementHelper.getExpressionForDiscriminatorForClass(stmt, subclassName, dismd, discMapping, discSqlTbl, clr);
+                    BooleanExpression discExprSub = DiscriminatorUtils.getExpressionForDiscriminatorForClass(stmt, subclassName, dismd, discMapping, discSqlTbl, clr);
                     if (discExpr != null)
                     {
                         multiplePossibles = true;

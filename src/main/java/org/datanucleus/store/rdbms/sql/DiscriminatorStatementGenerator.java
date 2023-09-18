@@ -28,6 +28,7 @@ import org.datanucleus.metadata.DiscriminatorStrategy;
 import org.datanucleus.store.rdbms.identifier.DatastoreIdentifier;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
+import org.datanucleus.store.rdbms.discriminator.DiscriminatorUtils;
 import org.datanucleus.store.rdbms.sql.SQLJoin.JoinType;
 import org.datanucleus.store.rdbms.sql.expression.BooleanExpression;
 import org.datanucleus.store.rdbms.sql.expression.InExpression;
@@ -263,7 +264,7 @@ public class DiscriminatorStatementGenerator extends AbstractSelectStatementGene
                         continue;
                     }
 
-                    BooleanExpression discExprCandidate = SQLStatementHelper.getExpressionForDiscriminatorForClass(stmt, candidates[i].getName(), dismd, discMapping, discrimSqlTbl, clr);
+                    BooleanExpression discExprCandidate = DiscriminatorUtils.getExpressionForDiscriminatorForClass(stmt, candidates[i].getName(), dismd, discMapping, discrimSqlTbl, clr);
                     if (discExpr != null)
                     {
                         discExpr = discExpr.ior(discExprCandidate);
@@ -283,7 +284,7 @@ public class DiscriminatorStatementGenerator extends AbstractSelectStatementGene
                         while (subclassIter.hasNext())
                         {
                             String subclassName = subclassIter.next();
-                            BooleanExpression discExprSub = SQLStatementHelper.getExpressionForDiscriminatorForClass(stmt, subclassName, dismd, discMapping, discrimSqlTbl, clr);
+                            BooleanExpression discExprSub = DiscriminatorUtils.getExpressionForDiscriminatorForClass(stmt, subclassName, dismd, discMapping, discrimSqlTbl, clr);
                             discExpr = discExpr.ior(discExprSub);
                         }
                     }
@@ -294,7 +295,7 @@ public class DiscriminatorStatementGenerator extends AbstractSelectStatementGene
                 // Single candidate
                 if (!Modifier.isAbstract(candidateType.getModifiers()))
                 {
-                    discExpr = SQLStatementHelper.getExpressionForDiscriminatorForClass(stmt, candidateType.getName(), dismd, discMapping, discrimSqlTbl, clr);
+                    discExpr = DiscriminatorUtils.getExpressionForDiscriminatorForClass(stmt, candidateType.getName(), dismd, discMapping, discrimSqlTbl, clr);
                 }
                 if (includeSubclasses)
                 {
@@ -310,7 +311,7 @@ public class DiscriminatorStatementGenerator extends AbstractSelectStatementGene
                             continue;
                         }
 
-                        BooleanExpression discExprCandidate = SQLStatementHelper.getExpressionForDiscriminatorForClass(stmt, subclassName, dismd, discMapping, discrimSqlTbl, clr);
+                        BooleanExpression discExprCandidate = DiscriminatorUtils.getExpressionForDiscriminatorForClass(stmt, subclassName, dismd, discMapping, discrimSqlTbl, clr);
                         if (discExpr == null)
                         {
                             discExpr = discExprCandidate;

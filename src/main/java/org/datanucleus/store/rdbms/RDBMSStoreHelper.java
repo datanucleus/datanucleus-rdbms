@@ -36,8 +36,8 @@ import org.datanucleus.metadata.DiscriminatorMetaData;
 import org.datanucleus.metadata.InheritanceMetaData;
 import org.datanucleus.metadata.InheritanceStrategy;
 import org.datanucleus.store.connection.ManagedConnection;
-import org.datanucleus.store.rdbms.discriminatordefiner.CustomClassNameResolver;
-import org.datanucleus.store.rdbms.discriminatordefiner.DiscriminatorDefiner;
+import org.datanucleus.store.rdbms.discriminator.DiscriminatorClassNameResolver;
+import org.datanucleus.store.rdbms.discriminator.DiscriminatorDefiner;
 import org.datanucleus.store.rdbms.mapping.column.ColumnMapping;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.mapping.java.PersistableIdMapping;
@@ -103,10 +103,10 @@ public class RDBMSStoreHelper
 
         // check if custom class name definer has been defined
         final DiscriminatorDefiner discriminatorDefiner = storeMgr.getDiscriminatorDefiner(cmd, clr);
-        CustomClassNameResolver customClassNameResolver = null;
+        DiscriminatorClassNameResolver customClassNameResolver = null;
         if (discriminatorDefiner != null)
         {
-            customClassNameResolver = discriminatorDefiner.getCustomClassNameResolver(ec, null);
+            customClassNameResolver = discriminatorDefiner.getDiscriminatorClassNameResolver(ec, null);
             if (customClassNameResolver != null)
             {
                 // custom discriminator definer also gets access to fields in default fetch group
@@ -153,7 +153,7 @@ public class RDBMSStoreHelper
                             // check custom discriminator definer first
                             if (customClassNameResolver != null)
                             {
-                                String customClassName = customClassNameResolver.getCustomClassName(rs);
+                                String customClassName = customClassNameResolver.getClassName(rs);
                                 if (customClassName != null)
                                 {
                                     return customClassName;

@@ -50,9 +50,9 @@ import org.datanucleus.metadata.VersionMetaData;
 import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.FieldValues;
 import org.datanucleus.store.StoreManager;
-import org.datanucleus.store.rdbms.discriminatordefiner.CustomClassNameResolver;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
-import org.datanucleus.store.rdbms.discriminatordefiner.DiscriminatorDefiner;
+import org.datanucleus.store.rdbms.discriminator.DiscriminatorClassNameResolver;
+import org.datanucleus.store.rdbms.discriminator.DiscriminatorDefiner;
 import org.datanucleus.store.rdbms.fieldmanager.ResultSetGetter;
 import org.datanucleus.store.rdbms.mapping.MappingHelper;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
@@ -87,7 +87,7 @@ public final class PersistentClassROF<T> extends AbstractROF<T>
     /** Resolved classes for metadata / discriminator keyed by class names. */
     private Map<String, Class> resolvedClasses = new ConcurrentReferenceHashMap<>(1, ReferenceType.STRONG, ReferenceType.SOFT);
 
-    private final CustomClassNameResolver customClassNameResolver;
+    private final DiscriminatorClassNameResolver discriminatorClassNameResolver;
 
     /**
      * Constructor.
@@ -105,17 +105,17 @@ public final class PersistentClassROF<T> extends AbstractROF<T>
         this.resultMapping = resultMapping;
         this.rootCmd = acmd;
         this.persistentClass = persistentClass;
+
         final StoreManager storeManager = ec.getStoreManager();
         if (acmd.getDiscriminatorMetaData() != null)
         {
             final DiscriminatorDefiner discriminatorDefiner = ((RDBMSStoreManager) storeManager).getDiscriminatorDefiner(acmd.getBaseAbstractClassMetaData(), ec.getClassLoaderResolver());
-            this.customClassNameResolver = discriminatorDefiner != null ?
-                    discriminatorDefiner.getCustomClassNameResolver(ec, resultMapping)
-                    :
-                    null;
+            this.discriminatorClassNameResolver = discriminatorDefiner != null ?
+                    discriminatorDefiner.getDiscriminatorClassNameResolver(ec, resultMapping) : null;
         }
-        else {
-            this.customClassNameResolver = null;
+        else
+        {
+            this.discriminatorClassNameResolver = null;
         }
     }
 
@@ -145,9 +145,9 @@ public final class PersistentClassROF<T> extends AbstractROF<T>
 
         StatementMappingIndex discrimMapIdx = resultMapping.getMappingForMemberPosition(SurrogateColumnType.DISCRIMINATOR.getFieldNumber());
 
-        if (customClassNameResolver != null)
+        if (discriminatorClassNameResolver != null)
         {
-            className = customClassNameResolver.getCustomClassName(rs);
+            className = discriminatorClassNameResolver.getClassName(rs);
             if (className != null)
             {
                 foundClassByDiscrim = true;

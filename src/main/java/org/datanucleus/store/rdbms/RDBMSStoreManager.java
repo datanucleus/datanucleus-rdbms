@@ -113,7 +113,7 @@ import org.datanucleus.store.rdbms.SQLController.StatementLoggingType;
 import org.datanucleus.store.rdbms.adapter.DatastoreAdapter;
 import org.datanucleus.store.rdbms.adapter.DatastoreAdapterFactory;
 import org.datanucleus.store.rdbms.autostart.SchemaAutoStarter;
-import org.datanucleus.store.rdbms.discriminatordefiner.DiscriminatorDefiner;
+import org.datanucleus.store.rdbms.discriminator.DiscriminatorDefiner;
 import org.datanucleus.store.rdbms.exceptions.NoTableManagedException;
 import org.datanucleus.store.rdbms.exceptions.UnsupportedDataTypeException;
 import org.datanucleus.store.rdbms.identifier.DN2IdentifierFactory;

@@ -19,7 +19,6 @@ package org.datanucleus.store.rdbms.sql;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -32,13 +31,9 @@ import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.FetchPlan;
 import org.datanucleus.FetchPlanForClass;
-import org.datanucleus.NucleusContext;
 import org.datanucleus.exceptions.NucleusException;
-import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
-import org.datanucleus.metadata.DiscriminatorMetaData;
-import org.datanucleus.metadata.DiscriminatorStrategy;
 import org.datanucleus.metadata.FieldMetaData;
 import org.datanucleus.metadata.IdentityType;
 import org.datanucleus.metadata.InheritanceStrategy;
@@ -46,9 +41,7 @@ import org.datanucleus.metadata.JoinMetaData;
 import org.datanucleus.metadata.MetaDataManager;
 import org.datanucleus.metadata.RelationType;
 import org.datanucleus.store.connection.ManagedConnection;
-import org.datanucleus.store.rdbms.discriminatordefiner.DiscriminatorDefiner;
 import org.datanucleus.store.rdbms.mapping.MappingHelper;
-import org.datanucleus.store.rdbms.mapping.java.DiscriminatorMapping;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.mapping.java.PersistableIdMapping;
 import org.datanucleus.store.rdbms.mapping.java.PersistableMapping;
@@ -58,9 +51,8 @@ import org.datanucleus.store.rdbms.query.StatementMappingIndex;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.SQLController;
 import org.datanucleus.store.rdbms.adapter.DatastoreAdapter;
+import org.datanucleus.store.rdbms.discriminator.DiscriminatorUtils;
 import org.datanucleus.store.rdbms.sql.SQLJoin.JoinType;
-import org.datanucleus.store.rdbms.sql.expression.BooleanExpression;
-import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
 import org.datanucleus.store.rdbms.table.DatastoreClass;
 import org.datanucleus.store.rdbms.table.ElementContainerTable;
 import org.datanucleus.store.rdbms.table.JoinTable;
@@ -839,7 +831,7 @@ public class SQLStatementHelper
                         List discValueList = null;
                         for (String clsName : clsNames)
                         {
-                            List values = getDiscriminatorValuesForMember(clsName, relatedDiscrimMapping, storeMgr, clr);
+                            List values = DiscriminatorUtils.getDiscriminatorValuesForMember(clsName, relatedDiscrimMapping, storeMgr, clr);
                             if (discValueList == null)
                             {
                                 discValueList = values;
@@ -1230,116 +1222,5 @@ public class SQLStatementHelper
             }
         }
         return joinType;
-    }
-
-    /**
-     * Convenience method to generate a BooleanExpression for the associated discriminator value for
-     * the specified class.
-     * @param stmt The Query Statement to be updated
-     * @param className The class name
-     * @param dismd MetaData for the discriminator
-     * @param discriminatorMapping Mapping for the discriminator
-     * @param discrimSqlTbl SQLTable for the table with the discriminator
-     * @param clr ClassLoader resolver
-     * @return Boolean expression for this discriminator value
-     */
-    public static BooleanExpression getExpressionForDiscriminatorForClass(SQLStatement stmt, String className, DiscriminatorMetaData dismd, JavaTypeMapping discriminatorMapping,
-            SQLTable discrimSqlTbl, ClassLoaderResolver clr)
-    {
-        DiscriminatorDefiner discriminatorDefiner = stmt.getRDBMSManager().getDiscriminatorDefiner(discriminatorMapping.getTable().getClassMetaData(), clr);
-        final BooleanExpression customExpr = discriminatorDefiner != null ?
-                discriminatorDefiner.getCustomExpressionForDiscriminatorForClass(stmt, className, dismd, discriminatorMapping, discrimSqlTbl, clr)
-                :
-                null;
-        if (customExpr != null)
-        {
-            return customExpr;
-        }
-
-        Object discriminatorValue = getDiscriminatorValueForClass(stmt.getRDBMSManager().getNucleusContext(), className, dismd, discriminatorMapping, clr);
-
-        SQLExpression discrExpr = stmt.getSQLExpressionFactory().newExpression(stmt, discrimSqlTbl, discriminatorMapping);
-        SQLExpression discrVal = stmt.getSQLExpressionFactory().newLiteral(stmt, discriminatorMapping, discriminatorValue);
-        return discrExpr.eq(discrVal);
-    }
-
-    /**
-     * Convenience method to generate a BooleanExpression for the associated discriminator value for
-     * the specified class.
-     * @param nucleusCtx NucleusContext
-     * @param className The class name
-     * @param dismd MetaData for the discriminator
-     * @param discriminatorMapping Mapping for the discriminator
-     * @param clr ClassLoader resolver
-     * @return The discriminator value for this class
-     */
-    public static Object getDiscriminatorValueForClass(NucleusContext nucleusCtx, String className, DiscriminatorMetaData dismd, JavaTypeMapping discriminatorMapping,
-            ClassLoaderResolver clr)
-    {
-        AbstractClassMetaData targetCmd = nucleusCtx.getMetaDataManager().getMetaDataForClass(className, clr);
-        Object discriminatorValue = targetCmd.getDiscriminatorValue();
-        if (dismd.getStrategy() == DiscriminatorStrategy.VALUE_MAP)
-        {
-            String strValue = null;
-            if (targetCmd.getInheritanceMetaData() != null && targetCmd.getInheritanceMetaData().getDiscriminatorMetaData() != null)
-            {
-                strValue = targetCmd.getInheritanceMetaData().getDiscriminatorMetaData().getValue();
-            }
-            if (strValue == null)
-            {
-                // No value defined for this clause of the map
-                strValue = className;
-            }
-            if (discriminatorMapping instanceof DiscriminatorMapping.DiscriminatorLongMapping)
-            {
-                try
-                {
-                    discriminatorValue = Integer.valueOf(strValue);
-                }
-                catch (NumberFormatException nfe)
-                {
-                    throw new NucleusUserException("Discriminator for " + className + " is not integer-based but needs to be!");
-                }
-            }
-            else
-            {
-                discriminatorValue = strValue;
-            }
-        }
-        return discriminatorValue;
-    }
-
-    /**
-     * Method to return all possible discriminator values for the supplied class and its subclasses.
-     * @param className Name of the class
-     * @param discMapping The discriminator mapping
-     * @param storeMgr StoreManager
-     * @param clr ClassLoader resolver
-     * @return The possible discriminator values
-     */
-    public static List getDiscriminatorValuesForMember(String className, JavaTypeMapping discMapping, RDBMSStoreManager storeMgr, ClassLoaderResolver clr)
-    {
-        List discrimValues = new ArrayList();
-        DiscriminatorStrategy strategy = discMapping.getTable().getDiscriminatorMetaData().getStrategy();
-        if (strategy != DiscriminatorStrategy.NONE)
-        {
-            MetaDataManager mmgr = storeMgr.getMetaDataManager();
-            AbstractClassMetaData cmd = mmgr.getMetaDataForClass(className, clr);
-            discrimValues.add(cmd.getDiscriminatorValue());
-
-            Collection<String> subclasses = storeMgr.getSubClassesForClass(className, true, clr);
-            if (subclasses != null && subclasses.size() > 0)
-            {
-                Iterator<String> subclassesIter = subclasses.iterator();
-                while (subclassesIter.hasNext())
-                {
-                    String subclassName = subclassesIter.next();
-                    AbstractClassMetaData subclassCmd = mmgr.getMetaDataForClass(subclassName, clr);
-                    discrimValues.add(subclassCmd.getDiscriminatorValue());
-                }
-            }
-        }
-
-        return discrimValues;
     }
 }

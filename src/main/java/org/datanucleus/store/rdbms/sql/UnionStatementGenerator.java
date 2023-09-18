@@ -31,6 +31,7 @@ import org.datanucleus.metadata.DiscriminatorStrategy;
 import org.datanucleus.store.rdbms.identifier.DatastoreIdentifier;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
+import org.datanucleus.store.rdbms.discriminator.DiscriminatorUtils;
 import org.datanucleus.store.rdbms.sql.SQLJoin.JoinType;
 import org.datanucleus.store.rdbms.sql.expression.BooleanExpression;
 import org.datanucleus.store.rdbms.sql.expression.InExpression;
@@ -456,7 +457,7 @@ public class UnionStatementGenerator extends AbstractSelectStatementGenerator
         if (discriminatorMapping != null && discriminatorMetaData.getStrategy() != DiscriminatorStrategy.NONE)
         {
             // Restrict to valid discriminator value where we have a discriminator specified on this table
-            BooleanExpression discExpr = SQLStatementHelper.getExpressionForDiscriminatorForClass(stmt, className, discriminatorMetaData, discriminatorMapping, stmt.getPrimaryTable(), clr);
+            BooleanExpression discExpr = DiscriminatorUtils.getExpressionForDiscriminatorForClass(stmt, className, discriminatorMetaData, discriminatorMapping, stmt.getPrimaryTable(), clr);
             stmt.whereAnd(discExpr, false);
         }
 
