@@ -361,6 +361,15 @@ public class PostgreSQLAdapter extends BaseDatastoreAdapter
         return info;
     }
 
+    /**
+     * Accessor for the transaction isolation level to use during schema creation.
+     * @return The transaction isolation level for schema generation process
+     */
+    public int getTransactionIsolationForSchemaCreation()
+    {
+        return Connection.TRANSACTION_READ_COMMITTED;
+    }
+
     // ------------------------------------ Schema Methods -------------------------------------
 
     public String getDropDatabaseStatement(String catalogName, String schemaName)
