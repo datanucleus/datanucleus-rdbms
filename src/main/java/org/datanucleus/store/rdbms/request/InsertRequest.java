@@ -180,7 +180,9 @@ public class InsertRequest extends Request
         table.provideNonPrimaryKeyMappings(consumer);
         table.providePrimaryKeyMappings(consumer);
         table.provideSurrogateMapping(SurrogateColumnType.VERSION, consumer);
-        boolean discriminatorColumnAlreadyMapped = cmd.getDiscriminatorColumnName()!=null && consumer.assignedColumns.containsKey(cmd.getDiscriminatorColumnName().toUpperCase());
+
+        boolean discriminatorColumnAlreadyMapped = cmd.getDiscriminatorColumnName() != null && 
+                consumer.assignedColumns.containsKey(table.getStoreManager().getIdentifierFactory().getIdentifierInAdapterCase(cmd.getDiscriminatorColumnName()));
         if (!discriminatorColumnAlreadyMapped)
         {
             table.provideSurrogateMapping(SurrogateColumnType.DISCRIMINATOR, consumer);
