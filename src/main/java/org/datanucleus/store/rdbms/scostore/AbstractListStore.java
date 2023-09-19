@@ -603,7 +603,7 @@ public abstract class AbstractListStore<E> extends AbstractCollectionStore<E> im
                 }
 
                 // Execute the statement
-                return sqlControl.executeStatementUpdate(ec, conn, shiftStmt, ps, executeNow);
+                return sqlControl.executeStatementUpdate(ec, conn, shiftBulkStmt, ps, executeNow);
             }
             finally
             {
@@ -612,7 +612,7 @@ public abstract class AbstractListStore<E> extends AbstractCollectionStore<E> im
         }
         catch (SQLException sqle)
         {
-            throw new MappedDatastoreException(shiftStmt, sqle);
+            throw new MappedDatastoreException(shiftBulkStmt, sqle);
         }        
     }
 

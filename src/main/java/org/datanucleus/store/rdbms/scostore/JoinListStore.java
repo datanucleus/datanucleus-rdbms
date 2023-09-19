@@ -260,13 +260,15 @@ public class JoinListStore<E> extends AbstractListStore<E>
                 // Shift any existing elements so that we can insert the new element(s) at their position
                 if (!atEnd && start != currentListSize)
                 {
-                    internalShiftBulk(op, mconn, true, start-1, shift, true);
-//                    boolean batched = currentListSize - start > 0;
-//                    for (int i = currentListSize - 1; i >= start; i--)
-//                    {
-//                        // Shift the index for this row by "shift"
-//                        internalShift(op, mconn, batched, i, shift, (i == start));
-//                    }
+//                    internalShiftBulk(op, mconn, true, start-1, shift, true);
+// Revert to "one at a time" shifting to see if that fixed the bug with bulk shifting raised by me:
+// https://github.com/datanucleus/datanucleus-rdbms/issues/464
+                    boolean batched = currentListSize - start > 0;
+                    for (int i = currentListSize - 1; i >= start; i--)
+                    {
+                        // Shift the index for this row by "shift"
+                        internalShift(op, mconn, batched, i, shift, (i == start));
+                    }
                 }
                 else
                 {
