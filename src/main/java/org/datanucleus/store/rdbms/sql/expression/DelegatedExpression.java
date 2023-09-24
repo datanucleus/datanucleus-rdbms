@@ -136,18 +136,33 @@ public abstract class DelegatedExpression extends SQLExpression
         return delegate.sub(expr);
     }
 
-    public SQLExpression invoke(String methodName, List<SQLExpression> args)
+    @Override
+    public boolean isParameter()
     {
-        return stmt.getRDBMSManager().getSQLExpressionFactory().invokeMethod(stmt, mapping.getJavaType().getName(), methodName, this, args);
+        return delegate.isParameter();
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.rdbms.sql.expression.SQLExpression#toSQLText(int)
-     */
+    @Override
+    public int getNumberOfSubExpressions()
+    {
+        return delegate.getNumberOfSubExpressions();
+    }
+
+    @Override
+    public ColumnExpression getSubExpression(int index)
+    {
+        return delegate.getSubExpression(index);
+    }
+
     @Override
     public SQLText toSQLText()
     {
         return delegate.toSQLText();
+    }
+
+    public SQLExpression invoke(String methodName, List<SQLExpression> args)
+    {
+        return stmt.getRDBMSManager().getSQLExpressionFactory().invokeMethod(stmt, mapping.getJavaType().getName(), methodName, this, args);
     }
 
     /**
@@ -159,10 +174,5 @@ public abstract class DelegatedExpression extends SQLExpression
     public SQLExpression getDelegate()
     {
         return delegate;
-    }
-
-    public boolean isParameter()
-    {
-        return delegate.isParameter();
     }
 }
