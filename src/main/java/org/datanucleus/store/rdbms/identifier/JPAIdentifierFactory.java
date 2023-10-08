@@ -81,7 +81,7 @@ public class JPAIdentifierFactory extends AbstractIdentifierFactory
 
         // SCO table for this field
         AbstractMemberMetaData[] relatedMmds = null;
-        if (mmd.getColumnMetaData().length > 0 && mmd.getColumnMetaData()[0].getName() != null)
+        if (mmd.getColumnMetaData().length > 0 && mmd.getColumnMetaData()[0].getName() != null && mmd.getTable() == null)
         {
             // Name the table based on the column
             identifierName = mmd.getColumnMetaData()[0].getName();

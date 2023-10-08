@@ -82,8 +82,7 @@ public class PersistableJoinTable extends JoinTable
         final ColumnMetaData[] ownerColmd;
         final ColumnMetaData[] relatedColmd;
         final boolean hasColumnMetaData = mmd.getColumnMetaData() != null && mmd.getColumnMetaData().length > 0;
-        if (mmd.getJoinMetaData() != null && mmd.getJoinMetaData().getColumnMetaData() != null &&
-            mmd.getJoinMetaData().getColumnMetaData().length > 0)
+        if (mmd.getJoinMetaData() != null && mmd.getJoinMetaData().getColumnMetaData() != null && mmd.getJoinMetaData().getColumnMetaData().length > 0)
         {
             // Column mappings defined at this side
             // When specified at this side they use the <join> tag or

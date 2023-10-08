@@ -3864,24 +3864,23 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                 }
                 else if (relationType == RelationType.MANY_TO_ONE_BI || relationType == RelationType.MANY_TO_ONE_UNI)
                 {
-                    AbstractMemberMetaData[] relMmd = mmd.getRelatedMemberMetaData(clr);
+                    AbstractMemberMetaData[] relMmds = mmd.getRelatedMemberMetaData(clr);
                     DatastoreClass relTable = storeMgr.getDatastoreClass(mmd.getTypeName(), clr);
-                    final AbstractClassMetaData relCmd = relMmd!=null ? relMmd[0].getAbstractClassMetaData()
+                    final AbstractClassMetaData relCmd = relMmds!=null ? relMmds[0].getAbstractClassMetaData()
                             : ec.getMetaDataManager().getMetaDataForClass(mmd.getType(), clr);
-                    if (mmd.getJoinMetaData() != null || relMmd[0].getJoinMetaData() != null)
+                    if (mmd.getJoinMetaData() != null || relMmds[0].getJoinMetaData() != null)
                     {
                         // Has join table so use that
                         sqlTbl = theStmt.getTable(relTable, primaryName);
                         if (sqlTbl == null)
                         {
                             // Join to the join table
-                            Table joinTbl = storeMgr.getTable(relMmd!=null ? relMmd[0] : mmd);
+                            Table joinTbl = storeMgr.getTable(relMmds!=null ? relMmds[0] : mmd);
                             final JavaTypeMapping sourceMapping;
                             final JavaTypeMapping targetMapping;
                             if (joinTbl instanceof PersistableJoinTable)
                             {
-                                // join table defined locally on this assoc - and according to comment in
-                                // PersistableJoinTable:
+                                // join table defined locally on this assoc - and according to comment in PersistableJoinTable:
                                 //   *The "owner" in this case is the side with the relation (the "N" side). The "related" is the other side*
                                 sourceMapping = ((PersistableJoinTable)joinTbl).getRelatedMapping();
                                 targetMapping = ((PersistableJoinTable)joinTbl).getOwnerMapping();
