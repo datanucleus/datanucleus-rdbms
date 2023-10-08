@@ -47,8 +47,6 @@ import org.datanucleus.util.NucleusLogger;
  */
 public class PersistableJoinTable extends JoinTable
 {
-    /** Table of the owner of this member. */
-    protected Table ownerTable;
 
     /** Mapping from the join table to the "related". This will be a PersistableMapping. */
     protected JavaTypeMapping relatedMapping;
@@ -80,14 +78,27 @@ public class PersistableJoinTable extends JoinTable
     {
         boolean pkRequired = requiresPrimaryKey();
 
-        // Add owner mapping
-        ColumnMetaData[] ownerColmd = null;
-        if (mmd.getColumnMetaData() != null && mmd.getColumnMetaData().length > 0)
+        // Prepare mapping creations
+        final ColumnMetaData[] ownerColmd;
+        final ColumnMetaData[] relatedColmd;
+        final boolean hasColumnMetaData = mmd.getColumnMetaData() != null && mmd.getColumnMetaData().length > 0;
+        if (mmd.getJoinMetaData() != null && mmd.getJoinMetaData().getColumnMetaData() != null &&
+            mmd.getJoinMetaData().getColumnMetaData().length > 0)
         {
-            // Column mappings defined at this side via <column>
-            ownerColmd = mmd.getColumnMetaData();
+            // Column mappings defined at this side
+            // When specified at this side they use the <join> tag or
+            // @Join annotation with column mappings
+            ownerColmd = mmd.getJoinMetaData().getColumnMetaData();
+            relatedColmd = hasColumnMetaData ? mmd.getColumnMetaData() : null;
         }
-        ownerMapping = ColumnCreator.createColumnsForJoinTables(clr.classForName(mmd.getClassName(true)), mmd, 
+        else
+        {
+            // Column mappings defined not defined - we auto-create them from other side
+            ownerColmd = hasColumnMetaData ? mmd.getColumnMetaData() : null;
+            relatedColmd = null;
+        }
+        // Add owner mapping
+        ownerMapping = ColumnCreator.createColumnsForJoinTables(clr.classForName(mmd.getClassName(true)), mmd,
             ownerColmd, storeMgr, this, pkRequired, false, FieldRole.ROLE_OWNER, clr, null);
         if (NucleusLogger.DATASTORE.isDebugEnabled())
         {
@@ -95,13 +106,6 @@ public class PersistableJoinTable extends JoinTable
         }
 
         // Add related mapping
-        ColumnMetaData[] relatedColmd = null;
-        if (mmd.getJoinMetaData().getColumnMetaData() != null &&
-            mmd.getJoinMetaData().getColumnMetaData().length > 0)
-        {
-            // Column mappings defined at this side via <join>
-            relatedColmd = mmd.getJoinMetaData().getColumnMetaData();
-        }
         relatedMapping = ColumnCreator.createColumnsForJoinTables(mmd.getType(), mmd,
             relatedColmd, storeMgr, this, pkRequired, false, FieldRole.ROLE_PERSISTABLE_RELATION, clr, null);
         if (NucleusLogger.DATASTORE.isDebugEnabled())

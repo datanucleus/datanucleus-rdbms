@@ -176,6 +176,7 @@ public class JoinPersistableRelationStore implements PersistableRelationStore
         String updateStmt = getUpdateStmt();
         ExecutionContext ec = sm1.getExecutionContext();
         SQLController sqlControl = storeMgr.getSQLController();
+        boolean updated = false;
         try
         {
             ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
@@ -189,7 +190,7 @@ public class JoinPersistableRelationStore implements PersistableRelationStore
 
                 // Execute the statement
                 int[] nums = sqlControl.executeStatementUpdate(ec, mconn, updateStmt, ps, true);
-                return (nums != null && nums.length == 1 && nums[0] == 1);
+                updated =  (nums != null && nums.length == 1 && nums[0] == 1);
             }
             finally
             {
@@ -201,6 +202,11 @@ public class JoinPersistableRelationStore implements PersistableRelationStore
         {
             throw new NucleusDataStoreException("Exception thrown updating row into persistable relation join table", sqle);
         }
+        if (!updated)
+        {
+            return add(sm1, sm2);
+        }
+        return updated;
     }
 
     /**
