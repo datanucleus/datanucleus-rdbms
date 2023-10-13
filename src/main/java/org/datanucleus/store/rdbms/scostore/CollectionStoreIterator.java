@@ -38,7 +38,7 @@ import org.datanucleus.store.rdbms.table.Table;
  * RDBMS-specific implementation of {@link Iterator} for Collections/Sets.
  * @param <E> Type of element in the collection backing store
  */
-class CollectionStoreIterator<E> implements Iterator<E>
+public class CollectionStoreIterator<E> implements Iterator<E>
 {
     private final AbstractCollectionStore<E> collStore;
     private final DNStateManager sm;
@@ -46,7 +46,7 @@ class CollectionStoreIterator<E> implements Iterator<E>
     private final Iterator<E> delegate;
     private E lastElement = null;
 
-    CollectionStoreIterator(DNStateManager sm, ResultSet rs, ResultObjectFactory rof, AbstractCollectionStore<E> store)
+    public CollectionStoreIterator(DNStateManager sm, ResultSet rs, ResultObjectFactory rof, AbstractCollectionStore<E> store)
     {
         this.sm = sm;
         this.ec = sm.getExecutionContext();
