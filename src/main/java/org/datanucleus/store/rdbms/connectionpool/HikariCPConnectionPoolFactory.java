@@ -173,6 +173,12 @@ public class HikariCPConnectionPoolFactory extends AbstractConnectionPoolFactory
             config.setConnectionInitSql(connectionInitSQL);
         }
 
+        if (storeMgr.hasProperty(RDBMSPropertyNames.PROPERTY_CONNECTION_POOL_REGISTER_MBEANS))
+        {
+            boolean registerMbeans = storeMgr.getBooleanProperty(RDBMSPropertyNames.PROPERTY_CONNECTION_POOL_REGISTER_MBEANS);
+            config.setRegisterMbeans(registerMbeans);
+        }
+
         // Create the actual pool of connections
         HikariDataSource ds = new HikariDataSource(config);
 
