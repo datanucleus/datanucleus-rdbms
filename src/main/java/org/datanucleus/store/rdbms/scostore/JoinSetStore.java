@@ -191,7 +191,7 @@ public class JoinSetStore<E> extends AbstractSetStore<E>
      * @param element The element
      * @return Whether the element contains the owner
      */
-    private boolean elementAlreadyContainsOwnerInMtoN(DNStateManager ownerSM, Object element)
+    protected boolean elementAlreadyContainsOwnerInMtoN(DNStateManager ownerSM, Object element)
     {
         ExecutionContext ec = ownerSM.getExecutionContext();
 
@@ -537,7 +537,7 @@ public class JoinSetStore<E> extends AbstractSetStore<E>
         return stmt.toString();
     }
 
-    private boolean locate(DNStateManager sm, Object element)
+    protected boolean locate(DNStateManager sm, Object element)
     {
         boolean exists = true;
         String stmt = getLocateStmt(element);
@@ -679,7 +679,7 @@ public class JoinSetStore<E> extends AbstractSetStore<E>
      * @param element The element to locate
      * @return Statement for locating an owner-element relation in the join table
      */
-    private String getLocateStatementString(Object element)
+    protected String getLocateStatementString(Object element)
     {
         StringBuilder stmt = new StringBuilder("SELECT 1 FROM ").append(containerTable.toString()).append(" WHERE ");
         BackingStoreHelper.appendWhereClauseForMapping(stmt, ownerMapping, null, true);
