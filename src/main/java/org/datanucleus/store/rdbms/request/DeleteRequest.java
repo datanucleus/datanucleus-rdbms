@@ -25,6 +25,7 @@ package org.datanucleus.store.rdbms.request;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -109,6 +110,9 @@ public class DeleteRequest extends Request
     /** MetaData for the version handling. */
     protected VersionMetaData versionMetaData = null;
 
+    /** Fields in PK that are null - only used if PC model has objects with nullable PK fields */
+    private final BitSet nullPkFields;
+
     /** Whether we should make checks on optimistic version before updating. */
     protected boolean versionChecks = false;
 
@@ -117,10 +121,12 @@ public class DeleteRequest extends Request
      * @param table The Class Table representing the datastore table to delete.
      * @param cmd ClassMetaData of objects being deleted
      * @param clr ClassLoader resolver
+     * @param nullPkFields Fields in PK that are null - only used if PC model has objects with nullable PK fields
      */
-    public DeleteRequest(DatastoreClass table, AbstractClassMetaData cmd, ClassLoaderResolver clr)
+    public DeleteRequest(DatastoreClass table, AbstractClassMetaData cmd, ClassLoaderResolver clr, BitSet nullPkFields)
     {
         super(table);
+        this.nullPkFields = nullPkFields;
 
         this.cmd = cmd;
         versionMetaData = table.getVersionMetaData();
@@ -529,10 +535,10 @@ public class DeleteRequest extends Request
         int paramIndex = 1;
 
         /** WHERE clause field numbers to use in identifying the record to delete. */
-        private List whereFields = new ArrayList();
+        private List<Integer> whereFields = new ArrayList<>();
 
         /** Fields in a 1-1 relation with FK in the table of the other object. */
-        private List oneToOneNonOwnerFields = new ArrayList();
+        private List<AbstractMemberMetaData> oneToOneNonOwnerFields = new ArrayList<>();
 
         /** Mapping Callbacks to invoke at deletion. */
         private List<MappingCallbacks> callbackMappings = null;
@@ -621,14 +627,20 @@ public class DeleteRequest extends Request
                                 where.append(" AND ");
                             }
                             where.append(m.getColumnMapping(j).getColumn().getIdentifier());
-                            where.append("="); 
-                            where.append(m.getColumnMapping(j).getUpdateInputParameter());
-
-                            if (!whereFields.contains(abs_field_num))
+                            if (nullPkFields.get(abs_field_num))
                             {
-                                whereFields.add(abs_field_num);
+                                where.append(" IS NULL");
                             }
-                            parametersIndex[j] = paramIndex++;
+                            else {
+                                where.append("=");
+                                where.append(m.getColumnMapping(j).getUpdateInputParameter());
+
+                                if (!whereFields.contains(abs_field_num))
+                                {
+                                    whereFields.add(abs_field_num);
+                                }
+                                parametersIndex[j] = paramIndex++;
+                            }
                         }
                     }
                 }
@@ -746,7 +758,7 @@ public class DeleteRequest extends Request
             int[] fieldNumbers = new int[whereFields.size()];
             for (int i = 0; i < whereFields.size(); i++)
             {
-                fieldNumbers[i] = ((Integer)whereFields.get(i)).intValue();
+                fieldNumbers[i] = whereFields.get(i);
             }
             return fieldNumbers;
         }
@@ -760,7 +772,7 @@ public class DeleteRequest extends Request
             AbstractMemberMetaData[] fmds = new AbstractMemberMetaData[oneToOneNonOwnerFields.size()];
             for (int i = 0; i < oneToOneNonOwnerFields.size(); ++i)
             {
-                fmds[i] = (AbstractMemberMetaData) oneToOneNonOwnerFields.get(i);
+                fmds[i] = oneToOneNonOwnerFields.get(i);
             }
             return fmds;
         }

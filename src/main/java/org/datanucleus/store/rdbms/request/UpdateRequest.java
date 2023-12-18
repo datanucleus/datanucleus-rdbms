@@ -26,6 +26,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -105,6 +106,9 @@ public class UpdateRequest extends Request
     /** MetaData for the version handling. */
     protected VersionMetaData versionMetaData = null;
 
+    /** Fields in PK that are null - only used if PC model has objects with nullable PK fields */
+    private final BitSet nullPkFields;
+
     /** Whether we should make checks on optimistic version before updating. */
     protected boolean versionChecks = false;
 
@@ -123,7 +127,21 @@ public class UpdateRequest extends Request
      */
     public UpdateRequest(DatastoreClass table, AbstractMemberMetaData[] reqFieldMetaData, AbstractClassMetaData cmd, ClassLoaderResolver clr)
     {
+        this(table, reqFieldMetaData, cmd, clr, new BitSet(0));
+    }
+
+    /**
+     * Constructor, taking the table. Uses the structure of the datastore table to build a basic query.
+     * @param table The Class Table representing the datastore table to update
+     * @param reqFieldMetaData MetaData of the fields to update
+     * @param cmd ClassMetaData of objects being updated
+     * @param clr ClassLoader resolver
+     * @param nullPkFields Fields in PK that are null - only used if PC model has objects with nullable PK fields
+     */
+    public UpdateRequest(DatastoreClass table, AbstractMemberMetaData[] reqFieldMetaData, AbstractClassMetaData cmd, ClassLoaderResolver clr, BitSet nullPkFields)
+    {
         super(table);
+        this.nullPkFields = nullPkFields;
 
         this.cmd = cmd;
         versionMetaData = table.getVersionMetaData();
@@ -254,6 +272,15 @@ public class UpdateRequest extends Request
         postSetMappings = consumer.getPostSetMappings();
         whereFieldNumbers = consumer.getWhereFieldNumbers();
         updateFieldNumbers = consumer.getUpdateFieldNumbers();
+    }
+
+    /**
+     * Check if update request will actually do any updates.
+     * @return true if updates will be made, and return false if no updates will be made.
+     */
+    public boolean willUpdate()
+    {
+        return updateStmt != null;
     }
 
     /**
@@ -551,10 +578,10 @@ public class UpdateRequest extends Request
         int paramIndex = 1;
 
         /** Numbers of all fields to be updated. */
-        List updateFields = new ArrayList();
+        List<Integer> updateFields = new ArrayList<>();
 
         /** Numbers of all WHERE clause fields. */
-        List whereFields = new ArrayList();
+        List<Integer> whereFields = new ArrayList<>();
 
         /** Mappings that require post-set processing. */
         List<JavaTypeMapping> postSetMappings;
@@ -672,14 +699,20 @@ public class UpdateRequest extends Request
                                 where.append(" AND ");
                             }
                             where.append(m.getColumnMapping(j).getColumn().getIdentifier());
-                            where.append("=");
-                            where.append(m.getColumnMapping(j).getUpdateInputParameter());
-
-                            if (!whereFields.contains(abs_field_num))
+                            if (nullPkFields.get(abs_field_num))
                             {
-                                whereFields.add(abs_field_num);
+                                where.append(" IS NULL");
                             }
-                            parametersIndex[j] = paramIndex++;
+                            else {
+                                where.append("=");
+                                where.append(m.getColumnMapping(j).getUpdateInputParameter());
+
+                                if (!whereFields.contains(abs_field_num))
+                                {
+                                    whereFields.add(abs_field_num);
+                                }
+                                parametersIndex[j] = paramIndex++;
+                            }
                         }
                     }
                 }
@@ -867,7 +900,7 @@ public class UpdateRequest extends Request
             int[] fieldNumbers = new int[updateFields.size()];
             for (int i = 0; i < updateFields.size(); ++i)
             {
-                fieldNumbers[i] = ((Integer) updateFields.get(i)).intValue();
+                fieldNumbers[i] = updateFields.get(i);
             }
             return fieldNumbers;
         }
@@ -881,7 +914,7 @@ public class UpdateRequest extends Request
             int[] fieldNumbers = new int[whereFields.size()];
             for (int i = 0; i < whereFields.size(); i++)
             {
-                fieldNumbers[i] = ((Integer) whereFields.get(i)).intValue();
+                fieldNumbers[i] = whereFields.get(i);
             }
             return fieldNumbers;
         }
