@@ -60,6 +60,8 @@ public class RDBMSPropertyNames
     public static final String PROPERTY_RDBMS_STATEMENT_LOGGING = "datanucleus.rdbms.statementLogging".toLowerCase();
     public static final String PROPERTY_RDBMS_STATEMENT_BATCH_LIMIT = "datanucleus.rdbms.statementBatchLimit".toLowerCase();
 
+    public static final String PROPERTY_RDBMS_FLUSH_PROCESS_CLASS = "datanucleus.rdbms.flushProcessClass".toLowerCase();
+
     // TODO Likely these should move to core plugin
     public static final String PROPERTY_CONNECTION_POOL_MAX_CONNECTIONS = "datanucleus.connectionPool.maxConnections".toLowerCase();
     public static final String PROPERTY_CONNECTION_POOL_MAX_STATEMENTS = "datanucleus.connectionPool.maxStatements".toLowerCase();
