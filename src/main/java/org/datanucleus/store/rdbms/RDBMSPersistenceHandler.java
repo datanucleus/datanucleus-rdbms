@@ -96,7 +96,7 @@ public class RDBMSPersistenceHandler extends AbstractPersistenceHandler
         return ((RDBMSStoreManager)storeMgr).getDatastoreClass(className, clr);
     }
 
-    private static BitSet getNullPkFields(DNStateManager<?> sm)
+    protected BitSet getNullPkFields(DNStateManager<?> sm)
     {
         final AbstractClassMetaData cmd = sm.getClassMetaData();
         int[] nullablePkFieldsForPC = nullablePkFields.computeIfAbsent(sm.getObject().getClass(), pcClass ->
