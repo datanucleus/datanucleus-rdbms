@@ -822,4 +822,24 @@ public class SQLController
         };
         conn.addListener(listener);
     }
+
+    /**
+     * Will flush any remaining batch operations.
+     * This method can be called from custom flush processes in order to have final
+     * batch operations executed within same commit scope as the rest of the operations
+     * during commit.
+     * If not done in that scope it will end up being called later on when calling listener
+     * added in above setConnectionStatementState - which might propagate exceptions differently
+     * to client code.
+     * @param conn connection used
+     */
+    public void flushBatch(ManagedConnection conn)
+    {
+        try
+        {
+            processConnectionStatement(conn);
+        } catch (SQLException e) {
+            throw RequestUtil.convertSqlException("Error from flushing SQL batch: "+e.getMessage(), e);
+        }
+    }
 }
