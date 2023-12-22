@@ -21,6 +21,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.BitSet;
 import java.util.List;
 
 import org.datanucleus.ClassLoaderResolver;
@@ -43,6 +45,7 @@ import org.datanucleus.store.rdbms.fieldmanager.ParameterSetter;
 import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.SelectStatement;
 import org.datanucleus.store.rdbms.sql.expression.InExpression;
+import org.datanucleus.store.rdbms.sql.expression.NullLiteral;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpressionFactory;
 import org.datanucleus.store.rdbms.table.DatastoreClass;
@@ -68,13 +71,18 @@ public class LocateRequest extends Request
     /** Definition of mappings in the SQL statement. */
     private StatementClassMapping mappingDefinition;
 
+    /** ALl non-null PK members */
+    private int[] nonNullPkMembers = null;
+
     /**
      * Constructor, taking the table. Uses the structure of the datastore table to build a basic query.
-     * @param table The Class Table representing the datastore table to retrieve
-     * @param cmd Metadata for the class we are locating an instance of
-     * @param clr ClassLoader resolver
+     *
+     * @param table        The Class Table representing the datastore table to retrieve
+     * @param cmd          Metadata for the class we are locating an instance of
+     * @param clr          ClassLoader resolver
+     * @param nullPkFields Fields in PK that are null - only used if PC model has objects with nullable PK fields
      */
-    public LocateRequest(DatastoreClass table, AbstractClassMetaData cmd, ClassLoaderResolver clr)
+    public LocateRequest(DatastoreClass table, AbstractClassMetaData cmd, ClassLoaderResolver clr, BitSet nullPkFields)
     {
         super(table);
 
@@ -105,6 +113,9 @@ public class LocateRequest extends Request
         }
         else if (table.getIdentityType() == IdentityType.APPLICATION)
         {
+            nonNullPkMembers = Arrays.stream(cmd.getPKMemberPositions())
+                    .filter(pos -> nullPkFields==null || !nullPkFields.get(pos))
+                    .toArray();
             // Application identity value(s) for input
             int[] pkNums = cmd.getPKMemberPositions();
             for (int i=0;i<pkNums.length;i++)
@@ -116,21 +127,29 @@ public class LocateRequest extends Request
                     pkMapping = table.getMemberMapping(mmd);
                 }
                 SQLExpression expr = exprFactory.newExpression(sqlStatement, sqlStatement.getPrimaryTable(), pkMapping);
-                SQLExpression val = exprFactory.newLiteralParameter(sqlStatement, pkMapping, null, "PK" + i);
-                sqlStatement.whereAnd(expr.eq(val), true);
+                if (nullPkFields != null && nullPkFields.get(i))
+                {
+                    // Support for nullable PK fields
+                    final NullLiteral nullLiteral = new NullLiteral(sqlStatement, null, null, null);
+                    sqlStatement.whereAnd(expr.eq(nullLiteral), true);
+                }
+                else {
+                    SQLExpression val = exprFactory.newLiteralParameter(sqlStatement, pkMapping, null, "PK" + i);
+                    sqlStatement.whereAnd(expr.eq(val), true);
 
-                StatementMappingIndex pkIdx = mappingDefinition.getMappingForMemberPosition(pkNums[i]);
-                if (pkIdx == null)
-                {
-                    pkIdx = new StatementMappingIndex(pkMapping);
-                    mappingDefinition.addMappingForMember(pkNums[i], pkIdx);
+                    StatementMappingIndex pkIdx = mappingDefinition.getMappingForMemberPosition(pkNums[i]);
+                    if (pkIdx == null)
+                    {
+                        pkIdx = new StatementMappingIndex(pkMapping);
+                        mappingDefinition.addMappingForMember(pkNums[i], pkIdx);
+                    }
+                    int[] inputParams = new int[pkMapping.getNumberOfColumnMappings()];
+                    for (int j = 0; j < pkMapping.getNumberOfColumnMappings(); j++)
+                    {
+                        inputParams[j] = inputParamNum++;
+                    }
+                    pkIdx.addParameterOccurrence(inputParams);
                 }
-                int[] inputParams = new int[pkMapping.getNumberOfColumnMappings()];
-                for (int j=0;j<pkMapping.getNumberOfColumnMappings();j++)
-                {
-                    inputParams[j] = inputParamNum++;
-                }
-                pkIdx.addParameterOccurrence(inputParams);
             }
         }
 
@@ -232,7 +251,7 @@ public class LocateRequest extends Request
                         }
                         else if (cmd.getIdentityType() == IdentityType.APPLICATION)
                         {
-                            sm.provideFields(cmd.getPKMemberPositions(), new ParameterSetter(sm, ps, mappingDefinition));
+                            sm.provideFields(nonNullPkMembers, new ParameterSetter(sm, ps, mappingDefinition));
                         }
 
                         JavaTypeMapping multitenancyMapping = table.getSurrogateMapping(SurrogateColumnType.MULTITENANCY, false);

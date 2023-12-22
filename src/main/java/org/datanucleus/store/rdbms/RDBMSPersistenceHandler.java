@@ -18,12 +18,15 @@ Contributors:
 package org.datanucleus.store.rdbms;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.BitSet;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ExecutionContext;
@@ -34,6 +37,7 @@ import org.datanucleus.exceptions.NucleusObjectNotFoundException;
 import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
+import org.datanucleus.metadata.ColumnMetaData;
 import org.datanucleus.metadata.InheritanceStrategy;
 import org.datanucleus.metadata.RelationType;
 import org.datanucleus.state.DNStateManager;
@@ -52,6 +56,7 @@ import org.datanucleus.store.rdbms.request.UpdateRequest;
 import org.datanucleus.store.rdbms.table.ClassView;
 import org.datanucleus.store.rdbms.table.DatastoreClass;
 import org.datanucleus.store.rdbms.table.SecondaryDatastoreClass;
+import org.datanucleus.store.types.converters.TypeConverter;
 import org.datanucleus.util.ConcurrentReferenceHashMap;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
@@ -64,6 +69,9 @@ public class RDBMSPersistenceHandler extends AbstractPersistenceHandler
 {
     /** The cache of database requests. Access is synchronized on the map object itself. */
     private Map<RequestIdentifier, Request> requestsByID = new ConcurrentReferenceHashMap<>(1, ReferenceType.STRONG, ReferenceType.SOFT);
+
+    /** Cache of nullable PK fields */
+    private static Map<Class<?>, int[]> nullablePkFields = new ConcurrentHashMap<>();
 
     /**
      * Constructor.
@@ -86,6 +94,57 @@ public class RDBMSPersistenceHandler extends AbstractPersistenceHandler
     private DatastoreClass getDatastoreClass(String className, ClassLoaderResolver clr)
     {
         return ((RDBMSStoreManager)storeMgr).getDatastoreClass(className, clr);
+    }
+
+    protected BitSet getNullPkFields(DNStateManager<?> sm)
+    {
+        final AbstractClassMetaData cmd = sm.getClassMetaData();
+        int[] nullablePkFieldsForPC = nullablePkFields.computeIfAbsent(sm.getObject().getClass(), pcClass ->
+        {
+            final int[] pkMemberPositions = cmd.getPKMemberPositions();
+            if (pkMemberPositions == null)
+            {
+                return new int[0];
+            }
+            return Arrays.stream(pkMemberPositions)
+                    .sorted()
+                    .filter(no ->
+                    {
+                        final AbstractMemberMetaData mmd = cmd.getMetaDataForManagedMemberAtAbsolutePosition(no);
+                        if (mmd != null)
+                        {
+                            final ColumnMetaData[] columnMetaData = mmd.getColumnMetaData();
+                            if (columnMetaData != null)
+                            {
+                                for (ColumnMetaData columnMetaDatum : columnMetaData)
+                                {
+                                    if (columnMetaDatum.isAllowsNull())
+                                    {
+                                        return true;
+                                    }
+                                }
+                            }
+                        }
+                        return false;
+                    })
+                    .toArray();
+        });
+
+        BitSet concreteNullPkFields = new BitSet();
+
+        for (int nullablePkField : nullablePkFieldsForPC)
+        {
+            final String typeConverterName = cmd.getMetaDataForManagedMemberAtAbsolutePosition(nullablePkField)
+                    .getTypeConverterName();
+            final TypeConverter typeConverter = sm.getExecutionContext().getNucleusContext()
+                    .getTypeManager().getTypeConverterForName(typeConverterName);
+            final Object val = sm.provideField(nullablePkField);
+            if ((typeConverter==null ? val : typeConverter.toDatastoreType(val)) == null)
+            {
+                concreteNullPkFields.set(nullablePkField);
+            }
+        }
+        return concreteNullPkFields;
     }
 
     // ------------------------------ Insert ----------------------------------
@@ -350,7 +409,7 @@ public class RDBMSPersistenceHandler extends AbstractPersistenceHandler
             }
 
             DatastoreClass table = getDatastoreClass(sm.getClassMetaData().getFullClassName(), clr);
-            Request req = getFetchRequest(table, sm.getFetchPlanForClass(), clr, sm.getClassMetaData(), mmdsToFetch, mmdsToStore);
+            Request req = getFetchRequest(table, sm.getFetchPlanForClass(), clr, sm, mmdsToFetch, mmdsToStore);
             req.execute(sm);
         }
     }
@@ -361,20 +420,22 @@ public class RDBMSPersistenceHandler extends AbstractPersistenceHandler
      * @param table The table from which to fetch.
      * @param fpClass FetchPlan for class
      * @param clr ClassLoader resolver
-     * @param cmd ClassMetaData of the object of the request
+     * @param sm StateManager for the object being updated
      * @param mmdsFetch MetaData for the members to be fetched.
      * @param mmdsStore MetaData for the members to store the values for later processing
      * @return A fetch request object.
      */
-    private Request getFetchRequest(DatastoreClass table, FetchPlanForClass fpClass, ClassLoaderResolver clr, AbstractClassMetaData cmd, 
+    private Request getFetchRequest(DatastoreClass table, FetchPlanForClass fpClass, ClassLoaderResolver clr, DNStateManager<?> sm,
             AbstractMemberMetaData[] mmdsFetch, AbstractMemberMetaData[] mmdsStore)
     {
         // TODO Add fpClass to RequestIdentifier
-        RequestIdentifier reqID = new RequestIdentifier(table, mmdsFetch, mmdsStore, RequestType.FETCH, cmd.getFullClassName());
+        final BitSet nullPkFields = getNullPkFields(sm);
+        final AbstractClassMetaData cmd = sm.getClassMetaData();
+        RequestIdentifier reqID = new RequestIdentifier(table, mmdsFetch, mmdsStore, RequestType.FETCH, cmd.getFullClassName(), nullPkFields);
         Request req = requestsByID.get(reqID);
         if (req == null)
         {
-            req = new FetchRequest(table, fpClass, clr, cmd, mmdsFetch, mmdsStore);
+            req = new FetchRequest(table, fpClass, clr, cmd, mmdsFetch, mmdsStore, nullPkFields);
             requestsByID.put(reqID, req);
         }
         return req;
@@ -394,9 +455,6 @@ public class RDBMSPersistenceHandler extends AbstractPersistenceHandler
     @Override
     public void updateObject(DNStateManager sm, int fieldNumbers[])
     {
-        // Check if read-only so update not permitted
-        assertReadOnlyForUpdateOfObject(sm);
-
         // Check if we need to do any updates to the schema before updating this object
         checkForSchemaUpdatesForFieldsOfObject(sm, fieldNumbers);
 
@@ -444,7 +502,14 @@ public class RDBMSPersistenceHandler extends AbstractPersistenceHandler
         }
 
         // Do the actual update of this table
-        getUpdateRequest(table, mmds, sm.getClassMetaData(), clr).execute(sm);
+        final Request updateRequest = getUpdateRequest(table, mmds, sm, clr);
+        if (!(updateRequest instanceof UpdateRequest) || ((UpdateRequest) updateRequest).willUpdate())
+        {
+            // Check if read-only so update not permitted
+            // Only check if update request really will update anything
+            assertReadOnlyForUpdateOfObject(sm);
+        }
+        updateRequest.execute(sm);
 
         // Update any secondary tables
         Collection<? extends SecondaryDatastoreClass> secondaryTables = table.getSecondaryDatastoreClasses();
@@ -463,17 +528,19 @@ public class RDBMSPersistenceHandler extends AbstractPersistenceHandler
      * The store manager will cache the request object for re-use by subsequent requests to the same table.
      * @param table The table in which to update.
      * @param mmds The metadata corresponding to the columns to be updated. MetaData whose columns exist in supertables will be ignored.
-     * @param cmd ClassMetaData of the object of the request
+     * @param sm StateManager for the object being updated
      * @param clr ClassLoader resolver
      * @return An update request object.
      */
-    private Request getUpdateRequest(DatastoreClass table, AbstractMemberMetaData[] mmds, AbstractClassMetaData cmd, ClassLoaderResolver clr)
+    private Request getUpdateRequest(DatastoreClass table, AbstractMemberMetaData[] mmds, DNStateManager<?> sm, ClassLoaderResolver clr)
     {
-        RequestIdentifier reqID = new RequestIdentifier(table, mmds, RequestType.UPDATE, cmd.getFullClassName());
+        final AbstractClassMetaData cmd = sm.getClassMetaData();
+        BitSet nullPkFields = getNullPkFields(sm);
+        RequestIdentifier reqID = new RequestIdentifier(table, mmds, null, RequestType.UPDATE, cmd.getFullClassName(), nullPkFields);
         Request req = requestsByID.get(reqID);
         if (req == null)
         {
-            req = new UpdateRequest(table, mmds, cmd, clr);
+            req = new UpdateRequest(table, mmds, cmd, clr, nullPkFields);
             requestsByID.put(reqID, req);
         }
         return req;
@@ -531,7 +598,7 @@ public class RDBMSPersistenceHandler extends AbstractPersistenceHandler
         }
 
         // Do the actual delete of this table
-        getDeleteRequest(table, sm.getClassMetaData(), clr).execute(sm);
+        getDeleteRequest(table, sm, clr).execute(sm);
 
         DatastoreClass supertable = table.getSuperDatastoreClass();
         if (supertable != null)
@@ -545,17 +612,19 @@ public class RDBMSPersistenceHandler extends AbstractPersistenceHandler
      * Returns a request object that will delete a row from the given table.
      * The store manager will cache the request object for re-use by subsequent requests to the same table.
      * @param table The table from which to delete.
-     * @param acmd ClassMetaData of the object of the request
+     * @param sm StateManager for the object being updated
      * @param clr ClassLoader resolver
      * @return A deletion request object.
      */
-    private Request getDeleteRequest(DatastoreClass table, AbstractClassMetaData acmd, ClassLoaderResolver clr)
+    private Request getDeleteRequest(DatastoreClass table, DNStateManager<?> sm, ClassLoaderResolver clr)
     {
-        RequestIdentifier reqID = new RequestIdentifier(table, null, RequestType.DELETE, acmd.getFullClassName());
+        final AbstractClassMetaData acmd = sm.getClassMetaData();
+        BitSet nullPkFields = getNullPkFields(sm);
+        RequestIdentifier reqID = new RequestIdentifier(table, null, null, RequestType.DELETE, acmd.getFullClassName(), nullPkFields);
         Request req = requestsByID.get(reqID);
         if (req == null)
         {
-            req = new DeleteRequest(table, acmd, clr);
+            req = new DeleteRequest(table, acmd, clr, nullPkFields);
             requestsByID.put(reqID, req);
         }
         return req;
@@ -612,24 +681,26 @@ public class RDBMSPersistenceHandler extends AbstractPersistenceHandler
     {
         ClassLoaderResolver clr = sm.getExecutionContext().getClassLoaderResolver();
         DatastoreClass table = getDatastoreClass(sm.getObject().getClass().getName(), clr);
-        getLocateRequest(table, sm.getClassMetaData(), clr).execute(sm);
+        getLocateRequest(table, sm, clr).execute(sm);
     }
 
     /**
      * Returns a request object that will locate a row from the given table.
      * The store manager will cache the request object for re-use by subsequent requests to the same table.
      * @param table The table from which to locate.
-     * @param cmd Metadata for the class being located
+     * @param sm StateManager for the object being updated
      * @param clr ClassLoader resolver
      * @return A locate request object.
      */
-    private Request getLocateRequest(DatastoreClass table, AbstractClassMetaData cmd, ClassLoaderResolver clr)
+    private Request getLocateRequest(DatastoreClass table, DNStateManager<?> sm, ClassLoaderResolver clr)
     {
-        RequestIdentifier reqID = new RequestIdentifier(table, null, RequestType.LOCATE, cmd.getFullClassName());
+        final AbstractClassMetaData cmd = sm.getClassMetaData();
+        BitSet nullPkFields = getNullPkFields(sm);
+        RequestIdentifier reqID = new RequestIdentifier(table, null, null, RequestType.LOCATE, cmd.getFullClassName(), nullPkFields);
         Request req = requestsByID.get(reqID);
         if (req == null)
         {
-            req = new LocateRequest(table, cmd, clr);
+            req = new LocateRequest(table, cmd, clr, nullPkFields);
             requestsByID.put(reqID, req);
         }
         return req;

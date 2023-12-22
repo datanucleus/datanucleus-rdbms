@@ -19,6 +19,8 @@ Contributors:
 package org.datanucleus.store.rdbms.request;
 
 import java.util.Arrays;
+import java.util.BitSet;
+import java.util.Objects;
 
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.store.rdbms.table.DatastoreClass;
@@ -34,6 +36,7 @@ public class RequestIdentifier
     private final RequestType type;
     private final int hashCode;
     private final String className;
+    private final BitSet nullPkFields;
 
     /**
      * Constructor.
@@ -44,52 +47,25 @@ public class RequestIdentifier
      */
     public RequestIdentifier(DatastoreClass table, AbstractMemberMetaData[] mmds, RequestType type, String className)
     {
-        this.table = table;
-        this.type = type;
-        this.secondaryMemberNumbers = null;
-
-        if (mmds == null)
-        {
-            this.memberNumbers = null;
-        }
-        else
-        {
-            this.memberNumbers = new int[mmds.length];
-            for (int i=0;i<this.memberNumbers.length;i++)
-            {
-                this.memberNumbers[i] = mmds[i].getAbsoluteFieldNumber();
-            }
-
-            // The key uniqueness is dependent on memberNumbers being sorted
-            Arrays.sort(this.memberNumbers);
-        }
-        this.className = className;
-
-        // Since we are an immutable object, pre-compute the hash code for improved performance in equals()
-        int h = table.hashCode() ^ type.hashCode() ^ className.hashCode();
-        if (this.memberNumbers != null)
-        {
-            for (int i = 0; i < this.memberNumbers.length; ++i)
-            {
-                h ^= this.memberNumbers[i];
-            }
-        }
-        hashCode = h;
+        this(table, mmds, null, type, className, null);
     }
 
     /**
      * Constructor.
-     * @param table Datastore class for which this is a request
-     * @param mmds MetaData of members to use in the request (if required)
+     *
+     * @param table         Datastore class for which this is a request
+     * @param mmds          MetaData of members to use in the request (if required)
      * @param secondaryMmds MetaData of secondary members to use the in the request
-     * @param type The type being represented
-     * @param className The name of the class
+     * @param type          The type being represented
+     * @param className     The name of the class
+     * @param nullPkFields  PK fields that are null
      */
-    public RequestIdentifier(DatastoreClass table, AbstractMemberMetaData[] mmds, AbstractMemberMetaData[] secondaryMmds, RequestType type, String className)
+    public RequestIdentifier(DatastoreClass table, AbstractMemberMetaData[] mmds, AbstractMemberMetaData[] secondaryMmds, RequestType type, String className, BitSet nullPkFields)
     {
         this.table = table;
         this.type = type;
         this.className = className;
+        this.nullPkFields = nullPkFields;
 
         if (mmds == null)
         {
@@ -123,25 +99,10 @@ public class RequestIdentifier
         }
 
         // Since we are an immutable object, pre-compute the hash code for improved performance in equals()
-        int h = table.hashCode() ^ type.hashCode() ^ className.hashCode();
-
-        if (this.memberNumbers != null)
-        {
-            for (int i = 0; i < this.memberNumbers.length; ++i)
-            {
-                h ^= this.memberNumbers[i];
-            }
-        }
-
-        if (this.secondaryMemberNumbers != null)
-        {
-            for (int i = 0; i < this.secondaryMemberNumbers.length; ++i)
-            {
-                h ^= this.secondaryMemberNumbers[i];
-            }
-        }
-
-        hashCode = h;
+        int tmpHash = Objects.hash(table, type, className, nullPkFields);
+        tmpHash = 31 * tmpHash + Arrays.hashCode(memberNumbers);
+        tmpHash = 31 * tmpHash + Arrays.hashCode(secondaryMemberNumbers);
+        hashCode = tmpHash;
     }
 
     /**
@@ -185,6 +146,7 @@ public class RequestIdentifier
         }
 
         return table.equals(ri.table) && type.equals(ri.type) && className.equals(ri.className) &&
+                Objects.equals(nullPkFields, ri.nullPkFields) &&
                 Arrays.equals(memberNumbers, ri.memberNumbers) && 
                 Arrays.equals(secondaryMemberNumbers, ri.secondaryMemberNumbers);
     }

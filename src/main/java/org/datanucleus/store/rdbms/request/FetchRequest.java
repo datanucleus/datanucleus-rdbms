@@ -22,6 +22,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.BitSet;
 import java.util.Collection;
 import java.util.List;
 
@@ -56,6 +58,7 @@ import org.datanucleus.store.rdbms.sql.SQLStatementHelper;
 import org.datanucleus.store.rdbms.sql.SQLTable;
 import org.datanucleus.store.rdbms.sql.SelectStatement;
 import org.datanucleus.store.rdbms.sql.expression.InExpression;
+import org.datanucleus.store.rdbms.sql.expression.NullLiteral;
 import org.datanucleus.store.rdbms.sql.expression.ParameterLiteral;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpressionFactory;
@@ -107,6 +110,9 @@ public class FetchRequest extends Request
     /** Name of the version field. Only applies if the class has a version field (not surrogate). */
     private String versionFieldName = null;
 
+    /** ALl non-null PK members */
+    private int[] nonNullPkMembers = null;
+
     /**
      * Constructor. Uses the structure of the datastore table to build a basic SELECT query.
      * @param classTable The Class Table representing the datastore table to retrieve
@@ -115,9 +121,10 @@ public class FetchRequest extends Request
      * @param cmd ClassMetaData of the candidate
      * @param mmds MetaData of the members to fetch
      * @param mmdsToStore MetaData of the members to store
+     * @param nullPkFields Fields in PK that are null - only used if PC model has objects with nullable PK fields
      */
     public FetchRequest(DatastoreClass classTable, FetchPlanForClass fpClass, ClassLoaderResolver clr, AbstractClassMetaData cmd, 
-            AbstractMemberMetaData[] mmds, AbstractMemberMetaData[] mmdsToStore)
+            AbstractMemberMetaData[] mmds, AbstractMemberMetaData[] mmdsToStore, BitSet nullPkFields)
     {
         super(classTable);
 
@@ -239,31 +246,42 @@ public class FetchRequest extends Request
         else if (cmd.getIdentityType() == IdentityType.APPLICATION)
         {
             // Application identity value(s) for input
+            nonNullPkMembers = Arrays.stream(cmd.getPKMemberPositions())
+                    .filter(pos -> nullPkFields==null || !nullPkFields.get(pos))
+                    .toArray();
             int[] pkNums = cmd.getPKMemberPositions();
             for (int i=0;i<pkNums.length;i++)
             {
                 AbstractMemberMetaData mmd = cmd.getMetaDataForManagedMemberAtAbsolutePosition(pkNums[i]);
                 JavaTypeMapping pkMapping = table.getMemberMapping(mmd);
                 SQLExpression expr = exprFactory.newExpression(sqlStatement, sqlStatement.getPrimaryTable(), pkMapping);
-                SQLExpression val = exprFactory.newLiteralParameter(sqlStatement, pkMapping, null, "PK" + i);
-                if (val instanceof ParameterLiteral)
+                if (nullPkFields != null && nullPkFields.get(i))
                 {
-                    val = exprFactory.replaceParameterLiteral((ParameterLiteral)val, expr);
+                    // Support for nullable PK fields
+                    final NullLiteral nullLiteral = new NullLiteral(sqlStatement, null, null, null);
+                    sqlStatement.whereAnd(expr.eq(nullLiteral), true);
                 }
-                sqlStatement.whereAnd(expr.eq(val), true);
+                else {
+                    SQLExpression val = exprFactory.newLiteralParameter(sqlStatement, pkMapping, null, "PK" + i);
+                    if (val instanceof ParameterLiteral)
+                    {
+                        val = exprFactory.replaceParameterLiteral((ParameterLiteral) val, expr);
+                    }
+                    sqlStatement.whereAnd(expr.eq(val), true);
 
-                StatementMappingIndex pkIdx = mappingDefinition.getMappingForMemberPosition(pkNums[i]);
-                if (pkIdx == null)
-                {
-                    pkIdx = new StatementMappingIndex(pkMapping);
-                    mappingDefinition.addMappingForMember(pkNums[i], pkIdx);
+                    StatementMappingIndex pkIdx = mappingDefinition.getMappingForMemberPosition(pkNums[i]);
+                    if (pkIdx == null)
+                    {
+                        pkIdx = new StatementMappingIndex(pkMapping);
+                        mappingDefinition.addMappingForMember(pkNums[i], pkIdx);
+                    }
+                    int[] inputParams = new int[pkMapping.getNumberOfColumnMappings()];
+                    for (int j = 0; j < pkMapping.getNumberOfColumnMappings(); j++)
+                    {
+                        inputParams[j] = inputParamNum++;
+                    }
+                    pkIdx.addParameterOccurrence(inputParams);
                 }
-                int[] inputParams = new int[pkMapping.getNumberOfColumnMappings()];
-                for (int j=0;j<pkMapping.getNumberOfColumnMappings();j++)
-                {
-                    inputParams[j] = inputParamNum++;
-                }
-                pkIdx.addParameterOccurrence(inputParams);
             }
         }
 
@@ -424,7 +442,7 @@ public class FetchRequest extends Request
                         }
                         else if (cmd.getIdentityType() == IdentityType.APPLICATION)
                         {
-                            sm.provideFields(cmd.getPKMemberPositions(), new ParameterSetter(sm, ps, mappingDef));
+                            sm.provideFields(nonNullPkMembers, new ParameterSetter(sm, ps, mappingDef));
                         }
 
                         JavaTypeMapping multitenancyMapping = table.getSurrogateMapping(SurrogateColumnType.MULTITENANCY, false);
