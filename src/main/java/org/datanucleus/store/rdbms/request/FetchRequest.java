@@ -261,7 +261,8 @@ public class FetchRequest extends Request
                     final NullLiteral nullLiteral = new NullLiteral(sqlStatement, null, null, null);
                     sqlStatement.whereAnd(expr.eq(nullLiteral), true);
                 }
-                else {
+                else 
+                {
                     SQLExpression val = exprFactory.newLiteralParameter(sqlStatement, pkMapping, null, "PK" + i);
                     if (val instanceof ParameterLiteral)
                     {

@@ -133,7 +133,8 @@ public class LocateRequest extends Request
                     final NullLiteral nullLiteral = new NullLiteral(sqlStatement, null, null, null);
                     sqlStatement.whereAnd(expr.eq(nullLiteral), true);
                 }
-                else {
+                else 
+                {
                     SQLExpression val = exprFactory.newLiteralParameter(sqlStatement, pkMapping, null, "PK" + i);
                     sqlStatement.whereAnd(expr.eq(val), true);
 

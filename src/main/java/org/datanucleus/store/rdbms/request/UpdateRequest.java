@@ -703,7 +703,8 @@ public class UpdateRequest extends Request
                             {
                                 where.append(" IS NULL");
                             }
-                            else {
+                            else
+                            {
                                 where.append("=");
                                 where.append(m.getColumnMapping(j).getUpdateInputParameter());
 
