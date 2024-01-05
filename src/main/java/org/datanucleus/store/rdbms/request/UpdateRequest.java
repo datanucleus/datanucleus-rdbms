@@ -30,11 +30,11 @@ import java.util.BitSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.IntConsumer;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.exceptions.NotYetFlushedException;
-import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.exceptions.NucleusOptimisticException;
 import org.datanucleus.identity.IdentityUtils;
@@ -52,6 +52,7 @@ import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.SQLController;
 import org.datanucleus.store.rdbms.fieldmanager.OldValueParameterSetter;
 import org.datanucleus.store.rdbms.fieldmanager.ParameterSetter;
+import org.datanucleus.store.rdbms.flush.BatchingFlushProcess;
 import org.datanucleus.store.rdbms.identifier.DatastoreIdentifier;
 import org.datanucleus.store.rdbms.mapping.MappingCallbacks;
 import org.datanucleus.store.rdbms.mapping.MappingConsumer;
@@ -355,6 +356,11 @@ public class UpdateRequest extends Request
 
             boolean batch = false;
             // TODO Set the batch flag based on whether we have no other SQL being invoked in here just our UPDATE
+            if (storeMgr.getFlushProcess() instanceof BatchingFlushProcess)
+            {
+                batch = ((BatchingFlushProcess) storeMgr.getFlushProcess()).batchInUpdateRequest(optimisticChecks, ec);
+            }
+
             try
             {
                 ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
@@ -491,19 +497,26 @@ public class UpdateRequest extends Request
                             }
                         }
 
-                        int[] rcs = sqlControl.executeStatementUpdate(ec, mconn, stmt, ps, !batch);
-                        if (rcs[0] == 0 && optimisticChecks)
+                        Object finalCurrentVersion = currentVersion;
+                        IntConsumer handler = rows ->
                         {
-                            // No object updated so either object disappeared or failed optimistic version checks
-                            // TODO Batching : when we use batching here we need to process these somehow
-                            throw new NucleusOptimisticException(Localiser.msg("052203", sm.getObjectAsPrintable(), sm.getInternalObjectId(), "" + currentVersion), sm.getObject());
-                        }
+                            if (rows == 0)
+                            {
+                                throw new NucleusOptimisticException(
+                                        Localiser.msg("052203", sm.getObjectAsPrintable(), sm.getInternalObjectId(), "" + finalCurrentVersion), sm.getObject());
+                            }
+                        };
+
+                        sqlControl.executeStatementUpdateDeferRowCountCheckForBatching(ec, mconn, stmt, ps, !batch, optimisticChecks ? handler : null);
 
                         // Execute any post-set mappings
                         if (postSetMappings != null)
                         {
                             for (JavaTypeMapping m : postSetMappings)
                             {
+                                if (batch && optimisticChecks)
+                                    throw new UnsupportedOperationException("postSetMappings after batched optimistic checks");
+
                                 if (NucleusLogger.PERSISTENCE.isDebugEnabled())
                                 {
                                     NucleusLogger.PERSISTENCE.debug(Localiser.msg("052222", sm.getObjectAsPrintable(), m.getMemberMetaData().getFullFieldName()));
@@ -525,14 +538,7 @@ public class UpdateRequest extends Request
             catch (SQLException e)
             {
                 String msg = Localiser.msg("052215", IdentityUtils.getPersistableIdentityForId(sm.getInternalObjectId()), stmt, StringUtils.getStringFromStackTrace(e));
-                NucleusLogger.DATASTORE_PERSIST.error(msg);
-                List<Exception> exceptions = new ArrayList<>();
-                exceptions.add(e);
-                while((e = e.getNextException())!=null)
-                {
-                    exceptions.add(e);
-                }
-                throw new NucleusDataStoreException(msg, exceptions.toArray(new Throwable[exceptions.size()]));
+                throw RequestUtil.convertSqlException(msg, e);
             }
         }
 

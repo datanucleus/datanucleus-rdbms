@@ -301,7 +301,7 @@ public class ConnectionFactoryImpl extends AbstractConnectionFactory
         return mconn;
     }
 
-    class ManagedConnectionImpl extends AbstractManagedConnection
+    class ManagedConnectionImpl extends AbstractManagedConnection implements ManagedConnectionWithExecutionContext
     {
         ExecutionContext ec;
         XAResource xaRes = null;
@@ -319,6 +319,11 @@ public class ConnectionFactoryImpl extends AbstractConnectionFactory
             {
                 isolation = TransactionUtils.getTransactionIsolationLevelForName(storeMgr.getStringProperty(PropertyNames.PROPERTY_TRANSACTION_ISOLATION));
             }
+        }
+
+        @Override
+        public ExecutionContext getExecutionContext() {
+            return ec;
         }
 
         /**

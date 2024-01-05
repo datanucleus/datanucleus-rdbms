@@ -30,6 +30,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.function.IntConsumer;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ExecutionContext;
@@ -48,6 +49,7 @@ import org.datanucleus.metadata.VersionMetaData;
 import org.datanucleus.metadata.VersionStrategy;
 import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.connection.ManagedConnection;
+import org.datanucleus.store.rdbms.flush.BatchingFlushProcess;
 import org.datanucleus.store.rdbms.mapping.MappingCallbacks;
 import org.datanucleus.store.rdbms.mapping.MappingConsumer;
 import org.datanucleus.store.rdbms.mapping.MappingHelper;
@@ -283,7 +285,11 @@ public class DeleteRequest extends Request
             {
                 // Perform the delete
                 boolean batch = true;
-                if (optimisticChecks || !ec.getTransaction().isActive())
+                if (storeMgr.getFlushProcess() instanceof BatchingFlushProcess)
+                {
+                    batch = ((BatchingFlushProcess) storeMgr.getFlushProcess()).batchInDeleteRequest(optimisticChecks, ec);
+                }
+                else if (optimisticChecks || !ec.getTransaction().isActive())
                 {
                     // Turn OFF batching if doing optimistic checks (since we need the result of the delete)
                     // or if using nontransactional writes (since we want it sending to the datastore now)
@@ -341,13 +347,16 @@ public class DeleteRequest extends Request
                         }
                     }
 
-                    int[] rcs = sqlControl.executeStatementUpdate(ec, mconn, stmt, ps, !batch);
-                    if (optimisticChecks && rcs[0] == 0)
+                    IntConsumer handler = rows ->
                     {
-                        // No object deleted so either object disappeared or failed optimistic version checks
-                        throw new NucleusOptimisticException(Localiser.msg("052203", IdentityUtils.getPersistableIdentityForId(sm.getInternalObjectId()), 
-                            "" + sm.getTransactionalVersion()), sm.getObject());
-                    }
+                        if (rows == 0)
+                        {
+                            throw new NucleusOptimisticException(
+                                    Localiser.msg("052203", IdentityUtils.getPersistableIdentityForId(sm.getInternalObjectId()),
+                                            "" + sm.getTransactionalVersion()), sm.getObject());
+                        }
+                    };
+                    sqlControl.executeStatementUpdateDeferRowCountCheckForBatching(ec, mconn, stmt, ps, !batch, optimisticChecks ? handler : null);
 
                     if (relatedObjectsToDelete != null && !relatedObjectsToDelete.isEmpty())
                     {
@@ -355,6 +364,9 @@ public class DeleteRequest extends Request
                         Iterator iter = relatedObjectsToDelete.iterator();
                         while (iter.hasNext())
                         {
+                            if (batch && optimisticChecks)
+                                throw new UnsupportedOperationException("relatedObjectsToDelete after batched optimistic checks");
+
                             Object relatedObject = iter.next();
                             ec.deleteObjectInternal(relatedObject);
                         }
@@ -373,14 +385,7 @@ public class DeleteRequest extends Request
         catch (SQLException e)
         {
             String msg = Localiser.msg("052211", IdentityUtils.getPersistableIdentityForId(sm.getInternalObjectId()), stmt, e.getMessage());
-            NucleusLogger.PERSISTENCE.warn(msg);
-            List exceptions = new ArrayList();
-            exceptions.add(e);
-            while((e = e.getNextException())!=null)
-            {
-                exceptions.add(e);
-            }
-            throw new NucleusDataStoreException(msg, (Throwable[])exceptions.toArray(new Throwable[exceptions.size()]));
+            throw RequestUtil.convertSqlException(msg, e);
         }
     }
 

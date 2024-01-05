@@ -83,6 +83,7 @@ import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.flush.FlushOrdered;
+import org.datanucleus.flush.FlushProcess;
 import org.datanucleus.identity.IdentityUtils;
 import org.datanucleus.identity.SCOID;
 import org.datanucleus.metadata.AbstractClassMetaData;
@@ -287,7 +288,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
     protected void initRDBMSStoreManager(ClassLoaderResolver clr, PersistenceNucleusContext ctx, Map<String, Object> props)
     {
         persistenceHandler = createPersistenceHandler();
-        flushProcess = createFlushProcess();
+        flushProcess = createFlushProcess(clr);
         schemaHandler = createSchemaHandler();
 
         // Retrieve the Database Adapter for this datastore
@@ -402,8 +403,22 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
         return new RDBMSSchemaHandler(this);
     }
 
-    protected static FlushOrdered createFlushProcess()
+    protected FlushProcess createFlushProcess(ClassLoaderResolver clr)
     {
+        final String flushProcessClassName = getStringProperty(RDBMSPropertyNames.PROPERTY_RDBMS_FLUSH_PROCESS_CLASS);
+        if (flushProcessClassName != null && !flushProcessClassName.isEmpty())
+        {
+            final Class<FlushProcess> flushProcessClass = clr.classForName(flushProcessClassName);
+            try
+            {
+                return flushProcessClass.getDeclaredConstructor().newInstance();
+            }
+            catch (InstantiationException | IllegalAccessException |
+                   InvocationTargetException | NoSuchMethodException e)
+            {
+                throw new RuntimeException(e);
+            }
+        }
         return new FlushOrdered(); // TODO Change this to FlushReferential when we have it complete
     }
 

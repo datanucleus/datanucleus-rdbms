@@ -19,20 +19,25 @@ package org.datanucleus.store.rdbms;
 
 import static java.util.Collections.emptyList;
 
+import java.sql.BatchUpdateException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.IntConsumer;
 
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.exceptions.NucleusDataStoreException;
+import org.datanucleus.management.ManagerStatistics;
 import org.datanucleus.store.connection.ManagedConnection;
 import org.datanucleus.store.connection.ManagedConnectionResourceListener;
 import org.datanucleus.store.rdbms.query.RDBMSQueryUtils;
+import org.datanucleus.store.rdbms.request.RequestUtil;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 import org.datanucleus.util.StringUtils;
@@ -123,6 +128,11 @@ public class SQLController
 
         /** Whether to close the statement on processing */
         boolean closeStatementOnProcess = false;
+
+	    /**
+	     * Deferred result handlers for processing batched results.
+	     */
+		private final List<IntConsumer> handlers = new ArrayList<>();
 
         public String toString()
         {
@@ -384,6 +394,22 @@ public class SQLController
     public int[] executeStatementUpdate(ExecutionContext ec, ManagedConnection conn, String stmt, PreparedStatement ps, boolean processNow)
     throws SQLException
     {
+		return doExecuteStatementUpdate(ec, conn, stmt, ps, processNow, null);
+    }
+
+	/**
+	 * Defers results of the operation to "handler". This is useful for batches where the result is not always
+	 * known at the end of this method.
+	 */
+	public void executeStatementUpdateDeferRowCountCheckForBatching(ExecutionContext ec, ManagedConnection conn, String stmt, PreparedStatement ps, boolean processNow, IntConsumer handler)
+	throws SQLException
+	{
+		doExecuteStatementUpdate(ec, conn, stmt, ps, processNow, handler);
+	}
+
+	private int[] doExecuteStatementUpdate(ExecutionContext ec, ManagedConnection conn, String stmt, PreparedStatement ps, boolean processNow, IntConsumer handler)
+	throws SQLException
+	{
         ConnectionStatementState state = getConnectionStatementState(conn);
         if (state != null)
         {
@@ -396,6 +422,7 @@ public class SQLController
                 }
                 state.processable = true;
                 state.stmt.addBatch();
+				state.handlers.add(handler);
 
                 if (processNow)
                 {
@@ -439,6 +466,9 @@ public class SQLController
         {
             NucleusLogger.DATASTORE_PERSIST.debug(Localiser.msg("045001", "" + (System.currentTimeMillis() - startTime), "" + ind, StringUtils.toJVMIDString(ps)));
         }
+
+		if (handler != null) // Non-batched.
+			handler.accept(ind);
 
         return new int[] {ind};
     }
@@ -666,24 +696,55 @@ public class SQLController
             }
         }
 
-        int[] ind = state.stmt.executeBatch();
-        state.stmt.clearBatch();
+	    try {
+            int[] ind = state.stmt.executeBatch();
+            state.stmt.clearBatch();
 
-        if (NucleusLogger.DATASTORE.isDebugEnabled())
-        {
-            NucleusLogger.DATASTORE.debug(Localiser.msg("045001",""+(System.currentTimeMillis() - startTime), StringUtils.intArrayToString(ind), StringUtils.toJVMIDString(state.stmt)));
+            if (NucleusLogger.DATASTORE.isDebugEnabled())
+            {
+                NucleusLogger.DATASTORE.debug(Localiser.msg("045001", "" + (System.currentTimeMillis() - startTime), StringUtils.intArrayToString(ind), StringUtils.toJVMIDString(state.stmt)));
+            }
+
+            // Remove the current connection statement
+            removeConnectionStatementState(conn);
+
+            // Close the statement if it is registered for closing after processing
+            if (state.closeStatementOnProcess)
+            {
+                state.stmt.close();
+            }
+
+            // Make sure we process the results of the batch execution, rather than
+            // potentially ignoring optimistic lock exceptions.
+            if (ind.length != state.handlers.size())
+                throw new IllegalStateException();
+
+            for (int i = 0; i != ind.length; i++)
+            {
+                IntConsumer handler = state.handlers.get(i);
+                if (handler != null)
+                    handler.accept(ind[i]);
+            }
+
+            return ind;
         }
-
-        // Remove the current connection statement
-        removeConnectionStatementState(conn);
-
-        // Close the statement if it is registered for closing after processing
-        if (state.closeStatementOnProcess)
+        catch (BatchUpdateException e)
         {
-            state.stmt.close();
-        }
+		    String msg = String.format("Batched statement \"%s\" failed. \n", state.stmtText);
+		    throw new RequestUtil.BatchUpdateWithSQLException(msg + e.getMessage(), e);
+	    }
+        finally
+        {
+			state.handlers.clear();
 
-        return ind;
+            if (conn instanceof ManagedConnectionWithExecutionContext)
+            {
+                ExecutionContext ec = ((ManagedConnectionWithExecutionContext) conn).getExecutionContext();
+                ManagerStatistics stats = ec.getStatistics();
+                if (stats != null)
+                    stats.incrementNumWrites();
+            }
+		}
     }
 
     /**
@@ -745,13 +806,19 @@ public class SQLController
                         }
                     }
 
-                    throw new NucleusDataStoreException(Localiser.msg("052108"), e);
+                    throw RequestUtil.convertSqlException(Localiser.msg("052108"), e);
                 }
             }
             public void transactionPreClose(){}
             public void managedConnectionPreClose(){}
-            public void managedConnectionPostClose(){}
-            public void resourcePostClose(){}
+            public void managedConnectionPostClose()
+            {
+                conn.removeListener(this);
+            }
+            public void resourcePostClose()
+            {
+                conn.removeListener(this);
+            }
         };
         conn.addListener(listener);
     }

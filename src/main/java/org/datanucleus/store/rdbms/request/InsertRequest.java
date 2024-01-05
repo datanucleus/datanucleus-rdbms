@@ -56,6 +56,7 @@ import org.datanucleus.metadata.RelationType;
 import org.datanucleus.metadata.VersionMetaData;
 import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.connection.ManagedConnection;
+import org.datanucleus.store.rdbms.flush.BatchingFlushProcess;
 import org.datanucleus.store.rdbms.identifier.DatastoreIdentifier;
 import org.datanucleus.store.rdbms.mapping.MappingCallbacks;
 import org.datanucleus.store.rdbms.mapping.MappingConsumer;
@@ -249,6 +250,11 @@ public class InsertRequest extends Request
 
         try
         {
+            if (table.getStoreManager().getFlushProcess() instanceof BatchingFlushProcess)
+            {
+                batch = ((BatchingFlushProcess) table.getStoreManager().getFlushProcess()).batchInInsertRequest(hasIdentityColumn, externalFKStmtMappings, sm.getClassMetaData(), ec);
+            }
+
             VersionMetaData vermd = table.getVersionMetaData();
             RDBMSStoreManager storeMgr = table.getStoreManager();
             if (vermd != null && vermd.getMemberName() != null)
@@ -523,10 +529,13 @@ public class InsertRequest extends Request
                         }
                     }
 
-                    sqlControl.executeStatementUpdate(ec, mconn, insertStmt, ps, !batch);
+                    sqlControl.executeStatementUpdateDeferRowCountCheckForBatching(ec, mconn, insertStmt, ps, !batch, null);
 
                     if (hasIdentityColumn)
                     {
+                        if (batch)
+                            throw new UnsupportedOperationException("Cannot get generated value from potentially pending batch");
+
                         // Identity column was set in the datastore using auto-increment/identity/serial etc
                         Object newId = getInsertedIdentityValue(ec, sqlControl, sm, mconn, ps);
                         sm.setPostStoreNewObjectId(newId);
@@ -613,14 +622,7 @@ public class InsertRequest extends Request
         catch (SQLException e)
         {
             String msg = Localiser.msg("052208", sm.getObjectAsPrintable(), insertStmt, e.getMessage());
-            NucleusLogger.DATASTORE_PERSIST.warn(msg);
-            List<Exception> exceptions = new ArrayList<>();
-            exceptions.add(e);
-            while ((e = e.getNextException()) != null)
-            {
-                exceptions.add(e);
-            }
-            throw new NucleusDataStoreException(msg, exceptions.toArray(new Throwable[exceptions.size()]));
+            throw RequestUtil.convertSqlException(msg, e);
         }
 
         // Execute any mapping actions now that we have inserted the element (things like inserting any association parent-child).
@@ -755,6 +757,7 @@ public class InsertRequest extends Request
         StringBuilder columnNames = new StringBuilder();
         StringBuilder columnValues = new StringBuilder();
 
+        /** Column names -> the index of its JDBC parameter in the statement. */
         Map<String, Integer> assignedColumns = new HashMap<>();
 
         /** Mappings that require post-set processing. */
