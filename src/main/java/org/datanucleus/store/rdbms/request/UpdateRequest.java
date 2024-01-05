@@ -128,24 +128,26 @@ public class UpdateRequest extends Request
      */
     public UpdateRequest(DatastoreClass table, AbstractMemberMetaData[] reqFieldMetaData, AbstractClassMetaData cmd, ClassLoaderResolver clr)
     {
-        this(table, reqFieldMetaData, cmd, clr, new BitSet(0));
+        this(table, reqFieldMetaData, cmd, clr, new BitSet(0), false);
     }
 
     /**
      * Constructor, taking the table. Uses the structure of the datastore table to build a basic query.
-     * @param table The Class Table representing the datastore table to update
+     *
+     * @param table            The Class Table representing the datastore table to update
      * @param reqFieldMetaData MetaData of the fields to update
-     * @param cmd ClassMetaData of objects being updated
-     * @param clr ClassLoader resolver
-     * @param nullPkFields Fields in PK that are null - only used if PC model has objects with nullable PK fields
+     * @param cmd              ClassMetaData of objects being updated
+     * @param clr              ClassLoader resolver
+     * @param nullPkFields     Fields in PK that are null - only used if PC model has objects with nullable PK fields
+     * @param noVersionUpdate Should we ignore updating version when using optimistic lock?
      */
-    public UpdateRequest(DatastoreClass table, AbstractMemberMetaData[] reqFieldMetaData, AbstractClassMetaData cmd, ClassLoaderResolver clr, BitSet nullPkFields)
+    public UpdateRequest(DatastoreClass table, AbstractMemberMetaData[] reqFieldMetaData, AbstractClassMetaData cmd, ClassLoaderResolver clr, BitSet nullPkFields, boolean noVersionUpdate)
     {
         super(table);
         this.nullPkFields = nullPkFields;
 
         this.cmd = cmd;
-        versionMetaData = table.getVersionMetaData();
+        versionMetaData = noVersionUpdate ? null : table.getVersionMetaData();
         if (versionMetaData != null && versionMetaData.getStrategy() != VersionStrategy.NONE)
         {
             // Only apply a version check if we have a strategy defined
