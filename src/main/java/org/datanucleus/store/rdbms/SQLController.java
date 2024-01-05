@@ -32,7 +32,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.IntConsumer;
 
 import org.datanucleus.ExecutionContext;
-import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.management.ManagerStatistics;
 import org.datanucleus.store.connection.ManagedConnection;
 import org.datanucleus.store.connection.ManagedConnectionResourceListener;

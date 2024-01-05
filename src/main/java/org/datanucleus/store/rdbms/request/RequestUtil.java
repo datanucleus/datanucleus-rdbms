@@ -43,6 +43,8 @@ public final class RequestUtil
 
     public static class BatchUpdateWithSQLException extends SQLException
     {
+        private static final long serialVersionUID = 7732720788650460371L;
+
         public BatchUpdateWithSQLException(String msg, SQLException e)
         {
             super(msg, e);
