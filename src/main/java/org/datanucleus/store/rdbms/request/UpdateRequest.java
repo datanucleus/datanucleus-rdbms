@@ -505,7 +505,7 @@ public class UpdateRequest extends Request
                             if (rows == 0)
                             {
                                 throw new NucleusOptimisticException(
-                                        Localiser.msg("052203", sm.getObjectAsPrintable(), sm.getInternalObjectId(), "" + finalCurrentVersion), sm.getObject());
+                                        Localiser.msg("052203", IdentityUtils.getPersistableIdentityForId(sm.getInternalObjectId()), "" + finalCurrentVersion), sm.getObject());
                             }
                         };
 
