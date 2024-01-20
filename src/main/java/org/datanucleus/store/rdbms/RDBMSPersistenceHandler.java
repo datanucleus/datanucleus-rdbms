@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ExecutionContext;
@@ -71,7 +72,20 @@ public class RDBMSPersistenceHandler extends AbstractPersistenceHandler
     private Map<RequestIdentifier, Request> requestsByID = new ConcurrentReferenceHashMap<>(1, ReferenceType.STRONG, ReferenceType.SOFT);
 
     /** Cache of nullable PK fields */
-    private static Map<Class<?>, int[]> nullablePkFields = new ConcurrentHashMap<>();
+    private static final Map<Class<?>, int[]> nullablePkFields = new ConcurrentHashMap<>();
+
+    /** 
+     * Member extension for when using optimistic locking.
+     * When setting this extension with value "false" then it means that
+     * when updating this member then do not update version of object.
+     * So if ONLY updating such members no version update is made.
+     * On the other hand - if just one other member (without this setting)
+     * is updated then version is updated as normally.
+     */
+    public static final String EXTENSION_MEMBER_VERSION_UPDATE = "rdbms-version-update";
+
+    /** Cache of version-update=false field - that is fields where version should not be updated when using optimistic locking */
+    private static final Map<Class<? extends Object>, Set<Integer>> noVersionUpdateFieldsMap = new ConcurrentHashMap<>();
 
     /**
      * Constructor.
@@ -476,18 +490,21 @@ public class RDBMSPersistenceHandler extends AbstractPersistenceHandler
 
             ClassLoaderResolver clr = ec.getClassLoaderResolver();
             DatastoreClass dc = getDatastoreClass(sm.getObject().getClass().getName(), clr);
-            updateObjectInTable(dc, sm, clr, mmds);
+            final boolean noVersionUpdate = onlyNoVersionUpdateFieldsDirty(sm, fieldNumbers);
+            updateObjectInTable(dc, sm, clr, mmds, noVersionUpdate);
         }
     }
 
     /**
      * Convenience method to handle the update into the various tables that this object is persisted into.
-     * @param table The table to process
-     * @param sm StateManager for the object being updated
-     * @param clr ClassLoader resolver
-     * @param mmds MetaData for the fields being updated
+     *
+     * @param table           The table to process
+     * @param sm              StateManager for the object being updated
+     * @param clr             ClassLoader resolver
+     * @param mmds            MetaData for the fields being updated
+     * @param noVersionUpdate
      */
-    private void updateObjectInTable(DatastoreClass table, DNStateManager sm, ClassLoaderResolver clr, AbstractMemberMetaData[] mmds)
+    private void updateObjectInTable(DatastoreClass table, DNStateManager sm, ClassLoaderResolver clr, AbstractMemberMetaData[] mmds, boolean noVersionUpdate)
     {
         if (table instanceof ClassView)
         {
@@ -498,11 +515,11 @@ public class RDBMSPersistenceHandler extends AbstractPersistenceHandler
         if (supertable != null)
         {
             // Process the superclass table first
-            updateObjectInTable(supertable, sm, clr, mmds);
+            updateObjectInTable(supertable, sm, clr, mmds, noVersionUpdate);
         }
 
         // Do the actual update of this table
-        final Request updateRequest = getUpdateRequest(table, mmds, sm, clr);
+        final Request updateRequest = getUpdateRequest(table, mmds, sm, clr, noVersionUpdate);
         if (!(updateRequest instanceof UpdateRequest) || ((UpdateRequest) updateRequest).willUpdate())
         {
             // Check if read-only so update not permitted
@@ -518,29 +535,73 @@ public class RDBMSPersistenceHandler extends AbstractPersistenceHandler
             for (SecondaryDatastoreClass secTable : secondaryTables)
             {
                 // Process the secondary table
-                updateObjectInTable(secTable, sm, clr, mmds);
+                updateObjectInTable(secTable, sm, clr, mmds, noVersionUpdate);
             }
         }
     }
 
     /**
-     * Returns a request object that will update a row in the given table. 
+     * Checks if ONLY version-update=false fields are updated.
+     * If this is the case we do not want to update anything - not even version number.
+     * Return true from this method if you do not want to update version of object
+     * based on fieldNumbers being updated.
+     *
+     * @param sm StateManager for the object to be updated.
+     * @param fieldNumbers The numbers of the fields to be updated.
+     * @return true if no version update is wanted for this objects and supplied updated fieldsNumbers.
+     */
+    protected boolean onlyNoVersionUpdateFieldsDirty(DNStateManager sm, int[] fieldNumbers)
+    {
+        Set<Integer> noVersionUpdateFields = getNoVersionUpdateFields(sm); // get all fields with version-update=false
+        if (noVersionUpdateFields.isEmpty())
+            return false; // only relevant for types having version-update=false fields
+        boolean hadDirtyField = false;
+        for (int i=0; i< fieldNumbers.length; i++)
+        {
+            int fieldNo = fieldNumbers[i];
+            hadDirtyField = true;
+            if (!noVersionUpdateFields.contains(fieldNo))
+                return false;
+        }
+        return hadDirtyField; // has dirty fields && all dirty fields are version-update=false marked
+    }
+
+    private static Set<Integer> getNoVersionUpdateFields(DNStateManager sm) {
+        final AbstractClassMetaData cmd = sm.getClassMetaData();
+        Set<Integer> lockGroupNoneFields = noVersionUpdateFieldsMap.computeIfAbsent(sm.getObject().getClass(), clazz ->
+        {
+            return Arrays.stream(cmd.getAllMemberPositions())
+                    .filter(fieldNo -> {
+                        final String versionLock = cmd.getMetaDataForManagedMemberAtAbsolutePosition(fieldNo)
+                                .getValueForExtension(EXTENSION_MEMBER_VERSION_UPDATE);
+                        return "false".equals(versionLock);
+                    })
+                    .boxed()
+                    .collect(Collectors.toSet());
+        });
+        return lockGroupNoneFields;
+    }
+
+    /**
+     * Returns a request object that will update a row in the given table.
      * The store manager will cache the request object for re-use by subsequent requests to the same table.
-     * @param table The table in which to update.
-     * @param mmds The metadata corresponding to the columns to be updated. MetaData whose columns exist in supertables will be ignored.
-     * @param sm StateManager for the object being updated
-     * @param clr ClassLoader resolver
+     *
+     * @param table           The table in which to update.
+     * @param mmds            The metadata corresponding to the columns to be updated. MetaData whose columns exist in supertables will be ignored.
+     * @param sm              StateManager for the object being updated
+     * @param clr             ClassLoader resolver
+     * @param noVersionUpdate Should we ignore updating version when using optimistic lock?
      * @return An update request object.
      */
-    private Request getUpdateRequest(DatastoreClass table, AbstractMemberMetaData[] mmds, DNStateManager<?> sm, ClassLoaderResolver clr)
+    private Request getUpdateRequest(DatastoreClass table, AbstractMemberMetaData[] mmds, DNStateManager<?> sm, ClassLoaderResolver clr, boolean noVersionUpdate)
     {
         final AbstractClassMetaData cmd = sm.getClassMetaData();
         BitSet nullPkFields = getNullPkFields(sm);
-        RequestIdentifier reqID = new RequestIdentifier(table, mmds, null, RequestType.UPDATE, cmd.getFullClassName(), nullPkFields);
+        RequestIdentifier reqID = new RequestIdentifier(table, mmds, null, RequestType.UPDATE, cmd.getFullClassName(), nullPkFields, noVersionUpdate);
         Request req = requestsByID.get(reqID);
         if (req == null)
         {
-            req = new UpdateRequest(table, mmds, cmd, clr, nullPkFields);
+            req = new UpdateRequest(table, mmds, cmd, clr, nullPkFields, noVersionUpdate);
             requestsByID.put(reqID, req);
         }
         return req;

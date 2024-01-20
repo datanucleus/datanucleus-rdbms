@@ -37,6 +37,7 @@ public class RequestIdentifier
     private final int hashCode;
     private final String className;
     private final BitSet nullPkFields;
+    private final boolean noVersionUpdate;
 
     /**
      * Constructor.
@@ -62,10 +63,27 @@ public class RequestIdentifier
      */
     public RequestIdentifier(DatastoreClass table, AbstractMemberMetaData[] mmds, AbstractMemberMetaData[] secondaryMmds, RequestType type, String className, BitSet nullPkFields)
     {
+        this(table, mmds, secondaryMmds, type, className, nullPkFields, false);
+    }
+
+    /**
+     * Constructor.
+     *
+     * @param table         Datastore class for which this is a request
+     * @param mmds          MetaData of members to use in the request (if required)
+     * @param secondaryMmds MetaData of secondary members to use the in the request
+     * @param type          The type being represented
+     * @param className     The name of the class
+     * @param nullPkFields  PK fields that are null
+     * @param noVersionUpdate Should we ignore updating version when using optimistic lock?
+     */
+    public RequestIdentifier(DatastoreClass table, AbstractMemberMetaData[] mmds, AbstractMemberMetaData[] secondaryMmds, RequestType type, String className, BitSet nullPkFields, boolean noVersionUpdate)
+    {
         this.table = table;
         this.type = type;
         this.className = className;
         this.nullPkFields = nullPkFields;
+        this.noVersionUpdate = noVersionUpdate;
 
         if (mmds == null)
         {
@@ -99,7 +117,7 @@ public class RequestIdentifier
         }
 
         // Since we are an immutable object, pre-compute the hash code for improved performance in equals()
-        int tmpHash = Objects.hash(table, type, className, nullPkFields);
+        int tmpHash = Objects.hash(table, type, className, nullPkFields, noVersionUpdate);
         tmpHash = 31 * tmpHash + Arrays.hashCode(memberNumbers);
         tmpHash = 31 * tmpHash + Arrays.hashCode(secondaryMemberNumbers);
         hashCode = tmpHash;
@@ -147,7 +165,8 @@ public class RequestIdentifier
 
         return table.equals(ri.table) && type.equals(ri.type) && className.equals(ri.className) &&
                 Objects.equals(nullPkFields, ri.nullPkFields) &&
-                Arrays.equals(memberNumbers, ri.memberNumbers) && 
+                noVersionUpdate == ri.noVersionUpdate &&
+                Arrays.equals(memberNumbers, ri.memberNumbers) &&
                 Arrays.equals(secondaryMemberNumbers, ri.secondaryMemberNumbers);
     }
 }
