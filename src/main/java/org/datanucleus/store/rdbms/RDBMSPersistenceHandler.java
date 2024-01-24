@@ -566,12 +566,14 @@ public class RDBMSPersistenceHandler extends AbstractPersistenceHandler
         return hadDirtyField; // has dirty fields && all dirty fields are version-update=false marked
     }
 
-    private static Set<Integer> getNoVersionUpdateFields(DNStateManager sm) {
+    private static Set<Integer> getNoVersionUpdateFields(DNStateManager sm)
+    {
         final AbstractClassMetaData cmd = sm.getClassMetaData();
         Set<Integer> lockGroupNoneFields = noVersionUpdateFieldsMap.computeIfAbsent(sm.getObject().getClass(), clazz ->
         {
             return Arrays.stream(cmd.getAllMemberPositions())
-                    .filter(fieldNo -> {
+                    .filter(fieldNo ->
+                    {
                         final String versionLock = cmd.getMetaDataForManagedMemberAtAbsolutePosition(fieldNo)
                                 .getValueForExtension(EXTENSION_MEMBER_VERSION_UPDATE);
                         return "false".equals(versionLock);
@@ -586,10 +588,10 @@ public class RDBMSPersistenceHandler extends AbstractPersistenceHandler
      * Returns a request object that will update a row in the given table.
      * The store manager will cache the request object for re-use by subsequent requests to the same table.
      *
-     * @param table           The table in which to update.
-     * @param mmds            The metadata corresponding to the columns to be updated. MetaData whose columns exist in supertables will be ignored.
-     * @param sm              StateManager for the object being updated
-     * @param clr             ClassLoader resolver
+     * @param table The table in which to update.
+     * @param mmds The metadata corresponding to the columns to be updated. MetaData whose columns exist in supertables will be ignored.
+     * @param sm StateManager for the object being updated
+     * @param clr ClassLoader resolver
      * @param noVersionUpdate Should we ignore updating version when using optimistic lock?
      * @return An update request object.
      */

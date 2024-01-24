@@ -397,8 +397,15 @@ public class SQLController
     }
 
 	/**
-	 * Defers results of the operation to "handler". This is useful for batches where the result is not always
-	 * known at the end of this method.
+	 * Defers results of the operation to "handler". 
+	 * This is useful for batches where the result is not always known at the end of this method.
+	 * @param ec ExecutionContext
+	 * @param conn The connection
+	 * @param stmt The statement to execute
+	 * @param ps The associated PreparedStatement
+	 * @param processNow Whether to process immediately
+	 * @param handler Any handler
+	 * @throws SQLException if an error occurs
 	 */
 	public void executeStatementUpdateDeferRowCountCheckForBatching(ExecutionContext ec, ManagedConnection conn, String stmt, PreparedStatement ps, boolean processNow, IntConsumer handler)
 	throws SQLException
