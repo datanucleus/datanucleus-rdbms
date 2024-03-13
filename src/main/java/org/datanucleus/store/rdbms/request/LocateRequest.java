@@ -127,7 +127,7 @@ public class LocateRequest extends Request
                     pkMapping = table.getMemberMapping(mmd);
                 }
                 SQLExpression expr = exprFactory.newExpression(sqlStatement, sqlStatement.getPrimaryTable(), pkMapping);
-                if (nullPkFields != null && nullPkFields.get(i))
+                if (nullPkFields != null && nullPkFields.get(pkNums[i]))
                 {
                     // Support for nullable PK fields
                     final NullLiteral nullLiteral = new NullLiteral(sqlStatement, null, null, null);
