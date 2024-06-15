@@ -562,348 +562,353 @@ public class SelectStatement extends SQLStatement
 
     public SQLText getSQLText()
     {
-        if (sql != null)
-        {
-            return sql;
-        }
-
-        DatastoreAdapter dba = getDatastoreAdapter();
-        boolean lock = false;
-        Boolean val = (Boolean)getValueForExtension(EXTENSION_LOCK_FOR_UPDATE);
-        if (val != null)
-        {
-            lock = val.booleanValue();
-        }
-
-        boolean addAliasToAllSelects = false;
-        if (rangeOffset > 0 || rangeCount > -1)
-        {
-            if (dba.getRangeByRowNumberColumn2().length() > 0)
+        sqlLock.lock();
+        try {
+            if (sql != null)
             {
-                // Doing "SELECT * FROM (...)" so to be safe we need alias on all selects
-                addAliasToAllSelects = true;
+                return sql;
             }
-        }
 
-        // SELECT ..., ..., ...
-        sql = new SQLText("SELECT ");
-
-        if (distinct)
-        {
-            sql.append("DISTINCT ");
-        }
-
-        addOrderingColumnsToSelect();
-
-        if (selectedItems.isEmpty())
-        {
-            // Nothing selected so select all
-            sql.append("*");
-        }
-        else
-        {
-            int autoAliasNum = 0;
-            Iterator<SelectedItem> selectItemIter = selectedItems.iterator();
-            while (selectItemIter.hasNext())
+            DatastoreAdapter dba = getDatastoreAdapter();
+            boolean lock = false;
+            Boolean val = (Boolean) getValueForExtension(EXTENSION_LOCK_FOR_UPDATE);
+            if (val != null)
             {
-                SelectedItem selectedItem = selectItemIter.next();
-                SQLText selectedST = selectedItem.getSQLText();
-                sql.append(selectedST);
+                lock = val.booleanValue();
+            }
 
-                if (selectedItem.getAlias() != null)
+            boolean addAliasToAllSelects = false;
+            if (rangeOffset > 0 || rangeCount > -1)
+            {
+                if (dba.getRangeByRowNumberColumn2().length() > 0)
                 {
-                    sql.append(" AS " + rdbmsMgr.getIdentifierFactory().getIdentifierInAdapterCase(selectedItem.getAlias()));
+                    // Doing "SELECT * FROM (...)" so to be safe we need alias on all selects
+                    addAliasToAllSelects = true;
                 }
-                else
+            }
+
+            // SELECT ..., ..., ...
+            sql = new SQLText("SELECT ");
+
+            if (distinct)
+            {
+                sql.append("DISTINCT ");
+            }
+
+            addOrderingColumnsToSelect();
+
+            if (selectedItems.isEmpty())
+            {
+                // Nothing selected so select all
+                sql.append("*");
+            }
+            else
+            {
+                int autoAliasNum = 0;
+                Iterator<SelectedItem> selectItemIter = selectedItems.iterator();
+                while (selectItemIter.hasNext())
                 {
-                    if (addAliasToAllSelects)
+                    SelectedItem selectedItem = selectItemIter.next();
+                    SQLText selectedST = selectedItem.getSQLText();
+                    sql.append(selectedST);
+
+                    if (selectedItem.getAlias() != null)
                     {
-                        // This query needs an alias on all selects, so add "DN_{X}"
-                        sql.append(" AS ").append(rdbmsMgr.getIdentifierFactory().getIdentifierInAdapterCase("DN_" + autoAliasNum));
-                        autoAliasNum++;
-                    }
-                }
-
-                if (selectItemIter.hasNext())
-                {
-                    sql.append(',');
-                }
-            }
-            if ((rangeOffset > -1 || rangeCount > -1) && dba.getRangeByRowNumberColumn().length() > 0)
-            {
-                // Add a ROW NUMBER column if supported as the means of handling ranges by the RDBMS
-                sql.append(',').append(dba.getRangeByRowNumberColumn()).append(" rn");
-            }
-        }
-
-        // FROM ...
-        sql.append(" FROM ");
-        sql.append(primaryTable.toString());
-        if (lock && dba.supportsOption(DatastoreAdapter.LOCK_ROW_USING_OPTION_AFTER_FROM))
-        {
-            // Add locking after FROM where supported
-            sql.append(" WITH ").append(dba.getSelectWithLockOption());
-        }
-        if (joins != null)
-        {
-            sql.append(getSqlForJoins(lock));
-        }
-
-        // WHERE ...
-        if (where != null)
-        {
-            sql.append(" WHERE ").append(where.toSQLText());
-        }
-
-        // GROUP BY ...
-        if (groupingExpressions != null)
-        {
-            List<SQLText> groupBy = new ArrayList<>();
-            Iterator<SQLExpression> groupIter = groupingExpressions.iterator();
-            while (groupIter.hasNext())
-            {
-                SQLExpression expr = groupIter.next();
-                boolean exists = false;
-                String exprSQL = expr.toSQLText().toSQL();
-                for (SQLText st : groupBy)
-                {
-                    String sql = st.toSQL();
-                    if (sql.equals(exprSQL))
-                    {
-                        exists = true;
-                        break;
-                    }
-                }
-                if (!exists)
-                {
-                    groupBy.add(expr.toSQLText());
-                }
-            }
-
-            if (dba.supportsOption(DatastoreAdapter.GROUP_BY_REQUIRES_ALL_SELECT_PRIMARIES))
-            {
-                // Check that all select items are represented in the grouping for those RDBMS that need that
-                for (SelectedItem selItem : selectedItems)
-                {
-                    if (selItem.isPrimary())
-                    {
-                        boolean exists = false;
-                        String selItemSQL = selItem.getSQLText().toSQL();
-                        for (SQLText st : groupBy)
-                        {
-                            String sql = st.toSQL();
-                            if (sql.equals(selItemSQL))
-                            {
-                                exists = true;
-                                break;
-                            }
-                        }
-                        if (!exists)
-                        {
-                            groupBy.add(selItem.getSQLText());
-                        }
-                    }
-                }
-            }
-
-            if (groupBy.size() > 0 && aggregated)
-            {
-                sql.append(" GROUP BY ");
-                for (int i=0; i<groupBy.size(); i++)
-                {
-                    if (i > 0)
-                    {
-                        sql.append(',');
-                    }
-                    sql.append(groupBy.get(i));
-                }
-            }
-        }
-
-        // HAVING ...
-        if (having != null)
-        {
-            sql.append(" HAVING ").append(having.toSQLText());
-        }
-
-        if (unions != null && allowUnions)
-        {
-            // Add on any UNIONed statements
-            if (!dba.supportsOption(DatastoreAdapter.UNION_SYNTAX))
-            {
-                throw new NucleusException(Localiser.msg("052504", "UNION")).setFatal();
-            }
-
-            Iterator<SelectStatement> unionIter = unions.iterator();
-            while (unionIter.hasNext())
-            {
-                if (dba.supportsOption(DatastoreAdapter.USE_UNION_ALL))
-                {
-                    sql.append(" UNION ALL ");
-                }
-                else
-                {
-                    sql.append(" UNION ");
-                }
-
-                SelectStatement stmt = unionIter.next();
-                SQLText unionSql = stmt.getSQLText();
-                sql.append(unionSql);
-            }
-        }
-
-        // ORDER BY ...
-        SQLText orderStmt = generateOrderingStatement();
-        if (orderStmt != null)
-        {
-            sql.append(" ORDER BY ").append(orderStmt);
-        }
-
-        // RANGE
-        if (rangeOffset > -1 || rangeCount > -1)
-        {
-            // Add a LIMIT clause to end of statement if supported by the adapter
-            String limitClause = dba.getRangeByLimitEndOfStatementClause(rangeOffset, rangeCount, orderStmt != null);
-            if (limitClause.length() > 0)
-            {
-                sql.append(" ").append(limitClause);
-            }
-        }
-
-        if (lock)
-        {
-            if (dba.supportsOption(DatastoreAdapter.LOCK_ROW_USING_SELECT_FOR_UPDATE))
-            {
-                // Add any required locking based on the RDBMS capability
-                if (distinct && !dba.supportsOption(DatastoreAdapter.DISTINCT_WITH_SELECT_FOR_UPDATE))
-                {
-                    NucleusLogger.QUERY.warn(Localiser.msg("052502"));
-                }
-                else if (groupingExpressions != null && !dba.supportsOption(DatastoreAdapter.GROUPING_WITH_SELECT_FOR_UPDATE))
-                {
-                    NucleusLogger.QUERY.warn(Localiser.msg("052506"));
-                }
-                else if (having != null && !dba.supportsOption(DatastoreAdapter.HAVING_WITH_SELECT_FOR_UPDATE))
-                {
-                    NucleusLogger.QUERY.warn(Localiser.msg("052507"));
-                }
-                else if (orderingExpressions != null && !dba.supportsOption(DatastoreAdapter.ORDERING_WITH_SELECT_FOR_UPDATE))
-                {
-                    NucleusLogger.QUERY.warn(Localiser.msg("052508"));
-                }
-                else if (joins != null && !joins.isEmpty() && !dba.supportsOption(DatastoreAdapter.MULTITABLES_WITH_SELECT_FOR_UPDATE))
-                {
-                    NucleusLogger.QUERY.warn(Localiser.msg("052509"));
-                }
-                else
-                {
-                    sql.append(" " + dba.getSelectForUpdateText());
-                    if (dba.supportsOption(DatastoreAdapter.LOCK_ROW_USING_SELECT_FOR_UPDATE_NOWAIT))
-                    {
-                        Boolean nowait = (Boolean) getValueForExtension(EXTENSION_LOCK_FOR_UPDATE_NOWAIT);
-                        if (nowait != null)
-                        {
-                            sql.append(" NOWAIT");
-                        }
-                    }
-                }
-            }
-            else if (!dba.supportsOption(DatastoreAdapter.LOCK_ROW_USING_OPTION_AFTER_FROM) &&
-                     !dba.supportsOption(DatastoreAdapter.LOCK_ROW_USING_OPTION_WITHIN_JOIN))
-            {
-                NucleusLogger.QUERY.warn("Requested locking of query statement, but this RDBMS doesn't support a convenient mechanism");
-            }
-        }
-
-        if (rangeOffset > 0 || rangeCount > -1)
-        {
-            if (dba.getRangeByRowNumberColumn2().length() > 0)
-            {
-                // Oracle-specific using ROWNUM. Creates a query of the form
-                // SELECT * FROM (
-                //     SELECT subq.*, ROWNUM rn FROM (
-                //         SELECT x1, x2, ... FROM ... WHERE ... ORDER BY ...
-                //     ) subq
-                // ) WHERE rn > {offset} AND rn <= {count}
-                SQLText userSql = sql;
-
-                // SELECT all columns of userSql, plus ROWNUM, with the FROM being the users query
-                SQLText innerSql = new SQLText("SELECT subq.*");
-                innerSql.append(',').append(dba.getRangeByRowNumberColumn2()).append(" rn");
-                innerSql.append(" FROM (").append(userSql).append(") subq ");
-
-                // Put that query as the FROM of the outer query, and apply the ROWNUM restrictions
-                SQLText outerSql = new SQLText("SELECT * FROM (").append(innerSql).append(") ");
-                outerSql.append("WHERE ");
-                if (rangeOffset > 0)
-                {
-                    outerSql.append("rn > " + rangeOffset);
-                    if (rangeCount > -1)
-                    {
-                        outerSql.append(" AND rn <= " + (rangeCount+rangeOffset));
-                    }
-                }
-                else
-                {
-                    outerSql.append(" rn <= " + rangeCount);
-                }
-
-                sql = outerSql;
-            }
-            else if (dba.getRangeByRowNumberColumn().length() > 0)
-            {
-                // DB2-specific ROW_NUMBER weirdness. Creates a query of the form
-                // SELECT subq.x1, subq.x2, ... FROM (
-                //     SELECT x1, x2, ..., {keyword} rn FROM ... WHERE ... ORDER BY ...) subq
-                // WHERE subq.rn >= {offset} AND subq.rn < {count}
-                // This apparently works for DB2 (unverified, but claimed by IBM employee)
-                SQLText userSql = sql;
-                sql = new SQLText("SELECT ");
-                Iterator<SelectedItem> selectedItemIter = selectedItems.iterator();
-                while (selectedItemIter.hasNext())
-                {
-                    SelectedItem selectedItemExpr = selectedItemIter.next();
-                    sql.append("subq.");
-                    String selectedCol = selectedItemExpr.getSQLText().toSQL();
-                    if (selectedItemExpr.getAlias() != null)
-                    {
-                        selectedCol = rdbmsMgr.getIdentifierFactory().getIdentifierInAdapterCase(selectedItemExpr.getAlias());
+                        sql.append(" AS " + rdbmsMgr.getIdentifierFactory().getIdentifierInAdapterCase(selectedItem.getAlias()));
                     }
                     else
                     {
-                        // strip out qualifier when encountered from column name since we are adding a new qualifier above.
-                        // NOTE THAT THIS WILL FAIL IF THE ORIGINAL QUERY HAD "A0.COL1, B0.COL1" IN THE SELECT
-                        int dotIndex = selectedCol.indexOf(".");
-                        if (dotIndex > 0) 
+                        if (addAliasToAllSelects)
                         {
-                            // Remove qualifier name and the dot
-                            selectedCol = selectedCol.substring(dotIndex+1);
+                            // This query needs an alias on all selects, so add "DN_{X}"
+                            sql.append(" AS ").append(rdbmsMgr.getIdentifierFactory().getIdentifierInAdapterCase("DN_" + autoAliasNum));
+                            autoAliasNum++;
                         }
                     }
 
-                    sql.append(selectedCol);
-                    if (selectedItemIter.hasNext())
+                    if (selectItemIter.hasNext())
                     {
                         sql.append(',');
                     }
                 }
-                sql.append(" FROM (").append(userSql).append(") subq WHERE ");
-                if (rangeOffset > 0)
+                if ((rangeOffset > -1 || rangeCount > -1) && dba.getRangeByRowNumberColumn().length() > 0)
                 {
-                    sql.append("subq.rn").append(">").append("" + rangeOffset);
-                }
-                if (rangeCount > 0)
-                {
-                    if (rangeOffset > 0)
-                    {
-                        sql.append(" AND ");
-                    }
-                    sql.append("subq.rn").append("<=").append("" + (rangeCount + rangeOffset));
+                    // Add a ROW NUMBER column if supported as the means of handling ranges by the RDBMS
+                    sql.append(',').append(dba.getRangeByRowNumberColumn()).append(" rn");
                 }
             }
-        }
 
-        return sql;
+            // FROM ...
+            sql.append(" FROM ");
+            sql.append(primaryTable.toString());
+            if (lock && dba.supportsOption(DatastoreAdapter.LOCK_ROW_USING_OPTION_AFTER_FROM))
+            {
+                // Add locking after FROM where supported
+                sql.append(" WITH ").append(dba.getSelectWithLockOption());
+            }
+            if (joins != null)
+            {
+                sql.append(getSqlForJoins(lock));
+            }
+
+            // WHERE ...
+            if (where != null)
+            {
+                sql.append(" WHERE ").append(where.toSQLText());
+            }
+
+            // GROUP BY ...
+            if (groupingExpressions != null)
+            {
+                List<SQLText> groupBy = new ArrayList<>();
+                Iterator<SQLExpression> groupIter = groupingExpressions.iterator();
+                while (groupIter.hasNext())
+                {
+                    SQLExpression expr = groupIter.next();
+                    boolean exists = false;
+                    String exprSQL = expr.toSQLText().toSQL();
+                    for (SQLText st : groupBy)
+                    {
+                        String sql = st.toSQL();
+                        if (sql.equals(exprSQL))
+                        {
+                            exists = true;
+                            break;
+                        }
+                    }
+                    if (!exists)
+                    {
+                        groupBy.add(expr.toSQLText());
+                    }
+                }
+
+                if (dba.supportsOption(DatastoreAdapter.GROUP_BY_REQUIRES_ALL_SELECT_PRIMARIES))
+                {
+                    // Check that all select items are represented in the grouping for those RDBMS that need that
+                    for (SelectedItem selItem : selectedItems)
+                    {
+                        if (selItem.isPrimary())
+                        {
+                            boolean exists = false;
+                            String selItemSQL = selItem.getSQLText().toSQL();
+                            for (SQLText st : groupBy)
+                            {
+                                String sql = st.toSQL();
+                                if (sql.equals(selItemSQL))
+                                {
+                                    exists = true;
+                                    break;
+                                }
+                            }
+                            if (!exists)
+                            {
+                                groupBy.add(selItem.getSQLText());
+                            }
+                        }
+                    }
+                }
+
+                if (groupBy.size() > 0 && aggregated)
+                {
+                    sql.append(" GROUP BY ");
+                    for (int i = 0; i < groupBy.size(); i++)
+                    {
+                        if (i > 0)
+                        {
+                            sql.append(',');
+                        }
+                        sql.append(groupBy.get(i));
+                    }
+                }
+            }
+
+            // HAVING ...
+            if (having != null)
+            {
+                sql.append(" HAVING ").append(having.toSQLText());
+            }
+
+            if (unions != null && allowUnions)
+            {
+                // Add on any UNIONed statements
+                if (!dba.supportsOption(DatastoreAdapter.UNION_SYNTAX))
+                {
+                    throw new NucleusException(Localiser.msg("052504", "UNION")).setFatal();
+                }
+
+                Iterator<SelectStatement> unionIter = unions.iterator();
+                while (unionIter.hasNext())
+                {
+                    if (dba.supportsOption(DatastoreAdapter.USE_UNION_ALL))
+                    {
+                        sql.append(" UNION ALL ");
+                    }
+                    else
+                    {
+                        sql.append(" UNION ");
+                    }
+
+                    SelectStatement stmt = unionIter.next();
+                    SQLText unionSql = stmt.getSQLText();
+                    sql.append(unionSql);
+                }
+            }
+
+            // ORDER BY ...
+            SQLText orderStmt = generateOrderingStatement();
+            if (orderStmt != null)
+            {
+                sql.append(" ORDER BY ").append(orderStmt);
+            }
+
+            // RANGE
+            if (rangeOffset > -1 || rangeCount > -1)
+            {
+                // Add a LIMIT clause to end of statement if supported by the adapter
+                String limitClause = dba.getRangeByLimitEndOfStatementClause(rangeOffset, rangeCount, orderStmt != null);
+                if (limitClause.length() > 0)
+                {
+                    sql.append(" ").append(limitClause);
+                }
+            }
+
+            if (lock)
+            {
+                if (dba.supportsOption(DatastoreAdapter.LOCK_ROW_USING_SELECT_FOR_UPDATE))
+                {
+                    // Add any required locking based on the RDBMS capability
+                    if (distinct && !dba.supportsOption(DatastoreAdapter.DISTINCT_WITH_SELECT_FOR_UPDATE))
+                    {
+                        NucleusLogger.QUERY.warn(Localiser.msg("052502"));
+                    }
+                    else if (groupingExpressions != null && !dba.supportsOption(DatastoreAdapter.GROUPING_WITH_SELECT_FOR_UPDATE))
+                    {
+                        NucleusLogger.QUERY.warn(Localiser.msg("052506"));
+                    }
+                    else if (having != null && !dba.supportsOption(DatastoreAdapter.HAVING_WITH_SELECT_FOR_UPDATE))
+                    {
+                        NucleusLogger.QUERY.warn(Localiser.msg("052507"));
+                    }
+                    else if (orderingExpressions != null && !dba.supportsOption(DatastoreAdapter.ORDERING_WITH_SELECT_FOR_UPDATE))
+                    {
+                        NucleusLogger.QUERY.warn(Localiser.msg("052508"));
+                    }
+                    else if (joins != null && !joins.isEmpty() && !dba.supportsOption(DatastoreAdapter.MULTITABLES_WITH_SELECT_FOR_UPDATE))
+                    {
+                        NucleusLogger.QUERY.warn(Localiser.msg("052509"));
+                    }
+                    else
+                    {
+                        sql.append(" " + dba.getSelectForUpdateText());
+                        if (dba.supportsOption(DatastoreAdapter.LOCK_ROW_USING_SELECT_FOR_UPDATE_NOWAIT))
+                        {
+                            Boolean nowait = (Boolean) getValueForExtension(EXTENSION_LOCK_FOR_UPDATE_NOWAIT);
+                            if (nowait != null)
+                            {
+                                sql.append(" NOWAIT");
+                            }
+                        }
+                    }
+                }
+                else if (!dba.supportsOption(DatastoreAdapter.LOCK_ROW_USING_OPTION_AFTER_FROM) &&
+                           !dba.supportsOption(DatastoreAdapter.LOCK_ROW_USING_OPTION_WITHIN_JOIN))
+                {
+                    NucleusLogger.QUERY.warn("Requested locking of query statement, but this RDBMS doesn't support a convenient mechanism");
+                }
+            }
+
+            if (rangeOffset > 0 || rangeCount > -1)
+            {
+                if (dba.getRangeByRowNumberColumn2().length() > 0)
+                {
+                    // Oracle-specific using ROWNUM. Creates a query of the form
+                    // SELECT * FROM (
+                    //     SELECT subq.*, ROWNUM rn FROM (
+                    //         SELECT x1, x2, ... FROM ... WHERE ... ORDER BY ...
+                    //     ) subq
+                    // ) WHERE rn > {offset} AND rn <= {count}
+                    SQLText userSql = sql;
+
+                    // SELECT all columns of userSql, plus ROWNUM, with the FROM being the users query
+                    SQLText innerSql = new SQLText("SELECT subq.*");
+                    innerSql.append(',').append(dba.getRangeByRowNumberColumn2()).append(" rn");
+                    innerSql.append(" FROM (").append(userSql).append(") subq ");
+
+                    // Put that query as the FROM of the outer query, and apply the ROWNUM restrictions
+                    SQLText outerSql = new SQLText("SELECT * FROM (").append(innerSql).append(") ");
+                    outerSql.append("WHERE ");
+                    if (rangeOffset > 0)
+                    {
+                        outerSql.append("rn > " + rangeOffset);
+                        if (rangeCount > -1)
+                        {
+                            outerSql.append(" AND rn <= " + (rangeCount + rangeOffset));
+                        }
+                    }
+                    else
+                    {
+                        outerSql.append(" rn <= " + rangeCount);
+                    }
+
+                    sql = outerSql;
+                }
+                else if (dba.getRangeByRowNumberColumn().length() > 0)
+                {
+                    // DB2-specific ROW_NUMBER weirdness. Creates a query of the form
+                    // SELECT subq.x1, subq.x2, ... FROM (
+                    //     SELECT x1, x2, ..., {keyword} rn FROM ... WHERE ... ORDER BY ...) subq
+                    // WHERE subq.rn >= {offset} AND subq.rn < {count}
+                    // This apparently works for DB2 (unverified, but claimed by IBM employee)
+                    SQLText userSql = sql;
+                    sql = new SQLText("SELECT ");
+                    Iterator<SelectedItem> selectedItemIter = selectedItems.iterator();
+                    while (selectedItemIter.hasNext())
+                    {
+                        SelectedItem selectedItemExpr = selectedItemIter.next();
+                        sql.append("subq.");
+                        String selectedCol = selectedItemExpr.getSQLText().toSQL();
+                        if (selectedItemExpr.getAlias() != null)
+                        {
+                            selectedCol = rdbmsMgr.getIdentifierFactory().getIdentifierInAdapterCase(selectedItemExpr.getAlias());
+                        }
+                        else
+                        {
+                            // strip out qualifier when encountered from column name since we are adding a new qualifier above.
+                            // NOTE THAT THIS WILL FAIL IF THE ORIGINAL QUERY HAD "A0.COL1, B0.COL1" IN THE SELECT
+                            int dotIndex = selectedCol.indexOf(".");
+                            if (dotIndex > 0)
+                            {
+                                // Remove qualifier name and the dot
+                                selectedCol = selectedCol.substring(dotIndex + 1);
+                            }
+                        }
+
+                        sql.append(selectedCol);
+                        if (selectedItemIter.hasNext())
+                        {
+                            sql.append(',');
+                        }
+                    }
+                    sql.append(" FROM (").append(userSql).append(") subq WHERE ");
+                    if (rangeOffset > 0)
+                    {
+                        sql.append("subq.rn").append(">").append("" + rangeOffset);
+                    }
+                    if (rangeCount > 0)
+                    {
+                        if (rangeOffset > 0)
+                        {
+                            sql.append(" AND ");
+                        }
+                        sql.append("subq.rn").append("<=").append("" + (rangeCount + rangeOffset));
+                    }
+                }
+            }
+
+            return sql;
+        } finally {
+            sqlLock.unlock();
+        }
     }
 
     /**

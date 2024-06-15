@@ -71,31 +71,32 @@ public class InsertStatement extends SQLStatement
 
     public SQLText getSQLText()
     {
-        if (sql != null)
-        {
-            return sql;
-        }
-
-        sql = new SQLText("INSERT INTO ");
-        sql.append(primaryTable.getTable().toString());
-        sql.append('(');
-        Iterator<SQLExpression> columnListIter = columnList.iterator();
-        while (columnListIter.hasNext())
-        {
-            SQLExpression colExpr = columnListIter.next();
-            sql.append(colExpr.toSQLText());
-            if (columnListIter.hasNext())
-            {
-                sql.append(',');
+        sqlLock.lock();
+        try {
+            if (sql != null) {
+                return sql;
             }
-        }
-        sql.append(") ");
 
-        if (selectStmt != null)
-        {
-            sql.append(selectStmt.getSQLText());
-        }
+            sql = new SQLText("INSERT INTO ");
+            sql.append(primaryTable.getTable().toString());
+            sql.append('(');
+            Iterator<SQLExpression> columnListIter = columnList.iterator();
+            while (columnListIter.hasNext()) {
+                SQLExpression colExpr = columnListIter.next();
+                sql.append(colExpr.toSQLText());
+                if (columnListIter.hasNext()) {
+                    sql.append(',');
+                }
+            }
+            sql.append(") ");
 
-        return sql;
+            if (selectStmt != null) {
+                sql.append(selectStmt.getSQLText());
+            }
+
+            return sql;
+        } finally {
+            sqlLock.unlock();
+        }
     }
 }
