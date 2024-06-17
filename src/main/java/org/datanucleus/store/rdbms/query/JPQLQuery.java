@@ -24,6 +24,7 @@ import java.lang.reflect.Modifier;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.SQLFeatureNotSupportedException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -759,12 +760,17 @@ public class JPQLQuery extends AbstractJPQLQuery
     }
 
     protected boolean cancelTaskObject(Object obj)
+    throws UnsupportedOperationException
     {
         Statement ps = (Statement)obj;
         try
         {
             ps.cancel();
             return true;
+        }
+        catch (SQLFeatureNotSupportedException fnse)
+        {
+            throw new UnsupportedOperationException("Error cancelling query. Feature not supported", fnse);
         }
         catch (SQLException sqle)
         {
