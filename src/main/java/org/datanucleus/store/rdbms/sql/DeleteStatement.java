@@ -56,48 +56,53 @@ public class DeleteStatement extends SQLStatement
 
     public SQLText getSQLText()
     {
-        if (sql != null)
-        {
-            return sql;
-        }
+        sqlLock.lock();
+        try {
+            if (sql != null)
+            {
+                return sql;
+            }
 
-        sql = new SQLText(rdbmsMgr.getDatastoreAdapter().getDeleteTableStatement(primaryTable));
+            sql = new SQLText(rdbmsMgr.getDatastoreAdapter().getDeleteTableStatement(primaryTable));
 
-        if (joins != null)
-        {
-            // Joins present so convert to "DELETE FROM MYTABLE WHERE EXISTS (SELECT * FROM OTHER_TBL ...)"
-            Iterator<SQLJoin> joinIter = joins.iterator();
+            if (joins != null)
+            {
+                // Joins present so convert to "DELETE FROM MYTABLE WHERE EXISTS (SELECT * FROM OTHER_TBL ...)"
+                Iterator<SQLJoin> joinIter = joins.iterator();
 
-            // Create sub-statement selecting the first joined table, joining back to the outer statement
-            SQLJoin subJoin = joinIter.next();
-            SQLStatement subStmt = new SelectStatement(this, rdbmsMgr, subJoin.getTargetTable().getTable(), subJoin.getTargetTable().getAlias(), subJoin.getTargetTable().getGroupName());
-            subStmt.whereAnd(subJoin.getCondition(), false);
+                // Create sub-statement selecting the first joined table, joining back to the outer statement
+                SQLJoin subJoin = joinIter.next();
+                SQLStatement subStmt = new SelectStatement(this, rdbmsMgr, subJoin.getTargetTable().getTable(), subJoin.getTargetTable().getAlias(), subJoin.getTargetTable().getGroupName());
+                subStmt.whereAnd(subJoin.getCondition(), false);
+                if (where != null)
+                {
+                    // Move the WHERE clause to the sub-statement
+                    subStmt.whereAnd(where, false);
+                }
+
+                // Put any remaining joins into the sub-statement
+                while (joinIter.hasNext())
+                {
+                    SQLJoin join = joinIter.next();
+                    if (subStmt.joins == null)
+                    {
+                        subStmt.joins = new ArrayList<>();
+                    }
+                    subStmt.joins.add(join);
+                }
+
+                // Set WHERE clause of outer statement to "EXISTS (sub-statement)"
+                BooleanExpression existsExpr = new BooleanSubqueryExpression(this, "EXISTS", subStmt);
+                where = existsExpr;
+            }
             if (where != null)
             {
-                // Move the WHERE clause to the sub-statement
-                subStmt.whereAnd(where, false);
+                sql.append(" WHERE ").append(where.toSQLText());
             }
 
-            // Put any remaining joins into the sub-statement
-            while (joinIter.hasNext())
-            {
-                SQLJoin join = joinIter.next();
-                if (subStmt.joins == null)
-                {
-                    subStmt.joins = new ArrayList<>();
-                }
-                subStmt.joins.add(join);
-            }
-
-            // Set WHERE clause of outer statement to "EXISTS (sub-statement)"
-            BooleanExpression existsExpr = new BooleanSubqueryExpression(this, "EXISTS", subStmt);
-            where = existsExpr;
+            return sql;
+        } finally {
+            sqlLock.unlock();
         }
-        if (where != null)
-        {
-            sql.append(" WHERE ").append(where.toSQLText());
-        }
-
-        return sql;
     }
 }
