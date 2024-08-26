@@ -60,6 +60,13 @@ public interface IdentifierFactory
     String getIdentifierInAdapterCase(String identifier);
 
     /**
+     * Accessor for an identifier for use in the datastore adapter, but omitting any quoting.
+     * @param identifier The identifier name
+     * @return Identifier name for use with the datastore adapter
+     */
+    String getIdentifierInAdapterCaseUnquoted(String identifier);
+
+    /**
      * Method to truncate the provided identifier as required to the datastore adapter column length (if required)
      * @param identifier The identifier
      * @return The truncated variant (if the length was longer than the max column identifier length);

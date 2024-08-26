@@ -196,7 +196,7 @@ public abstract class ElementContainerTable extends JoinTable
         ColumnMetaData[] pkCols = pkmd.getColumnMetaData();
         for (int i=0;i<pkCols.length;i++)
         {
-            String colName = storeMgr.getIdentifierFactory().getIdentifierInAdapterCase(pkCols[i].getName());
+            String colName = storeMgr.getIdentifierFactory().getIdentifierInAdapterCaseUnquoted(pkCols[i].getName());
             boolean found = false;
             for (int j=0;j<ownerMapping.getNumberOfColumnMappings();j++)
             {

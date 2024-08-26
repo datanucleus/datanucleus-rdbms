@@ -416,6 +416,36 @@ public abstract class AbstractIdentifierFactory implements IdentifierFactory
     }
 
     /**
+     * Convenience method to convert the passed identifier into an identifier in the correct case.
+     * @param identifier The identifier
+     * @return The updated identifier in the correct case
+     */
+    public String getIdentifierInAdapterCaseUnquoted(String identifier)
+    {
+        // TODO return namingFactory.getNameInRequiredCase(identifier);
+        if (identifier == null)
+        {
+            return null;
+        }
+        StringBuilder id = new StringBuilder();
+
+        if (namingCase == NamingCase.LOWER_CASE || namingCase == NamingCase.LOWER_CASE_QUOTED)
+        {
+            id.append(identifier.toLowerCase());
+        }
+        else if (namingCase == NamingCase.UPPER_CASE || namingCase == NamingCase.UPPER_CASE_QUOTED)
+        {
+            id.append(identifier.toUpperCase());
+        }
+        else
+        {
+            id.append(identifier);
+        }
+
+        return id.toString();
+    }
+
+    /**
      * Method to generate an identifier based on the supplied name for the requested type of identifier.
      * @param identifierType the type of identifier to be created
      * @param name The Java or SQL identifier name
