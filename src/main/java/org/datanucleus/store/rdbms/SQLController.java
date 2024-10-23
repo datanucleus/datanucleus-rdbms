@@ -26,6 +26,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -35,6 +36,7 @@ import org.datanucleus.ExecutionContext;
 import org.datanucleus.management.ManagerStatistics;
 import org.datanucleus.store.connection.ManagedConnection;
 import org.datanucleus.store.connection.ManagedConnectionResourceListener;
+import org.datanucleus.store.connection.ManagedConnectionWithListenerAccess;
 import org.datanucleus.store.rdbms.query.RDBMSQueryUtils;
 import org.datanucleus.store.rdbms.request.RequestUtil;
 import org.datanucleus.util.Localiser;
@@ -781,51 +783,82 @@ public class SQLController
     protected void setConnectionStatementState(final ManagedConnection conn, ConnectionStatementState state)
     {
         connectionStatements.put(conn, state);
-        ManagedConnectionResourceListener listener = new ManagedConnectionResourceListener()
+
+        // add listener (if not already added) for ensuring that all batch statements are processed when flushed
+        if (conn instanceof ManagedConnectionWithListenerAccess)
         {
-            public void transactionFlushed()
+            final Collection<ManagedConnectionResourceListener> listeners = ((ManagedConnectionWithListenerAccess) conn).getListeners();
+            for (Object listener : listeners)
             {
-                try
+                if (listener instanceof SQLControllerManagedConnectionResourceListener
+                        && ((SQLControllerManagedConnectionResourceListener) listener).listenerFor(this, conn))
                 {
-                    processStatementsForConnection(conn);
+                    return; // no need to add similar listener again
                 }
-                catch (SQLException e)
+            }
+        }
+
+        ManagedConnectionResourceListener listener = new SQLControllerManagedConnectionResourceListener(this, conn);
+        conn.addListener(listener);
+    }
+
+    private static class SQLControllerManagedConnectionResourceListener implements ManagedConnectionResourceListener
+    {
+        private final SQLController sqlController;
+        private final ManagedConnection conn;
+
+        public SQLControllerManagedConnectionResourceListener(SQLController sqlController, ManagedConnection managedConnection)
+        {
+            this.sqlController = sqlController;
+            this.conn = managedConnection;
+        }
+
+        protected boolean listenerFor(SQLController sqlController, ManagedConnection managedConnection)
+        {
+            return this.sqlController == sqlController && this.conn == managedConnection;
+        }
+
+        public void transactionFlushed()
+        {
+            try
+            {
+                sqlController.processStatementsForConnection(conn);
+            }
+            catch (SQLException e)
+            {
+                // cleanup state
+                ConnectionStatementState state = sqlController.getConnectionStatementState(conn);
+                if (state != null)
                 {
-                    // cleanup state
-                    ConnectionStatementState state = getConnectionStatementState(conn);
-                    if (state != null)
+                    // Remove the current connection statement
+                    sqlController.removeConnectionStatementState(conn);
+
+                    // Close the statement if it is registered for closing after processing
+                    if (state.closeStatementOnProcess)
                     {
-                        // Remove the current connection statement
-                        removeConnectionStatementState(conn);
-    
-                        // Close the statement if it is registered for closing after processing
-                        if (state.closeStatementOnProcess)
+                        try
                         {
-                            try
-                            {
-                                state.stmt.close();
-                            }
-                            catch (SQLException ex)
-                            {
-                                //ignore
-                            }
+                            state.stmt.close();
+                        }
+                        catch (SQLException ex)
+                        {
+                            //ignore
                         }
                     }
-
-                    throw RequestUtil.convertSqlException(Localiser.msg("052108"), e);
                 }
+
+                throw RequestUtil.convertSqlException(Localiser.msg("052108"), e);
             }
-            public void transactionPreClose(){}
-            public void managedConnectionPreClose(){}
-            public void managedConnectionPostClose()
-            {
-                conn.removeListener(this);
-            }
-            public void resourcePostClose()
-            {
-                conn.removeListener(this);
-            }
-        };
-        conn.addListener(listener);
+        }
+        public void transactionPreClose(){}
+        public void managedConnectionPreClose(){}
+        public void managedConnectionPostClose()
+        {
+            conn.removeListener(this);
+        }
+        public void resourcePostClose()
+        {
+            conn.removeListener(this);
+        }
     }
 }
