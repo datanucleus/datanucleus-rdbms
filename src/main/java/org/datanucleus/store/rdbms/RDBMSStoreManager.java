@@ -2817,6 +2817,26 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
     }
 
     /**
+     * Accessor for the timezone to use with dates / calendars etc.
+     * Utilises the "serverTimeZoneID".
+     * @return The timezone.
+     */
+    public TimeZone getTimeZone()
+    {
+        TimeZone tz;
+        String serverTimeZoneID = getStringProperty(PropertyNames.PROPERTY_SERVER_TIMEZONE_ID);
+        if (serverTimeZoneID != null)
+        {
+            tz = TimeZone.getTimeZone(serverTimeZoneID);
+        }
+        else
+        {
+            tz = TimeZone.getDefault();
+        }
+        return tz;
+    }
+
+    /**
      * Accessor for the Calendar to be used in handling all timezone issues with the datastore.
      * Utilises the "serverTimeZoneID" in providing this Calendar used in time/date conversions.
      * @return The calendar to use for dateTimezone issues.
@@ -2825,16 +2845,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
     {
         if (dateTimezoneCalendar == null)
         {
-            TimeZone tz;
-            String serverTimeZoneID = getStringProperty(PropertyNames.PROPERTY_SERVER_TIMEZONE_ID);
-            if (serverTimeZoneID != null)
-            {
-                tz = TimeZone.getTimeZone(serverTimeZoneID);
-            }
-            else
-            {
-                tz = TimeZone.getDefault();
-            }
+            TimeZone tz = getTimeZone();
             dateTimezoneCalendar = new GregorianCalendar(tz);
         }
 

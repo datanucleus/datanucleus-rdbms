@@ -28,6 +28,7 @@ import java.sql.Types;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.TimeZone;
 
 import org.datanucleus.ClassNameConstants;
 import org.datanucleus.exceptions.NucleusDataStoreException;
@@ -509,8 +510,7 @@ public class CharColumnMapping extends AbstractColumnMapping
     }
 
     /**
-     * Get a Format object to handle java.util.Date. If a TimeZone is present, it will be used to format dates
-     * to that zone.
+     * Get a Format object to handle java.util.Date. If a TimeZone is present, it will be used to format dates to that zone.
      * @return Date formatter to use
      */
     public SimpleDateFormat getJavaUtilDateFormat()
@@ -518,11 +518,11 @@ public class CharColumnMapping extends AbstractColumnMapping
         FormatterInfo formatInfo = formatterThreadInfo.get();
         if (formatInfo.formatter == null)
         {
-            Calendar cal = storeMgr.getCalendarForDateTimezone();
+            TimeZone tz = storeMgr.getTimeZone();
             formatInfo.formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
-            if (cal != null)
+            if (tz != null)
             {
-                formatInfo.formatter.setTimeZone(cal.getTimeZone());
+                formatInfo.formatter.setTimeZone(tz);
             }
         }
         return formatInfo.formatter;
