@@ -708,7 +708,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                             if (sqlExpr.getJavaTypeMapping() instanceof PersistableMapping)
                             {
                                 // Method returns persistable object, so select the FetchPlan
-                                String selectedType = ((PersistableMapping)sqlExpr.getJavaTypeMapping()).getType();
+                                String selectedType = sqlExpr.getJavaTypeMapping().getType();
                                 AbstractClassMetaData selectedCmd = ec.getMetaDataManager().getMetaDataForClass(selectedType, clr);
                                 FetchPlanForClass fpForCmd = fetchPlan.getFetchPlanForClass(selectedCmd);
                                 int[] membersToSelect = fpForCmd.getMemberNumbers();

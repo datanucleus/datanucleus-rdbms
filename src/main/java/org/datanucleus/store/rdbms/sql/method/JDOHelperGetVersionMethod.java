@@ -74,9 +74,9 @@ public class JDOHelperGetVersionMethod implements SQLMethod
         }
         else if (ObjectExpression.class.isAssignableFrom(expr.getClass()))
         {
-            if (((ObjectExpression)expr).getJavaTypeMapping() instanceof PersistableMapping)
+            if (expr.getJavaTypeMapping() instanceof PersistableMapping)
             {
-                JavaTypeMapping mapping = ((ObjectExpression)expr).getJavaTypeMapping();
+                JavaTypeMapping mapping = expr.getJavaTypeMapping();
                 DatastoreClass table = (DatastoreClass) expr.getSQLTable().getTable();
                 if (table.getIdMapping() == mapping) // Version of candidate
                 {

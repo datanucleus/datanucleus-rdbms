@@ -53,7 +53,6 @@ import org.datanucleus.store.rdbms.sql.expression.TemporalExpression;
 import org.datanucleus.store.rdbms.sql.expression.UnboundExpression;
 import org.datanucleus.store.rdbms.table.CollectionTable;
 import org.datanucleus.store.rdbms.table.DatastoreClass;
-import org.datanucleus.store.rdbms.table.JoinTable;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 
@@ -500,7 +499,7 @@ public class CollectionContainsMethod implements SQLMethod
                 subStmt.select(exprFactory.newLiteral(subStmt, oneMapping, 1), null);
 
                 // Restrict to collection owner
-                JavaTypeMapping ownerMapping = ((JoinTable)joinTbl).getOwnerMapping();
+                JavaTypeMapping ownerMapping = joinTbl.getOwnerMapping();
                 SQLExpression ownerExpr = exprFactory.newExpression(subStmt, subStmt.getPrimaryTable(), ownerMapping);
                 SQLExpression ownerIdExpr = exprFactory.newExpression(stmt, collExpr.getSQLTable(), collExpr.getSQLTable().getTable().getIdMapping());
                 subStmt.whereAnd(ownerExpr.eq(ownerIdExpr), true);
@@ -531,7 +530,7 @@ public class CollectionContainsMethod implements SQLMethod
                     null, null, true, null);
 
                 // Restrict to collection owner
-                JavaTypeMapping ownerMapping = ((JoinTable)joinTbl).getOwnerMapping();
+                JavaTypeMapping ownerMapping = joinTbl.getOwnerMapping();
                 SQLExpression ownerExpr = exprFactory.newExpression(subStmt, joinSqlTbl, ownerMapping);
                 SQLExpression ownerIdExpr = exprFactory.newExpression(stmt, collExpr.getSQLTable(), collExpr.getSQLTable().getTable().getIdMapping());
                 subStmt.whereAnd(ownerExpr.eq(ownerIdExpr), true);

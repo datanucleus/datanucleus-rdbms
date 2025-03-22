@@ -48,7 +48,6 @@ import org.datanucleus.store.rdbms.sql.expression.TemporalExpression;
 import org.datanucleus.store.rdbms.sql.expression.UnboundExpression;
 import org.datanucleus.store.rdbms.table.ArrayTable;
 import org.datanucleus.store.rdbms.table.DatastoreClass;
-import org.datanucleus.store.rdbms.table.JoinTable;
 import org.datanucleus.util.NucleusLogger;
 
 /**
@@ -253,7 +252,7 @@ public class ArrayContainsMethod implements SQLMethod
                 subStmt.select(exprFactory.newLiteral(subStmt, oneMapping, 1), null);
 
                 // Restrict to array owner
-                JavaTypeMapping ownerMapping = ((JoinTable)joinTbl).getOwnerMapping();
+                JavaTypeMapping ownerMapping = joinTbl.getOwnerMapping();
                 SQLExpression ownerExpr = exprFactory.newExpression(subStmt, subStmt.getPrimaryTable(), ownerMapping);
                 SQLExpression ownerIdExpr = exprFactory.newExpression(stmt, arrExpr.getSQLTable(), arrExpr.getSQLTable().getTable().getIdMapping());
                 subStmt.whereAnd(ownerExpr.eq(ownerIdExpr), true);
@@ -284,7 +283,7 @@ public class ArrayContainsMethod implements SQLMethod
                     null, null, null, true, null);
 
                 // Restrict to array owner
-                JavaTypeMapping ownerMapping = ((JoinTable)joinTbl).getOwnerMapping();
+                JavaTypeMapping ownerMapping = joinTbl.getOwnerMapping();
                 SQLExpression ownerExpr = exprFactory.newExpression(subStmt, joinSqlTbl, ownerMapping);
                 SQLExpression ownerIdExpr = exprFactory.newExpression(stmt, arrExpr.getSQLTable(), arrExpr.getSQLTable().getTable().getIdMapping());
                 subStmt.whereAnd(ownerExpr.eq(ownerIdExpr), true);

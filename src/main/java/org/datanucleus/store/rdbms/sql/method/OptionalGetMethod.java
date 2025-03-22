@@ -22,7 +22,6 @@ import java.util.List;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.store.rdbms.mapping.java.OptionalMapping;
 import org.datanucleus.store.rdbms.sql.SQLStatement;
-import org.datanucleus.store.rdbms.sql.expression.OptionalExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpressionFactory;
 
@@ -42,7 +41,7 @@ public class OptionalGetMethod implements SQLMethod
             throw new NucleusException("Optional.get should be passed no arguments");
         }
 
-        OptionalMapping opMapping = (OptionalMapping) ((OptionalExpression)expr).getJavaTypeMapping();
+        OptionalMapping opMapping = (OptionalMapping)expr.getJavaTypeMapping();
         SQLExpressionFactory exprFactory = stmt.getSQLExpressionFactory();
         return exprFactory.newExpression(stmt, expr.getSQLTable(), opMapping.getWrappedMapping());
     }

@@ -37,7 +37,6 @@ import org.datanucleus.store.rdbms.sql.expression.CaseExpression;
 import org.datanucleus.store.rdbms.sql.expression.CaseNumericExpression;
 import org.datanucleus.store.rdbms.sql.expression.CaseStringExpression;
 import org.datanucleus.store.rdbms.sql.expression.NullLiteral;
-import org.datanucleus.store.rdbms.sql.expression.OptionalExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpressionFactory;
 
@@ -60,7 +59,7 @@ public class OptionalOrElseMethod implements SQLMethod
         SQLExpression elseExpr = args.get(0);
 
         SQLExpressionFactory exprFactory = stmt.getSQLExpressionFactory();
-        OptionalMapping opMapping = (OptionalMapping) ((OptionalExpression)expr).getJavaTypeMapping();
+        OptionalMapping opMapping = (OptionalMapping)expr.getJavaTypeMapping();
         JavaTypeMapping javaMapping = opMapping.getWrappedMapping();
         SQLExpression getExpr = exprFactory.newExpression(stmt, expr.getSQLTable(),javaMapping);
         SQLExpression isNotNullExpr = exprFactory.newExpression(stmt, expr.getSQLTable(),javaMapping).ne(new NullLiteral(stmt, javaMapping, null, null));

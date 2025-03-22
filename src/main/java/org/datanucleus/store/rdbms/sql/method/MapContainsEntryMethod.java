@@ -41,7 +41,6 @@ import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpressionFactory;
 import org.datanucleus.store.rdbms.sql.expression.UnboundExpression;
 import org.datanucleus.store.rdbms.table.DatastoreClass;
-import org.datanucleus.store.rdbms.table.JoinTable;
 import org.datanucleus.store.rdbms.table.MapTable;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
@@ -450,7 +449,7 @@ public class MapContainsEntryMethod implements SQLMethod
             subStmt.select(exprFactory.newLiteral(subStmt, oneMapping, 1), null);
 
             // Restrict to collection owner
-            JavaTypeMapping ownerMapping = ((JoinTable)joinTbl).getOwnerMapping();
+            JavaTypeMapping ownerMapping = joinTbl.getOwnerMapping();
             SQLExpression ownerExpr = exprFactory.newExpression(subStmt, subStmt.getPrimaryTable(), ownerMapping);
             SQLExpression ownerIdExpr = exprFactory.newExpression(stmt, mapExpr.getSQLTable(),
                 mapExpr.getSQLTable().getTable().getIdMapping());

@@ -126,7 +126,7 @@ public class InterfaceMapping extends ReferenceMapping
                     {
                         ((PersistableMapping) mapping).addJavaTypeMapping(m.getJavaTypeMapping()[j]);
                     }
-                    ((PersistableMapping) mapping).setReferenceMapping(m.getReferenceMapping());
+                    mapping.setReferenceMapping(m.getReferenceMapping());
                 }
                 else
                 {

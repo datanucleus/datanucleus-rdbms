@@ -28,7 +28,6 @@ import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.expression.BooleanLiteral;
-import org.datanucleus.store.rdbms.sql.expression.CollectionExpression;
 import org.datanucleus.store.rdbms.sql.expression.CollectionLiteral;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpressionFactory;
@@ -62,7 +61,7 @@ public class CollectionIsEmptyMethod implements SQLMethod
             return new BooleanLiteral(stmt, m, isEmpty ? Boolean.TRUE : Boolean.FALSE);
         }
 
-        AbstractMemberMetaData mmd = ((CollectionExpression)expr).getJavaTypeMapping().getMemberMetaData();
+        AbstractMemberMetaData mmd = expr.getJavaTypeMapping().getMemberMetaData();
         if (mmd.isSerialized())
         {
             throw new NucleusUserException("Cannot perform Collection.isEmpty when the collection is being serialised");

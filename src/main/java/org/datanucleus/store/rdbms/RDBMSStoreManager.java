@@ -2492,7 +2492,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
             {
                 throw new NucleusUserException(Localiser.msg("050035", im.className, im.fieldName, im.subfieldName));
             }
-            m = ((Table) ct).getIdMapping();
+            m = ct.getIdMapping();
         }
         else
         {
@@ -3389,7 +3389,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                         rdbmsMgr.registerStoreData(sdNew);
 
                         // must be initialized after registering, to avoid StackOverflowError
-                        ((Table)t).preInitialize(clr);
+                        t.preInitialize(clr);
                     }
                     else if (imd.getStrategy() == InheritanceStrategy.SUPERCLASS_TABLE)
                     {
