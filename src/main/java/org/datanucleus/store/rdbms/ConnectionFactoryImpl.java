@@ -364,6 +364,10 @@ public class ConnectionFactoryImpl extends AbstractConnectionFactory
                 }
                 catch (SQLException sqle)
                 {
+                    NucleusLogger.GENERAL.error(">> MC.release threw exception ", sqle);
+                    // Process the release before we throw the exception
+                    super.release();
+
                     throw new NucleusDataStoreException(sqle.getMessage(), sqle);
                 }
             }
