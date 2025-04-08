@@ -166,6 +166,13 @@ public class HikariCPConnectionPoolFactory extends AbstractConnectionPoolFactory
                 config.setValidationTimeout(validationTimeout);
             }
         }
+    
+        if (storeMgr.hasProperty(RDBMSPropertyNames.PROPERTY_CONNECTION_POOL_INIT_SQL))
+        {
+            String connectionInitSQL = storeMgr.getStringProperty(RDBMSPropertyNames.PROPERTY_CONNECTION_POOL_INIT_SQL);
+            config.setConnectionInitSql(connectionInitSQL);
+        }
+    
 
         // Create the actual pool of connections
         HikariDataSource ds = new HikariDataSource(config);
