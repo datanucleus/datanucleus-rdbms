@@ -34,4 +34,11 @@
 		<nature>org.eclipse.pde.PluginNature</nature>
 		<nature>org.eclipse.wst.common.project.facet.core.nature</nature>
 	</natures>
+	<linkedResources>
+		<link>
+			<name>.._.._.._.._.._usr_local_software_datanucleus_datanucleus-rdbms_src_main_resources</name>
+			<type>2</type>
+			<location>//usr/local/software/datanucleus/datanucleus-rdbms/src/main/resources/</location>
+		</link>
+	</linkedResources>
 </projectDescription>

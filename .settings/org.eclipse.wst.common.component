@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?><project-modules id="moduleCoreId" project-version="1.5.0">
+        
     <wb-module deploy-name="datanucleus-rdbms">
+                
         <wb-resource deploy-path="/" source-path="/src/main/java"/>
-        <wb-resource deploy-path="/" source-path="/src/main/resources"/>
+        <wb-resource deploy-path="/" source-path="/.._.._.._.._.._usr_local_software_datanucleus_datanucleus-rdbms_src_main_resources"/>
+            
     </wb-module>
+    
 </project-modules>
