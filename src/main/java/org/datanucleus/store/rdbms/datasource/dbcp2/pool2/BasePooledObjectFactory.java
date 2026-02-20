@@ -6,7 +6,7 @@
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,64 +16,79 @@
  */
 package org.datanucleus.store.rdbms.datasource.dbcp2.pool2;
 
+import java.util.Objects;
+
 /**
- * A base implementation of <code>PoolableObjectFactory</code>.
+ * A base implementation of {@code PoolableObjectFactory}.
  * <p>
  * All operations defined here are essentially no-op's.
  * <p>
  * This class is immutable, and therefore thread-safe
  *
  * @param <T> Type of element managed in this factory.
- *
  * @see PooledObjectFactory
  * @see BaseKeyedPooledObjectFactory
- *
  * @since 2.0
  */
 public abstract class BasePooledObjectFactory<T> extends BaseObject implements PooledObjectFactory<T> {
+
+    /**
+     * Constructs a new instance.
+     */
+    public BasePooledObjectFactory() {
+        // empty
+    }
+
+    /**
+     * No-op.
+     *
+     * @param p ignored
+     */
+    @Override
+    public void activateObject(final PooledObject<T> p) throws Exception {
+        // The default implementation is a no-op.
+    }
+
     /**
      * Creates an object instance, to be wrapped in a {@link PooledObject}.
      * <p>This method <strong>must</strong> support concurrent, multi-threaded
-     * activation.</p>
+     * invocation.</p>
      *
-     * @return an instance to be served by the pool
-     *
+     * @return an instance to be served by the pool, not null.
      * @throws Exception if there is a problem creating a new instance,
      *    this will be propagated to the code requesting an object.
      */
     public abstract T create() throws Exception;
 
     /**
-     * Wrap the provided instance with an implementation of
-     * {@link PooledObject}.
+     * No-op.
      *
-     * @param obj the instance to wrap
-     *
-     * @return The provided instance, wrapped by a {@link PooledObject}
+     * @param p ignored
      */
-    public abstract PooledObject<T> wrap(T obj);
+    @Override
+    public void destroyObject(final PooledObject<T> p) throws Exception  {
+        // The default implementation is a no-op.
+    }
 
     @Override
     public PooledObject<T> makeObject() throws Exception {
-        return wrap(create());
+        return wrap(Objects.requireNonNull(create(), () -> String.format("BasePooledObjectFactory(%s).create() = null", getClass().getName())));
     }
 
     /**
-     *  No-op.
+     * No-op.
      *
-     *  @param p ignored
+     * @param p ignored
      */
     @Override
-    public void destroyObject(final PooledObject<T> p)
-        throws Exception  {
+    public void passivateObject(final PooledObject<T> p) throws Exception {
         // The default implementation is a no-op.
     }
 
     /**
-     * This implementation always returns {@code true}.
+     * Always returns {@code true}.
      *
      * @param p ignored
-     *
      * @return {@code true}
      */
     @Override
@@ -82,23 +97,11 @@ public abstract class BasePooledObjectFactory<T> extends BaseObject implements P
     }
 
     /**
-     *  No-op.
+     * Wraps the provided instance with an implementation of
+     * {@link PooledObject}.
      *
-     *  @param p ignored
+     * @param obj the instance to wrap, should not be null.
+     * @return The provided instance, wrapped by a {@link PooledObject}
      */
-    @Override
-    public void activateObject(final PooledObject<T> p) throws Exception {
-        // The default implementation is a no-op.
-    }
-
-    /**
-     *  No-op.
-     *
-     * @param p ignored
-     */
-    @Override
-    public void passivateObject(final PooledObject<T> p)
-        throws Exception {
-        // The default implementation is a no-op.
-    }
+    public abstract PooledObject<T> wrap(T obj);
 }

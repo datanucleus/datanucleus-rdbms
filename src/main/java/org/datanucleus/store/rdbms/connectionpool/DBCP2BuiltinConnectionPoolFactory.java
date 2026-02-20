@@ -41,6 +41,7 @@ public class DBCP2BuiltinConnectionPoolFactory extends AbstractConnectionPoolFac
     /* (non-Javadoc)
      * @see org.datanucleus.store.rdbms.datasource.ConnectionPoolFactory#createConnectionPool(org.datanucleus.store.StoreManager)
      */
+    @SuppressWarnings("deprecation")
     public ConnectionPool createConnectionPool(StoreManager storeMgr)
     {
         // Load the database driver

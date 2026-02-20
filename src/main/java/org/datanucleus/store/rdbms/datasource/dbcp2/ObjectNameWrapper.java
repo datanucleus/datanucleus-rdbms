@@ -6,7 +6,7 @@
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.datanucleus.store.rdbms.datasource.dbcp2;
 
 import java.lang.management.ManagementFactory;
@@ -31,15 +30,16 @@ import org.datanucleus.util.NucleusLogger;
  *
  * @since 2.2.1
  */
-class ObjectNameWrapper {
+final class ObjectNameWrapper {
+
     private static final NucleusLogger log = NucleusLogger.CONNECTION;
 
-    private static MBeanServer MBEAN_SERVER = getPlatformMBeanServer();
+    private static final MBeanServer MBEAN_SERVER = getPlatformMBeanServer();
 
     private static MBeanServer getPlatformMBeanServer() {
         try {
             return ManagementFactory.getPlatformMBeanServer();
-        } catch (LinkageError | Exception e) {
+        } catch (final LinkageError | Exception e) {
             // ignore - JMX not available
             log.debug("Failed to get platform MBeanServer", e);
             return null;
@@ -70,7 +70,7 @@ class ObjectNameWrapper {
         }
         try {
             MBEAN_SERVER.registerMBean(object, objectName);
-        } catch (LinkageError | Exception e) {
+        } catch (final LinkageError | Exception e) {
             log.warn("Failed to complete JMX registration for " + objectName, e);
         }
     }
@@ -90,7 +90,7 @@ class ObjectNameWrapper {
         if (MBEAN_SERVER.isRegistered(objectName)) {
             try {
                 MBEAN_SERVER.unregisterMBean(objectName);
-            } catch (LinkageError | Exception e) {
+            } catch (final LinkageError | Exception e) {
                 log.warn("Failed to complete JMX unregistration for " + objectName, e);
             }
         }
