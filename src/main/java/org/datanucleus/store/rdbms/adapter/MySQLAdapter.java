@@ -165,6 +165,7 @@ public class MySQLAdapter extends BaseDatastoreAdapter
         supportedOptions.add(OPERATOR_BITWISE_OR);
         supportedOptions.add(OPERATOR_BITWISE_XOR);
         supportedOptions.add(PARAMETER_IN_CASE_IN_UPDATE_CLAUSE);
+        supportedOptions.add(ORDER_BY_IN_UPDATE_STATEMENT);
 
 //        supportedOptions.add(NATIVE_ENUM_TYPE); // There is no point to supporting this since "CHECK IN(...)" is ANSI standard and does the same
 

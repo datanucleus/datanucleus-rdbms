@@ -39,6 +39,7 @@ import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.metadata.CollectionMetaData;
 import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.connection.ManagedConnection;
+import org.datanucleus.store.rdbms.adapter.DatastoreAdapter;
 import org.datanucleus.store.rdbms.mapping.java.ReferenceMapping;
 import org.datanucleus.store.types.scostore.ListStore;
 import org.datanucleus.store.rdbms.JDBCUtils;
@@ -59,6 +60,7 @@ public abstract class AbstractListStore<E> extends AbstractCollectionStore<E> im
     protected String removeAtStmt;
     protected String shiftStmt;
     protected String shiftBulkStmt;
+    protected String shiftBulkUpStmt;
 
     /**
      * Constructor. Protected to prevent instantiation.
@@ -455,7 +457,7 @@ public abstract class AbstractListStore<E> extends AbstractCollectionStore<E> im
      */
     protected int[] internalShiftBulk(DNStateManager ownerSM, int start, int amount, ManagedConnection conn, boolean batched, boolean executeNow)
     {
-        String shiftBulkStmt = getShiftBulkStmt();
+        String shiftBulkStmt = (amount > 0) ? getShiftBulkUpStmt() : getShiftBulkStmt();
         try
         {
             SQLController sqlControl = storeMgr.getSQLController();
@@ -482,7 +484,7 @@ public abstract class AbstractListStore<E> extends AbstractCollectionStore<E> im
         }
         catch (SQLException sqle)
         {
-            throw new NucleusDataStoreException(Localiser.msg("056012", shiftStmt), sqle);
+            throw new NucleusDataStoreException(Localiser.msg("056012", shiftBulkStmt), sqle);
         }
     }
 
@@ -836,5 +838,65 @@ public abstract class AbstractListStore<E> extends AbstractCollectionStore<E> im
             }
         }
         return shiftBulkStmt;
+    }
+
+    /**
+     * Generate statement for bulk shifting rows UP (positive amount).
+     * When the datastore supports ORDER BY in UPDATE statements, adds ORDER BY DESC
+     * to avoid unique constraint violations when shifting indices upward.
+     * <PRE>
+     * UPDATE LISTTABLE SET INDEXCOL = INDEXCOL + ?
+     * WHERE OWNERCOL = ?
+     * AND INDEXCOL &gt; ?
+     * [AND DISTINGUISHER=?]
+     * [ORDER BY INDEXCOL DESC]
+     * </PRE>
+     * @return The Statement for shifting elements up in bulk
+     */
+    protected String getShiftBulkUpStmt()
+    {
+        if (shiftBulkUpStmt == null)
+        {
+            synchronized (this)
+            {
+                StringBuilder stmt = new StringBuilder("UPDATE ").append(containerTable.toString()).append(" SET ");
+
+                for (int i = 0; i < orderMapping.getNumberOfColumnMappings(); i++)
+                {
+                    if (i > 0)
+                    {
+                        stmt.append(",");
+                    }
+                    stmt.append(orderMapping.getColumnMapping(i).getColumn().getIdentifier().toString());
+                    stmt.append(" = ");
+                    stmt.append(orderMapping.getColumnMapping(i).getColumn().getIdentifier().toString());
+                    stmt.append(" + ");
+                    stmt.append(orderMapping.getColumnMapping(i).getUpdateInputParameter());
+                }
+
+                stmt.append(" WHERE ");
+                BackingStoreHelper.appendWhereClauseForMapping(stmt, ownerMapping, null, true);
+
+                stmt.append(" AND ");
+                stmt.append(orderMapping.getColumnMapping(0).getColumn().getIdentifier().toString());
+                stmt.append(">");
+                stmt.append(orderMapping.getColumnMapping(0).getInsertionInputParameter()); // Start position
+
+                if (relationDiscriminatorMapping != null)
+                {
+                    BackingStoreHelper.appendWhereClauseForMapping(stmt, relationDiscriminatorMapping, null, false);
+                }
+
+                if (dba.supportsOption(DatastoreAdapter.ORDER_BY_IN_UPDATE_STATEMENT))
+                {
+                    stmt.append(" ORDER BY ");
+                    stmt.append(orderMapping.getColumnMapping(0).getColumn().getIdentifier().toString());
+                    stmt.append(" DESC");
+                }
+
+                shiftBulkUpStmt = stmt.toString();
+            }
+        }
+        return shiftBulkUpStmt;
     }
 }
