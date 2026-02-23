@@ -101,6 +101,7 @@ public class H2Adapter extends BaseDatastoreAdapter
 
         // Create index before FK to avoid duplication since H2 automatically creates index for FK
         supportedOptions.add(CREATE_INDEXES_BEFORE_FOREIGN_KEYS);
+        supportedOptions.add(ORDER_BY_IN_UPDATE_STATEMENT);
     }
 
     /**

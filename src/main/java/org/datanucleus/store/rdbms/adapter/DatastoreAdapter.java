@@ -410,6 +410,9 @@ public interface DatastoreAdapter
 
     public static final String INCLUDE_TABLE_INDEX_STATISTICS = "IncludeTableIndexStatistics";
 
+    /** Whether this datastore supports ORDER BY in UPDATE statements (required to avoid unique constraint violations on row-order-dependent updates). */
+    public static final String ORDER_BY_IN_UPDATE_STATEMENT = "OrderByInUpdateStatement";
+
     /**
      * Initialise the datastore adapter.
      * @param handler SchemaHandler that we initialise the types for
