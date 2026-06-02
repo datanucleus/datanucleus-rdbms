@@ -20,6 +20,7 @@ package org.datanucleus.store.rdbms.identifier;
 import java.util.Map;
 
 import org.datanucleus.ClassLoaderResolver;
+import org.datanucleus.NucleusContext;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
@@ -66,6 +67,19 @@ public class JPAIdentifierFactory extends AbstractIdentifierFactory
         super(dba, clr, props);
     }
 
+    public JPAIdentifierFactory(DatastoreAdapter dba, ClassLoaderResolver clr, Map props, NucleusContext ctx)
+    {
+        super(dba, clr, props);
+        if (ctx.getConfiguration().hasProperty("datanucleus.identifierfactory.jakarta.quote")
+                && ctx.getConfiguration().getBooleanProperty("datanucleus.identifierfactory.jakarta.quote", false))
+        {
+            this.namingCase = NamingCase.MIXED_CASE_QUOTED;
+        }
+        else
+        {
+            this.namingCase = NamingCase.MIXED_CASE;
+        }
+    }
     /**
      * Method to return a Table identifier for the join table of the specified field/property.
      * @param mmd Meta data for the field/property

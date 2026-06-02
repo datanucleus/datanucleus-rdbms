@@ -490,7 +490,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
             }
             else if ("jpa".equalsIgnoreCase(idFactoryName) || "jakarta".equalsIgnoreCase(idFactoryName))
             {
-                identifierFactory = new JPAIdentifierFactory(dba, clr, props);
+                identifierFactory = new JPAIdentifierFactory(dba, clr, props, nucleusContext);
             }
             else if ("datanucleus1".equalsIgnoreCase(idFactoryName))
             {
