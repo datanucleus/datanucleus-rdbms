@@ -42,6 +42,7 @@ import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.table.Table;
 import org.datanucleus.store.schema.AbstractStoreSchemaHandler;
 import org.datanucleus.store.schema.StoreSchemaData;
+import org.datanucleus.store.schema.naming.NamingCase;
 import org.datanucleus.transaction.TransactionIsolation;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
@@ -418,9 +419,9 @@ public class RDBMSSchemaHandler extends AbstractStoreSchemaHandler
         }
         String tableName   = (c[2] != null) ? c[2] : table.getIdentifier().getName();
 
-        catalogName = getIdentifierForUseWithDatabaseMetaData(catalogName);
-        schemaName = getIdentifierForUseWithDatabaseMetaData(schemaName);
-        tableName = getIdentifierForUseWithDatabaseMetaData(tableName);
+        catalogName = getIdentifierForUseWithDatabaseMetaData(conn, catalogName);
+        schemaName = getIdentifierForUseWithDatabaseMetaData(conn, schemaName);
+        tableName = getIdentifierForUseWithDatabaseMetaData(conn, tableName);
 
         try
         {
@@ -651,9 +652,9 @@ public class RDBMSSchemaHandler extends AbstractStoreSchemaHandler
         }
         String tableName   = (c[2] != null) ? c[2] : table.getIdentifier().getName();
 
-        catalogName = getIdentifierForUseWithDatabaseMetaData(catalogName);
-        schemaName = getIdentifierForUseWithDatabaseMetaData(schemaName);
-        tableName = getIdentifierForUseWithDatabaseMetaData(tableName);
+        catalogName = getIdentifierForUseWithDatabaseMetaData(conn, catalogName);
+        schemaName = getIdentifierForUseWithDatabaseMetaData(conn, schemaName);
+        tableName = getIdentifierForUseWithDatabaseMetaData(conn, tableName);
 
         return getRDBMSTableFKInfoForTable(conn, catalogName, schemaName, tableName);
     }
@@ -722,9 +723,9 @@ public class RDBMSSchemaHandler extends AbstractStoreSchemaHandler
         }
         String tableName   = (c[2] != null) ? c[2] : table.getIdentifier().getName();
 
-        catalogName = getIdentifierForUseWithDatabaseMetaData(catalogName);
-        schemaName = getIdentifierForUseWithDatabaseMetaData(schemaName);
-        tableName = getIdentifierForUseWithDatabaseMetaData(tableName);
+        catalogName = getIdentifierForUseWithDatabaseMetaData(conn, catalogName);
+        schemaName = getIdentifierForUseWithDatabaseMetaData(conn, schemaName);
+        tableName = getIdentifierForUseWithDatabaseMetaData(conn, tableName);
 
         return getRDBMSTablePKInfoForTable(conn, catalogName, schemaName, tableName);
     }
@@ -793,9 +794,9 @@ public class RDBMSSchemaHandler extends AbstractStoreSchemaHandler
         }
         String tableName   = (c[2] != null) ? c[2] : table.getIdentifier().getName();
 
-        catalogName = getIdentifierForUseWithDatabaseMetaData(catalogName);
-        schemaName = getIdentifierForUseWithDatabaseMetaData(schemaName);
-        tableName = getIdentifierForUseWithDatabaseMetaData(tableName);
+        catalogName = getIdentifierForUseWithDatabaseMetaData(conn, catalogName);
+        schemaName = getIdentifierForUseWithDatabaseMetaData(conn, schemaName);
+        tableName = getIdentifierForUseWithDatabaseMetaData(conn, tableName);
 
         return getRDBMSTableIndexInfoForTable(conn, catalogName, schemaName, tableName);
     }
@@ -822,7 +823,7 @@ public class RDBMSSchemaHandler extends AbstractStoreSchemaHandler
             {
                 // This is a hack for the DatabaseAdapter method that requires a schema for Oracle
                 schemaNameTmp = rdbmsStoreMgr.getDefaultSchemaName();
-                schemaNameTmp = getIdentifierForUseWithDatabaseMetaData(schemaNameTmp);
+                schemaNameTmp = getIdentifierForUseWithDatabaseMetaData(conn, schemaNameTmp);
             }
             ResultSet rs = dba.getExistingIndexes(conn, catalogName, schemaNameTmp, tableName);
             if (rs == null)
@@ -882,8 +883,8 @@ public class RDBMSSchemaHandler extends AbstractStoreSchemaHandler
         ResultSet rs = null;
         try
         {
-            String catalogName = getIdentifierForUseWithDatabaseMetaData(catalog);
-            String schemaName = getIdentifierForUseWithDatabaseMetaData(schema);
+            String catalogName = getIdentifierForUseWithDatabaseMetaData(conn, catalog);
+            String schemaName = getIdentifierForUseWithDatabaseMetaData(conn, schema);
             rs = getDatastoreAdapter().getColumns(conn, catalogName, schemaName, null, null);
             while (rs.next())
             {
@@ -972,9 +973,9 @@ public class RDBMSSchemaHandler extends AbstractStoreSchemaHandler
         }
         String tableName   = (c[2] != null) ? c[2] : table.getIdentifier().getName();
 
-        catalogName = getIdentifierForUseWithDatabaseMetaData(catalogName);
-        schemaName = getIdentifierForUseWithDatabaseMetaData(schemaName);
-        tableName = getIdentifierForUseWithDatabaseMetaData(tableName);
+        catalogName = getIdentifierForUseWithDatabaseMetaData(conn, catalogName);
+        schemaName = getIdentifierForUseWithDatabaseMetaData(conn, schemaName);
+        tableName = getIdentifierForUseWithDatabaseMetaData(conn, tableName);
 
         return getRDBMSTableInfoForTable(conn, catalogName, schemaName, tableName);
     }
@@ -1109,12 +1110,12 @@ public class RDBMSSchemaHandler extends AbstractStoreSchemaHandler
         try
         {
             Connection conn = (Connection)connection;
-            String catalogName = getIdentifierForUseWithDatabaseMetaData(catalog);
-            String schemaName = getIdentifierForUseWithDatabaseMetaData(schema);
+            String catalogName = getIdentifierForUseWithDatabaseMetaData(conn, catalog);
+            String schemaName = getIdentifierForUseWithDatabaseMetaData(conn, schema);
             if (tableNames.size() == 1)
             {
                 // Single table to retrieve so restrict the query
-                String tableName = getIdentifierForUseWithDatabaseMetaData((String)tableNames.iterator().next());
+                String tableName = getIdentifierForUseWithDatabaseMetaData(conn, (String)tableNames.iterator().next());
                 if (NucleusLogger.DATASTORE_SCHEMA.isDebugEnabled())
                 {
                     NucleusLogger.DATASTORE_SCHEMA.debug(Localiser.msg("050028", tableName, catalogName, schemaName));
@@ -1299,23 +1300,44 @@ public class RDBMSSchemaHandler extends AbstractStoreSchemaHandler
     /**
      * Convenience method to convert the passed identifier into the correct case for use with this
      * datastore adapter, and removing any quote characters.
+     * @param conn database connection
      * @param identifier The raw identifier
      * @return The identifier for use
      */
-    private String getIdentifierForUseWithDatabaseMetaData(String identifier)
+    public String getIdentifierForUseWithDatabaseMetaData(Connection conn, String identifier) 
     {
         if (identifier == null)
         {
             return null;
         }
-        return identifier.replace(getDatastoreAdapter().getIdentifierQuoteString(), "");
-        // TODO Really ought to do the case conversion so that we check in the case of the adapter
-        // This is needed where the user has provided an identifier but in the wrong case
-        // When you enable this the JDO2 TCK will likely go incredibly slow since Derby use of
-        // DatabaseMetaData.getColumns() see "http://issues.apache.org/jira/browse/DERBY-1996"
-/*        return JDBCUtils.getIdentifierNameStripped(
-            storeMgr.getIdentifierFactory().getIdentifierInAdapterCase(identifier), 
-            storeMgr.getDatastoreAdapter());*/
+        
+        identifier = rdbmsStoreMgr.getIdentifierFactory().getIdentifierInAdapterCase(identifier);
+        
+        if (identifier.startsWith(getDatastoreAdapter().getIdentifierQuoteString()))
+        {
+            
+            return identifier.replace(getDatastoreAdapter().getIdentifierQuoteString(), "");            
+        }
+        try
+        {
+            DatabaseMetaData dmd = conn.getMetaData(); 
+            if (dmd.storesLowerCaseIdentifiers())
+            {
+                return identifier.toLowerCase();
+            }
+            else if (dmd.storesUpperCaseIdentifiers())
+            {
+                return identifier.toUpperCase();
+            }
+            else
+            {
+                return identifier;
+            }            
+        }
+        catch (Exception e)
+        {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
