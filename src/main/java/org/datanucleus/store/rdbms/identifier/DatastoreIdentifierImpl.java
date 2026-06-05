@@ -181,7 +181,7 @@ public class DatastoreIdentifierImpl implements DatastoreIdentifier
     
             // Note that by adding on the quotes here we assume that the limits on the size of
             // the SQLIdentifier are not including the quotes. This may or may not be correct
-            if (dba.isReservedKeyword(name))
+            if (dba.isReservedKeyword(name) && !(factory instanceof JPAIdentifierFactory))
             {
                 // Identifier should be quoted since its a SQL keyword
                 toString = identifierQuoteString + name + identifierQuoteString;
