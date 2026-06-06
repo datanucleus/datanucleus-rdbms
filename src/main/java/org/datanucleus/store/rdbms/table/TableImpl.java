@@ -216,11 +216,11 @@ public abstract class TableImpl extends AbstractTable
                 {
                     col.initializeColumnInfoFromDatastore(ci);
                     col.validate(ci);
-                    unvalidated.remove(colIdentifier);
+                    unvalidated.remove(schemaToLogical.get(ci.getColumnName()));
                 }
                 else
                 {
-                    unvalidated.remove(colIdentifier);
+                    unvalidated.remove(schemaToLogical.get(ci.getColumnName()));
                 }
             }
         }
