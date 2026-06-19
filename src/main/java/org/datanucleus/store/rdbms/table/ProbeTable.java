@@ -33,6 +33,7 @@ import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.store.rdbms.adapter.DatastoreAdapter;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
+import org.datanucleus.store.rdbms.schema.RDBMSSchemaHandler;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.schema.naming.NamingCase;
 import org.datanucleus.util.Localiser;
@@ -93,16 +94,7 @@ public class ProbeTable extends TableImpl
 
         // Make sure the table name is in the correct case.
         // This is required by RDBMS such as PostgreSQL which allow creation in one format yet actually store it in another.
-        // This is for probe table so identifier will not be surrounded by quotes
-        String table_name = identifier.getName();
-        if (dmd.storesLowerCaseIdentifiers())
-        {
-            table_name = table_name.toLowerCase();
-        }
-        else if (dmd.storesUpperCaseIdentifiers())
-        {
-            table_name = table_name.toUpperCase();
-        }
+        String table_name = ((RDBMSSchemaHandler) storeMgr.getSchemaHandler()).getIdentifierForUseWithDatabaseMetaData(conn, identifier.getName());
 
         // Utilise default catalog/schema if available and applicable
         String catalog_name = storeMgr.getStringProperty(PropertyNames.PROPERTY_MAPPING_CATALOG);
@@ -122,7 +114,7 @@ public class ProbeTable extends TableImpl
         {
             if (!rs.next())
             {
-                throw new NucleusDataStoreException(Localiser.msg("057027",identifier));
+                throw new NucleusDataStoreException(Localiser.msg("057027", table_name));
             }
 
             schemaDetails[0] = rs.getString(1);
