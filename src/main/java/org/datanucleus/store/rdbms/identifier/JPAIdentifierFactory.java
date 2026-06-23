@@ -73,11 +73,37 @@ public class JPAIdentifierFactory extends AbstractIdentifierFactory
         if (ctx.getConfiguration().hasProperty("datanucleus.identifierfactory.jakarta.quote")
                 && ctx.getConfiguration().getBooleanProperty("datanucleus.identifierfactory.jakarta.quote", false))
         {
-            this.namingCase = NamingCase.MIXED_CASE_QUOTED;
+            if (this.namingCase == NamingCase.UPPER_CASE 
+                    || this.namingCase == NamingCase.UPPER_CASE_QUOTED)
+            {
+                this.namingCase = NamingCase.UPPER_CASE_QUOTED;
+            }
+            else if (this.namingCase == NamingCase.LOWER_CASE 
+                    || this.namingCase == NamingCase.LOWER_CASE_QUOTED)
+            {
+                this.namingCase = NamingCase.LOWER_CASE_QUOTED;
+            }
+            else
+            {
+                this.namingCase = NamingCase.MIXED_CASE_QUOTED;
+            } 
         }
         else
         {
-            this.namingCase = NamingCase.MIXED_CASE;
+            if (this.namingCase == NamingCase.UPPER_CASE 
+                    || this.namingCase == NamingCase.UPPER_CASE_QUOTED)
+            {
+                this.namingCase = NamingCase.UPPER_CASE;
+            }
+            else if (this.namingCase == NamingCase.LOWER_CASE 
+                    || this.namingCase == NamingCase.LOWER_CASE_QUOTED)
+            {
+                this.namingCase = NamingCase.LOWER_CASE;
+            }
+            else
+            {
+                this.namingCase = NamingCase.MIXED_CASE;
+            } 
         }
     }
     /**
