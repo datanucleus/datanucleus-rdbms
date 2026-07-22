@@ -193,6 +193,13 @@ public abstract class TableImpl extends AbstractTable
     throws SQLException
     {
         Map<DatastoreIdentifier, Column> unvalidated = new HashMap<>(columnsByIdentifier);
+        Map<String, DatastoreIdentifier> schemaToLogical = new HashMap<>();
+        unvalidated.keySet().forEach(key->{
+            RDBMSSchemaHandler schemaHandler = (RDBMSSchemaHandler) storeMgr.getSchemaHandler();
+            String schemaIdentifierName = schemaHandler.getIdentifierForUseWithDatabaseMetaData(conn, key.getName());
+            schemaToLogical.put(schemaIdentifierName, key);
+        });
+         
         List<StoreSchemaData> tableColInfo = storeMgr.getColumnInfoForTable(this, conn);
         Iterator i = tableColInfo.iterator();
         while (i.hasNext())
@@ -202,18 +209,18 @@ public abstract class TableImpl extends AbstractTable
             // Create an identifier to use for the real column - use "CUSTOM" because we don't want truncation
             DatastoreIdentifier colIdentifier = storeMgr.getIdentifierFactory().newColumnIdentifier(ci.getColumnName(), 
                 this.storeMgr.getNucleusContext().getTypeManager().isDefaultEmbeddedType(String.class), null, true);
-            Column col = unvalidated.get(colIdentifier);
+            Column col = unvalidated.get(schemaToLogical.get(ci.getColumnName()));
             if (col != null)
             {
                 if (validateColumnStructure)
                 {
                     col.initializeColumnInfoFromDatastore(ci);
                     col.validate(ci);
-                    unvalidated.remove(colIdentifier);
+                    unvalidated.remove(schemaToLogical.get(ci.getColumnName()));
                 }
                 else
                 {
-                    unvalidated.remove(colIdentifier);
+                    unvalidated.remove(schemaToLogical.get(ci.getColumnName()));
                 }
             }
         }
