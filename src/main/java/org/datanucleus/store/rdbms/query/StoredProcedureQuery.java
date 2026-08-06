@@ -23,7 +23,10 @@ import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Time;
+import java.sql.Timestamp;
 import java.sql.Types;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -37,12 +40,12 @@ import org.datanucleus.metadata.StoredProcQueryParameterMode;
 import org.datanucleus.store.StoreManager;
 import org.datanucleus.store.connection.ManagedConnection;
 import org.datanucleus.store.connection.ManagedConnectionResourceListener;
-import org.datanucleus.store.rdbms.adapter.DatastoreAdapter;
 import org.datanucleus.store.query.AbstractStoredProcedureQuery;
 import org.datanucleus.store.query.NoQueryResultsException;
 import org.datanucleus.store.query.QueryNotUniqueException;
 import org.datanucleus.store.query.QueryResult;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
+import org.datanucleus.store.rdbms.adapter.DatastoreAdapter;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 
@@ -185,7 +188,7 @@ public class StoredProcedureQuery extends AbstractStoredProcedureQuery
                         if (paramIter.hasNext())
                         {
                             stmtStr.append(",");
-                        }
+                        }  
                     }
                 }
                 stmtStr.append(")");
@@ -279,11 +282,11 @@ public class StoredProcedureQuery extends AbstractStoredProcedureQuery
                             {
                                 if (param.getName() != null)
                                 {
-                                    stmt.setDate(param.getName(), (java.sql.Date) parameters.get(param.getName()));
+                                    stmt.setDate(param.getName(), new java.sql.Date(((Date) parameters.get(param.getName())).getTime()));
                                 }
                                 else
                                 {
-                                    stmt.setDate(param.getPosition(), (java.sql.Date) parameters.get(param.getPosition()));
+                                    stmt.setDate(param.getPosition(), new java.sql.Date(((Date) parameters.get(param.getPosition())).getTime()));
                                 }
                             }
                             else if (param.getType() == BigInteger.class)
@@ -308,8 +311,48 @@ public class StoredProcedureQuery extends AbstractStoredProcedureQuery
                                     stmt.setDouble(param.getPosition(), ((BigDecimal) parameters.get(param.getPosition())).doubleValue());
                                 }
                             }
+                            else if (param.getType() == Calendar.class)
+                            {
+                                Object paramValue = (param.getName() != null)
+                                        ? parameters.get(param.getName())
+                                        : parameters.get(param.getPosition());
+                                if (paramValue instanceof Date)
+                                {
+                                    if (param.getName() != null)
+                                    {
+                                        stmt.setDate(param.getName(), new java.sql.Date(((Date) paramValue).getTime())); 
+                                    }
+                                    else
+                                    {
+                                        stmt.setDate(param.getPosition(), new java.sql.Date(((Date) paramValue).getTime())); 
+                                    }
+                                }
+                                else if (paramValue instanceof Time)
+                                {
+                                    if (param.getName() != null)
+                                    {
+                                        stmt.setTime(param.getName(), (Time) paramValue); 
+                                    }
+                                    else
+                                    {
+                                        stmt.setTime(param.getPosition(), (Time) paramValue); 
+                                    }
+                                }
+                                else if (paramValue instanceof Timestamp)
+                                {
+                                    if (param.getName() != null)
+                                    {
+                                        stmt.setTimestamp(param.getName(), (Timestamp) paramValue);
+                                    }
+                                    else
+                                    {
+                                        stmt.setTimestamp(param.getPosition(), (Timestamp) paramValue);
+                                    }           
+                                }
+                            }                            
                             else
                             {
+      
                                 throw new NucleusException("Dont currently support stored proc input params of type " + param.getType());
                             }
                         }
@@ -428,6 +471,17 @@ public class StoredProcedureQuery extends AbstractStoredProcedureQuery
                                 {
                                     stmt.registerOutParameter(param.getPosition(), Types.DOUBLE);
                                 }
+                            }
+                            else if (param.getMode().equals(StoredProcQueryParameterMode.REF_CURSOR))
+                            {
+                                if (param.getName() != null)
+                                {
+                                    stmt.registerOutParameter(param.getName(), Types.REF_CURSOR);
+                                }
+                                else
+                                {
+                                    stmt.registerOutParameter(param.getPosition(), Types.REF_CURSOR);
+                                }                                
                             }
                             else
                             {
@@ -566,6 +620,18 @@ public class StoredProcedureQuery extends AbstractStoredProcedureQuery
                                     value = stmt.getDouble(param.getPosition());
                                 }
                             }
+                            else if (param.getMode().equals(StoredProcQueryParameterMode.REF_CURSOR))
+                            {
+                                if (param.getName() != null)
+                                {
+                                    value = stmt.getObject(param.getName());
+                                }
+                                else
+                                {
+                                    value = stmt.getObject(param.getPosition());
+                                } 
+                                hasResultSet = true;
+                            }
                             else
                             {
                                 throw new NucleusUserException("Dont currently support output parameters of type=" + param.getType());
@@ -641,7 +707,7 @@ public class StoredProcedureQuery extends AbstractStoredProcedureQuery
             mconn.release();
         }
     }
-
+    
     @Override
     public Object getNextResults()
     {
@@ -653,32 +719,33 @@ public class StoredProcedureQuery extends AbstractStoredProcedureQuery
         ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
         try
         {
-            resultSetNumber++;
+            if (outputParamValues != null)
+            {
+                for (Object key : outputParamValues.keySet())
+                {
+                    Object value = outputParamValues.get(key);
+                    if (value instanceof ResultSet)
+                    {
+                        ResultSet rs = (ResultSet) value;
+                        QueryResult qr = getResultsForResultSet((RDBMSStoreManager)storeMgr, rs, mconn);
+                        outputParamValues.remove(key);
+                        resultSetNumber++;
+                        if (shouldReturnSingleRow())
+                        {
+                            return getUniqueResult(qr);
+                        }
+                        // Apply range?
+                        return qr;                   
+                    }
+                }               
+            }
+            
             ResultSet rs = stmt.getResultSet();
             QueryResult qr = getResultsForResultSet((RDBMSStoreManager)storeMgr, rs, mconn);
+            resultSetNumber++;
             if (shouldReturnSingleRow())
             {
-                // Single row only needed so just take first row
-                try
-                {
-                    if (qr == null || qr.size() == 0)
-                    {
-                        throw new NoQueryResultsException("No query results were returned");
-                    }
-
-                    Iterator qrIter = qr.iterator();
-                    Object firstRow = qrIter.next();
-                    if (qrIter.hasNext())
-                    {
-                        throw new QueryNotUniqueException();
-                    }
-                    return firstRow;
-                }
-                finally
-                {
-                    // can close results right now because we don't return it
-                    close(qr);
-                }
+                return getUniqueResult(qr);
             }
 
             // Apply range?
@@ -691,6 +758,31 @@ public class StoredProcedureQuery extends AbstractStoredProcedureQuery
         finally
         {
             mconn.release();
+        }
+    }
+
+    private Object getUniqueResult(QueryResult qr)
+    {
+        // Single row only needed so just take first row
+        try
+        {
+            if (qr == null || qr.size() == 0)
+            {
+                throw new NoQueryResultsException("No query results were returned");
+            }
+
+            Iterator qrIter = qr.iterator();
+            Object firstRow = qrIter.next();
+            if (qrIter.hasNext())
+            {
+                throw new QueryNotUniqueException();
+            }
+            return firstRow;
+        }
+        finally
+        {
+            // can close results right now because we don't return it
+            close(qr);
         }
     }
 
