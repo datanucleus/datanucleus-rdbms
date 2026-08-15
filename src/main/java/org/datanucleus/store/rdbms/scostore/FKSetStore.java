@@ -1245,12 +1245,12 @@ public class FKSetStore<E> extends AbstractSetStore<E>
                     if (sqlStmt == null)
                     {
                         SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(subStmt, elementClsMapping,
-                            fp, subStmt.getPrimaryTable(), elementInfo[i].getAbstractClassMetaData(), fp.getMaxFetchDepth());
+                            fp, subStmt.getPrimaryTable(), elementCmd, fp.getMaxFetchDepth());
                     }
                     else
                     {
                         SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(subStmt, null,
-                            fp, subStmt.getPrimaryTable(), elementInfo[i].getAbstractClassMetaData(), fp.getMaxFetchDepth());
+                            fp, subStmt.getPrimaryTable(), elementCmd, fp.getMaxFetchDepth());
                     }
                 }
                 else
